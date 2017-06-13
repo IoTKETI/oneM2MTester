@@ -1,0 +1,187 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Lovassy, Arpad
+ *   Ormandi, Matyas
+ *
+ ******************************************************************************/
+//
+//  File:          jabber_x_data.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Sun Jan  6 13:51:49 2013
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- x-data.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "jabber:x:data" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//
+//XEP-0004: Data Forms
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+module jabber_x_data {
+
+
+import from XSD all;
+
+
+/* The protocol documented by this schema is defined in
+      XEP-0004: http://www.xmpp.org/extensions/xep-0004.html */
+
+
+type record X
+{
+	enumerated {
+		cancel,
+		form,
+		result,
+		submit
+	} type_,
+	//record of XSD.String instructions_list,   Openfire pubsub sends title first
+       //XSD.String title optional,
+  	XSD.String title optional,
+  	record of XSD.String instructions_list,
+	record of Field field_list,
+	Reported reported optional,
+	record of Item item_list
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (type_) "name as 'type'";
+variant (type_) "attribute";
+variant (instructions_list) "untagged";
+variant (instructions_list[-]) "name as 'instructions'";
+variant (field_list) "untagged";
+variant (item_list) "untagged";
+};
+
+
+type record Field
+{
+	XSD.String label_ optional,
+	enumerated {
+		boolean_,
+		fixed,
+		hidden,
+		jid_multi,
+		jid_single,
+		list_multi,
+		list_single,
+		text_multi,
+		text_private,
+		text_single
+	} type_ optional,
+	XSD.String var_ optional,
+	XSD.String desc optional,
+	Empty required optional,
+	record of Value value_list,
+	record of Option option_list
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (label_) "name as 'label'";
+variant (label_) "attribute";
+variant (type_) "text 'boolean_' as 'boolean'";
+variant (type_) "text 'jid_multi' as 'jid-multi'";
+variant (type_) "text 'jid_single' as 'jid-single'";
+variant (type_) "text 'list_multi' as 'list-multi'";
+variant (type_) "text 'list_single' as 'list-single'";
+variant (type_) "text 'text_multi' as 'text-multi'";
+variant (type_) "text 'text_private' as 'text-private'";
+variant (type_) "text 'text_single' as 'text-single'";
+variant (type_) "name as 'type'";
+variant (type_) "defaultForEmpty as 'text-single'";
+variant (type_) "attribute";
+variant (var_) "name as 'var'";
+variant (var_) "attribute";
+variant (value_list) "untagged";
+variant (option_list) "untagged";
+};
+
+
+type record Option
+{
+	XSD.String label_ optional,
+	Value value_
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (label_) "name as 'label'";
+variant (label_) "attribute";
+variant (value_) "name as 'value'";
+};
+
+
+type XSD.String Value
+with {
+variant "name as uncapitalized";
+variant "element";
+};
+
+
+/* When contained in a "reported" element, the "field" element
+        SHOULD NOT contain a "value" child. */
+type record Reported
+{
+	record length(1 .. infinity) of Field field_list
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (field_list) "untagged";
+};
+
+
+type record Item
+{
+	record length(1 .. infinity) of Field field_list
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (field_list) "untagged";
+};
+
+
+type enumerated Empty
+{
+	x
+}
+with {
+variant "text 'x' as ''";
+variant "name as uncapitalized";
+};
+
+
+}
+with {
+encode "XML";
+variant "namespace as 'jabber:x:data'";
+variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+variant "elementFormQualified";
+}

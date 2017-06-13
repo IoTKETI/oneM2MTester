@@ -1,0 +1,64 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module HQ30408
+{
+
+type component CT {}
+
+type union target
+{
+  boolean moving
+}
+
+type union U
+{
+  integer    i,
+  charstring s,
+  target     practice
+  // this field is the kicker: union inside an union
+};
+  
+type record of U UList;
+
+external function enc_ulist(in UList ul) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+external function dec_ulist(in octetstring o) return UList
+with { extension "prototype(convert) decode(XER:XER_EXTENDED)" "errorbehavior(ALL:WARNING)"
+}
+
+const UList c_ul := {
+  { practice := { moving := true } }
+}
+
+testcase hq30408() runs on CT
+{
+  var octetstring encoded := enc_ulist(c_ul);
+  action(encoded);
+  
+  var UList v_ul := dec_ulist(encoded);
+  if (match(v_ul, c_ul)) { setverdict(pass); }
+  else { setverdict(fail, match(v_ul, c_ul)); }
+}
+  
+control {
+  execute(hq30408());
+}
+
+}
+with {
+  variant "namespace as 'titansim:namespace:without:prefix' "
+  variant "elementFormQualified"
+
+  encode "XML"
+}

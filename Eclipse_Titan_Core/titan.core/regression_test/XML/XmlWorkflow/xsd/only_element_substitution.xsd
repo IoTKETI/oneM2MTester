@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="www.example.org/only/element/substitution"
+  xmlns="www.example.org/only/element/substitution">
+
+<xsd:element name="requestAbstractType1" type="requestAbstractType"  abstract="true"/>
+
+<xsd:complexType name="requestAbstractType"  abstract="true">
+	<xsd:sequence>
+		<xsd:element name="commonName" type="xsd:string" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<!-- Production implementation -->
+
+<xsd:element name="productionRequest" substitutionGroup="requestAbstractType" >
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="requestAbstractType">
+				<xsd:sequence>
+					<xsd:element name="productionName" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+<!-- Production implementation -->
+<xsd:element name="programmingRequest"  substitutionGroup="requestAbstractType" >
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="requestAbstractType">
+				<xsd:sequence>
+					<xsd:element name="programmingName" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>
+

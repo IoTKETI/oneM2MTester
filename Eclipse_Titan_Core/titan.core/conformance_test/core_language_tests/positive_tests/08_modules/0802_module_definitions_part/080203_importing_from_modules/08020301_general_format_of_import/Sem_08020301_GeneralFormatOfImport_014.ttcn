@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:8.2.3.1, Verify that test case is imported together with parameter names
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// The following requirements are tested:
+// Restriction c:
+// A definition is imported together with its name and all local definitions.
+// Restriction d:
+// A definition is imported together with all information of referenced definitions that 
+// are necessary for the usage of the imported definition, independent of the visibility 
+// of the referenced definitions.
+// Table 8:
+// Test case
+
+module Sem_08020301_GeneralFormatOfImport_014 {
+
+	import from Sem_08020301_GeneralFormatOfImport_014_import { testcase TC_Sem_08020301_GeneralFormatOfImport_014 };
+	
+	control{
+		// testing if parameter names are imported
+		// type compatibility is checked during parameter passing: for this check, the type information for 
+		// the test case parameters should be available at this point to compile the script correctly
+		execute(TC_Sem_08020301_GeneralFormatOfImport_014(p_param1 := 1, p_param2 := 2)); 
+	}
+}
+
+

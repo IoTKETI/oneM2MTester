@@ -1,0 +1,52 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:6.5.6, Verify that the gYear type shall be translated to TTCN-3 using the pattern-restricted charstring
+ ** @verdict  pass reject
+ ***************************************************/
+module Neg_060506_gregorian_year_001 {
+
+    import from schema_Neg_060506_gregorian_year_001 language "XSD" all;
+
+    template E1 m_msg := "99";
+
+	external function enc_MyType(in E1 pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return E1
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Neg_060506_gregorian_year_001() runs on C system C {
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+        log("template should either be rejected by compiler or by runtime latest while encoding");
+
+        setverdict(fail, "Invalid template should not be encoded");
+
+    }
+
+    control {
+        execute(TC_Neg_060506_gregorian_year_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+}

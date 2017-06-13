@@ -1,0 +1,435 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Beres, Szabolcs
+ *
+ ******************************************************************************/
+module structured {
+
+//2012-12-03
+
+modulepar {
+  charstring tsp_1:="", tsp_2:="";
+  F          tsp_3_1:={f1:={f2:={f3:="default1"}}};
+  F          tsp_3_2:={f1:={f2:={f3:="default2"}}};
+  F          tsp_3_3:={f1:={f2:={f3:="default3"}}};
+  RoC        tsp_4 :={"default"}
+  RoRoF      tsp_5_1:={{0.0}}, tsp_5_2:={{0.0}};
+  F2         tsp_30 :={ f3:="default"},tsp_31 :={ f3:="default"},tsp_32 :={ f3:="default"};
+  F2         tsp_33 :={ f3:="default"},tsp_34 :={ f3:="default"},tsp_35 :={ f3:="default"};
+  F2         tsp_36 :={ f3:="default"},tsp_37 :={ f3:="default"},tsp_38 :={ f3:="default"};
+  F2         tsp_39 :={ f3:="default"};
+  RoRoC      tsp_41 :={},tsp_42 :={},tsp_43 :={},tsp_44 :={}, tsp_50:={};
+  E          tsp_e1 :={ i:=0, f:=0.0,bs:='0'B,hs:='F'H,os:='00'O,cs:=""};
+  E          tsp_e2 :={ i:=0, f:=0.0,bs:='0'B,hs:='F'H,os:='00'O,cs:=""};
+  E          tsp_e3 :={ i:=0, f:=0.0,bs:='0'B,hs:='F'H,os:='00'O,cs:=""};
+  E          tsp_e4 :={ i:=0, f:=0.0,bs:='0'B,hs:='F'H,os:='00'O,cs:=""};
+  U          tsp_U_i:={ i:=0 };
+  U          tsp_U_f:={ f:=0.0 };
+  U          tsp_U_bs:={ bs:='0'B };
+  U          tsp_U_hs:={ hs:='0'H };
+  U          tsp_U_os:={ os:='00'O };
+  U          tsp_U_cs1:={ cs:="" };
+  U          tsp_U_cs2:={ cs:="" };
+  CR         tsp_CR1:= CR_DEFAULT;
+  CR         tsp_CR2:= CR_DEFAULT;
+  CR         tsp_CR3:= CR_DEFAULT;
+}
+type component MyCT {}
+
+type record of float RoF;
+type record of RoF RoRoF;
+type record of charstring RoC;
+type record of RoC RoRoC;
+
+
+type record F2 { charstring f3};
+type record F1 { F2 f2 };
+type record F { F1 f1 };
+
+type record G { F1 f1, integer i};
+type record H { F1 f1, integer i};
+type record I { integer i }
+
+//to check basic ttcn3 types:
+type record E {
+  integer      i,
+  float        f,
+  bitstring   bs,
+  hexstring   hs,
+  octetstring os,
+  charstring  cs
+}
+
+type union U {
+  integer      i,
+  float        f,
+  bitstring   bs,
+  hexstring   hs,
+  octetstring os,
+  charstring  cs
+}
+
+//this record is constructed to reproduce the CR_TR00019403
+type record CR {
+  bitstring rf_PowerCapability,
+  bitstring a5_1,
+  bitstring esind,
+  bitstring revisionLevel,
+  bitstring spare1_1,
+  bitstring fc,
+  bitstring vgcs,
+  bitstring vbs,
+  bitstring sm_Capability,
+  bitstring ss_ScreenIndicator,
+  bitstring ps_Capability,
+  bitstring spare2_1,
+  ClassmarkInformationType classmarkInformationType2_oct5
+}
+
+type record ClassmarkInformationType { 
+  bitstring a5_2,
+  bitstring a5_3,
+  bitstring cmsp,
+  bitstring solsa,
+  bitstring ucs2,
+  bitstring lcsvacap,
+  bitstring spare,
+  bitstring cm3
+}
+
+const CR CLASSMARK2_GSM_ONLY :=
+{ 
+  rf_PowerCapability := '000'B, // '000'B class1 (for GSM+DCS+PCS)
+  a5_1 := '0'B, //encryption algorithm A5/1 available ('1'B) or not ('0'B)
+  esind := '0'B,//controlled early classmark sending implemented ('1'B) or not ('0'B)
+  revisionLevel := '01'B,      //  '00'B reserved for phase1 (GSM+DCS)
+  spare1_1 := '0'B,
+  fc := '0'B,          //  MS' support of E/R_GSM ('1'B) or not ('0'B)
+  vgcs := '0'B, // VGCS capability or notification wanted ('1'B) or not ('0'B)
+  vbs := '0'B,  // VBS capability or notification wanted ('1'B) or not ('0'B)
+  sm_Capability := '1'B, // SM capbility present ('1'B) or not ('0'B) 
+  ss_ScreenIndicator := '01'B, //  '00'B default value of phase1 (GSM+DCS)
+  ps_Capability := '0'B,      // ignored, if received
+  spare2_1 := '0'B,
+  classmarkInformationType2_oct5 :=
+  { a5_2 := '0'B,
+    a5_3 := '0'B,
+    cmsp := '0'B,
+    solsa := '0'B,
+    ucs2 := '0'B,
+    lcsvacap := '1'B,
+    spare := '0'B,
+    cm3 := '1'B
+  }
+}
+
+const CR CR_DEFAULT := { 
+  rf_PowerCapability := '000'B,
+  a5_1 := '0'B,
+  esind := '0'B,
+  revisionLevel := '00'B,     
+  spare1_1 := '0'B,
+  fc := '0'B,         
+  vgcs := '0'B,
+  vbs := '0'B, 
+  sm_Capability := '0'B,
+  ss_ScreenIndicator := '00'B,
+  ps_Capability := '0'B,     
+  spare2_1 := '0'B,
+  classmarkInformationType2_oct5 :=
+  { a5_2 := '0'B,
+    a5_3 := '0'B,
+    cmsp := '0'B,
+    solsa := '0'B,
+    ucs2 := '0'B,
+    lcsvacap := '0'B,
+    spare := '0'B,
+    cm3 := '0'B
+  }
+}
+
+//functions
+function f_checkCR(in CR pl_data, in template CR pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkE(in E pl_data, in template E pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkF(in F pl_data, in template F pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkF2(in F2 pl_data, in template F2 pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+function f_checkRoC(in RoC pl_data, in template RoC pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkRoRoC(in RoRoC pl_data, in template RoRoC pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkRoRoF(in RoRoF pl_data, in template RoRoF pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+function f_checkU(in U pl_data, in template U pl_expected_data) {
+  if( match(pl_data,pl_expected_data)) { 
+    setverdict(pass) 
+  } else { 
+    setverdict(fail,match(pl_data,pl_expected_data)) }
+}
+
+//==================================================
+//=============== Testcases ========================
+//==================================================
+testcase tc_F_simple() runs on MyCT {
+  var template F vl_expected:={f1:={f2:={f3:= "a"}}};
+  f_checkF(tsp_3_1,vl_expected);
+}
+
+testcase tc_F_comments() runs on MyCT {
+  var template F vl_expected:={f1:={f2:={f3:= "a"}}};
+  f_checkF(tsp_3_2,vl_expected);
+}
+
+testcase tc_F_embedded1() runs on MyCT {
+  var template F vl_expected:={f1:={f2:={f3:= "abrakadabra"}}};
+  f_checkF(tsp_3_3,vl_expected);
+}
+
+testcase tc_RoC_comments() runs on MyCT {
+  var template RoC vl_expected:={ "asdf" };
+  f_checkRoC(tsp_4,vl_expected);
+}
+
+testcase tc_F2_30() runs on MyCT {
+  var template F2 vl_expected:={ f3:="1" };
+  f_checkF2(tsp_30,vl_expected);
+}
+
+testcase tc_F2_31() runs on MyCT {
+  var template F2 vl_expected:={ f3:="1" };
+  f_checkF2(tsp_31,vl_expected);
+}  
+
+testcase tc_F2_32() runs on MyCT {
+  var template F2 vl_expected:={ f3:="1" };
+  f_checkF2(tsp_32,vl_expected);
+
+}  
+
+testcase tc_F2_33() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_33,vl_expected);
+}
+
+testcase tc_F2_34() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_34,vl_expected);
+}
+
+testcase tc_F2_35() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_35,vl_expected);
+}
+
+testcase tc_F2_36() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_36,vl_expected);
+}
+
+testcase tc_F2_37() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_37,vl_expected);
+}
+testcase tc_F2_38() runs on MyCT {
+  var template F2 vl_expected:={ f3:="a" };
+  f_checkF2(tsp_38,vl_expected);
+}
+
+testcase tc_F2_39() runs on MyCT {
+  var template F2 vl_expected:={ f3:="${DEF_20}" };
+  f_checkF2(tsp_39,vl_expected);
+}
+
+testcase tc_RoRoC_41() runs on MyCT {
+  var template RoRoC vl_expected:={ };
+  f_checkRoRoC(tsp_41,vl_expected);
+}
+testcase tc_RoRoC_42() runs on MyCT {
+  var template RoRoC vl_expected:={ };
+  f_checkRoRoC(tsp_42,vl_expected);
+}
+
+testcase tc_RoRoC_43() runs on MyCT {
+  var template RoRoC vl_expected:={ };
+  f_checkRoRoC(tsp_43,vl_expected);
+}
+testcase tc_RoRoC_44() runs on MyCT {
+  var template RoRoC vl_expected:={{},{},{},{},{}};
+  f_checkRoRoC(tsp_44,vl_expected);
+}
+
+testcase tc_RoRoC_50() runs on MyCT {
+  var template RoRoC vl_expected:={{},{},{},{}};
+  f_checkRoRoC(tsp_50,vl_expected);
+}
+
+//=====================================================
+
+testcase tc_E1() runs on MyCT {
+  var template E vl_expected:= {
+    i:=0,
+    f:=3.14,
+    bs:='0011'B,
+    hs:='123AF'H,
+    os:='0123AF'O,
+    cs:="hello"
+  }
+  f_checkE(tsp_e1,vl_expected);
+}
+
+testcase tc_E2() runs on MyCT {
+  var template E vl_expected:=
+  {i:=1,f:=7.2,bs:='0011'B,hs:='123AF'H,os:='0123AF'O,cs:="abrakadabra"};
+  f_checkE(tsp_e2,vl_expected);
+}
+
+testcase tc_E3() runs on MyCT {
+  var template E vl_expected:=
+  {i:=1,f:=7.2,bs:='0011'B,hs:='123AF'H,os:='0123AF'O,cs:="""abrakadabra"""};
+  f_checkE(tsp_e3,vl_expected);
+}
+
+testcase tc_E4() runs on MyCT {
+  var template E vl_expected:=
+  {i:=1,f:=7.2,bs:='0011'B,hs:='123AF'H,os:='0123AF'O,cs:="abrakadabra"};
+  f_checkE(tsp_e4,vl_expected);
+}
+
+testcase tc_U_i() runs on MyCT {
+  var template U vl_expected:=
+  {i:=1};
+  f_checkU(tsp_U_i,vl_expected);
+}
+
+testcase tc_U_f() runs on MyCT {
+  var template U vl_expected:=
+  {f:=7.2};
+  f_checkU(tsp_U_f,vl_expected);
+}
+
+testcase tc_U_bs() runs on MyCT {
+  var template U vl_expected:=
+  {bs:= '0011'B};
+  f_checkU(tsp_U_bs,vl_expected);
+}
+
+testcase tc_U_hs() runs on MyCT {
+  var template U vl_expected:=
+  {hs:= '123AF'H };
+  f_checkU(tsp_U_hs,vl_expected);
+}
+
+testcase tc_U_os() runs on MyCT {
+  var template U vl_expected:=
+  { os := '0123AF'O };
+  f_checkU(tsp_U_os,vl_expected);
+}
+
+testcase tc_U_cs1() runs on MyCT {
+  var template U vl_expected:=
+  {cs:= "abrakadabra" };
+  f_checkU(tsp_U_cs1,vl_expected);
+}
+
+testcase tc_U_cs2() runs on MyCT {
+  var template U vl_expected:=
+  {cs:= "abrakadabra" };
+  f_checkU(tsp_U_cs2,vl_expected);
+}
+
+testcase tc_CR_example1() runs on MyCT {
+  var template CR vl_expected:= CLASSMARK2_GSM_ONLY;
+  f_checkCR(tsp_CR1,vl_expected);
+}
+
+testcase tc_CR_example2() runs on MyCT {
+  var template CR vl_expected:= CLASSMARK2_GSM_ONLY;
+  f_checkCR(tsp_CR2,vl_expected);
+}
+
+testcase tc_CR_example3() runs on MyCT {
+  var template CR vl_expected:= CLASSMARK2_GSM_ONLY;
+  f_checkCR(tsp_CR3,vl_expected);
+} 
+//==== CONTROL PART ====
+control {
+
+  execute(tc_F_simple());
+  execute(tc_F_comments());
+  execute(tc_F_embedded1());
+  execute(tc_RoC_comments());
+  execute(tc_F2_30());
+  execute(tc_F2_31());
+  execute(tc_F2_32());
+  execute(tc_F2_33());
+  execute(tc_F2_34());
+  execute(tc_F2_35());
+  execute(tc_F2_36());
+  execute(tc_F2_37());
+  execute(tc_F2_38());
+  execute(tc_F2_39());
+  execute(tc_RoRoC_41());
+  execute(tc_RoRoC_42());
+  execute(tc_RoRoC_43());
+  execute(tc_RoRoC_44());
+  execute(tc_RoRoC_50());
+  execute(tc_E1());
+  execute(tc_E2());
+  execute(tc_E3());
+  execute(tc_E4());
+  execute(tc_U_i());
+  execute(tc_U_f());
+  execute(tc_U_bs());
+  execute(tc_U_hs());
+  execute(tc_U_os());
+  execute(tc_U_cs1());
+  execute(tc_U_cs2());
+  execute(tc_CR_example1());
+  execute(tc_CR_example2());
+  execute(tc_CR_example3());
+}
+}

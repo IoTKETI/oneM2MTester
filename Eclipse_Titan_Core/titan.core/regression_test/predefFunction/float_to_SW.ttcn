@@ -1,0 +1,125 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module float_to_SW {	//^In TTCN-3 module `float_to_SW'://
+
+type component PDTestComponent {};
+
+/*--- FLOAT2INT --------------------------------------------------*/
+
+
+const integer f2icon1 := float2int(5E-1)
+const integer f2icon2 := float2int(0.345)
+const integer f2icon3 := float2int(-0.345)
+const integer f2icon4 := float2int(-5E0)
+const integer f2icon5 := float2int(12345678910000.0)
+const integer f2icon6 := float2int(12345678910e+4)
+const integer f2icon7 := float2int(4294967296.0)
+
+testcase float_to_int() runs on PDTestComponent{ //In testcase definition//
+
+	if ((f2icon1 == 0)
+	and (f2icon1 == float2int(5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2icon2 == 0)
+	and (f2icon2 == float2int(0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2icon3 == 0)
+	and (f2icon3 == float2int(-0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2icon4 == -5)
+	and (f2icon4 == float2int(-5E0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	// Tests added for HL22929.
+    if ((f2icon5 == 12345678910000)
+	and (f2icon5 == float2int(12345678910000.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+    if ((f2icon6 == 123456789100000)
+	and (f2icon6 == float2int(12345678910e+4)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+    if ((f2icon7 == 4294967296)
+	and (f2icon7 == float2int(4294967296.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- FLOAT2STR --------------------------------------------------*/
+
+const charstring f2scon := "1234567890123456789012345678901234567890"
+
+const charstring f2scon1 := float2str(5E-1)
+const charstring f2scon2 := float2str(-5E-1)
+const charstring f2scon3 := float2str(0.345)
+const charstring f2scon4 := float2str(-0.345)
+const charstring f2scon5 := float2str(0.1234567)
+const charstring f2scon6 := float2str(123456748901.0)
+const charstring f2scon7 := float2str(123456758901.0)
+
+
+testcase float_to_str() runs on PDTestComponent{ //In testcase definition//
+
+	if ((f2scon1 == "0.500000")
+	and (f2scon1 == float2str(5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon2 == "-0.500000")
+	and (f2scon2 == float2str(-5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon3 == "0.345000")
+	and (f2scon3 == float2str(0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon4 == "-0.345000")
+	and (f2scon4 == float2str(-0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon5 == "0.123457")
+	and (f2scon5 == float2str(0.1234567)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon6 == "1.234567e+11")
+	and (f2scon6 == float2str(123456748901.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((f2scon7 == "1.234568e+11")
+	and (f2scon7 == float2str(123456758901.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+control {
+	execute (float_to_int());
+	execute (float_to_str());
+}
+
+}

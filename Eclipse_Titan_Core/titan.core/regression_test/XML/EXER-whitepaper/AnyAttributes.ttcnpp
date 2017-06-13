@@ -1,0 +1,371 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnyAttributes
+{
+modulepar boolean AnyAttributes_verbose := false;
+#define verbose AnyAttributes_verbose
+#include "../macros.ttcnin"
+
+type component AA {}
+
+type record of universal charstring AttrList;
+
+type record AAProduct {
+  AttrList   info, // a record of universal charstring
+  charstring name,
+  integer    price
+}
+with {
+  variant (info) "anyAttributes from 'http://www.example.com/A', "
+  "'http://www.example.com/B', unqualified" // 'absent' is used by ASN.1
+}
+
+DECLARE_XER_ENCODERS(AAProduct, aap);
+DECLARE_EXER_ENCODERS(AAProduct, aap);
+
+const AAProduct aap := {
+  info := {
+    "http://www.example.com/A size=""small""",
+    "http://www.example.com/B color=""red""",
+    "http://www.example.com/B x=""spot""",
+    "available=""yes"""},
+  name := "Trousers",
+  price:= 20
+}
+
+const AAProduct aap_trouble := {
+  info := {
+    "http://www.example.com/A   size=""small""", // too many spaces
+    "http://www.example.com/B color=""red""   ", // spaces after
+    "http://www.example.com/B   x=""spot""    ", // spaces before and after
+    "available=""yes"""},
+  name := "Trousers",
+  price:= 20
+}
+
+const AAProduct aap_tabs := {
+  info := {
+    "http://www.example.com/A\t\t size=""small""", // too many spaces
+    "http://www.example.com/B\tcolor=""red""\t\t", // spaces after
+    "http://www.example.com/B\t\tx=""spot""  \t ", // spaces before and after
+    "available=""yes"""},
+  name := "Trousers",
+  price:= 20
+}
+
+const AAProduct aap_jumbled := {
+  info := {
+    "http://www.example.com/B color=""red""",
+    "http://www.example.com/A size=""small""",
+    "available=""yes"""},
+  name := "Trousers",
+  price:= 20
+}
+
+/*   _e is for EXER, _b is for BXER   */
+
+const universal charstring str_aap_e :=
+"<AAProduct " &
+	"xmlns:b0=\'http://www.example.com/A\' b0:size=\"small\" " &
+	"xmlns:b1=\'http://www.example.com/B\' b1:color=\"red\" " &
+	"xmlns:b2=\'http://www.example.com/B\' b2:x=\"spot\" " &
+	"available=\"yes\">\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"</AAProduct>\n\n";
+
+const universal charstring str_aap_e_jumbled :=
+"<AAProduct xmlns:b0=\'http://www.example.com/A\' xmlns:b1=\'http://www.example.com/B\' b1:color=\"red\" b0:size=\"small\" available=\"yes\">\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"</AAProduct>\n\n";
+
+const universal charstring str_aap_b :=
+"<AAProduct>\n" &
+"\t<info>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/A size=&quot;small&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/B color=&quot;red&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/B x=&quot;spot&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>available=&quot;yes&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t</info>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"</AAProduct>\n\n";
+
+testcase encode_aa() runs on AA
+{
+  CHECK_METHOD(bxer_enc_aap, aap, str_aap_b);
+  CHECK_METHOD(exer_enc_aap, aap, str_aap_e);
+  CHECK_METHOD(exer_enc_aap, aap_trouble, str_aap_e);
+  CHECK_METHOD(exer_enc_aap, aap_tabs   , str_aap_e);
+}
+
+testcase decode_aa() runs on AA
+{
+  CHECK_DECODE(bxer_dec_aap, str_aap_b, AAProduct, aap);
+  CHECK_DECODE(exer_dec_aap, str_aap_e, AAProduct, aap);
+  CHECK_DECODE(exer_dec_aap, str_aap_e_jumbled, AAProduct, aap_jumbled);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+type record ABProduct {
+  AttrList   info, // a record of universal charstring
+  charstring name,
+  integer    price
+}
+with {
+  variant (info) "anyAttributes except 'http://www.example.com/C', unqualified"
+}
+
+DECLARE_XER_ENCODERS(ABProduct, abp);
+DECLARE_EXER_ENCODERS(ABProduct, abp);
+
+const ABProduct abp := {
+  info := {
+    "http://www.example.com/A size=""small""",
+    "http://www.example.com/B color=""red""",
+    "http://www.example.com/B available=""yes"""},
+  name := "Trousers",
+  price:= 20
+}
+
+const universal charstring str_abp_e :=
+//"<ABProduct xmlns:b0=\'http://www.example.com/A\' b0:size=\"small\" xmlns:b1=\'http://www.example.com/B\' b1:color=\"red\" b1:available=\"yes\">\n" &
+// this one below is a workaround because the encoder doesn't recognize that namespace b1 has already been declared :(
+"<ABProduct xmlns:b0=\'http://www.example.com/A\' b0:size=\"small\" xmlns:b1=\'http://www.example.com/B\' b1:color=\"red\" xmlns:b2=\'http://www.example.com/B\' b2:available=\"yes\">\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"</ABProduct>\n\n";
+
+const universal charstring str_abp_b :=
+"<ABProduct>\n" &
+"\t<info>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/A size=&quot;small&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/B color=&quot;red&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/B available=&quot;yes&quot;</UNIVERSAL_CHARSTRING>\n" &
+//originally: "\t\t<UNIVERSAL_CHARSTRING>available=\"yes\"</UNIVERSAL_CHARSTRING>\n" &
+"\t</info>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"</ABProduct>\n\n";
+
+testcase encode_ab() runs on AA
+{
+  CHECK_METHOD(bxer_enc_abp, abp, str_abp_b);
+  CHECK_METHOD(exer_enc_abp, abp, str_abp_e);
+}
+
+testcase decode_ab() runs on AA
+{
+  CHECK_DECODE(bxer_dec_abp, str_abp_b, ABProduct, abp);
+  CHECK_DECODE(exer_dec_abp, str_abp_e, ABProduct, abp);
+}
+
+type record ouch {
+  record of universal charstring embed,
+  AttrList aa // a record of universal charstring
+}
+with {
+  variant "embedValues"
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// ANY-ATTRIBUTES and "normal" ATTRIBUTES
+
+
+type record AXProduct {
+  charstring name,
+  AttrList   info, // a record of universal charstring
+  boolean    available,
+  integer    price
+}
+with {
+  variant (info) "anyAttributes from 'http://www.example.com/X', unqualified";
+  variant (name) "attribute";
+  variant (available) "attribute"
+}
+
+DECLARE_XER_ENCODERS(AXProduct, axp);
+DECLARE_EXER_ENCODERS(AXProduct, axp);
+
+const AXProduct axp := {
+  name := "Trousers",
+  info := {
+    "http://www.example.com/X size=""small""",
+    "http://www.example.com/X color=""red""",
+    "http://www.example.com/X available=""yes"""},
+  available := false,
+  price:= 20
+}
+
+const universal charstring estr_axp :=
+//"<AXProduct xmlns:b0=\'http://www.example.com/A\' b0:size=\"small\"
+//            xmlns:b1=\'http://www.example.com/B\' b1:color=\"red\"
+//            b1:available=\"yes\">\n" &
+// this one below is a workaround because the encoder doesn't recognize that namespace b1 has already been declared :(
+"<AXProduct name='Trousers' xmlns:b0=\'http://www.example.com/X\' b0:size=\"small\" " &
+                           "xmlns:b1=\'http://www.example.com/X\' b1:color=\"red\" " &
+                           "xmlns:b2=\'http://www.example.com/X\' b2:available=\"yes\" available='false'>\n" &
+"\t<price>20</price>\n" &
+"</AXProduct>\n\n";
+
+const universal charstring bstr_axp :=
+"<AXProduct>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<info>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/X size=&quot;small&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/X color=&quot;red&quot;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>http://www.example.com/X available=&quot;yes&quot;</UNIVERSAL_CHARSTRING>\n" &
+//originally: "\t\t<UNIVERSAL_CHARSTRING>available=\"yes\"</UNIVERSAL_CHARSTRING>\n" &
+"\t</info>\n" &
+"\t<available><false/></available>\n" &
+"\t<price>20</price>\n" &
+"</AXProduct>\n\n";
+
+testcase encode_ax() runs on AA
+{
+  CHECK_METHOD(bxer_enc_axp, axp, bstr_axp);
+  CHECK_METHOD(exer_enc_axp, axp, estr_axp);
+}
+
+testcase decode_ax() runs on AA
+{
+  CHECK_DECODE(bxer_dec_axp, bstr_axp, AXProduct, axp);
+  //not quite right yet:
+  CHECK_DECODE(exer_dec_axp, estr_axp, AXProduct, axp);
+}
+
+// Negative tests for namespace restrinctions in ANY-ATTRIBUTES
+// 1. anyAttributes from ...
+
+type record AAFProduct {
+  AttrList   info, // a record of universal charstring
+  charstring name
+}
+with {
+  variant (info) "anyAttributes from 'http://www.example.com/X', unqualified"
+}
+
+DECLARE_EXER_ENCODERS(AAFProduct, aaf);
+
+const AAFProduct aaf := {
+  info := {
+    "http://www.example.com/X size=""small""",
+    "http://www.example.com/Y color=""red""",
+    "available=""yes"""},
+  name := "Trousers"
+}
+
+const octetstring str_aaf := unichar2oct(
+"<AAFProduct  xmlns:b0=\'http://www.example.com/X\' b0:size=\"small\" " &
+             "xmlns:b1=\'http://www.example.com/Y\' b1:color=\"red\" " &
+             "available=\"yes\">\n" &
+"\t<name>Trousers</name>\n" &
+"</AAFProduct>\n\n", "UTF-8");
+
+template charstring error_aaf := pattern "*XML namespace \"http://www.example.com/Y\" is not in the allowed namespace list.";
+
+testcase encode_aaf() runs on AA
+{
+  CHECK_METHOD_ERROR(exer_enc_aaf, aaf, octetstring, error_aaf);
+}
+
+testcase decode_aaf() runs on AA
+{
+  CHECK_METHOD_ERROR(exer_dec_aaf, str_aaf, AAFProduct, error_aaf);
+}
+
+// 2. anyAttributes except ...
+
+type record AAEProduct {
+  AttrList   info, // a record of universal charstring
+  charstring name
+}
+with {
+  variant (info) "anyAttributes except 'http://www.example.com/X', unqualified"
+}
+
+DECLARE_EXER_ENCODERS(AAEProduct, aae);
+
+const AAEProduct aae1 := {
+  info := {
+    "http://www.example.com/X size=""small""",
+    "http://www.example.com/Y color=""red""",
+    "http://www.example.com/Z available=""yes"""},
+  name := "Trousers"
+}
+
+const AAEProduct aae2 := {
+  info := {
+    "http://www.example.com/Y size=""medium""",
+    "http://www.example.com/Z color=""green""",
+    "available=""no"""},
+  name := "Shirt"
+}
+
+const octetstring str_aae1 := unichar2oct(
+"<AAEProduct  xmlns:b0=\'http://www.example.com/X\' b0:size=\"small\" " &
+             "xmlns:b1=\'http://www.example.com/Y\' b1:color=\"red\" " &
+             "xmlns:b2=\'http://www.example.com/Z\' b2:available=\"yes\">\n" &
+"\t<name>Trousers</name>\n" &
+"</AAEProduct>\n\n", "UTF-8");
+
+const octetstring str_aae2 := unichar2oct(
+"<AAEProduct  xmlns:b0=\'http://www.example.com/Y\' b0:size=\"medium\" " &
+             "xmlns:b1=\'http://www.example.com/Z\' b1:color=\"green\" " &
+             "available=\"no\">\n" &
+"\t<name>Shirt</name>\n" &
+"</AAEProduct>\n\n", "UTF-8");
+
+template charstring error_aae1 := pattern "*XML namespace \"http://www.example.com/X\" is in the excluded namespace list.";
+
+template charstring error_aae2 := pattern "*The unqualified XML namespace is in the excluded namespace list.";
+
+testcase encode_aae() runs on AA
+{
+  CHECK_METHOD_ERROR(exer_enc_aae, aae1, octetstring, error_aae1);
+  CHECK_METHOD_ERROR(exer_enc_aae, aae2, octetstring, error_aae2);
+}
+
+testcase decode_aae() runs on AA
+{
+  CHECK_METHOD_ERROR(exer_dec_aae, str_aae1, AAEProduct, error_aae1);
+  CHECK_METHOD_ERROR(exer_dec_aae, str_aae2, AAEProduct, error_aae2);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+control
+{
+  execute(encode_aa());
+  execute(decode_aa());
+
+  execute(encode_ab());
+  execute(decode_ab());
+
+  execute(encode_ax());
+  execute(decode_ax());
+
+  execute(encode_aaf());
+  execute(decode_aaf());
+
+  execute(encode_aae());
+  execute(decode_aae());
+}
+
+}
+with {
+encode "XML"
+}

@@ -1,0 +1,132 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Kulcsar, Endre
+--   Raduly, Csaba
+--   Szabados, Kristof
+--
+--/////////////////////////////////////////////////////////////////////////////
+Test360A
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+IMPORTS ; -- nothing
+
+MySequenceType2 ::= SEQUENCE {
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			    -- field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a1,b1,c1}
+			   --  field7 REAL   NOT SUPP
+			    }
+
+
+
+MySetType2 ::= SET{
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			    -- field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a2,b2,c2}
+			    -- field7 REAL   NOT SUPP
+			    }
+MyChoiceType2 ::= CHOICE{
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			   --  field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a3,b3,c3}
+			    --  field7 REAL NOT SUPP
+			    }
+
+
+
+
+
+
+MyChoiceType ::= CHOICE
+{
+
+field1 INTEGER,
+field2 BOOLEAN,
+field3  BIT STRING,
+field4  OCTET STRING,
+field5  MySequenceType2,
+field6  MySetType2,
+field7  MyChoiceType2
+
+}
+
+
+
+
+myChoiceValue1A MyChoiceType ::= field1 : 347
+
+
+
+
+
+
+myChoiceValue2A MyChoiceType ::= field2 : TRUE
+
+
+
+
+
+
+myChoiceValue3A MyChoiceType ::= field3 : '0011'B
+
+
+
+
+
+
+myChoiceValue4A MyChoiceType ::= field4 : 'FFFF'H
+
+
+
+
+
+
+myChoiceValue5A MyChoiceType ::= field5 :
+{
+field1 67,
+field2 FALSE,
+field4 'FFAA66'H,
+field5 '010101'B,
+field6 a1
+}
+
+myChoiceValue6A MyChoiceType ::= field6 :
+{
+ field1 439,
+ field2 TRUE,
+ field5 '001100'B,
+ field6 b2,
+ field4 'AA'H
+}
+
+
+
+
+
+myChoiceValue7A MyChoiceType ::= field7 : field5 : '101010'B
+
+
+
+END

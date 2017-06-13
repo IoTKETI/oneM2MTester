@@ -1,0 +1,257 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module sub_str_SW {	//^In TTCN-3 module `sub_str_SW'://
+
+type component PDTestComponent {};
+
+/*--- SUBSTR ON BITSTRING --------------------------------------------------*/
+
+const bitstring subb := '1110001100'B
+const bitstring subb1 := substr('1110001100'B, 0, lengthof('1110001100'B)) 		// '1110001100'B
+const bitstring subb2 := substr(subb, 5, 0)			// ''B
+const bitstring subb3 := substr(subb, 5, 5)			// '01100'B
+const bitstring subb4 := substr(subb, 0, 5)			// '11100'B
+const bitstring subb5 := substr(subb, 0, lengthof(subb)/2)	// '11100'B
+const bitstring subb6 := substr(subb2, 0, lengthof(subb2)) 	// ''B
+
+testcase substr_bitstr() runs on PDTestComponent{ //In testcase definition//
+
+	if ((subb1 == subb)
+	and (subb1 == substr(subb, 0, 10)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subb2 == ''B)
+	and (subb2 == substr(subb, 5, 0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subb3 == '01100'B)
+	and (subb3 == substr(subb, 5, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subb4 == '11100'B)
+	and (subb4 == substr(subb, 0, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subb5 == subb4)
+	and (subb5 == substr(subb, 0, lengthof(subb)/2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subb6 == ''B)
+	and (subb6 == substr(subb2, 0, lengthof(subb2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+
+/*--- SUBSTR ON HEXSTRING --------------------------------------------------*/
+
+const hexstring subh := '1110001100'H
+const hexstring subh1 := substr('1110001100'H, 0, 10) 		// '1110001100'H
+const hexstring subh2 := substr(subh, 5, 0)			// ''H
+const hexstring subh3 := substr(subh, 5, 5)			// '01100'H
+const hexstring subh4 := substr(subh, 0, 5)			// '11100'H
+const hexstring subh5 := substr(subh, 0, lengthof(subh)/2)	// '11100'H
+const hexstring subh6 := substr(subh2, 0, lengthof(subh2)) 	// ''H
+
+testcase substr_hexstr() runs on PDTestComponent{ //^In testcase definition//
+
+	if ((subh1 == subh)
+	and (subh1 == substr(subh, 0, 10)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subh2 == ''H)
+	and (subh2 == substr(subh, 5, 0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subh3 == '01100'H)
+	and (subh3 == substr(subh, 5, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subh4 == '11100'H)
+	and (subh4 == substr(subh, 0, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subh5 == subh4)
+	and (subh5 == substr(subh, 0, lengthof(subh)/2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subh6 == ''H)
+	and (subh6 == substr(subh2, 0, lengthof(subh2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+
+
+/*--- SUBSTR ON OCTETSTRING --------------------------------------------------*/
+
+const octetstring subo := '11111100000011110000'O
+const octetstring subo1 := substr('11111100000011110000'O, 0, 10) 	// '11111100000011110000'O
+const octetstring subo2 := substr(subo, 5, 0)			// ''O
+const octetstring subo3 := substr(subo, 5, 5)			// '0011110000'O
+const octetstring subo4 := substr(subo, 0, 5)			// '1111110000'O
+const octetstring subo5 := substr(subo, 0, lengthof(subo)/2)	// '1111110000'O
+const octetstring subo6 := substr(subo2, 0, lengthof(subo2)) 	// ''O
+
+testcase substr_octetstr() runs on PDTestComponent{ //In testcase definition//
+
+	if ((subo1 == subo)
+	and (subo1 == substr(subo, 0, 10)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subo2 == ''O)
+	and (subo2 == substr(subo, 5, 0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subo3 == '0011110000'O)
+	and (subo3 == substr(subo, 5, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subo4 == '1111110000'O)
+	and (subo4 == substr(subo, 0, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subo5 == subo4)
+	and (subo5 == substr(subo, 0, lengthof(subo)/2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subo6 == ''O)
+	and (subo6 == substr(subo2, 0, lengthof(subo2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+
+/*--- SUBSTR ON CHARSTRING --------------------------------------------------*/
+
+const charstring subc := "1110001100"
+const charstring subc1 := substr("1110001100", 0, 10) 		// "1110001100"
+const charstring subc2 := substr(subc, 5, 0)			// ""
+const charstring subc3 := substr(subc, 5, 5)			// "01100"
+const charstring subc4 := substr(subc, 0, 5)			// "11100"
+const charstring subc5 := substr(subc, 0, lengthof(subc)/2)	// "11100"
+const charstring subc6 := substr(subc2, 0, lengthof(subc2)) 	// ""
+
+testcase substr_charstr() runs on PDTestComponent{ //In testcase definition//
+
+	if ((subc1 == subc)
+	and (subc1 == substr(subc, 0, 10)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subc2 == "")
+	and (subc2 == substr(subc, 5, 0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subc3 == "01100")
+	and (subc3 == substr(subc, 5, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subc4 == "11100")
+	and (subc4 == substr(subc, 0, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subc5 == subc4)
+	and (subc5 == substr(subc, 0, lengthof(subc)/2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subc6 == "")
+	and (subc6 == substr(subc2, 0, lengthof(subc2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+
+
+/*--- SUBSTR ON UNIVERSAL CHARSTRING --------------------------------------------------*/
+
+const universal charstring subuc := "1111" & char(0,0,0,65) & "0000" & char(0,0,0,66)
+const universal charstring subuc1 := substr("1111A0000B", 0, 10) 		// "1111A0000B"
+const universal charstring subuc2 := substr(subuc, 5, 0)				// ""
+const universal charstring subuc3 := substr(subuc, 5, 5)				// "0000B"
+const universal charstring subuc4 := substr(subuc, 0, 5)				// "1111A"
+const universal charstring subuc5 := substr(subuc, 0, lengthof(subuc)/2)		// "1111A"
+const universal charstring subuc6 := substr(subuc2, 0, lengthof(subuc2)) 		// ""
+
+testcase substr_ucharstr() runs on PDTestComponent{ //In testcase definition//
+
+log (subuc)
+
+	if ((subuc1 == subuc)
+	and (subuc1 == substr(subuc, 0, 10)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subuc2 == "")
+	and (subc2 == substr(subuc, 5, 0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subuc3 == "0000B")
+	and (subuc3 == substr(subuc, 5, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subuc4 == "1111A")
+	and (subuc4 == substr(subuc, 0, 5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subuc5 == subuc4)
+	and (subuc5 == substr(subuc, 0, lengthof(subuc)/2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((subuc6 == "")
+	and (subuc6 == substr(subuc2, 0, lengthof(subuc2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+
+/*--- SUBSTR --------------------------------------------------*/
+
+
+control {
+	execute (substr_bitstr());
+	execute (substr_hexstr());
+	execute (substr_octetstr());
+	execute (substr_charstr());
+	execute (substr_ucharstr());
+}
+
+}

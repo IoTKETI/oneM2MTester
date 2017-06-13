@@ -1,0 +1,103 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Baranyi, Botond
+--
+--/////////////////////////////////////////////////////////////////////////////
+
+IO-based-message DEFINITIONS
+
+AUTOMATIC TAGS ::= 
+
+BEGIN
+
+--Types to be used in IO definitions
+MySeq ::= SEQUENCE {
+  field1 INTEGER,
+  field2 OCTET STRING OPTIONAL
+}
+
+MyEnum ::= ENUMERATED { first, second, third, fourth, fifth }
+
+--Defining IO class
+MY-CLASS ::=   CLASS {
+       &id    INTEGER    UNIQUE,  -- id to distinguish the different IO instances
+       &OpenTypeField             -- Open type field
+}
+WITH SYNTAX { ID &id TYPE &OpenTypeField }
+
+-- Defining the information objects
+myIo1 MY-CLASS ::= { ID 1 TYPE MySeq } -- defining the type MySeq for the open type field,
+                                       -- instances of the object shall contain a value of this type
+  
+myIo2 MY-CLASS ::= { ID 2 TYPE MyEnum }
+
+myIo3 MY-CLASS ::= { ID 3 TYPE INTEGER }
+
+myIo4 MY-CLASS ::= { ID 4 TYPE NULL }
+
+-- Defining IO set to be used in message contraction
+
+MyIOSet MY-CLASS ::= { myIo1 | myIo2 | myIo3 | myIo4 }
+
+-- and now finally constructing the type
+
+MyMessage ::= SEQUENCE {
+  id MY-CLASS.&id ({MyIOSet}), -- integer field, values constrained to one of
+                               -- the value defined for an IO, member of the set
+  content MY-CLASS.&OpenTypeField ({MyIOSet} {@id})
+                       -- open type field constrainedto the types defined for
+                       -- the objects in the set; this is handled as an implicit
+                       -- union by Titan and should be an anytype, i.e. using the
+                       -- names of the types to select the given type.
+}
+
+-- Values
+a-message-id1-lower MyMessage ::= {
+  id 1,
+  content mySeq : { field1 23, field2 '1234'H }
+}
+
+a-message-id2-lower MyMessage ::= {
+  id 2,
+  content myEnum : third
+}
+
+a-message-id3-lower MyMessage ::= {
+  id 3,
+  content iNTEGER : 7
+}
+
+a-message-id4-lower MyMessage ::= {
+  id 4,
+  content nULL : NULL
+}
+/*
+-- Not supported values
+a-message-id1-upper MyMessage ::= {
+  id 1,
+  content MySeq : { field1 23, field2 '1234'H }
+}
+
+a-message-id2-upper MyMessage ::= {
+  id 2,
+  content MyEnum : third
+}
+
+a-message-id3-upper MyMessage ::= {
+  id 3,
+  content INTEGER : 7
+}
+
+a-message-id4-lower MyMessage ::= {
+  id 4,
+  content NULL : NULL
+}
+*/
+END

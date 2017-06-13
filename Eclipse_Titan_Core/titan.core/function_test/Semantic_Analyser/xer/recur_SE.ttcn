@@ -1,0 +1,53 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module recur {	//^In TTCN-3 module `recur'://
+
+type foo foo //^In type definition// \
+//^error: While checking attributes: Circular reference: `@recur.foo' -> `@recur.foo'//
+  with { variant "name as 'Foo'" }
+
+type record R1 {
+  integer f1,
+  R1 f2 optional // optional saves the day
+}
+
+// TR 949 = HM93077. This infinite recursion is not detected.
+// (Should be a compiler error, it is impossible to write a value for it)
+// C++ code generated from it cannot be compiled.
+type union no_choice { //In type definition//  \
+  //While checking embedded recursions: Circular reference://2
+  no_choice n1,
+  no_choice n2
+}
+
+// This is recursion can be broken
+type union pro_choice {
+  pro_choice n1,
+  pro_choice n2,
+  boolean n3
+}
+
+const pro_choice nc := {
+  n1 := {
+    n2 := {
+      n1 := {
+        n3 := true
+      }
+    }
+  }
+}
+
+}
+with {
+  encode "XML"
+}

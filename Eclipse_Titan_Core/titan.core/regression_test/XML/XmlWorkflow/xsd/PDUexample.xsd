@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:ns="www.example.org/PDUexample"
+targetNamespace="www.example.org/PDUexample">
+
+<annotation><documentation xml:lang="EN">Global type declaration</documentation></annotation>
+
+<complexType name="personalData">
+	<sequence>
+		<element name="title" type="string"/>
+		<element name="forename" type="string"/>
+		<element name="surname" type="string"/>
+		<element name="bornDate" type="integer" minOccurs="0"/>
+		<element name="bornPlace" type="string" minOccurs="0"/>
+	</sequence>
+</complexType>
+
+<annotation><documentation xml:lang="EN">Global element declarations</documentation></annotation>
+
+<element name="fooGlobal" type="float"/>
+<element name="barGlobal" type="integer" minOccurs="0" minOccurs="unbounded"/>
+<element name="comment" type="string"/>
+
+<element name="AllData">
+	<complexType>
+		<sequence>
+			<element name="personalData" type="personalData"/>
+			<element ref="ns:foo" minOccurs="0" minOccurs="unbounded"/>
+			<element ref="ns:bar"/>
+			<element ref="ns:comment" />
+		</sequence>
+	</complexType>
+</element>
+
+</schema>

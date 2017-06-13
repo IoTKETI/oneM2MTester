@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:26, Ensure that the interleave construct in the control part is accepted.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_26_ModuleControl_013 {
+
+	type component GeneralComp {}
+
+	testcase TC_Syn_26_ModuleControl_013() runs on GeneralComp 
+	{ setverdict(pass);	}
+
+	control{
+		timer t_timerOne;
+		timer t_timerTwo;
+		t_timerOne.start(20E-3);
+		t_timerTwo.start(30E-3);
+		interleave {
+			[] t_timerOne.timeout {
+			}
+			[] t_timerTwo.timeout {
+			}
+		}
+
+		execute(TC_Syn_26_ModuleControl_013()); //not part of the test
+	}
+
+}

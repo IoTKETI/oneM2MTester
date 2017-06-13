@@ -1,0 +1,150 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kulcsar, Endre
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module Test332T
+{
+
+import from Test332A all;
+
+/*
+// start of simulated import from ASN***************************
+// note : the following commented out section should be equivalent to
+// the sequences imported from ASN1
+
+type record MyBigMessageType1
+{
+boolean field1,
+integer field2   //Type
+}
+
+type record MyBigMessageType2
+{
+bitstring field1,
+integer field2   //Type
+}
+
+type record MyBigMessageType3
+{
+octetstring field1,
+integer field2   //Type
+}
+
+const MyBigMessageType1 myBigMessage1 :=
+{
+field1 := true,
+field2 := 5
+}
+
+const MyBigMessageType2 myBigMessage2 :=
+{
+field1 := '010101'B,
+field2 := 2
+}
+
+const MyBigMessageType3 myBigMessage3 :=
+{
+field1 := 'FFFF'O,
+field2 := 3
+}
+
+//end of simulated import from ASN***************************
+*/
+
+//AS A CONSTANT***************************
+
+const integer MyInt1 := myBigMessage1.field2   //5
+
+const integer MyInt2 := myBigMessage2.field2   //2
+
+const integer MyInt3 := myBigMessage3.field2   //3
+// we only check the type here
+// ideally the values should be checked too (dynamically?)
+
+const boolean MyBoolean := myBigMessage1.field1
+
+const bitstring MyBitstring := myBigMessage2.field1
+
+const octetstring MyOctetstring := myBigMessage3.field1
+//AS A CONSTANT***************************
+
+type port MyPort message
+{
+inout MyType
+} with { extension "internal" }
+
+type record MyType
+{
+ MyBigMessageType1   firstfield,
+ MyBigMessageType2   secondfield,
+ MyBigMessageType3   thirdfield
+}
+
+template MyType myMessage(template MyBigMessageType1 par_MyBigMessageType1,
+template MyBigMessageType2 par_MyBigMessageType2,
+template MyBigMessageType2 par_MyBigMessageType2
+)
+:=
+{
+firstfield := par_MyBigMessageType1,
+secondfield := par_MyBigMessageType2,
+thirdfield := par_MyBigMessageType3
+}
+
+type component MyMainComponent
+    {
+      port MyPort M_PCO;
+    }
+
+type component MyParallelComponent
+    {
+      port MyPort P_PCO;
+    }
+
+function handle_msg_on_ptc() runs on MyParallelComponent
+{
+
+// AS  PARAMETER *********************************************
+P_PCO.receive (myMessage(myBigMessage1, myBigMessage2, myBigMessage3))
+setverdict ( pass );
+// AS  PARAMETER *********************************************
+
+} // end of function
+
+testcase Test() runs on MyMainComponent
+{
+
+// AS A VARIABLE *********************************************
+var MyBigMessageType1 myExampleMessage1 := myBigMessage1
+
+var MyBigMessageType2 myExampleMessage2 := myBigMessage2
+
+var MyBigMessageType3 myExampleMessage3 := myBigMessage3
+// AS A VARIABLE *********************************************
+
+var MyParallelComponent myparallelcomponent := MyParallelComponent.create;
+connect ( mtc:M_PCO, myparallelcomponent: P_PCO );
+ myparallelcomponent.start(handle_msg_on_ptc());
+
+// AS A PARAMETER *********************************************
+M_PCO.send(myMessage(myBigMessage1, myBigMessage2, myBigMessage3))
+// AS A PARAMETER *********************************************
+
+myparallelcomponent.done;
+}
+
+control
+    {
+    execute (Test())
+    }
+
+}

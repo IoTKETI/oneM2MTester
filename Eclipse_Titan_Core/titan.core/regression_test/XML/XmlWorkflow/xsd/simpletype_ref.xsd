@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/simpletype/ref"
+ targetNamespace="www.example.org/simpletype/ref">
+
+<xsd:element name="SomeType">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:restriction base="this:Type">
+				<xsd:sequence>
+					<xsd:element name="something" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name="Type">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element name="something" type="xsd:string" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:complexType name="OtherType">
+	<xsd:sequence>
+		<xsd:element name="billingAccountNumber">
+			<xsd:simpleType>
+				<xsd:restriction base="this:SomeType"/>
+			</xsd:simpleType>
+		</xsd:element>
+		<xsd:element name="installmentPlanId">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:long">
+					<xsd:totalDigits value="5"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:element>
+		<xsd:element minOccurs="0" name="info">
+			<xsd:simpleType>
+				<xsd:restriction base="this:Info">
+					<xsd:maxLength value="30"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:element>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:simpleType name="start_list">
+	<xsd:list itemType="xsd:string"/>
+</xsd:simpleType>
+
+<xsd:simpleType name='List_ref'>
+	<xsd:restriction base='this:start_list'>
+		<xsd:length value="4"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name='Info'>
+	<xsd:restriction base='xsd:string'/>
+</xsd:simpleType>
+
+</xsd:schema>

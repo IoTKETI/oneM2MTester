@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:dfe="www.example.org/defaultforempty"  targetNamespace="www.example.org/defaultforempty">
+
+
+<!-- Basic defaultForEmpty -->
+
+<xs:element name="StringDefault" type="xs:string" default="defaultValue"/> 
+
+<xs:element name="StringFixed" type="xs:string" fixed="fixedValue"/> 
+
+<xs:element name="DateDefault" type="xs:date" default="1999-11-11"/> 
+
+<xs:element name="DateFixed" type="xs:date" fixed="1999-11-11"/> 
+
+<xs:element name="IntegerDefault" type="xs:integer" default="3"/> 
+
+<xs:element name="IntegerFixed" type="xs:integer" fixed="3"/> 
+
+<xs:element name="FloatDefault" type="xs:float" default="3"/> 
+
+<xs:element name="FloatFixed" type="xs:float" fixed="3"/> 
+
+<xs:element name="FloatDefault2" type="xs:float" default="3.0"/> 
+
+<xs:element name="FloatFixed2" type="xs:float" fixed="3.0"/> 
+
+<xs:element name="FloatDefault3" type="xs:float" default="INF"/> 
+
+<xs:element name="FloatFixed3" type="xs:float" fixed="INF"/> 
+
+<xs:element name="FloatDefault4" type="xs:float" default="-INF"/> 
+
+<xs:element name="FloatFixed4" type="xs:float" fixed="-INF"/> 
+
+<xs:element name="FloatDefault5" type="xs:float" default="NaN"/> 
+
+<xs:element name="FloatFixed5" type="xs:float" fixed="NaN"/> 
+
+<xs:element name="BooleanDefault" type="xs:boolean" default="true"/> 
+
+<xs:element name="BooleanFixed" type="xs:boolean" fixed="true"/> 
+
+<xs:element name="BooleanDefault2" type="xs:boolean" default="1"/> 
+
+<xs:element name="BooleanFixed2" type="xs:boolean" fixed="1"/> 
+
+<xs:element name="BooleanDefault3" type="xs:boolean" default="0"/> 
+
+<xs:element name="BooleanFixed3" type="xs:boolean" fixed="0"/>
+
+
+
+<!-- Check if the name conversion follows to the constants too -->
+<xs:element name="AttrfixedMyString3_"/>
+<xs:element name="MyString_"/>
+<xs:element name="MyString2_"/>
+
+<xs:simpleType name="MyString">
+	<xs:restriction base="xs:string">
+		<xs:pattern value="fix"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="MyStringFixed" type="dfe:MyString" fixed="fix"/>
+
+<xs:simpleType name="MyString2">
+	<xs:restriction base="xs:string"/>
+</xs:simpleType>
+
+<xs:element name="MyStringFixed2" type="dfe:MyString2" fixed="fix"/>
+<xs:attributeGroup name="attrgroup">
+ <xs:attribute name="birthPlaceAttrGroup" type="dfe:MyString"/>
+ </xs:attributeGroup>
+
+
+<xs:attribute name="AttrfixedMyString3" type="dfe:MyString" fixed="fix"/>
+
+<xs:complexType name="Complex">
+	<xs:sequence>
+		<xs:element name="MyStringFixed" type="dfe:MyString" fixed="fix"/>
+		<xs:element name="MyStringFixed2" type="dfe:MyString2" fixed="fix"/>
+	</xs:sequence>
+	<xs:attributeGroup ref="dfe:attrgroup"/>
+	<xs:attribute name="AttrfixedInteger" type="xs:integer" fixed="3"/>
+	<xs:attribute ref="dfe:AttrfixedMyString3" />
+	<xs:attribute name="AttrfixedMyString2" type="dfe:MyString2" fixed="fix"/>
+</xs:complexType>
+
+<!-- Enumerations -->
+
+<xs:element name="EnumStringFixed" type="dfe:EnumString" fixed="A"/>
+
+<xs:simpleType name="EnumString">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="A"/>
+		<xs:enumeration value="B"/>
+	</xs:restriction>
+</xs:simpleType>
+
+
+<xs:element name="EnumDateFixed" type="dfe:EnumDate" fixed="1888-01-01"/>
+
+<xs:simpleType name="EnumDate">
+	<xs:restriction base="xs:date">
+		<xs:enumeration value="1999-11-11"/>
+		<xs:enumeration value="1888-01-01"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="EnumFloatFixed" type="dfe:EnumFloat" fixed="INF"/>
+
+<xs:element name="EnumFloatFixed2" type="dfe:EnumFloat" fixed="NaN"/>
+
+<xs:element name="EnumFloatFixed3" type="dfe:EnumFloat" fixed="1.0"/>
+
+<xs:element name="EnumFloatFixed4" type="dfe:EnumFloat" fixed="1"/>
+
+<xs:simpleType name="EnumFloat">
+	<xs:restriction base="xs:float">
+		<xs:enumeration value="INF"/>
+		<xs:enumeration value="1.0"/>
+		<xs:enumeration value="NaN"/>
+		<xs:enumeration value="1"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="EnumIntegerFixed" type="dfe:EnumInteger" fixed="3"/>
+
+<xs:element name="EnumIntegerFixed2" type="dfe:EnumInteger" fixed="-3"/>
+
+<xs:simpleType name="EnumInteger">
+	<xs:restriction base="xs:integer">
+		<xs:enumeration value="3"/>
+		<xs:enumeration value="-3"/>
+	</xs:restriction>
+</xs:simpleType>
+
+
+</xs:schema>

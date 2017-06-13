@@ -1,0 +1,160 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module char_to_SW {	//^In TTCN-3 module `char_to_SW'://
+
+type component PDTestComponent {};
+
+/*--- CHAR2INT --------------------------------------------------*/
+
+const charstring c2icons := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+const integer c2icon1 := char2int("A")
+const integer c2icon2 := char2int("\n")
+const integer c2icon3 := char2int("" & "A" & "")
+const integer c2icon4 := char2int(substr(c2icons,0,1))
+const integer c2icon5 := char2int("A" <@ 1)
+
+
+testcase char_to_int() runs on PDTestComponent{ //^In testcase definition//
+
+	if ((c2icon1 == 65)
+	and (c2icon1 == char2int("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2icon2 == 10)
+	and (c2icon2 == char2int("\n")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2icon3 == 65)
+	and (c2icon3 == char2int("" & "A" & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2icon4 == 65)
+	and (c2icon4 == char2int(substr(c2icons,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2icon5 == 65)
+	and (c2icon5 == char2int("A" @> 1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- UNICHAR2INT --------------------------------------------------*/
+
+const universal charstring uc2icons := char(0,0,0,65) & "BCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+const integer uc2icon1 := unichar2int("A")
+const integer uc2icon2 := unichar2int(char(0,0,0,65))
+const integer uc2icon3 := unichar2int("" & char(0,0,0,65) & "")
+const integer uc2icon4 := unichar2int(substr(uc2icons,0,1))
+const integer uc2icon5 := unichar2int(char(0,0,0,255))
+const integer uc2icon6 := unichar2int(char(0,0,255,255))
+const integer uc2icon7 := unichar2int(char(0,255,255,255))
+const integer uc2icon8 := unichar2int(char(127,255,255,255))
+
+
+testcase unichar_to_int() runs on PDTestComponent{ //^In testcase definition//
+
+	if ((uc2icon1 == 65)
+	and (uc2icon1 == unichar2int("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon2 == 65)
+	and (uc2icon2 == unichar2int(char(0,0,0,65))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon3 == 65)
+	and (uc2icon3 == unichar2int("" & char(0,0,0,65) & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon4 == 65)
+	and (uc2icon4 == unichar2int(substr(uc2icons,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon5 == 255)
+	and (uc2icon5 == unichar2int(char(0,0,0,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon6 == 65535)
+	and (uc2icon6 == unichar2int(char(0,0,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon7 == 16777215)
+	and (uc2icon7 == unichar2int(char(0,255,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((uc2icon8 == 2147483647)
+	and (uc2icon8 == unichar2int(char(127,255,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- CHAR2OCT --------------------------------------------------*/
+
+const charstring c2ocons := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+const octetstring c2ocon1 := char2oct("A")
+const octetstring c2ocon2 := char2oct("\n")
+const octetstring c2ocon3 := char2oct("" & "A" & "")
+const octetstring c2ocon4 := char2oct(substr(c2ocons,0,1))
+const octetstring c2ocon5 := char2oct("A" @> 1)
+
+testcase char_to_oct() runs on PDTestComponent{ //^In testcase definition//
+
+	if ((c2ocon1 == '41'O)
+	and (c2ocon1 == char2oct("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2ocon2 == '0A'O)
+	and (c2ocon2 == char2oct("\n")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2ocon3 == '41'O)
+	and (c2ocon3 == char2oct("" & "A" & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2ocon4 == '41'O)
+	and (c2ocon4 == char2oct(substr(c2icons,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+	if ((c2ocon5 == '41'O)
+	and (c2ocon5 == char2oct("A" @> 1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+	//^warning: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+control {
+	execute (char_to_int());
+	execute (unichar_to_int());
+	execute (char_to_oct());
+}
+
+}

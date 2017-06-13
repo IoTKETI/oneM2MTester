@@ -1,0 +1,1796 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module all_from_permutation
+{
+import from types all;
+import from functions all;
+import from imported_templates all;
+
+// Test Target:
+// B.1.3.3    Permutation
+//"That shall be used only on values of record types"
+
+//just to test these types as well:
+modulepar RoI tsp_RoI3 := {20,21,22};
+modulepar RoI tsp_SoI3 := {20,21,22};
+
+const RoI c_RoI3 := {20,21,22};
+const SoI c_SoI3 := {20,21,22};
+/*
+template RoI t_RoI1 := {1, 2, (6..9)};
+template RoI t_RoI2 := {1, *, 3};
+
+// B.1.3.3    Permutation
+//EXAMPLE 1:
+    type RoI MySequenceOfType;
+
+    template MySequenceOfType MyTemplate1p := { permutation ( 1, 2, 3 ), 5 };
+    // matches any of the following sequences of 4 integers: 1,2,3,5; 1,3,2,5; 2,1,3,5;
+    // 2,3,1,5; 3,1,2,5; or 3,2,1,5
+
+    template MySequenceOfType MyTemplate2p := { permutation ( 1, 2, ? ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 1 and 2 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate3p := { permutation ( 1, 2, 3 ), * };
+    // matches any sequence of integers starting with 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1
+
+    template MySequenceOfType MyTemplate4p := { *, permutation ( 1, 2, 3 )};
+    // matches any sequence of integers ending with 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1
+
+    template MySequenceOfType MyTemplate5p := { *, permutation ( 1, 2, 3 ),* };
+    // matches any sequence of integers containing any of the following substrings at any position:
+    // 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1 
+
+    template MySequenceOfType MyTemplate6p := { permutation ( 1, 2, * ), 5 };
+    // matches any sequence of integers that ends with 5 and containing 1 and 2 at least once in
+    // other positions
+
+//error by Titan: Length restriction cannot be used in a template of type `integer'
+//    template MySequenceOfType MyTemplate7p := { permutation ( 1, 2, 3 ), * length (0..5) };
+    // matches any sequence of three to eight integers starting with 1,2,3; 1,3,2; 2,1,3; 2,3,1;
+    // 3,1,2 or 3,2,1
+
+    template integer MyInt1 := (1,2,3);
+    template integer MyInt2 := (1,2,?);
+    template integer MyInt3 := ?;
+    template integer MyInt4 := *;
+
+    template MySequenceOfType MyTemplate10 := { permutation (MyInt1, 2, 3 ), 5 };
+    // matches any of the sequences of 4 integers:
+    //        1,3,2,5; 2,1,3,5; 2,3,1,5; 3,1,2,5; or 3,2,1,5;
+    //        2,3,2,5; 2,2,3,5; 2,3,2,5; 3,2,2,5; or 3,2,2,5;
+    //        3,3,2,5; 2,3,3,5; 2,3,3,5; 3,3,2,5; or 3,2,3,5;
+
+    template MySequenceOfType MyTemplate11 := { permutation (MyInt2, 2, 3 ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate12 := { permutation (MyInt3, 2, 3 ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate13 := { permutation (MyInt4, 2, 3 ), 5 };
+    // matches any sequence of integers that ends with 5 and containing 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate14 := { permutation (MyInt3, 2, ? ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate15 := { permutation (MyInt4, 2, * ), 5 };
+    // matches any sequence of integers that ends with 5 and contains 2 at least once in
+    // other positions
+*/
+//EXAMPLE 2:
+template RoI t_RoI1 := {1, 2, *};
+template RoI t_RoI1p := {permutation(all from t_RoI1)};
+template RoI t_RoI1p_eq:={permutation(1, 2, *)};
+
+template RoI t_RoI2p := {permutation(0, all from t_RoI1), 4, 5};
+template RoI t_RoI2p_eq := {permutation(0,1,2,*), 4, 5};
+
+template RoI t_RoI3 := {1, 2, 3};
+template RoI t_RoI3p := {permutation( all from t_RoI3)};
+template RoI t_RoI3p_eq := {permutation(1, 2, 3)};
+
+template RoI t_RoI4p := {?,permutation(0, all from t_RoI1), 4, 5};
+template RoI t_RoI4p_eq := {?,permutation(0,1,2,*), 4, 5};
+
+template RoI t_RoI5p := {*,permutation(all from t_RoI3),*}
+template RoI t_RoI5p_eq := {*,permutation(1,2,3),*}
+
+template RoI t_RoI6p := {?,permutation(all from t_RoI3),4} //(?,permutation(1,2,3),4)
+template RoI t_RoI6p_eq := {?,permutation(1,2,3),4}
+
+template RoI t_RoI7 := {1, 2, ?};
+template RoI t_RoI7p := {permutation(all from t_RoI7)};
+template RoI t_RoI7p_eq := {permutation(1, 2, ?)};
+
+template RoI t_RoI8p := {permutation(0, all from t_RoI7), 4, 5};
+template RoI t_RoI8p_eq := {permutation(0,1,2,?), 4, 5};
+
+//from modulepar:
+template RoI t_RoI13roi := {permutation(all from tsp_RoI3)};
+template RoI t_RoI13_eq := {permutation(20,21,22)};
+template RoI t_RoI13soi := {permutation(all from tsp_SoI3)};
+
+//from const:
+template RoI t_RoI13roi_c :={permutation(all from c_RoI3)};
+template RoI t_RoI13soi_c :={permutation(all from c_SoI3)};
+
+//=== All from referring remote templates (imported templates)
+template RoI t_importing_RoI1p := {permutation(all from t_imported_RoI1_P)};
+template RoI t_importing_RoI2p := {permutation(0, all from t_imported_RoI1_P), 4, 5};
+template RoI t_importing_RoI3p := {permutation( all from  t_imported_RoI3_P)};
+
+// ===== Set of ====
+template SoI t_SoI1 := {1, 2, *};
+template RoI t_SoI1p := {permutation(all from t_SoI1)};
+template RoI t_SoI1p_eq:={permutation(1, 2, *)};
+
+template RoI t_SoI2p := {permutation(0, all from t_SoI1), 4, 5};
+template RoI t_SoI2p_eq := {permutation(0,1,2,*), 4, 5};
+
+template SoI t_SoI3 := {1, 2, 3};
+template RoI t_SoI3p := {permutation( all from t_SoI3)};
+template RoI t_SoI3p_eq := {permutation(1, 2, 3)};
+
+template RoI t_SoI4p := {?,permutation(0, all from t_SoI1), 4, 5};
+template RoI t_SoI4p_eq := {?,permutation(0,1,2,*), 4, 5};
+
+template RoI t_SoI5p := {*,permutation(all from t_SoI3),*}
+template RoI t_SoI5p_eq := {*,permutation(1,2,3),*}
+
+template RoI t_SoI6p := {?,permutation(all from t_SoI3),4} //(?,permutation(1,2,3),4)
+template RoI t_SoI6p_eq := {?,permutation(1,2,3),4}
+
+template SoI t_SoI7 := {1, 2, ?};
+template RoI t_SoI7p := {permutation(all from t_SoI7)};
+template RoI t_SoI7p_eq := {permutation(1, 2, ?)};
+
+template RoI t_SoI8p := {permutation(0, all from t_SoI7), 4, 5};
+template RoI t_SoI8p_eq := {permutation(0,1,2,?), 4, 5};
+
+//===== charstring 
+template RoCS t_RoCS1 := { "apple","banana","","pear"};
+template RoCS t_RoCS2 := { "apples","bananas","","pears"};
+
+template RoCS t_rocs1 := { permutation ( all from t_RoCS1 ) };
+template RoCS t_rocs1_eq := { permutation ( "apple","banana","","pear" ) };
+
+template RoCS t_rocs2 := { permutation( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2) };
+template RoCS t_rocs2_eq := { permutation( "treeeeeeeeeeeeee","apple","banana","","pear",
+  "dog","apples","bananas","","pears") };
+
+//==== function reference =====
+template RoF_int2int t_rofref_int2int := { refers(f_int2int_1),refers(f_int2int_2) }
+template RoF_int2int t_fref_int2int_p := { permutation( all from t_rofref_int2int ) };
+template RoF_int2int t_fref_int2int_p_eq := { permutation( refers(f_int2int_1),refers(f_int2int_2) ) };
+//************************* Testcases for Templates of type Record of Integer ******************************
+
+testcase tc_permut() runs on A
+{
+  action("permut: ", t_RoI2p);
+  var RoI v;
+
+  v := {}
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 1 }
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 1, 2, 3, 4, 5 }
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 0, 1, 2, 3, 4, 5 }
+  if (match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should match ", t_RoI2p); }
+
+  v := { -2, -1, 0, 1, 2, 3, 4, 5 }
+  if (match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should match ", t_RoI2p); }
+
+  v := { 1, 2, 3, 0, 4, 5 }
+  if (match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should match ", t_RoI2p); }
+
+  v := { 1, 2, 3, 4, 5, 0 }
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 5, 4, 3, 2, 1, 0 }
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 3, 2, 1, 0, -1, -2, -3, 4, 5 }
+  if (match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should match ", t_RoI2p); }
+
+  v := { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }
+  if (not match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should NOT match ", t_RoI2p); }
+
+  v := { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 }
+  if (match(v, t_RoI2p)) { setverdict(pass); }
+  else { setverdict(fail, v, " should match ", t_RoI2p); }
+}
+
+//====== Static Templates ======
+
+//=== 1 ===
+
+testcase tc_permut1_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI1p,t_RoI1p_eq);
+}
+
+testcase tc_permutImporting1_eq() runs on A {
+  f_checkRoITemplateEquivalence( t_importing_RoI1p,t_RoI1p_eq);
+}
+
+testcase tc_permut1() runs on A {
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(t_RoI1p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permutImporting1() runs on A {
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(t_importing_RoI1p,vl_goodValues,vl_badValues);
+}
+//=== 2 ===
+//{permutation(0,1,2,*), 4, 5};
+testcase tc_permut2_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI2p,t_RoI2p_eq);
+}
+
+testcase tc_permutImporting2_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI2p,t_RoI2p_eq);
+}
+
+testcase tc_permut2() runs on A {
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(t_RoI2p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permutImporting2() runs on A {
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(t_importing_RoI2p,vl_goodValues,vl_badValues);
+}
+//=== 3 ===
+testcase tc_permut3_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI3p,t_RoI3p_eq);
+}
+
+testcase tc_permutImporting3_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_importing_RoI3p,t_RoI3p_eq);
+}
+
+testcase tc_permut3() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4}, {1,2,3,3},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(t_RoI3p,vl_goodValues,vl_badValues);
+}
+
+
+//=== 4 ===
+
+testcase tc_permut4_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI4p,t_RoI4p_eq);
+}
+
+testcase tc_permut4() runs on A {
+  var RoRoI vl_goodValues := { 
+    {99,0,1,2,3,4,5}, {99,0,1,3,2,4,5},{99,0,2,1,3,4,5},{99,0,2,3,1,4,5},{99,0,3,2,1,4,5},{99,0,3,1,2,4,5},
+    {99,1,0,2,3,4,5}, {99,1,0,3,2,4,5},{99,1,2,0,3,4,5},{99,1,2,3,0,4,5},{99,1,3,2,0,4,5},{99,1,3,0,2,4,5},
+    {99,2,1,0,3,4,5}, {99,2,1,3,0,4,5},{99,2,0,1,3,4,5},{99,2,0,3,1,4,5},{99,2,3,0,1,4,5},{99,2,3,1,0,4,5},
+    {99,3,1,0,2,4,5}, {99,3,1,2,0,4,5},{99,3,0,1,2,4,5},{99,3,0,2,1,4,5},{99,3,2,0,1,4,5},{99,3,2,1,0,4,5},
+    {99,0,1,2,9,4,5}, {99,0,1,9,2,4,5},{99,0,2,1,9,4,5},{99,0,2,9,1,4,5},{99,0,9,2,1,4,5},{99,0,9,1,2,4,5},
+    {99,1,0,2,9,4,5}, {99,1,0,9,2,4,5},{99,1,2,0,9,4,5},{99,1,2,9,0,4,5},{99,1,9,2,0,4,5},{99,1,9,0,2,4,5},
+    {99,2,1,0,9,4,5}, {99,2,1,9,0,4,5},{99,2,0,1,9,4,5},{99,2,0,9,1,4,5},{99,2,9,0,1,4,5},{99,2,9,1,0,4,5},
+    {99,9,1,0,2,4,5}, {99,9,1,2,0,4,5},{99,9,0,1,2,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5},
+    {99,9,1,9,0,2,4,5}, 
+    {99,9,1,2,9,0,4,5},{99,9,0,9,1,9,2,9,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},
+    {1,2,3,4,5}, {0,1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(t_RoI4p,vl_goodValues,vl_badValues);
+}
+
+
+//=== 5 ===
+//{*,permutation(1,2,3),*}
+testcase tc_permut5_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI5p,t_RoI5p_eq);
+}
+
+testcase tc_permut5() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_RoI5p,vl_goodValues,vl_badValues);
+}
+//=== 6 ===
+//{?,permutation(1,2,3),4}
+testcase tc_permut6_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI6p,t_RoI6p_eq);
+}
+
+testcase tc_permut6() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 0,1,2,3,4},{0,1,3,2,4},
+    { 0,2,1,3,4},{0,2,3,1,4},
+    { 0,3,1,2,4},{0,3,2,1,4},
+
+    { 9,1,2,3,4},{9,1,3,2,4},
+    { 9,2,1,3,4},{9,2,3,1,4},
+    { 9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{0,2,3,1},
+    { 3,1,2},{ 3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_RoI6p,vl_goodValues,vl_badValues);
+}
+//=== 7 ===
+//{permutation{1, 2, ?}};
+testcase tc_permut7_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI7p,t_RoI7p_eq);
+}
+
+testcase tc_permut7() runs on A {
+  var RoRoI vl_goodValues := { 
+    {1,2,3}, {1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_RoI7p,vl_goodValues,vl_badValues);
+}
+
+//=== 8 ===
+//{permutation(0,1,2,?),4,5}
+
+testcase tc_permut8_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI8p,t_RoI8p_eq);
+}
+
+testcase tc_permut8() runs on A {
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(t_RoI8p,vl_goodValues,vl_badValues);
+}
+//=== 13 ===
+//{permutation(0,1,2,?),4,5}
+
+testcase tc_permut13roi_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI13roi,t_RoI13_eq);
+}
+
+testcase tc_permut13roi() runs on A {
+  var RoRoI vl_goodValues := { 
+    {20,21,22},{20,22,21}
+  }
+  var RoRoI vl_badValues := { {},{1},{21},{21,22}, {20,21},{20,20,20}
+
+  }
+  f_checkRoITemplate(t_RoI13roi,vl_goodValues,vl_badValues);
+}
+testcase tc_permut13soi_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI13soi,t_RoI13_eq);
+}
+
+testcase tc_permut13soi() runs on A {
+  var RoRoI vl_goodValues := { 
+    {20,21,22},{20,22,21}
+  }
+  var RoRoI vl_badValues := { {},{1},{21},{21,22}, {20,21},{20,20,20}
+
+  }
+  f_checkRoITemplate(t_RoI13soi,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut13roi_c_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI13roi_c,t_RoI13_eq);
+}
+
+testcase tc_permut13roi_c() runs on A {
+  var RoRoI vl_goodValues := { 
+    {20,21,22},{20,22,21}
+  }
+  var RoRoI vl_badValues := { {},{1},{21},{21,22}, {20,21},{20,20,20}
+
+  }
+  f_checkRoITemplate(t_RoI13roi_c,vl_goodValues,vl_badValues);
+}
+testcase tc_permut13soi_c_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_RoI13soi_c,t_RoI13_eq);
+}
+
+testcase tc_permut13soi_c() runs on A {
+  var RoRoI vl_goodValues := { 
+    {20,21,22},{20,22,21}
+  }
+  var RoRoI vl_badValues := { {},{1},{21},{21,22}, {20,21},{20,20,20}
+
+  }
+  f_checkRoITemplate(t_RoI13soi_c,vl_goodValues,vl_badValues);
+}
+
+//=== Testcases for Dynamic Templates=====
+
+
+//===1===
+//{permutation(1, 2, *)};
+
+testcase tc_permut1_eq_dyn() runs on A {
+  var template RoI tl_RoI1p := {permutation(all from t_RoI1)};
+  f_checkRoITemplateEquivalence(tl_RoI1p,t_RoI1p_eq);
+}
+
+testcase tc_permut1_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI1p := {permutation(all from tl_RoI1)};
+  f_checkRoITemplateEquivalence(tl_RoI1p,t_RoI1p_eq);
+}
+
+testcase tc_permut1_dyn() runs on A {
+  var template RoI tl_RoI1p := {permutation(all from t_RoI1)};
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(tl_RoI1p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut1_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI1p := {permutation(all from tl_RoI1)};
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(tl_RoI1p,vl_goodValues,vl_badValues);
+}
+//=== 2 ===
+testcase tc_permut2_eq_dyn() runs on A {
+  var template RoI tl_RoI2p := {permutation(0, all from t_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI2p,t_RoI2p_eq);
+}
+
+testcase tc_permut2_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI2p := {permutation(0, all from tl_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI2p,t_RoI2p_eq);
+}
+
+testcase tc_permut2_dyn() runs on A {
+  var template RoI tl_RoI2p := {permutation(0, all from t_RoI1), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(tl_RoI2p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut2_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  log("debug1");
+  var template RoI tl_RoI2p := {permutation(0, all from tl_RoI1), 4, 5};
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(tl_RoI2p,vl_goodValues,vl_badValues);
+}
+
+//=== 3 ===
+testcase tc_permut3_eq_dyn() runs on A {
+  var template RoI tl_RoI3p := {permutation(all from t_RoI3)}
+  f_checkRoITemplateEquivalence(tl_RoI3p,t_RoI3p_eq);
+}
+
+testcase tc_permut3_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  f_checkRoITemplateEquivalence(tl_RoI3p,t_RoI3p_eq);
+}
+
+testcase tc_permut3_dyn() runs on A {
+  log("debug1");
+  var template RoI tl_RoI3p := {permutation(all from t_RoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut3_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  log("debug1");
+  template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut3A_dyn() runs on A {
+  var integer x:=1,y:=2,z:=3;
+  var template RoI tl_RoI3 := {x, y, z};
+  log("debug1");
+  //template RoI tl_RoI5p_dyn := {*,permutation(all from tl_RoI3p_dyn),*}
+  template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2 },
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+//=== 4 ===
+testcase tc_permut4_eq_dyn() runs on A {
+  var template RoI tl_RoI4p := {?,permutation(0, all from t_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI4p,t_RoI4p_eq);
+}
+
+testcase tc_permut4_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI4p := {?,permutation(0, all from tl_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI4p,t_RoI4p_eq);
+}
+
+
+testcase tc_permut4_dyn() runs on A {
+  var template RoI tl_RoI4p := {permutation(0, all from t_RoI1), 4, 5}; //executor doesn't accept
+  var RoRoI vl_goodValues := { 
+    {99,0,1,2,3,4,5}, {99,0,1,3,2,4,5},{99,0,2,1,3,4,5},{99,0,2,3,1,4,5},{99,0,3,2,1,4,5},{99,0,3,1,2,4,5},
+    {99,1,0,2,3,4,5}, {99,1,0,3,2,4,5},{99,1,2,0,3,4,5},{99,1,2,3,0,4,5},{99,1,3,2,0,4,5},{99,1,3,0,2,4,5},
+    {99,2,1,0,3,4,5}, {99,2,1,3,0,4,5},{99,2,0,1,3,4,5},{99,2,0,3,1,4,5},{99,2,3,0,1,4,5},{99,2,3,1,0,4,5},
+    {99,3,1,0,2,4,5}, {99,3,1,2,0,4,5},{99,3,0,1,2,4,5},{99,3,0,2,1,4,5},{99,3,2,0,1,4,5},{99,3,2,1,0,4,5},
+    {99,0,1,2,9,4,5}, {99,0,1,9,2,4,5},{99,0,2,1,9,4,5},{99,0,2,9,1,4,5},{99,0,9,2,1,4,5},{99,0,9,1,2,4,5},
+    {99,1,0,2,9,4,5}, {99,1,0,9,2,4,5},{99,1,2,0,9,4,5},{99,1,2,9,0,4,5},{99,1,9,2,0,4,5},{99,1,9,0,2,4,5},
+    {99,2,1,0,9,4,5}, {99,2,1,9,0,4,5},{99,2,0,1,9,4,5},{99,2,0,9,1,4,5},{99,2,9,0,1,4,5},{99,2,9,1,0,4,5},
+    {99,9,1,0,2,4,5}, {99,9,1,2,0,4,5},{99,9,0,1,2,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5},
+    {99,9,1,9,0,2,4,5}, {99,9,1,2,9,0,4,5},{99,9,0,9,1,9,2,9,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(tl_RoI4p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut4_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI4p := {permutation(0, all from tl_RoI1), 4, 5}; //executor doesn't accept
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5},
+    {9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(tl_RoI4p,vl_goodValues,vl_badValues);
+}
+
+//=== 5 ===
+
+//{*,permutation(1,2,3),*}
+testcase tc_permut5_eq_dyn() runs on A {
+  var template RoI tl_RoI5p := {*,permutation(all from t_RoI3),*}
+  f_checkRoITemplateEquivalence(tl_RoI5p,t_RoI5p_eq);
+}
+
+testcase tc_permut5_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI5p := {*,permutation(all from tl_RoI3),*}
+  f_checkRoITemplateEquivalence(tl_RoI5p,t_RoI5p_eq);
+}
+
+testcase tc_permut5_dyn() runs on A {
+  var template RoI tl_RoI5p := {*,permutation(all from t_RoI3),*}
+  var RoRoI vl_goodValues := { 
+    {1,2,3},{1,3,2},
+    {2,1,3},{2,3,1},
+    {3,1,2},{3,2,1},
+    {0,2,1,3},{0,2,1,3,0},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI5p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut5_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI5p := {*,permutation(all from tl_RoI3),*}
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    {0,2,1,3},{0,2,1,3,0},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI5p,vl_goodValues,vl_badValues);
+}
+//=== 6 ===
+//{?,permutation(1,2,3),4}
+testcase tc_permut6_eq_dyn() runs on A {
+  var template RoI tl_RoI6p := {?,permutation(all from t_RoI3),4};
+  f_checkRoITemplateEquivalence(tl_RoI6p,t_RoI6p_eq);
+}
+
+testcase tc_permut6_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4};
+  f_checkRoITemplateEquivalence(tl_RoI6p,t_RoI6p_eq);
+}
+
+testcase tc_permut6_dyn() runs on A {
+  var template RoI tl_RoI6p := {?,permutation(all from t_RoI3),4} //(?,permutation(1,2,3),4)
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {1,2,3},{1,3,2},
+    {0,2,1,3},{0,2,3,1},
+    {3,1,2},{3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut6_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{0,2,3,1},
+    { 3,1,2},{ 3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut6A_dyn() runs on A {
+  var integer x:=1,y:=2,z:=3;
+  var template RoI tl_RoI3 := {x, y, z};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4}
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    { 0,1,2,3},{1,1,3,2},
+    { 2,2,1,3},{3,2,3,1},
+    { 4,3,1,2},{5,3,2,1},
+    { 1,2,3,4},{1,3,2,4},
+    { 2,1,3,4},{2,3,1,4},
+    { 3,1,2,4},{ 3,2,1,4},
+    { 0,1,2,3,5},{1,1,3,2,6},
+    { 2,2,1,3,7},{3,2,3,1,8},
+    { 4,3,1,2,9},{5,3,2,1,10},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+
+//=== 7 ===
+//{permutation{1, 2, ?}};
+testcase tc_permut7_eq_dyn() runs on A {
+  var template RoI tl_RoI7p := {permutation(all from t_RoI7)};
+  f_checkRoITemplateEquivalence(tl_RoI7p,t_RoI7p_eq);
+}
+
+testcase tc_permut7_eq_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI7p := {permutation(all from tl_RoI7)};
+  f_checkRoITemplateEquivalence(tl_RoI7p,t_RoI7p_eq);
+}
+
+testcase tc_permut7_dyn() runs on A {
+  var template RoI tl_RoI7p := {permutation(all from t_RoI7)};
+  var RoRoI vl_goodValues := { 
+    {1,2,3},{1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},{0,2,3,1,5},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI7p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut7_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI7p := {permutation(all from tl_RoI7)};
+  var RoRoI vl_goodValues := { 
+    {1,2,3}, {1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI7p,vl_goodValues,vl_badValues);
+}
+
+//=== 8 ===
+//{permutation(0,1,2,?),4,5}
+
+testcase tc_permut8_eq_dyn() runs on A {
+  var template RoI tl_RoI8p := {permutation(0, all from t_RoI7), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI8p,t_RoI8p_eq);
+}
+
+testcase tc_permut8_eq_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI8p := {permutation(0, all from tl_RoI7), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI8p,t_RoI8p_eq);
+}
+
+testcase tc_permut8_dyn() runs on A {
+  var template RoI tl_RoI8p := {permutation(0, all from t_RoI7), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(tl_RoI8p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut8_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI8p := {permutation(0, all from tl_RoI7), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(tl_RoI8p,vl_goodValues,vl_badValues);
+}
+
+//====================================================
+// ===== Permutation test for all from SoI ===========
+//====================================================
+
+
+//====== Static Templates ======
+
+//=== 1 ===
+
+testcase tc_permut1s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI1p,t_SoI1p_eq);
+}
+
+testcase tc_permut1s() runs on A {
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(t_SoI1p,vl_goodValues,vl_badValues);
+}
+
+//=== 2 ===
+//{permutation(0,1,2,*), 4, 5};
+testcase tc_permut2s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI2p,t_SoI2p_eq);
+}
+
+testcase tc_permut2s() runs on A {
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(t_SoI2p,vl_goodValues,vl_badValues);
+}
+
+//=== 3 ===
+testcase tc_permut3s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI3p,t_SoI3p_eq);
+}
+
+testcase tc_permut3s() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4}, {1,2,3,3},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(t_SoI3p,vl_goodValues,vl_badValues);
+}
+
+
+//=== 4 ===
+
+testcase tc_permut4s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI4p,t_SoI4p_eq);
+}
+
+testcase tc_permut4s() runs on A {
+  var RoRoI vl_goodValues := { 
+    {99,0,1,2,3,4,5}, {99,0,1,3,2,4,5},{99,0,2,1,3,4,5},{99,0,2,3,1,4,5},{99,0,3,2,1,4,5},{99,0,3,1,2,4,5},
+    {99,1,0,2,3,4,5}, {99,1,0,3,2,4,5},{99,1,2,0,3,4,5},{99,1,2,3,0,4,5},{99,1,3,2,0,4,5},{99,1,3,0,2,4,5},
+    {99,2,1,0,3,4,5}, {99,2,1,3,0,4,5},{99,2,0,1,3,4,5},{99,2,0,3,1,4,5},{99,2,3,0,1,4,5},{99,2,3,1,0,4,5},
+    {99,3,1,0,2,4,5}, {99,3,1,2,0,4,5},{99,3,0,1,2,4,5},{99,3,0,2,1,4,5},{99,3,2,0,1,4,5},{99,3,2,1,0,4,5},
+    {99,0,1,2,9,4,5}, {99,0,1,9,2,4,5},{99,0,2,1,9,4,5},{99,0,2,9,1,4,5},{99,0,9,2,1,4,5},{99,0,9,1,2,4,5},
+    {99,1,0,2,9,4,5}, {99,1,0,9,2,4,5},{99,1,2,0,9,4,5},{99,1,2,9,0,4,5},{99,1,9,2,0,4,5},{99,1,9,0,2,4,5},
+    {99,2,1,0,9,4,5}, {99,2,1,9,0,4,5},{99,2,0,1,9,4,5},{99,2,0,9,1,4,5},{99,2,9,0,1,4,5},{99,2,9,1,0,4,5},
+    {99,9,1,0,2,4,5}, {99,9,1,2,0,4,5},{99,9,0,1,2,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5},
+    {99,9,1,9,0,2,4,5}, 
+    {99,9,1,2,9,0,4,5},{99,9,0,9,1,9,2,9,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},
+    {1,2,3,4,5}, {0,1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(t_SoI4p,vl_goodValues,vl_badValues);
+}
+
+
+//=== 5 ===
+//{*,permutation(1,2,3),*}
+testcase tc_permut5s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI5p,t_SoI5p_eq);
+}
+
+testcase tc_permut5s() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_SoI5p,vl_goodValues,vl_badValues);
+}
+//=== 6 ===
+//{?,permutation(1,2,3),4}
+testcase tc_permut6s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI6p,t_SoI6p_eq);
+}
+
+testcase tc_permut6s() runs on A {
+  var RoRoI vl_goodValues := { 
+    { 0,1,2,3,4},{0,1,3,2,4},
+    { 0,2,1,3,4},{0,2,3,1,4},
+    { 0,3,1,2,4},{0,3,2,1,4},
+
+    { 9,1,2,3,4},{9,1,3,2,4},
+    { 9,2,1,3,4},{9,2,3,1,4},
+    { 9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{0,2,3,1},
+    { 3,1,2},{ 3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_SoI6p,vl_goodValues,vl_badValues);
+}
+//=== 7 ===
+//{permutation{1, 2, ?}};
+testcase tc_permut7s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI7p,t_SoI7p_eq);
+}
+
+testcase tc_permut7s() runs on A {
+  var RoRoI vl_goodValues := { 
+    {1,2,3}, {1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(t_SoI7p,vl_goodValues,vl_badValues);
+}
+
+//=== 8 ===
+//{permutation(0,1,2,?),4,5}
+
+testcase tc_permut8s_eq() runs on A {
+  f_checkRoITemplateEquivalence(t_SoI8p,t_SoI8p_eq);
+}
+
+testcase tc_permut8s() runs on A {
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(t_SoI8p,vl_goodValues,vl_badValues);
+}
+
+
+//=== Testcases for Dynamic Templates of type RoI created from SoI =====
+
+
+//===1===
+//{permutation(1, 2, *)};
+
+testcase tc_permut1s_eq_dyn() runs on A {
+  var template RoI tl_RoI1p := {permutation(all from t_SoI1)};
+  f_checkRoITemplateEquivalence(tl_RoI1p,t_SoI1p_eq);
+}
+
+testcase tc_permut1s_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI1p := {permutation(all from tl_RoI1)};
+  f_checkRoITemplateEquivalence(tl_RoI1p,t_SoI1p_eq);
+}
+
+testcase tc_permut1s_dyn() runs on A {
+  var template RoI tl_RoI1p := {permutation(all from t_SoI1)};
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(tl_RoI1p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut1s_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI1p := {permutation(all from tl_RoI1)};
+  var RoRoI vl_goodValues := {{1,2},{2,1},{1,2,0},{1,2,1,2,3,4},{2,1,0},{2,1,222},{1,1,1,2,2,2,2} }
+  var RoRoI vl_badValues := {{},{1},{2},{3},{3,4,5},{3,4,5,1},{3,4,5,2}
+  }
+  f_checkRoITemplate(tl_RoI1p,vl_goodValues,vl_badValues);
+}
+//=== 2 ===
+testcase tc_permut2s_eq_dyn() runs on A {
+  var template RoI tl_RoI2p := {permutation(0, all from t_SoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI2p,t_SoI2p_eq);
+}
+
+testcase tc_permut2s_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI2p := {permutation(0, all from tl_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI2p,t_SoI2p_eq);
+}
+
+testcase tc_permut2s_dyn() runs on A {
+  var template RoI tl_RoI2p := {permutation(0, all from t_SoI1), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(tl_RoI2p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut2s_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  log("debug1");
+  var template RoI tl_RoI2p := {permutation(0, all from tl_RoI1), 4, 5};
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    {0,1,2,4,5},{0,2,1,4,5},{1,0,2,4,5},{2,1,0,4,5},{1,2,0,4,5},
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    { -2, -1, 0, 1, 2, 3, 4, 5 },
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 4, 5 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4,5 }
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4 }};  
+  f_checkRoITemplate(tl_RoI2p,vl_goodValues,vl_badValues);
+}
+
+//=== 3 ===
+testcase tc_permut3s_eq_dyn() runs on A {
+  var template RoI tl_RoI3p := {permutation(all from t_SoI3)}
+  f_checkRoITemplateEquivalence(tl_RoI3p,t_SoI3p_eq);
+}
+
+testcase tc_permut3s_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  f_checkRoITemplateEquivalence(tl_RoI3p,t_SoI3p_eq);
+}
+
+testcase tc_permut3s_dyn() runs on A {
+  log("debug1");
+  var template RoI tl_RoI3p := {permutation(all from t_SoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut3s_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  log("debug1");
+  template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{4},{1,2},{1,3},{1,4},{2,3},{1,2,3,4},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut3sA_dyn() runs on A {
+  var integer x:=1,y:=2,z:=3;
+  var template RoI tl_RoI3 := {x, y, z};
+  log("debug1");
+  //template RoI tl_RoI5p_dyn := {*,permutation(all from tl_RoI3p_dyn),*}
+  template RoI tl_RoI3p := {permutation(all from tl_RoI3)}
+  log("debug2");
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2 },
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{3,2,1}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI3p,vl_goodValues,vl_badValues);
+}
+//=== 4 ===
+testcase tc_permut4s_eq_dyn() runs on A {
+  var template RoI tl_RoI4p := {?,permutation(0, all from t_SoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI4p,t_SoI4p_eq);
+}
+
+testcase tc_permut4s_eq_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI4p := {?,permutation(0, all from tl_RoI1), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI4p,t_SoI4p_eq);
+}
+
+
+testcase tc_permut4s_dyn() runs on A {
+  var template RoI tl_RoI4p := {permutation(0, all from t_SoI1), 4, 5}; //executor doesn't accept
+  var RoRoI vl_goodValues := { 
+    {99,0,1,2,3,4,5}, {99,0,1,3,2,4,5},{99,0,2,1,3,4,5},{99,0,2,3,1,4,5},{99,0,3,2,1,4,5},{99,0,3,1,2,4,5},
+    {99,1,0,2,3,4,5}, {99,1,0,3,2,4,5},{99,1,2,0,3,4,5},{99,1,2,3,0,4,5},{99,1,3,2,0,4,5},{99,1,3,0,2,4,5},
+    {99,2,1,0,3,4,5}, {99,2,1,3,0,4,5},{99,2,0,1,3,4,5},{99,2,0,3,1,4,5},{99,2,3,0,1,4,5},{99,2,3,1,0,4,5},
+    {99,3,1,0,2,4,5}, {99,3,1,2,0,4,5},{99,3,0,1,2,4,5},{99,3,0,2,1,4,5},{99,3,2,0,1,4,5},{99,3,2,1,0,4,5},
+    {99,0,1,2,9,4,5}, {99,0,1,9,2,4,5},{99,0,2,1,9,4,5},{99,0,2,9,1,4,5},{99,0,9,2,1,4,5},{99,0,9,1,2,4,5},
+    {99,1,0,2,9,4,5}, {99,1,0,9,2,4,5},{99,1,2,0,9,4,5},{99,1,2,9,0,4,5},{99,1,9,2,0,4,5},{99,1,9,0,2,4,5},
+    {99,2,1,0,9,4,5}, {99,2,1,9,0,4,5},{99,2,0,1,9,4,5},{99,2,0,9,1,4,5},{99,2,9,0,1,4,5},{99,2,9,1,0,4,5},
+    {99,9,1,0,2,4,5}, {99,9,1,2,0,4,5},{99,9,0,1,2,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5},
+    {99,9,1,9,0,2,4,5}, {99,9,1,2,9,0,4,5},{99,9,0,9,1,9,2,9,4,5},{99,9,0,2,1,4,5},{99,9,2,0,1,4,5},{99,9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(tl_RoI4p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut4s_2dyn() runs on A {
+  var template RoI tl_RoI1 := {1, 2, *};
+  var template RoI tl_RoI4p := {permutation(0, all from tl_RoI1), 4, 5}; //executor doesn't accept
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5},
+    {9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  };
+  var RoRoI vl_badValues := { {},{1},{1,2},{1,2,3},{1,2,3,4},{1,2,3,4,5},{0,1,2,3,5,4},{0,1,2,3,4,6},{ 5, 4, 3, 2, 1, 0 },{1,1,1,1,1,1}};  
+  f_checkRoITemplate(tl_RoI4p,vl_goodValues,vl_badValues);
+}
+
+//=== 5 ===
+
+//{*,permutation(1,2,3),*}
+testcase tc_permut5s_eq_dyn() runs on A {
+  var template RoI tl_RoI5p := {*,permutation(all from t_SoI3),*}
+  f_checkRoITemplateEquivalence(tl_RoI5p,t_SoI5p_eq);
+}
+
+testcase tc_permut5s_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI5p := {*,permutation(all from tl_RoI3),*}
+  f_checkRoITemplateEquivalence(tl_RoI5p,t_SoI5p_eq);
+}
+
+testcase tc_permut5s_dyn() runs on A {
+  var template RoI tl_RoI5p := {*,permutation(all from t_SoI3),*}
+  var RoRoI vl_goodValues := { 
+    {1,2,3},{1,3,2},
+    {2,1,3},{2,3,1},
+    {3,1,2},{3,2,1},
+    {0,2,1,3},{0,2,1,3,0},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI5p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut5s_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI5p := {*,permutation(all from tl_RoI3),*}
+  var RoRoI vl_goodValues := { 
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    {0,2,1,3},{0,2,1,3,0},
+    {-200,200,0,1,2,3,-1000},{-200,200,0,1,3,2,-1000},
+    {-200,200,0,2,1,3,-1000},{-200,200,0,2,3,1,-1000},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000},
+    {1,-200,200,0,1,2,3,-1000},{1,-200,200,0,1,3,2,-1000},
+    {2,-200,200,0,2,1,3,-1000,2},{1,2,-200,200,0,2,3,1,-1000,2,1},
+    {-200,200,0,3,1,2,-1000},{-200,200,0,3,2,1,-1000}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI5p,vl_goodValues,vl_badValues);
+}
+//=== 6 ===
+//{?,permutation(1,2,3),4}
+testcase tc_permut6s_eq_dyn() runs on A {
+  var template RoI tl_RoI6p := {?,permutation(all from t_SoI3),4};
+  f_checkRoITemplateEquivalence(tl_RoI6p,t_SoI6p_eq);
+}
+
+testcase tc_permut6s_eq_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4};
+  f_checkRoITemplateEquivalence(tl_RoI6p,t_SoI6p_eq);
+}
+
+testcase tc_permut6s_dyn() runs on A {
+  var template RoI tl_RoI6p := {?,permutation(all from t_SoI3),4} //(?,permutation(1,2,3),4)
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    {1,2,3},{1,3,2},
+    {0,2,1,3},{0,2,3,1},
+    {3,1,2},{3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut6s_2dyn() runs on A {
+  var template RoI tl_RoI3 := {1, 2, 3};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 0,2,1,3},{0,2,3,1},
+    { 3,1,2},{ 3,2,1},
+
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+testcase tc_permut6sA_dyn() runs on A {
+  var integer x:=1,y:=2,z:=3;
+  var template RoI tl_RoI3 := {x, y, z};
+  var template RoI tl_RoI6p := {?,permutation(all from tl_RoI3),4}
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4},{0,1,3,2,4},
+    {0,2,1,3,4},{0,2,3,1,4},
+    {0,3,1,2,4},{0,3,2,1,4},
+    {1,1,2,3,4},{1,1,3,2,4},
+    {1,2,1,3,4},{1,2,3,1,4},
+    {1,3,1,2,4},{1,3,2,1,4},
+    {2,1,2,3,4},{2,1,3,2,4},
+    {2,2,1,3,4},{2,2,3,1,4},
+    {2,3,1,2,4},{2,3,2,1,4},
+    {3,1,2,3,4},{3,1,3,2,4},
+    {3,2,1,3,4},{3,2,3,1,4},
+    {3,3,1,2,4},{3,3,2,1,4},
+    {9,1,2,3,4},{9,1,3,2,4},
+    {9,2,1,3,4},{9,2,3,1,4},
+    {9,3,1,2,4},{9,3,2,1,4},
+
+    {5,1,2,3,4},{5,1,3,2,4},
+    {5,2,1,3,4},{5,2,3,1,4},
+    {5,3,1,2,4},{5,3,2,1,4},
+
+    {99,1,2,3,4},{-5,1,3,2,4},
+    {1,2,1,3,4},{2,2,3,1,4},
+    {3,3,1,2,4},{4,3,2,1,4}}
+  var RoRoI vl_badValues := { {},{1},{1,2},
+    { 1,2,3},{1,3,2},
+    { 2,1,3},{2,3,1},
+    { 3,1,2},{ 3,2,1},
+    { 0,1,2,3},{1,1,3,2},
+    { 2,2,1,3},{3,2,3,1},
+    { 4,3,1,2},{5,3,2,1},
+    { 1,2,3,4},{1,3,2,4},
+    { 2,1,3,4},{2,3,1,4},
+    { 3,1,2,4},{ 3,2,1,4},
+    { 0,1,2,3,5},{1,1,3,2,6},
+    { 2,2,1,3,7},{3,2,3,1,8},
+    { 4,3,1,2,9},{5,3,2,1,10},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI6p,vl_goodValues,vl_badValues);
+}
+
+//=== 7 ===
+//{permutation{1, 2, ?}};
+testcase tc_permut7s_eq_dyn() runs on A {
+  var template RoI tl_RoI7p := {permutation(all from t_SoI7)};
+  f_checkRoITemplateEquivalence(tl_RoI7p,t_SoI7p_eq);
+}
+
+testcase tc_permut7s_eq_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI7p := {permutation(all from tl_RoI7)};
+  f_checkRoITemplateEquivalence(tl_RoI7p,t_SoI7p_eq);
+}
+
+testcase tc_permut7s_dyn() runs on A {
+  var template RoI tl_RoI7p := {permutation(all from t_SoI7)};
+  var RoRoI vl_goodValues := { 
+    {1,2,3},{1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},{0,2,3,1,5},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI7p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut7s_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI7p := {permutation(all from tl_RoI7)};
+  var RoRoI vl_goodValues := { 
+    {1,2,3}, {1,2,4},{1,2,5},{1,2,1000},
+    {1,3,2},{1,4,2},{1,5,2},{1,6,2},
+    {2,1,3},{2,1,4},{2,1,5},{2,1,6},
+    {3,1,2},{3,2,1},{4,1,2},{4,2,1},
+    {1000,1,2},{1,1000,2}
+  }
+  var RoRoI vl_badValues := { {},{1},{2},{3},{9999},{1,2},{2,1}, {13,31},
+    { 0,2,1,3},{0,2,3,1},
+    {-200,200,0,2,3,-1000},{-200,200,0,3,2,-1000},
+    {-200,200,0,1,3,-1000},{-200,200,0,3,1,-1000},
+    {-200,200,0,1,2,-1000},{-200,200,0,2,1,-1000}, 
+    {-200,200,0,2,-1000},{-200,200,0,3,-1000},{-200,200,0,1,-1000},
+    {1,2,100,3},{1,100,2,3},{1,100,2,200,3}
+  }
+  f_checkRoITemplate(tl_RoI7p,vl_goodValues,vl_badValues);
+}
+
+//=== 8 ===
+//{permutation(0,1,2,?),4,5}
+
+testcase tc_permut8s_eq_dyn() runs on A {
+  var template RoI tl_RoI8p := {permutation(0, all from t_SoI7), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI8p,t_SoI8p_eq);
+}
+
+testcase tc_permut8s_eq_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI8p := {permutation(0, all from tl_RoI7), 4, 5};
+  f_checkRoITemplateEquivalence(tl_RoI8p,t_SoI8p_eq);
+}
+
+testcase tc_permut8s_dyn() runs on A {
+  var template RoI tl_RoI8p := {permutation(0, all from t_SoI7), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(tl_RoI8p,vl_goodValues,vl_badValues);
+}
+
+testcase tc_permut8s_2dyn() runs on A {
+  var template RoI tl_RoI7 := {1, 2, ?};
+  var template RoI tl_RoI8p := {permutation(0, all from tl_RoI7), 4, 5};
+  var RoRoI vl_goodValues := { 
+    {0,1,2,3,4,5}, {0,1,3,2,4,5},{0,2,1,3,4,5},{0,2,3,1,4,5},{0,3,2,1,4,5},{0,3,1,2,4,5},
+    {1,0,2,3,4,5}, {1,0,3,2,4,5},{1,2,0,3,4,5},{1,2,3,0,4,5},{1,3,2,0,4,5},{1,3,0,2,4,5},
+    {2,1,0,3,4,5}, {2,1,3,0,4,5},{2,0,1,3,4,5},{2,0,3,1,4,5},{2,3,0,1,4,5},{2,3,1,0,4,5},
+    {3,1,0,2,4,5}, {3,1,2,0,4,5},{3,0,1,2,4,5},{3,0,2,1,4,5},{3,2,0,1,4,5},{3,2,1,0,4,5},
+    {0,1,2,9,4,5}, {0,1,9,2,4,5},{0,2,1,9,4,5},{0,2,9,1,4,5},{0,9,2,1,4,5},{0,9,1,2,4,5},
+    {1,0,2,9,4,5}, {1,0,9,2,4,5},{1,2,0,9,4,5},{1,2,9,0,4,5},{1,9,2,0,4,5},{1,9,0,2,4,5},
+    {2,1,0,9,4,5}, {2,1,9,0,4,5},{2,0,1,9,4,5},{2,0,9,1,4,5},{2,9,0,1,4,5},{2,9,1,0,4,5},
+    {9,1,0,2,4,5}, {9,1,2,0,4,5},{9,0,1,2,4,5},{9,0,2,1,4,5},{9,2,0,1,4,5},{9,2,1,0,4,5}
+  }
+  var RoRoI vl_badValues := { {},{1},{1,2},{9,1,9,0,2,4,5}, {9,1,2,9,0,4,5},{9,0,9,1,9,2,9,4,5}
+
+  }
+  f_checkRoITemplate(tl_RoI8p,vl_goodValues,vl_badValues);
+}
+
+//************************* Testcases for Templates of type Record of charstring ******************************
+
+//=== 1 ===
+testcase tc_CharstringTemplate1_eq() runs on A
+{
+  f_checkRoCSTemplateEquivalence(t_rocs1,t_rocs1_eq);
+}
+testcase tc_CharstringTemplate1_eq_local() runs on A
+{
+  template RoCS tl_rocs1 := { permutation ( all from t_RoCS1 ) };
+  f_checkRoCSTemplateEquivalence(tl_rocs1,t_rocs1_eq);
+}
+testcase tc_CharstringTemplate1_eq_dyn() runs on A
+{
+  var template RoCS tl_rocs1 := { permutation ( all from t_RoCS1 ) };
+  f_checkRoCSTemplateEquivalence(tl_rocs1,t_rocs1_eq);
+}
+
+testcase tc_CharstringTemplate1_eq_local_dyn() runs on A
+{
+  template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template RoCS tl_rocs1 := { permutation ( all from tl_RoCS1 ) };
+  f_checkRoCSTemplateEquivalence(tl_rocs1,t_rocs1_eq);
+}
+
+testcase tc_CharstringTemplate1_eq_2dyn() runs on A
+{
+  var template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template RoCS tl_rocs1 := { permutation ( all from tl_RoCS1 ) };
+  f_checkRoCSTemplateEquivalence(tl_rocs1,t_rocs1_eq);
+}
+
+//=== 2 ===
+testcase tc_CharstringTemplate2_eq() runs on A
+{
+  f_checkRoCSTemplateEquivalence(t_rocs2,t_rocs2_eq);
+}
+testcase tc_CharstringTemplate2_eq_local() runs on A
+{
+  template RoCS tl_rocs2 := { permutation( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2) };
+  f_checkRoCSTemplateEquivalence(tl_rocs2,t_rocs2_eq);
+}
+testcase tc_CharstringTemplate2_eq_dyn() runs on A
+{
+  var template RoCS tl_rocs2 := { permutation( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2) };
+  f_checkRoCSTemplateEquivalence(tl_rocs2,t_rocs2_eq);
+}
+
+testcase tc_CharstringTemplate2_eq_local_dyn() runs on A
+{
+  template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  template RoCS tl_RoCS2 := { "apples","bananas","","pears"};
+  var template RoCS tl_rocs2 := { permutation( "treeeeeeeeeeeeee",all from tl_RoCS1, "dog", all from tl_RoCS2) }; 
+  f_checkRoCSTemplateEquivalence(tl_rocs2,t_rocs2_eq);
+}
+
+
+testcase tc_CharstringTemplate2_eq_2dyn() runs on A
+{
+  var template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template RoCS tl_RoCS2 := { "apples","bananas","","pears"};
+  var template RoCS tl_rocs2 := { permutation( "treeeeeeeeeeeeee",all from tl_RoCS1, "dog", all from tl_RoCS2) }; 
+  f_checkRoCSTemplateEquivalence(tl_rocs2,t_rocs2_eq);
+}
+
+//==== function reference =====
+testcase tc_functionRef_rof_p_eq() runs on A {
+  f_checkMyRoFRefTemplateEquivalence( t_fref_int2int_p,t_fref_int2int_p_eq);
+}
+
+// permutation all from with length restriction
+// 1. the target of 'all from' is foldable (known at compile-time)
+testcase tc_perm_varTemplate_len_res_foldable() runs on A
+{
+  template RoI tl_foldable := { 6, 9 };
+  var template RoI tl_len_res := { permutation ( 2, all from tl_foldable ) } length (3);
+  var template RoI tl_len_res_eq := { permutation ( 2, 6, 9 ) } length (3);
+  f_checkRoITemplateEquivalence(tl_len_res, tl_len_res_eq);
+}
+
+// 2. the target of 'all from' is unfoldable (not known at compile-time)
+testcase tc_perm_varTemplate_len_res_unfoldable() runs on A
+{
+  var template RoI tl_unfoldable := { 6, 9 };
+  var template RoI tl_len_res := { permutation ( 2, all from tl_unfoldable ) } length (3);
+  var template RoI tl_len_res_eq := { permutation ( 2, 6, 9 ) } length (3);
+  f_checkRoITemplateEquivalence(tl_len_res, tl_len_res_eq);
+}
+
+
+}  // end of module

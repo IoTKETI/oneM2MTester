@@ -1,0 +1,185 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module TtemplateAnytype {
+type component templateAnytype_mycomp {};
+type anytype templateAnytype_myAnytype /*{
+ integer f1,
+ float f2 }*/;
+type record templateAnytype_rec {
+ templateAnytype_myAnytype x1,
+ templateAnytype_myAnytype x2,
+ templateAnytype_myAnytype x3 optional };
+template templateAnytype_rec templateAnytype_tSpec :={ //specific values
+ x1:={float:=1.2},
+ x2:={integer:=2},
+ x3:={integer:=3} };
+template templateAnytype_rec templateAnytype_tList :={ //specific value and value list
+ x1:={float:=1.2},
+ x2:=({integer:=2},{integer:=3},{float:=1.2}),
+ x3:={integer:=3} };
+template templateAnytype_rec templateAnytype_tComp :={ //specific value and compl. list
+ x1:={float:=1.2},
+ x2:=complement ({integer:=2},{float:=1.2},{integer:=6}),
+ x3:={integer:=3} };
+template templateAnytype_rec templateAnytype_tOmit :={ //omitting values
+ x1:={float:=1.2},
+ x2:={integer:=2},
+ x3:=omit } ;
+template templateAnytype_rec templateAnytype_tAny :={ //specific and any value
+ x1:={float:=1.2},
+ x2:={integer:=2},
+ x3:=? } ;
+template templateAnytype_rec templateAnytype_tAnyorNone :={ //specific and AnyorNone value
+ x1:={float:=1.2},
+ x2:={integer:=2},
+ x3:=* };
+template templateAnytype_rec templateAnytype_tIfpresent :={ //specific value and ifpresent
+ x1:={float:=1.2},
+ x2:={integer:=2},
+ x3:={integer:=3} ifpresent };
+
+testcase templateAnytypeSpec() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2;		//specific value
+x1:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp };
+x2:={ x1:={float:=1.3},  x2:={integer:=2},  x3:=temp };
+//match
+if (match(x1,templateAnytype_tSpec)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x2,templateAnytype_tSpec))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeList() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2,x3;		//value list
+x1:={ x1:={float:=1.2},  x2:={integer:=3},  x3:=temp };
+x2:={ x1:={float:=1.2},  x2:={integer:=7},  x3:=temp };
+x3:={ x1:={integer:=8},  x2:={integer:=3},  x3:=temp };
+//match
+if (match(x1,templateAnytype_tList)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of list
+if (not(match(x2,templateAnytype_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateAnytype_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeComp() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2,x3;		//complemented list
+x1:={ x1:={float:=1.2},  x2:={integer:=7},  x3:=temp };
+x2:={ x1:={float:=1.2},  x2:={integer:=6},  x3:=temp };
+x3:={ x1:={float:=1.3},  x2:={integer:=7},  x3:=temp };
+//match
+if (match(x1,templateAnytype_tComp)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: in the list
+if (not(match(x2,templateAnytype_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateAnytype_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeOmit() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2,x3;		//omitting value
+x1:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=omit };
+x2:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp };
+x3:={ x1:={integer:=2},  x2:={integer:=2},  x3:=omit };
+//match
+if (match(x1,templateAnytype_tOmit)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: not omitted
+if (not(match(x2,templateAnytype_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateAnytype_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeAny() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2,x3;		//any value
+x1:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp };
+x2:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=omit };
+x3:={ x1:={integer:=2},  x2:={integer:=2},  x3:=temp };
+//match
+if (match(x1,templateAnytype_tAny)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: field omitted
+if (not(match(x2,templateAnytype_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateAnytype_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeAnyorNone() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp:={integer:=3};
+var templateAnytype_rec x1,x2,x3;		//AnyorNone value
+x1:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=omit };
+x2:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp };
+x3:={ x1:={integer:=2},  x2:={integer:=2},  x3:=omit };
+//match: omitted
+if (match(x1,templateAnytype_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: value
+if (match(x2,templateAnytype_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateAnytype_tAnyorNone))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateAnytypeIfpresent() runs on templateAnytype_mycomp {
+var templateAnytype_myAnytype temp1:={integer:=3};	//ifpresent
+var templateAnytype_myAnytype temp2:={integer:=4};
+var templateAnytype_rec x1,x2,x3,x4;
+x1:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp1 };
+x2:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=omit };
+x3:={ x1:={float:=1.2},  x2:={integer:=2},  x3:=temp2 };
+x4:={ x1:={float:=1.4},  x2:={integer:=2},  x3:=omit };
+//match: present and match
+if (match(x1,templateAnytype_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: not present
+if (match(x2,templateAnytype_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: present and not match
+if (not(match(x3,templateAnytype_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateAnytype_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+control {
+ execute(templateAnytypeSpec());
+ execute(templateAnytypeList());
+ execute(templateAnytypeComp());
+ execute(templateAnytypeOmit());
+ execute(templateAnytypeAny());
+ execute(templateAnytypeAnyorNone());
+ execute(templateAnytypeIfpresent());
+
+}
+}
+with {
+  extension "anytype integer, float"
+}

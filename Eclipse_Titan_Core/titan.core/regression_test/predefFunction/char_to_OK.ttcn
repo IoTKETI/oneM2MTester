@@ -1,0 +1,156 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module char_to_OK {
+
+type component PDTestComponent {};
+
+/*--- CHAR2INT --------------------------------------------------*/
+
+const charstring c2ipars := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+modulepar integer c2ipar1 := char2int("A")
+modulepar integer c2ipar2 := char2int("\n")
+modulepar integer c2ipar3 := char2int("" & "A" & "")
+modulepar integer c2ipar4 := char2int(substr(c2ipars,0,1))
+modulepar integer c2ipar5 := char2int("A" <@ 1)
+
+
+testcase char_to_int() runs on PDTestComponent{
+
+	if ((c2ipar1 == 65)
+	and (c2ipar1 == char2int("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2ipar2 == 10)
+	and (c2ipar2 == char2int("\n")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2ipar3 == 65)
+	and (c2ipar3 == char2int("" & "A" & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2ipar4 == 65)
+	and (c2ipar4 == char2int(substr(c2ipars,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2ipar5 == 65)
+	and (c2ipar5 == char2int("A" @> 1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j
+	for (j:=0; j<lengthof(c2ipars); j:=j+1) {
+	if (char2int(substr(c2ipars,j,1))-char2int("A") == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+/*--- UNICHAR2INT --------------------------------------------------*/
+
+const universal charstring uc2ipars := char(0,0,0,65) & "BCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+modulepar integer uc2ipar1 := unichar2int("A")
+modulepar integer uc2ipar2 := unichar2int(char(0,0,0,65))
+modulepar integer uc2ipar3 := unichar2int("" & char(0,0,0,65) & "")
+modulepar integer uc2ipar4 := unichar2int(substr(uc2ipars,0,1))
+modulepar integer uc2ipar5 := unichar2int(char(0,0,0,255))
+modulepar integer uc2ipar6 := unichar2int(char(0,0,255,255))
+modulepar integer uc2ipar7 := unichar2int(char(0,255,255,255))
+modulepar integer uc2ipar8 := unichar2int(char(127,255,255,255))
+
+
+testcase unichar_to_int() runs on PDTestComponent{
+
+	if ((uc2ipar1 == 65)
+	and (uc2ipar1 == unichar2int("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar2 == 65)
+	and (uc2ipar2 == unichar2int(char(0,0,0,65))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar3 == 65)
+	and (uc2ipar3 == unichar2int("" & char(0,0,0,65) & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar4 == 65)
+	and (uc2ipar4 == unichar2int(substr(uc2ipars,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar5 == 255)
+	and (uc2ipar5 == unichar2int(char(0,0,0,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar6 == 65535)
+	and (uc2ipar6 == unichar2int(char(0,0,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar7 == 16777215)
+	and (uc2ipar7 == unichar2int(char(0,255,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((uc2ipar8 == 2147483647)
+	and (uc2ipar8 == unichar2int(char(127,255,255,255))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+}
+
+/*--- CHAR2OCT --------------------------------------------------*/
+
+const charstring c2opars := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+modulepar octetstring c2opar1 := char2oct("A")
+modulepar octetstring c2opar2 := char2oct("\n")
+modulepar octetstring c2opar3 := char2oct("" & "A" & "")
+modulepar octetstring c2opar4 := char2oct(substr(c2opars,0,1))
+modulepar octetstring c2opar5 := char2oct("A" @> 1)
+
+testcase char_to_oct() runs on PDTestComponent{
+
+	if ((c2opar1 == '41'O)
+	and (c2opar1 == char2oct("A")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2opar2 == '0A'O)
+	and (c2opar2 == char2oct("\n")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2opar3 == '41'O)
+	and (c2opar3 == char2oct("" & "A" & "")))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2opar4 == '41'O)
+	and (c2opar4 == char2oct(substr(c2ipars,0,1))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((c2opar5 == '41'O)
+	and (c2opar5 == char2oct("A" @> 1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j
+	for (j:=0; j<lengthof(c2opars); j:=j+1) {
+	if (oct2int(char2oct(substr(c2opars,j,1)))-65 == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+control {
+	execute (char_to_int());
+	execute (unichar_to_int());
+	execute (char_to_oct());
+}
+
+}

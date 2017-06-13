@@ -1,0 +1,573 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module tests custom encoding for TTCN-3 types and encoding for ASN.1 types
+// (Encvalue and decvalue encode and decode values of TTCN-3 types using manually written
+// external functions, as long as they have the same encoding name as the value's type.
+// When using encvalue or decvalue on a value of an ASN.1 type an encoding/decoding
+// external function, of a built-in encoding type, must be declared for the ASN.1 type.
+// PER encoding for ASN.1 types works similarly to custom encoding for TTCN-3 types:
+// encoding and decoding is done by manually written coders, that are declared with
+// the 'PER' encoding attribute, instead of a custom encoding attribute).
+module Custom1 {
+
+import from Custom2 all;
+import from Custom3 all;
+import from Types all;
+
+type record Msg {
+  octetstring data optional,
+  RecOf list
+}
+
+signature Sig(inout universal charstring p);
+
+type port PT_Msg message {
+  inout Msg
+}
+with {
+  extension "internal";
+}
+
+type port PT_Proc procedure {
+  inout Sig
+}
+with {
+  extension "internal";
+}
+
+type component CT {
+  port PT_Msg pt_msg;
+  port PT_Proc pt_proc;
+}
+
+// Test 1.
+// The encoded type is a record defined in another module
+// The coding functions are declared in a 3rd module
+testcase tc_custom1() runs on CT
+{
+  var Rec x := { num := 3, str := "ttcn" };
+  var bitstring enc_exp := int2bit(x.num, 8);
+  var Rec dec_exp := { num := 3, str := "c++" };
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Rec dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Separator for the following 2 tests
+const bitstring c_separator := '1111'B;
+
+// Test 2.
+// The encoded type is a record-of. It is defined in this module.
+// The coding functions are declared in this module, but after
+// they are used (through encvalue and decvalue)
+testcase tc_custom2() runs on CT
+{
+  var RecOf x := { '1010'B, '0010'B, '01'B };
+  var bitstring enc_exp := x[0] & c_separator & x[1] & c_separator & x[2];
+  var RecOf dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var RecOf dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+external function f_enc_recof(in RecOf x) return bitstring
+  with { extension "prototype(convert) encode(globalCustom)" }
+  
+external function f_dec_recof(inout bitstring b, out RecOf x) return integer
+  with { extension "prototype(sliding) decode(globalCustom)" }
+
+type record of bitstring RecOf; // encoding type defined globally (at module level)
+
+type union Uni {
+  integer i,
+  octetstring os,
+  universal charstring ucs
+} // encoding type defined globally (at module level)
+
+// Test 3.
+// The encoded type is a union defined in this module.
+// The coding functions are declared in another module (circular import).
+testcase tc_custom3() runs on CT
+{
+  var Uni x := { i := 16 };
+  var bitstring enc_exp := c_separator & int2bit(x.i, 8) & c_separator;
+  var Uni dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Uni dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 4.
+// The encoded type and the coding functions are in another module (in the same other module).
+testcase tc_custom4() runs on CT
+{
+  var BitString x := '10010110'B;
+  var bitstring enc_exp := x;
+  var BitString dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var BitString dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 5.
+// The encoded type is a set defined in another module
+// The coding functions are declared in a 3rd module (which is not imported in this module)
+testcase tc_custom5() runs on CT
+{
+  var Set x := { num := 3, str := "ttcn" };
+  var bitstring enc_exp := int2bit(x.num, 8);
+  var Set dec_exp := { num := 3, str := "c++" };
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Set dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 6.
+// Using encvalue on templates and template variables
+// Same type and encoding function as test 1
+testcase tc_custom_temp() runs on CT
+{
+  template Rec t := { num := 3, str := "ttcn" };
+  var template Rec vt := { num := 3, str := "ttcn" };
+  var bitstring enc_exp := int2bit(valueof(vt.num), 8);
+  var Rec dec_exp := { num := 3, str := "c++" };
+  
+  var bitstring enc := encvalue(t);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  enc := encvalue(vt);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  setverdict(pass);
+}
+
+// Test 7.
+// Same as test 2, but with encvalue_unichar and decvalue_unichar.
+// The input RecOf has also been adjusted, so it doesn't cause problems for the UTF-8 decoder.
+testcase tc_custom_unichar() runs on CT
+{
+  var RecOf x := { '0110'B, '0100'B, '01110101'B };
+  var universal charstring enc_exp := oct2unichar(bit2oct(x[0] & c_separator & x[1] & c_separator & x[2]), "UTF-8");
+  var RecOf dec_exp := x;
+  
+  var universal charstring enc := encvalue_unichar(x, "UTF-8");
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var RecOf dec;
+  var integer res := decvalue_unichar(enc_exp, dec, "UTF-8");
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 8.
+// Using custom encoding on a decoded parameter redirect.
+// Same input value as in test 5.
+testcase tc_custom_param_redirect() runs on CT
+{
+  connect(self:pt_proc, self:pt_proc);
+  var RecOf val := { '0110'B, '0100'B, '01110101'B };
+  var charstring str_fmt := "UTF-8";
+  var universal charstring val_enc := encvalue_unichar(val, str_fmt);
+  var RecOf res;
+  pt_proc.reply(Sig: { p := val_enc });
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_proc.getreply(Sig: { p := val_enc }) -> param (res := @decoded(str_fmt) p) {
+      if (res != val) {
+        setverdict(fail, "Invalid decoded parameter. Expected: ", val, ", got: ", res);
+      }
+      else {
+        setverdict(pass);
+      }
+    }
+    [] pt_proc.getreply(Sig: { p := ?}) {
+      setverdict(fail, "Invalid reply received.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// Test 9.
+// Using custom encoding in a template with decoded content matching.
+// Same input as test 3.
+testcase tc_custom_decmatch() runs on CT
+{
+  connect(self:pt_msg, self:pt_msg);
+  var Uni val := { i := 16 };
+  var Msg msg := { data := omit, list := { encvalue(val) } };
+  var Uni res;
+  pt_msg.send(msg);
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_msg.receive(Msg: { data := omit, list := { decmatch val } }) {
+      setverdict(pass);
+    }
+    [] pt_msg.receive(?) {
+      setverdict(fail, "Invalid message received or decoded content matching failed.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// these let encvalue and decvalue know which encoding to use for the ASN.1 type
+external function f_enc_seq(in Seq x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" };
+  
+external function f_dec_seq(in octetstring x) return Seq
+  with { extension "prototype(convert) decode(JSON)" };
+  
+// Test 10.
+// Using encvalue and decvalue on the ASN.1 type Seq (with JSON encoding).
+testcase tc_asn() runs on CT
+{
+  var Seq x := { num := 10, str := "abc" };
+  var bitstring enc_exp := oct2bit(char2oct("{\"num\":10,\"str\":\"abc\"}"));
+  var Seq dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Seq dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 11.
+// Using encvalue and decvalue on the ASN.1 type Set (with JSON encoding).
+// The external functions indicating the type's coding are in a different module, which is not imported.
+testcase tc_asn2() runs on CT
+{
+  var Set2 x := { num := 10, str := "abc" };
+  var bitstring enc_exp := oct2bit(char2oct("{\"num\":10,\"str\":\"abc\"}"));
+  var Set2 dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Set2 dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 12.
+// The redirected parameter is decoded into a value of ASN.1 type Seq.
+// Same input value as in test 8.
+testcase tc_asn_param_redirect() runs on CT
+{
+  connect(self:pt_proc, self:pt_proc);
+  var Seq val := { num := 10, str := "abc" };
+  var charstring str_fmt := "UTF-8";
+  var universal charstring val_enc := encvalue_unichar(val, str_fmt);
+  var Seq res;
+  pt_proc.reply(Sig: { p := val_enc });
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_proc.getreply(Sig: { p := val_enc }) -> param (res := @decoded(str_fmt) p) {
+      if (res != val) {
+        setverdict(fail, "Invalid decoded parameter. Expected: ", val, ", got: ", res);
+      }
+      else {
+        setverdict(pass);
+      }
+    }
+    [] pt_proc.getreply(Sig: { p := ?}) {
+      setverdict(fail, "Invalid reply received.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// Test 13.
+// Decoded content matching against a value of ASN.1 type Seq.
+// Same input value as in test 8.
+testcase tc_asn_decmatch() runs on CT
+{
+  connect(self:pt_msg, self:pt_msg);
+  var Seq val := { num := 10, str := "abc" };
+  var Msg msg := { data := omit, list := { encvalue(val) } };
+  var Seq res;
+  pt_msg.send(msg);
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_msg.receive(Msg: { data := omit, list := { decmatch val } }) {
+      setverdict(pass);
+    }
+    [] pt_msg.receive(?) {
+      setverdict(fail, "Invalid message received or decoded content matching failed.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// PER coder functions, these need to be implemented manually, just like custom
+// coder functions
+external function f_enc_seqof(in SeqOf x) return bitstring
+  with { extension "prototype(convert) encode(PER)" };
+  
+external function f_dec_seqof(inout bitstring x, out SeqOf y) return integer
+  with { extension "prototype(sliding) decode(PER)" };
+  
+// Test 14.
+// PER coder with encvalue and decvalue.
+testcase tc_per() runs on CT
+{
+  var SeqOf x := { 1, 2, 3 };
+  // the manually written "PER" coder for this module uses the built-in JSON coder
+  var bitstring enc_exp := oct2bit(char2oct("[1,2,3]"));
+  var SeqOf dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var SeqOf dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 15.
+// PER coder with encvalue and decvalue.
+// The PER coder functions are declared in a module, which is not imported into this one.
+testcase tc_per2() runs on CT
+{
+  var SetOf x := { 1, 2, 3 };
+  // the manually written "PER" coder for this module uses the built-in JSON coder
+  var bitstring enc_exp := oct2bit(char2oct("[1,2,3]"));
+  var SetOf dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var SetOf dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+// Test 16.
+// The redirected parameter is decoded using the PER coder.
+// Same input value as in test 11.
+testcase tc_per_param_redirect() runs on CT
+{
+  connect(self:pt_proc, self:pt_proc);
+  var SeqOf val := { 1, 2, 3 };
+  var charstring str_fmt := "UTF-8";
+  var universal charstring val_enc := encvalue_unichar(val, str_fmt);
+  var SeqOf res;
+  pt_proc.reply(Sig: { p := val_enc });
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_proc.getreply(Sig: { p := val_enc }) -> param (res := @decoded(str_fmt) p) {
+      if (res != val) {
+        setverdict(fail, "Invalid decoded parameter. Expected: ", val, ", got: ", res);
+      }
+      else {
+        setverdict(pass);
+      }
+    }
+    [] pt_proc.getreply(Sig: { p := ?}) {
+      setverdict(fail, "Invalid reply received.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// Test 17.
+// Decoded content matching with the PER coder.
+// Same input value as in test 11.
+testcase tc_per_decmatch() runs on CT
+{
+  connect(self:pt_msg, self:pt_msg);
+  var SeqOf val := { 1, 2, 3 };
+  var Msg msg := { data := omit, list := { encvalue(val) } };
+  var SeqOf res;
+  pt_msg.send(msg);
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] pt_msg.receive(Msg: { data := omit, list := { decmatch val } }) {
+      setverdict(pass);
+    }
+    [] pt_msg.receive(?) {
+      setverdict(fail, "Invalid message received or decoded content matching failed.");
+    }
+    [] tmr.timeout {
+      setverdict(fail, "Timed out.");
+    }
+  }
+}
+
+// encoder function for ASN.1 type Choice, using the built-in JSON codec
+external function f_enc_choice(in Choice x) return bitstring
+  with { extension "prototype(convert) encode(JSON)" };
+
+// PER decoder function for ASN.1 type Choice, which needs to be implemented manually
+external function f_dec_choice(inout bitstring x, out Choice y) return integer
+  with { extension "prototype(sliding) decode(PER)" };
+
+// Test 18.
+// Encoding an ASN.1 type with JSON (built-in) and decoding the same type with PER (manual).
+testcase tc_asn_mixed() runs on CT
+{
+  var Choice x := { num := 2 };
+  var bitstring enc_exp := oct2bit(char2oct("{\"num\":2}"));
+  // the manually written "PER" decoder for this module uses the built-in JSON coder,
+  // so the encoding result can safely be used as input for the decoder, and the
+  // decoding result will be the initial value
+  var Choice dec_exp := x;
+  
+  var bitstring enc := encvalue(x);
+  if (enc != enc_exp) {
+    setverdict(fail, "Expected: ", enc_exp, ", got: ", enc);
+  }
+  var Choice dec;
+  var integer res := decvalue(enc_exp, dec);
+  if (res != 0) {
+    setverdict(fail, "Failed to decode ", enc_exp);
+  }
+  if (dec != dec_exp) {
+    setverdict(fail, "Expected: ", dec_exp, ", got: ", dec);
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc_custom1());
+  execute(tc_custom2());
+  execute(tc_custom3());
+  execute(tc_custom4());
+  execute(tc_custom5());
+  execute(tc_custom_temp());
+  execute(tc_custom_unichar());
+  execute(tc_custom_param_redirect());
+  execute(tc_custom_decmatch());
+  execute(tc_asn());
+  execute(tc_asn2());
+  execute(tc_asn_param_redirect());
+  execute(tc_asn_decmatch());
+  execute(tc_per());
+  execute(tc_per2());
+  execute(tc_per_param_redirect());
+  execute(tc_per_decmatch());
+  execute(tc_asn_mixed());
+}
+
+}
+with {
+  encode "globalCustom";
+}

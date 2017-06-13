@@ -1,0 +1,69 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// Original TR:
+// Omitted optional fields of union type (with the "untagged" coding instruction)
+// are not handled by the XER decoder.
+// The XER decoder reports a decoding error, if the decoded element does not match
+// any of the union's alternatives. It does not consider the possibility, that the
+// union might be an (omitted) optional field of a record or set, and decoded
+// element might be meant for another field.
+module HU13380 {
+
+type component CT {}
+
+type record Rec {
+  integer int1,
+  union {
+    charstring abc,
+    charstring def
+  } uni optional,
+  integer int2
+}
+with {
+  variant(uni) "untagged";
+}
+
+external function f_enc(in Rec x) return octetstring
+  with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+external function f_dec(in octetstring x) return Rec
+  with { extension "prototype(convert) decode(XER:XER_EXTENDED)" }
+  
+const Rec c_value := { 3, omit, -3 };
+const octetstring c_value_enc := char2oct(
+  "<Rec>\n" &
+  "\t<int1>3</int1>\n" &
+  "\t<int2>-3</int2>\n" &
+  "</Rec>\n\n");
+  
+testcase tc_HU13380() runs on CT {
+  var octetstring v_enc := f_enc(c_value);
+  if (v_enc != c_value_enc) {
+    setverdict(fail, "Expected: ", c_value_enc, ", got: ", v_enc);
+  }
+  var Rec v_dec := f_dec(c_value_enc);
+  if (v_dec != c_value) {
+    setverdict(fail, "Expected: ", c_value, ", got: ", v_dec);
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc_HU13380());
+}
+
+}
+with {
+  encode "XML";
+}

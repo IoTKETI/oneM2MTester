@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="www.example.org/enumeration_restriction3"
+    xmlns:nse="www.example.org/enumeration_restriction3">
+
+<element name="C">
+	<simpleType>
+		<restriction base="nse:CType" />
+	</simpleType>
+</element>
+
+<simpleType name="CType">
+	<restriction base="string">
+		<maxLength value="32" />
+		<enumeration value="B2" />
+		<enumeration value="UNKNOWN" />
+	</restriction>
+</simpleType>
+
+<simpleType name="CTypeEnum">
+	<restriction base="nse:CType" >
+		<enumeration value="B2" />
+	</restriction>
+</simpleType>
+
+<element name="C2" type="nse:CTypeEnum"/>
+
+
+<simpleType name="mountainbikesize">
+	<restriction base="string">
+		<enumeration value="small"/>
+		<enumeration value="medium"/>
+	</restriction>
+</simpleType>
+
+<complexType name="FamilyMountainBikeSizes">
+	<simpleContent>
+		<extension base="nse:mountainbikesize">
+			<attribute name="familyMember" type="string" />
+		</extension>
+	</simpleContent>
+</complexType>
+
+<complexType name="ChildMountainBikeSizes">
+	<simpleContent>
+		<restriction base="nse:FamilyMountainBikeSizes" >
+			<enumeration value="small"/>
+		</restriction>
+	</simpleContent>
+</complexType>
+
+
+</schema>

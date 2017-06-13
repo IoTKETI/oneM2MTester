@@ -1,0 +1,134 @@
+/*******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator version: CRL 113 200/5 R4A                       
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+//
+//  File:          http_www_example_org_2001_XMLSchema.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Mon Jun 13 09:08:10 2015
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- MyXMLSchema.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "http://www.example.org/2001/XMLSchema" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module http_www_example_org_2001_XMLSchema {
+
+
+import from XSD all;
+
+
+type record AttrDecls
+{
+	record of union {
+		XSD.String attribute,
+		XSD.String attributeGroup
+	} choice_list
+}
+with {
+  variant "untagged";
+  variant (choice_list) "untagged";
+  variant (choice_list[-]) "untagged";
+};
+
+
+type record OpenAttrs
+{
+	record of XSD.String attr optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (attr) "anyAttributes except unqualified, 'http://www.example.org/2001/XMLSchema'";
+};
+
+
+type record Annotated
+{
+	record of XSD.String attr optional,
+	XSD.String asd optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (attr) "anyAttributes except unqualified, 'http://www.example.org/2001/XMLSchema'";
+};
+
+
+type union TypeDefParticle
+{
+	XSD.String group_
+}
+with {
+  variant "untagged";
+  variant (group_) "name as 'group'";
+};
+
+
+type record RestrictionType
+{
+	record of XSD.String attr optional,
+	XSD.String asd optional,
+	union {
+		TypeDefParticle typeDefParticle
+	} choice optional,
+	record of union {
+		XSD.String attribute,
+		XSD.String attributeGroup
+	} choice_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (attr) "anyAttributes except unqualified, 'http://www.example.org/2001/XMLSchema'";
+  variant (choice) "untagged";
+  variant (choice_list) "untagged";
+  variant (choice_list[-]) "untagged";
+};
+
+
+type record ComplexRestrictionType
+{
+	record of XSD.String attr optional,
+	union {
+		TypeDefParticle typeDefParticle
+	} choice,
+	record of union {
+		XSD.String attribute,
+		XSD.String attributeGroup
+	} choice_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (attr) "anyAttributes except unqualified, 'http://www.example.org/2001/XMLSchema'";
+  variant (choice) "untagged";
+  variant (choice_list) "untagged";
+  variant (choice_list[-]) "untagged";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'http://www.example.org/2001/XMLSchema' prefix 'a'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

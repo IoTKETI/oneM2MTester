@@ -1,0 +1,31 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+// Correct syntax but bad semantics
+
+module testcase_SE
+{
+    type record length (10) of integer int10;
+
+    type component C1
+    {
+    }
+
+    testcase tc_isbound_const() runs on C1
+    {
+        // passing the testcase name without its actual parameter list
+        // is an error by itself, but isvalue's parameter check flags it too.
+        var boolean dontcare1 := isvalue(tc_isbound_const);
+
+        //this is a syntax error: var boolean dontcare2 := isvalue(tc_isbound_const());
+    }
+}

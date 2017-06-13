@@ -1,0 +1,178 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating universal charstring templates
+module TemplateConcatUnichar {
+
+import from Types all;
+
+const universal charstring c_unichar := char(0, 1, 2, 3);
+
+template universal charstring t_unichar := char(0, 0, 1, 2);
+
+// there is no other way to recreate these universal charstring templates, than concatenation,
+// so use constants and variable for the expected values
+template universal charstring t_unichar1 := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+const universal charstring c_unichar1_exp := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+
+template universal charstring t_unichar2 := c_unichar & char(0, 0, 1, 2);
+const universal charstring c_unichar2_exp := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+
+template universal charstring t_unichar3 := t_unichar & char(0, 0, 0, 241);
+const universal charstring c_unichar3_exp := char(0, 0, 1, 2) & char(0, 0, 0, 241);
+
+template universal charstring t_unichar4 := char(0, 0, 1, 117) & t_unichar & char(0, 0, 1, 117);
+const universal charstring c_unichar4_exp := char(0, 0, 1, 117) & char(0, 0, 1, 2) & char(0, 0, 1, 117);
+
+
+testcase tc_unichar_t_values() runs on CT {
+  if (log2str(t_unichar1) != log2str(c_unichar1_exp)) {
+    setverdict(fail, "Expected: ", c_unichar1_exp, ", got: ", t_unichar1);
+  }
+  else if (log2str(t_unichar2) != log2str(c_unichar2_exp)) {
+    setverdict(fail, "Expected: ", c_unichar2_exp, ", got: ", t_unichar2);
+  }
+  else if (log2str(t_unichar3) != log2str(c_unichar3_exp)) {
+    setverdict(fail, "Expected: ", c_unichar3_exp, ", got: ", t_unichar3);
+  }
+  else if (log2str(t_unichar4) != log2str(c_unichar4_exp)) {
+    setverdict(fail, "Expected: ", c_unichar4_exp, ", got: ", t_unichar4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_unichar_vt_values() runs on CT {
+  var template universal charstring vt_unichar1 := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+  var universal charstring v_unichar1_exp := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+
+  var template universal charstring vt_unichar2 := c_unichar & char(0, 0, 1, 2);
+  var universal charstring v_unichar2_exp := char(0, 1, 2, 3) & char(0, 0, 1, 2);
+
+  var template universal charstring vt_unichar3 := t_unichar & char(0, 0, 0, 241);
+  var universal charstring v_unichar3_exp := char(0, 0, 1, 2) & char(0, 0, 0, 241);
+
+  var template universal charstring vt_unichar4 := char(0, 0, 1, 117) & t_unichar & char(0, 0, 1, 117);
+  var universal charstring v_unichar4_exp := char(0, 0, 1, 117) & char(0, 0, 1, 2) & char(0, 0, 1, 117);
+  
+  if (log2str(vt_unichar1) != log2str(v_unichar1_exp)) {
+    setverdict(fail, "Expected: ", v_unichar1_exp, ", got: ", vt_unichar1);
+  }
+  else if (log2str(vt_unichar2) != log2str(v_unichar2_exp)) {
+    setverdict(fail, "Expected: ", v_unichar2_exp, ", got: ", vt_unichar2);
+  }
+  else if (log2str(vt_unichar3) != log2str(v_unichar3_exp)) {
+    setverdict(fail, "Expected: ", v_unichar3_exp, ", got: ", vt_unichar3);
+  }
+  else if (log2str(vt_unichar4) != log2str(v_unichar4_exp)) {
+    setverdict(fail, "Expected: ", v_unichar4_exp, ", got: ", vt_unichar4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_unichar_vt_w_str_elem() runs on CT {
+  var universal charstring v_unichar := "xyz";
+
+  var template universal charstring vt_unichar1 := t_unichar & v_unichar[2];
+  var universal charstring v_unichar1_exp := char(0, 0, 1, 2) & "z";
+  
+  var template universal charstring vt_unichar2 := v_unichar[2] & t_unichar;
+  var universal charstring v_unichar2_exp := "z" & char(0, 0, 1, 2);
+  
+  var template universal charstring vt_unichar3 := char(0, 1, 2, 3) & v_unichar[1];
+  var universal charstring v_unichar3_exp := char(0, 1, 2, 3) & "y";
+  
+  var template universal charstring vt_unichar4 := v_unichar[1] & char(0, 1, 2, 3);
+  var universal charstring v_unichar4_exp := "y" & char(0, 1, 2, 3);
+  
+  if (log2str(vt_unichar1) != log2str(v_unichar1_exp)) {
+    setverdict(fail, "Expected: ", v_unichar1_exp, ", got: ", vt_unichar1);
+  }
+  else if (log2str(vt_unichar2) != log2str(v_unichar2_exp)) {
+    setverdict(fail, "Expected: ", v_unichar2_exp, ", got: ", vt_unichar2);
+  }
+  else if (log2str(vt_unichar3) != log2str(v_unichar3_exp)) {
+    setverdict(fail, "Expected: ", v_unichar3_exp, ", got: ", vt_unichar3);
+  }
+  else if (log2str(vt_unichar4) != log2str(v_unichar4_exp)) {
+    setverdict(fail, "Expected: ", v_unichar4_exp, ", got: ", vt_unichar4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_unichar_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, omit, "aeiou", omit, omit, omit };
+
+  var template universal charstring vt_unichar1 := t_unichar & v_rec.cs;
+  var universal charstring v_unichar1_exp := char(0, 0, 1, 2) & "aeiou";
+  
+  var template universal charstring vt_unichar2 := v_rec.cs & t_unichar;
+  var universal charstring v_unichar2_exp := "aeiou" & char(0, 0, 1, 2);
+  
+  var template universal charstring vt_unichar3 := char(0, 0, 1, 117) & v_rec.cs;
+  var universal charstring v_unichar3_exp := char(0, 0, 1, 117) & "aeiou";
+  
+  var template universal charstring vt_unichar4 := v_rec.cs & char(0, 0, 1, 117);
+  var universal charstring v_unichar4_exp := "aeiou" & char(0, 0, 1, 117);
+  
+  if (log2str(vt_unichar1) != log2str(v_unichar1_exp)) {
+    setverdict(fail, "Expected: ", v_unichar1_exp, ", got: ", vt_unichar1);
+  }
+  else if (log2str(vt_unichar2) != log2str(v_unichar2_exp)) {
+    setverdict(fail, "Expected: ", v_unichar2_exp, ", got: ", vt_unichar2);
+  }
+  else if (log2str(vt_unichar3) != log2str(v_unichar3_exp)) {
+    setverdict(fail, "Expected: ", v_unichar3_exp, ", got: ", vt_unichar3);
+  }
+  else if (log2str(vt_unichar4) != log2str(v_unichar4_exp)) {
+    setverdict(fail, "Expected: ", v_unichar4_exp, ", got: ", vt_unichar4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_unichar_vt_extra() runs on CT {
+  var universal charstring v_unichar := "xyz";
+  var Rec v_rec := { omit, omit, omit, "aeiou", omit, omit, omit };
+
+  var template universal charstring vt_unichar1 := v_unichar[0] & v_rec.cs;
+  var universal charstring v_unichar1_exp := "xaeiou";
+  
+  var template universal charstring vt_unichar2 := v_rec.cs & v_unichar[0];
+  var universal charstring v_unichar2_exp := "aeioux";
+  
+  if (log2str(vt_unichar1) != log2str(v_unichar1_exp)) {
+    setverdict(fail, "Expected: ", v_unichar1_exp, ", got: ", vt_unichar1);
+  }
+  else if (log2str(vt_unichar2) != log2str(v_unichar2_exp)) {
+    setverdict(fail, "Expected: ", v_unichar2_exp, ", got: ", vt_unichar2);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_unichar_t_values());
+  execute(tc_unichar_vt_values());
+  execute(tc_unichar_vt_w_str_elem());
+  execute(tc_unichar_vt_w_opt_fields());
+  execute(tc_unichar_vt_extra());
+}
+
+}

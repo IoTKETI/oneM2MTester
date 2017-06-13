@@ -1,0 +1,86 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Raduly, Csaba
+--
+--/////////////////////////////////////////////////////////////////////////////
+EmptyUnion DEFINITIONS
+AUTOMATIC TAGS ::=
+
+BEGIN
+
+IMPORTS ;
+
+/* Regression test for TR 936. Just get it to compile.
+
+Empty unions were not handled. These are not allowed for ordinary
+union/CHOICE types, but can be caused by open type.
+
+*/
+
+MAP-EXTENSION-V2  ::= CLASS {
+	&ExtensionType				OPTIONAL,
+	&extensionId 	OBJECT IDENTIFIER }
+	-- The length of the Object Identifier shall not exceed 16 octets and the
+	-- number of components of the Object Identifier shall not exceed 16
+
+
+
+ExtensionContainer-v2 ::= SEQUENCE {
+	privateExtensionList	[0]PrivateExtensionList-v2	OPTIONAL,
+	pcs-Extensions	[1]PCS-Extensions-v2	OPTIONAL,
+	...}
+
+
+PrivateExtensionList-v2 ::= SEQUENCE SIZE (1..maxNumOfPrivateExtensions-v2) OF
+				PrivateExtension-v2
+
+PrivateExtension-v2 ::= SEQUENCE {
+	extId		MAP-EXTENSION-V2.&extensionId
+				({ExtensionSet-v2}),
+	extType		MAP-EXTENSION-V2.&ExtensionType
+				({ExtensionSet-v2}{@extId})	OPTIONAL}
+
+maxNumOfPrivateExtensions-v2  INTEGER ::= 10
+
+
+extensionIE-v2-1 MAP-EXTENSION-V2 ::= { &extensionId { iso standard 8571 } }
+
+extensionIE-v2-2 MAP-EXTENSION-V2 ::= { &ExtensionType INTEGER, &extensionId { iso standard 8572 } }
+
+
+ExtensionSet-v2		MAP-EXTENSION-V2 ::=
+	{ extensionIE-v2-1 |
+	  extensionIE-v2-2,
+          ...
+	 -- ExtensionSet is the set of all defined private extensions
+	}
+
+	-- Unsupported private extensions shall be discarded if received.
+
+
+PCS-Extensions-v2 ::= SEQUENCE {
+	...}
+
+
+
+pike PrivateExtension-v2 ::= {
+  extId { iso standard 8571 }
+}
+
+pike2 PrivateExtension-v2 ::= {
+  extId  { iso standard 8572 },
+  extType iNTEGER : 3 -- OSS asn1c calls this member "INTEGER"
+}
+
+da ExtensionContainer-v2 ::= {
+  privateExtensionList	{ pike, pike2 }
+}
+
+END

@@ -1,0 +1,55 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:5.4.1.2, Ensure that the IUT correctly handles parametrization through the use of parameterized templates.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+module Sem_05040102_parameters_of_kind_template_001 {
+
+type enumerated MyEnumeratedType {e_black, e_white}
+type integer address;
+
+type record MyRecord {
+ integer field1,
+ integer field2
+}
+
+template MyRecord m_parametrizedTemplate(integer p_integer := 5, template integer p_integerTemplate := ? ) := {
+  field1 := p_integer,
+  field2 := p_integerTemplate
+}
+
+type component GeneralComp {	    	    
+
+}	
+
+
+testcase TC_Sem_05040102_parameters_of_kind_template_001() runs on GeneralComp {
+
+ var MyRecord DefaultValues  := {
+  field1 := 5,
+  field2 := 1			//any number can be used here to correspond with ? matching
+ }
+
+ var MyRecord ModifiedValues  := {
+  field1 := 2,
+  field2 := 1
+ }
+
+    if ( match(DefaultValues, m_parametrizedTemplate) and 
+		 match(ModifiedValues, m_parametrizedTemplate(2,1))) 
+ 	{ setverdict(pass);}
+    else 
+	{ setverdict(fail); }		
+ 
+}
+
+
+control{
+    execute(TC_Sem_05040102_parameters_of_kind_template_001());
+}
+
+}

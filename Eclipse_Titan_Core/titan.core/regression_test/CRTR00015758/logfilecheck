@@ -1,0 +1,113 @@
+#!/usr/bin/perl -w
+
+use strict;
+# No use warnings; in 5.005 but we have the -w flag
+
+my @expected_filenames;
+
+BEGIN { # @expected_filenames must be set at compile time
+my    $host = $ENV{HOSTNAME} || $ENV{HOSTNAME} || `hostname`;
+
+$host =~ s/\r|\n//g;
+$host =~ s/\.\S+//;
+
+my    $user = $ENV{USER} || $ENV{USERNAME};
+
+@expected_filenames = (
+"e=no,h=$host,l=$user,n=HC,r=hc,t=,c=,s=\.log",
+"e=no,h=$host,l=$user,n=MTC,r=mtc,t=,c=,s=\.log",
+"e=no,h=$host,l=$user,n=MTC,r=mtc,t=,c=tc_nooooo,s=\.log",
+"e=no,h=$host,l=$user,n=MTC,r=mtc,t=,c=tc_no,s=\.log",
+"e=no,h=$host,l=$user,n=MTC,r=mtc,t=No,c=tc_nooooo,s=\.log",
+"e=no,h=$host,l=$user,n=MTC,r=mtc,t=No,c=tc_no,s=\.log",
+                                      "c=,s=.log",
+                                      "c=tc_nooooo,s=\.log",
+                                      "c=tc_no,s=\.log",
+);
+}
+
+if ($] < 5.006) {
+  # ancient perl, we must be on Solaris :(
+  my @perlloc = qw( /proj/TTCN/Tools/perl-5.10.1/bin/perl /mnt/TTCN/Tools/perl-5.10.1/bin/perl );
+  foreach (@perlloc) {
+    if (-x $_) {
+      warn "Let's try with $_ instead";
+      exec( $_, '-wT', $0, @ARGV ) or die "That didn't work either: $!";
+    }
+  }
+}
+else {
+  require Test::More;
+  use constant NUM_LOGFILES => scalar @expected_filenames;
+                            
+  Test::More->import(
+    tests =>
+  1 # test number of log files
++ 2 * NUM_LOGFILES  # test existence + switched/not switched
++ 1 # Local IP address warning
++ 1 # Non-unique log file name warning
+  );                             
+}
+
+use strict;
+
+# grep a file. Returns the number of times (lines) it matched.
+# Parameter 1: filename
+# Parameter 2: regex
+sub grepper($$) {
+  local $_;
+  my ($filename, $regex) = @_;
+  my $result = 0;
+  open (LOG, '< ' . $filename) or die "open : $!, $^E";
+  while (<LOG>) {
+    if ( /$regex/ ) {
+      ++$result;
+    }
+  }
+  close(LOG) or die "close: $!, $^E";
+  return $result;
+}
+
+# Return 1 if "switching to log file" appears in the file.
+# One parameter, the file name
+sub switched($) {
+  return grepper($_[0], qr/EXECUTOR_RUNTIME [sS]witching to log file/) != 0;
+}
+
+# Start !
+
+# Collect the list of log files on the disk. There are two patterns.
+my   @files = <e=no,h=*,l=*,n={HC\,r=hc,MTC\,r=mtc},*.log>;
+push @files , <c=*.log>;
+
+# Check that it is the correct number
+is(scalar @files, NUM_LOGFILES, 'Number of log files');
+
+foreach my $x ( @expected_filenames )
+{
+  # Filter the list of filenames, keep just the matching ones
+  my @g = grep($_ =~ /^$x$/, @files);
+  # There must be exactly one match
+  is(scalar @g, 1, "Found        : $x");
+}
+
+foreach my $fn ( @files )
+{
+  chomp $fn;
+  if ($fn =~ /^e=no,h=[\w.-]+,l=\w+,n=HC,r=hc,t=,c=,s=\.log$/ ) {
+    ok( !switched($fn), "Not switched : $fn" );
+    is( grepper($fn, qr/The address of MC was set to a local IP address\. This may cause incorrect behavior/), 1,
+        "Local IP warn: $fn" );
+  }
+  else {
+    ok(  switched($fn), "Switched     : $fn" );
+  }
+
+  if ($fn =~ /^c=,s=.log$/) {
+    is( grepper($fn, qr/does not guarantee unique log file name for every test system process/), 1,
+        "Warns once   : $fn\n(about log file name not being unique)" );
+  }
+}
+
+
+__END__

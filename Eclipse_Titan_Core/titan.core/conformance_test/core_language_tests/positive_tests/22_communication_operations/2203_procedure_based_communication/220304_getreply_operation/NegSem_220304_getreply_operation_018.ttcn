@@ -1,0 +1,56 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:22.3.4, value of wrong type in @decoded redirect value assignment
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirements are tested:
+// Any other value shall cause an error.
+
+module NegSem_220304_getreply_operation_018 {
+	type record R {
+        integer id,
+        universal charstring payload
+    }
+    
+    signature S() return R;
+
+	type integer I with {variant "32 bit"};
+    
+	type port P procedure {
+		inout S;
+	} with {extension "internal"}
+	
+    type component GeneralComp {
+		port P p;
+	}
+    
+    function f_server() runs on GeneralComp {
+        var I v_src := 1953719668;
+        var R v_rec := { id := 5, payload := encvalue_unichar(v_src) };
+        p.getcall(S: {});
+        p.reply(S:{} value v_rec);
+    }
+	
+    testcase TC_NegSem_220304_getreply_operation_018() runs on GeneralComp system GeneralComp {
+        var I v_res, v_enc := 32;        
+        var GeneralComp v_ptc := GeneralComp.create("PTC");
+        connect(self:p, v_ptc:p);
+        v_ptc.start(f_server());
+        p.call(S:{}) {
+            [] p.getreply(S: {} value R:?) -> value (v_res := @decoded(v_enc) payload) { 
+                setverdict (pass);
+            }
+            [] p.getreply { setverdict(pass); }
+        }        
+
+    }
+
+    control {
+        execute(TC_NegSem_220304_getreply_operation_018(), 5.0);
+    }
+}  with { encode "RAW"}

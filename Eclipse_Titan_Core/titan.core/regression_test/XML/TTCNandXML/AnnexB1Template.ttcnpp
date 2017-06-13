@@ -1,0 +1,102 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnnexB1Template
+{
+import from AnnexB1 all;
+import from Flattener { function all }
+
+modulepar boolean AnnexB1Template_verbose := false;
+#define verbose AnnexB1Template_verbose
+
+#include "../macros.ttcnin"
+
+template Shiporder t_Shiporder:={
+  orderid:="18920320_17",
+  orderperson:="Dr.Watson",
+  shipto:=
+  {
+    name:="Sherlock Holmes",
+    address_1:="Baker Street 221B",
+    city:="London",
+    country:="England"
+  },
+  item:=
+  {
+    title:="Memoirs",
+    note:= omit,
+    quantity:=2,
+    price:=10632191074844.699219 // U.S. national debt
+  }
+}
+
+type component air {}
+
+DECLARE_EXER_ENCODERS(Shiporder, shp)
+DECLARE_XER_ENCODERS(Shiporder, shp)
+
+const universal charstring expected :=
+//"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" &
+"<shiporder orderid='18920320_17'>\n" &
+"\t<orderperson>Dr.Watson</orderperson>\n" &
+"\t<shipto>\n" &
+"\t\t<name>Sherlock Holmes</name>\n" &
+"\t\t<address>Baker Street 221B</address>\n" &
+"\t\t<city>London</city>\n" &
+"\t\t<country>England</country>\n" &
+"\t</shipto>\n" &
+"\t<item>\n" &
+"\t\t<title>Memoirs</title>\n" &
+"\t\t<quantity>2</quantity>\n" &
+"\t\t<price>10632191074844.699219</price>\n" &
+"\t</item>\n" &
+"</shiporder>\n" &
+"\n";
+
+const universal charstring expected_basic :=
+//"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" &
+"<Shiporder>\n" &
+"\t<orderid>18920320_17</orderid>\n" &
+"\t<orderperson>Dr.Watson</orderperson>\n" &
+"\t<shipto>\n" &
+"\t\t<name>Sherlock Holmes</name>\n" &
+"\t\t<address_1>Baker Street 221B</address_1>\n" &
+"\t\t<city>London</city>\n" &
+"\t\t<country>England</country>\n" &
+"\t</shipto>\n" &
+"\t<item>\n" &
+"\t\t<title>Memoirs</title>\n" &
+"\t\t<quantity>2</quantity>\n" &
+"\t\t<price>1.063219e+13</price>\n" &
+"\t</item>\n" &
+"</Shiporder>\n" &
+"\n";
+
+testcase encode_order() runs on air
+{
+    CHECK_METHOD(exer_enc_shp, valueof(t_Shiporder), expected);
+    CHECK_METHOD(bxer_enc_shp, valueof(t_Shiporder), expected_basic);
+}
+
+testcase decode_order() runs on air
+{
+    CHECK_DECODE(exer_dec_shp, expected         , Shiporder, t_Shiporder);
+    CHECK_DECODE(exer_dec_shp, flatten(expected), Shiporder, t_Shiporder);
+    CHECK_DECODE(bxer_dec_shp, expected_basic   , Shiporder, t_Shiporder);
+}
+
+control {
+    execute(encode_order())
+}
+
+}//end module
+

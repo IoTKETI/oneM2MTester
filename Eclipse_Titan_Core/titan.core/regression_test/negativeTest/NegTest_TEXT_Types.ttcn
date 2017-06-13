@@ -1,0 +1,224 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module NegTest_TEXT_Types {
+
+type enumerated MyEnum { first(1), second(2), third(3) } with { variant "BEGIN('<MyEnum>')";variant "END('</MyEnum>')"; variant "TEXT_CODING()"}
+type integer MyInteger10 (1..10) with {variant "BEGIN('<MyInt>')"; variant "END('</MyInt>')"; variant "TEXT_CODING()" }
+
+//1.Sequence (record)
+type record MySeqEmpty {} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()" }
+type record MySeqBool {boolean b} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()" }
+//type record MySeqNull { NULL n} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()" }
+type record MySeqInt {integer i} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()" }
+type record MySeqMyEnum {MyEnum e} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()" }
+type record MySeqInt2 { integer i, integer j} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqInt2opt { integer i, integer j optional} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqInt3opt { integer i, integer j, integer k optional} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntSeqInt2 { integer i, MySeqInt2 jk } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntSeqInt2opt { integer i optional, MySeqInt2 jk } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntSeqInt2optopt { integer i optional, MySeqInt2opt jk } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqInt3 { integer i, integer j, integer k} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqInt4 { integer i, integer j, integer k, integer l} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqInt4opt { integer i, integer j, integer k, integer l optional} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqCharstring { charstring x } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqCharstring2 { charstring x, charstring y optional } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqStr { charstring s} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqStr2 { charstring s, charstring t} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqBitStr { bitstring b} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqBitStr2 { bitstring s, bitstring t} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntCharstring { integer i, charstring x } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntStr { integer i, charstring s} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIntBitStr { integer i, bitstring b} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqOctStr { octetstring o} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqOJKL { octetstring o, integer j, integer k, integer l} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqIOKL { integer i, octetstring o, integer k, integer l } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+type record MySeqISKL { integer i, MySeqInt4 s, integer k, integer l} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+//===== sequence of sequence of sequence ====
+
+type record MySeqIntSeqIntSeqInt2SeqCharstring2 {
+  integer i optional,
+  MySeqIntSeqInt2 jkl,
+  MySeqCharstring2      xy
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqIntSeqIntSeqInt2optoptSeqCharstring2 {
+  integer i optional,
+  MySeqIntSeqInt2optopt jkl,
+  MySeqCharstring2            xy
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqIntSeqCharstring2 {
+  integer i optional,
+  MySeqCharstring2 xy
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqIntSeqIntSeqInt2 {
+  integer i,
+  MySeqIntSeqInt2 jkl
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqSeqIntSeqInt2SeqCharstring2 {
+  MySeqIntSeqInt2 jkl,
+  MySeqCharstring2      xy
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeq_SeqSeqIntSeqInt2SeqCharstring2_SeqSeqIntSeqInt2SeqCharstring2 {
+  MySeqSeqIntSeqInt2SeqCharstring2 s1,
+  MySeqSeqIntSeqInt2SeqCharstring2 s2
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeq_SeqSeqIntSeqInt2optoptSeqCharstring2_SeqSeqIntSeqInt2optoptSeqCharstring2 {
+  MySeqIntSeqIntSeqInt2optoptSeqCharstring2 s1,
+  MySeqIntSeqIntSeqInt2optoptSeqCharstring2 s2
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+type record MySeqBasicTypes {
+  boolean b,
+  //NULL n,
+  integer i,
+  MyEnum e, 
+  charstring  r,
+  bitstring bs,
+  octetstring os,
+  objid oi
+  //,relativeobjid
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+//2.Sequence of (record of)
+
+type record of boolean MySeqOfBool with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"}
+// There is no such type as NULL:
+//type record of NULL MySeqOfNull;
+type record of integer MySeqOfInt with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of MyEnum MySeqOfMyEnum with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of charstring MySeqOfCharstring with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of bitstring MySeqOfBitStr with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of octetstring MySeqOfOctStr with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of objid MySeqOfObjId with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of MyUnionBasicTypes MySeqOfMyUnionBT with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of MySeqSeqIntSeqInt2SeqCharstring2 MySeqOfSeqSeqIntSeqInt2SeqCharstring2 with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+type record of MySeqIntSeqIntSeqInt2optoptSeqCharstring2 MySeqOfMySeqIntSeqIntSeqInt2optoptSeqCharstring2 with { variant "BEGIN('<MySeqOf>')"; variant "END('</MySeqOf>')"; variant "TEXT_CODING()"};
+//3. Set
+type set MySetEmpty {} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetBool { boolean b } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+// There is no such type as NULL
+//type set MySetNull { NULL n } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt { integer i } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetMyEnum { MyEnum e } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt2 { integer i, integer j }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt2opt { integer i optional, integer j optional }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt3opt { integer i optional, integer j optional, integer k optional }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2 { integer i, MySeqInt2 jk } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2T { integer i, MySeqInt2 jk } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2opt { integer i optional, MySeqInt2 jk } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2Topt { integer i optional, MySeqInt2 jk } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2optopt { integer i optional, MySeqInt2opt jk optional } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqInt2Toptopt { integer i optional, MySeqInt2opt jk optional } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt3 { integer i, integer j, integer k }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt4 { integer i, integer j, integer k, integer l }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetInt4opt { integer i optional, integer j optional, integer k optional, integer l optional }  with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetCharstring { charstring x } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetCharstring2 { charstring x, charstring y } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetStr { charstring s } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetStr2 { charstring s, charstring t } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetBitStr { bitstring b } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetOctStr { octetstring o } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetBitStr2 { bitstring a, bitstring b } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntCharstring { integer i, charstring f } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntStr { integer i , charstring s } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntBitStr { integer i, bitstring b} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntOctStr { integer i, octetstring o } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetOJKL { octetstring o, integer j, integer k, integer l } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIOKL { integer i, octetstring o, integer k, integer l } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetISKL { integer i, MySeqInt4 s, integer k, integer l } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetISKLopt { integer i optional, MySeqInt4opt s optional, integer k optional, integer l optional } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIS2KLopt { integer i optional, MySeqInt2 s optional, integer k optional, integer l optional } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetISOKL { integer i,MySeqInt4 s, octetstring o, integer k, integer l   } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetISOKLopt { integer i optional,MySeqInt4opt s optional, octetstring o optional, integer k optional, integer l optional } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIOSKL {integer i, octetstring o, MySeqInt4 s, integer k, integer l} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIOSKLopt {integer i optional, octetstring o optional, MySeqInt4opt s optional, integer k optional, integer l optional} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+//===== set of sequence of sequence ====
+type set MySetIntSeqIntSeqInt2SeqCharstring2 { integer i optional, MySeqIntSeqInt2 jkl, MySeqCharstring2 xy} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetIntSeqIntSeqInt2optoptSeqCharstring2 { integer i optional, MySeqIntSeqInt2optopt jkl, MySeqCharstring2 xy} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+//subtypes:
+type set MySetIntSeqCharstring2 { integer i optional, MySeqCharstring2 xy } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+
+type set MySetIntSeqIntSeqInt2 { integer i optional, MySeqIntSeqInt2 jkl } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySetSeqIntSeqInt2SeqCharstring2 { MySeqIntSeqInt2 jkl, MySeqCharstring2 xy } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySet_SeqSeqIntSeqInt2SeqCharstring2_SeqSeqIntSeqInt2SeqCharstring2 { 
+  MySeqSeqIntSeqInt2SeqCharstring2 s1, 
+  MySeqSeqIntSeqInt2SeqCharstring2 s2 
+} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+type set MySet_SeqSeqIntSeqInt2optoptSeqCharstring2_SeqSeqIntSeqInt2optoptSeqCharstring2 {
+  MySeqIntSeqIntSeqInt2optoptSeqCharstring2 s1,
+  MySeqIntSeqIntSeqInt2optoptSeqCharstring2 s2
+} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+
+type set MySetBasicTypes { 
+  boolean b, 
+  //NULL n,
+  integer i,
+  MyEnum e,
+  charstring r,
+  bitstring bs,
+  octetstring os,
+  objid oi
+  //RELATIVE_OID roi
+} with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+
+type set MySetEnum { MyEnum e } with { variant "BEGIN('<MySet>')"; variant "END('</MySet>')"; variant "TEXT_CODING()"}
+
+//4. Set of
+type set of boolean MySetOfBool with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"}
+// There is no such type as NULL:
+//type record of NULL MySeqOfNull;
+type set of integer MySetOfInt with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of MyEnum MySetOfMyEnum with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of charstring MySetOfCharstring with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of bitstring MySetOfBitStr with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of octetstring MySetOfOctStr with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of objid MySetOfObjId with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of MyUnionBasicTypes MySetOfMyUnionBT with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of MySeqSeqIntSeqInt2SeqCharstring2 MySetOfSeqSeqIntSeqInt2SeqCharstring2 with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+type set of MySeqIntSeqIntSeqInt2optoptSeqCharstring2 MySetOfMySeqIntSeqIntSeqInt2optoptSeqCharstring2 with { variant "BEGIN('<MySetOf>')"; variant "END('</MySetOf>')"; variant "TEXT_CODING()"};
+
+//5.choice (union)
+type union MyUnionBasicTypes {
+  boolean b,
+  integer i,
+  MyEnum e, 
+  charstring r,
+  bitstring bs,
+  octetstring os,
+  objid oi
+} with { variant "TEXT_CODING()"}
+
+//Tagged version:
+type union MyUnionBasicTypesT {
+  boolean b,
+  integer i,
+  MyEnum e, 
+  charstring r,
+  bitstring bs,
+  octetstring os,
+  objid oi
+}  with { variant "BEGIN('<MyUnion>')"; variant "END('</MyUnion>')"; variant "TEXT_CODING()"}
+
+type union MyUnionComplexTypes {
+  MyUnionBasicTypes u,
+  //MySeqIntSeqCharstring2 s,
+  MySeqOfCharstring  sofcharstring
+} with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; variant "TEXT_CODING()"}
+
+} with { encode "TEXT" }
+

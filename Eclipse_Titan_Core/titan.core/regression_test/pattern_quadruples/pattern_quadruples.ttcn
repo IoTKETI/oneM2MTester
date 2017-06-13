@@ -1,0 +1,145 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Zalanyi, Balazs Andor
+ *
+ ******************************************************************************/
+module pattern_quadruples
+{
+  type component univchar_comp {};
+
+  testcase univ_match() runs on univchar_comp {
+    var universal charstring ustr;
+    const universal charstring custr := char(1, 21, 0, 122);
+    var template universal charstring utmp := pattern "{custr}[a-zA-Z\q{0, 0, 255, 24}-\q{0, 2, 12, 230}]";
+    template universal charstring utmp2 := pattern "{utmp}[^0-9]";
+
+    var boolean b := true;
+    var integer i;
+    const integer l1 := unichar2int(char(0, 0, 255, 24));
+    const integer l2 := unichar2int(char(0, 2, 12, 230));
+    const integer l := unichar2int(char(0, 2, 12, 255));
+    for (i := 0; i <= l and b == true; i := i + 1) {
+      ustr := char(1, 21, 0, 122) & int2unichar(i) & "a";
+      b:= match(ustr, utmp2);
+      if (i < 65 or (i > 90 and i < 97) or (i > 122 and i < l1) or i > l2) {
+        b := not b;
+      }
+    }
+    if (b) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+
+  testcase univ_match_neg() runs on univchar_comp {
+    var universal charstring ustr;
+    template universal charstring utmp := pattern "[^\q{0, 1, 123, 12}-\q{0, 2, 203, 255}]";
+
+    var boolean b := true;
+    var integer i;
+    const integer l1 := unichar2int(char(0, 1, 123, 12));
+    const integer l2 := unichar2int(char(0, 2, 203, 255));
+    const integer l := unichar2int(char(0, 3, 0, 0));
+    for (i := 0; i <= l and b == true; i := i + 1) {
+      ustr := int2unichar(i);
+      b:= match(ustr, utmp);
+      if (i >= l1 and i <= l2) {
+        b := not b;
+      }
+    }
+    if (b) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+
+  testcase univ_regexp() runs on univchar_comp {
+    var universal charstring uinput := "   simple text for a regexp example  ";
+    var universal charstring uregexp;
+
+    var universal charstring expected[0..2] := { "   simple ", "text", " for a regexp example  " };
+
+    var charstring ustrpattern := "(?+)(text)(?+)";
+
+    var integer i;
+    for (i := 0; i <= 2; i := i + 1) {
+      uregexp := regexp(uinput, ustrpattern, i);
+      if (uregexp != expected[i]) {
+        setverdict(fail, "not equal at ", i);
+      }
+    }
+
+    setverdict(pass);
+  }
+
+  testcase univ_from_charstr_pattern() runs on univchar_comp {
+    template           charstring t_cs := pattern "foo.*";
+    template universal charstring t_us := t_cs; // not an error anymore
+
+    var           charstring foobar_c := "foo.bar";
+    var universal charstring foobar_u := "foo.bar";
+
+    if (not match(foobar_c, t_cs)) { setverdict(fail, "cstr mismatch,", match(foobar_c, t_cs)); }
+    if (not match(foobar_u, t_us)) { setverdict(fail, "ustr mismatch,", match(foobar_u, t_us)); }
+    setverdict(pass);
+  }
+  
+  const universal charstring c_ucs_val := "AÍ";
+  const universal charstring c_ucs_pattern := "([abc][é-ű])";
+  
+  // case-insensitive regexp
+  testcase univ_regexp_nocase() runs on univchar_comp {
+    // regexp with constants (calculated at compile-time)
+    var universal charstring v_res_const := regexp @nocase (c_ucs_val, c_ucs_pattern, 0);
+    if (v_res_const != c_ucs_val) {
+      setverdict(fail, "Const regexp failed. Got: ", v_res_const, ", expected: ", c_ucs_val);
+    }
+    
+    // regexp with variables (calculated at runtime)
+    var universal charstring v_ucs_val := "aÁű";
+    var universal charstring v_ucs_pattern := "(Aá[É-Ű])";
+    var universal charstring v_res_var := regexp @nocase (v_ucs_val, v_ucs_pattern, 0);
+    if (v_res_var != v_ucs_val) {
+      setverdict(fail, "Var regexp failed. Got: ", v_res_var, ", expected: ", v_ucs_val);
+    }
+    setverdict(pass);
+  }
+  
+  modulepar template universal charstring mpt_ucs;
+  
+  // case-insensitive pattern
+  testcase univ_pattern_nocase() runs on univchar_comp {
+    // pattern in template variable
+    var template universal charstring vt_ucs := pattern @nocase "A\q{0,0,0,225}[\q{0,0,0,201}-\q{0,0,1,113}]"; // "Aá[É-ű]"
+    var universal charstring val := "aÁű";
+    if (not match(val, vt_ucs)) {
+      setverdict(fail, "Var template pattern failed: ", match(val, vt_ucs));
+    }
+    
+    // pattern in template module parameter
+    if (not match(val, mpt_ucs)) {
+      setverdict(fail, "Var template pattern failed: ", match(val, mpt_ucs));
+    }
+    setverdict(pass);
+  }
+
+  control {
+    execute(univ_match());
+    execute(univ_match_neg());
+    execute(univ_regexp());
+    execute(univ_from_charstr_pattern());
+    execute(univ_regexp_nocase());
+    execute(univ_pattern_nocase());
+  }
+}

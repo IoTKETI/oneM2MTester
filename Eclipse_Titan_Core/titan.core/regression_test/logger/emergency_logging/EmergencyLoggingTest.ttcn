@@ -1,0 +1,111 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module EmergencyLoggingTest {
+
+modulepar integer tsp_looplimit:=20;
+
+import from Titan_LogTestDefinitions all;
+//import from TitanLoggerControl all;
+
+const charstring c_legacy_logger_plugin := "LegacyLogger"
+  
+testcase tc_user_EL() runs on MTCType {
+  //var Severities vl_sevOrig:=get_file_mask(c_legacy_logger_plugin);
+  //set_file_mask(c_legacy_logger_plugin, {VERDICTOP_SETVERDICT,USER_UNQUALIFIED});
+  var integer a, b;
+  log("Before the loop");
+  action(">>>>ACTION in ",%testcaseId,", before the loop<<<<<");
+  for(var integer i:=0; i<tsp_looplimit;i:=i+1) {
+    log( %testcaseId," loop ", i);
+  }
+  action(">>>>ACTION in ",%testcaseId,", after the loop<<<<<");
+  setverdict(pass);
+  log("This line is reached last");
+  a:=b; //DTE, unbound value on the right side
+  log("This line never reached 1.");
+  setverdict(pass);
+}
+
+testcase tc_user() runs on MTCType {
+  log("Before the loop");
+  action(">>>>ACTION in ",%testcaseId,", before the loop<<<<<");
+  for(var integer i:=0; i<tsp_looplimit;i:=i+1) {
+    log( %testcaseId," loop ", i);
+  }
+  action(">>>>ACTION in ",%testcaseId,", after the loop<<<<<");
+  setverdict(pass);
+  log("This line reached last");
+}
+
+//Expected output:
+//TESTCASE_START EmergencyLoggingTest.ttcn:25 Test case tc_second started.
+//PARALLEL_PTC EmergencyLoggingTest.ttcn:25 Initializing variables, timers and ports of component type Titan_LogTestDefinitions.MTCType inside testcase tc_second.
+//PORTEVENT_STATE EmergencyLoggingTest.ttcn:25 Port internal_port was started.
+//PORTEVENT_STATE EmergencyLoggingTest.ttcn:25 Port external_port was started.
+//PARALLEL_PTC EmergencyLoggingTest.ttcn:25 Component type Titan_LogTestDefinitions.MTCType was initialized.
+//PARALLEL_UNQUALIFIED EmergencyLoggingTest.ttcn:27 Creating new PTC with component type Titan_LogTestDefinitions.MTCType.
+//PARALLEL_PTC EmergencyLoggingTest.ttcn:27 PTC was created. Component reference: 3, alive: no, type: Titan_LogTestDefinitions.MTCType.
+//PARALLEL_UNQUALIFIED EmergencyLoggingTest.ttcn:28 Creating new PTC with component type Titan_LogTestDefinitions.MTCType.
+//PARALLEL_PTC EmergencyLoggingTest.ttcn:28 PTC was created. Component reference: 4, alive: no, type: Titan_LogTestDefinitions.MTCType.
+//USER_UNQUALIFIED EmergencyLoggingTest.ttcn:29 Before the DTE
+
+testcase tc_PTC_create_EL() runs on MTCType {
+  var MTCType  vc_1, vc_2;
+  vc_1:= MTCType.create;
+  vc_2:= MTCType.create;
+  var integer a,b;
+  log("Last line before the DTE");
+  a:=b; //DTE
+  log("This line is reached last 2.");
+}
+
+testcase tc_PTC_create() runs on MTCType {
+  var MTCType  vc_1, vc_2;
+  vc_1:= MTCType.create;
+  vc_2:= MTCType.create;
+  var integer a,b;
+  log("This line is reached last in ", %testcaseId);
+}
+
+function f_plugin_behaviour(in charstring pl_msg) runs on MTCType {
+  log("Hello, login from", pl_msg);
+  var integer a,b;
+  a:=b; //DTE
+}
+
+testcase tc_plugins() runs on MTCType {  
+  var MTCType  vc_1, vc_2;
+  vc_1:= MTCType.create("Comp1");
+  vc_2:= MTCType.create("Comp2");
+  vc_1.start(f_plugin_behaviour("This is Comp1"));
+  vc_2.start(f_plugin_behaviour("This is Comp2"));
+  vc_1.done;
+  vc_2.done;
+}
+
+control {
+  timer t:=1000.0; t.start;
+  var float vl_finish:=0.0;
+  var float vl_start:=t.read;
+  action("Start:",vl_start, " s");
+  for(var integer i:=0;i<5;i:=i+1) {
+    action("Outer loop follows with index ", i);
+    execute(tc_user());
+    action("Outer loop finished with index ", i);
+  }
+  execute(tc_PTC_create_EL()); //Trigger/geneerate emergency log
+  vl_finish:=t.read;
+  action("Finish:", vl_finish);
+  action("Elapsed time:", vl_finish-vl_start, " s");
+}//control
+
+}//eof module

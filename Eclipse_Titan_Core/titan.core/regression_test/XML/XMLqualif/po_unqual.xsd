@@ -1,0 +1,42 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:u="http://www.example.com/POU"
+        targetNamespace="http://www.example.com/POU"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+
+  <element name="purchaseOrder4" type="u:PurchaseOrderType4"/>
+  <element name="comment4"       type="string"/>
+
+  <complexType name="PurchaseOrderType4">
+    <sequence>
+      <element name="shipTo"    type="u:USAddress4"/>
+      <element name="billTo"    type="u:USAddress4"/>
+      <element ref="u:comment4" minOccurs="0"/>
+      <!-- etc. -->
+    </sequence>
+    <attribute name="orderDate" type="date"/>
+  </complexType>
+
+  <complexType name="USAddress4">
+    <sequence>
+      <element name="name"   type="string"/>
+      <element name="street" type="string"/>
+      <!-- etc. -->
+    </sequence>
+    <attribute name="country" type="NMTOKEN" fixed="US" />
+  </complexType>
+
+  <!-- etc. -->
+
+</schema>

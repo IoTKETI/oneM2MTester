@@ -1,0 +1,255 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating record of templates
+module TemplateConcatRecof {
+
+import from Types all;
+
+const RecOfInt c_recof := { 1, 2 };
+
+template RecOfInt t_recof_op1 := { 1, 2, 3 };
+template RecOfInt t_recof_op2 := { 4, 5 };
+template RecOfInt t_recof_op3 := ?;
+template RecOfInt t_recof_op4 := ? length(2..2);
+template RecOfInt t_recof_op5 := * length(3);
+
+template RecOfInt t_recof1 := t_recof_op1 & { 4, 5 };
+template RecOfInt t_recof1_exp := { 1, 2, 3, 4, 5};
+
+template RecOfInt t_recof2 := t_recof_op1 & ?;
+template RecOfInt t_recof2_exp := { 1, 2, 3, * };
+
+template RecOfInt t_recof3 := ? & t_recof_op2;
+template RecOfInt t_recof3_exp := { *, 4, 5 };
+
+template RecOfInt t_recof4 := ? length(2..2) & { 4, 5 } & * length(3);
+template RecOfInt t_recof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+
+template RecOfInt t_recof5 := t_recof_op1 & t_recof_op2;
+template RecOfInt t_recof5_exp := { 1, 2, 3, 4, 5 };
+
+template RecOfInt t_recof6 := t_recof_op1 & t_recof_op3;
+template RecOfInt t_recof6_exp := { 1, 2, 3, * };
+
+template RecOfInt t_recof7 := t_recof_op3 & t_recof_op1;
+template RecOfInt t_recof7_exp := { *, 1, 2, 3 };
+
+template RecOfInt t_recof8 := t_recof_op4 & t_recof_op2 & t_recof_op5;
+template RecOfInt t_recof8_exp := { ?, ?, 4, 5, ?, ?, ? };
+
+
+testcase tc_recof_t_w_refs_and_literals() runs on CT {
+  if (log2str(t_recof1) != log2str(t_recof1_exp)) {
+    setverdict(fail, "Expected: ", t_recof1_exp, ", got: ", t_recof1);
+  }
+  else if (log2str(t_recof2) != log2str(t_recof2_exp)) {
+    setverdict(fail, "Expected: ", t_recof2_exp, ", got: ", t_recof2);
+  }
+  else if (log2str(t_recof3) != log2str(t_recof3_exp)) {
+    setverdict(fail, "Expected: ", t_recof3_exp, ", got: ", t_recof3);
+  }
+  else if (log2str(t_recof4) != log2str(t_recof4_exp)) {
+    setverdict(fail, "Expected: ", t_recof4_exp, ", got: ", t_recof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_t_w_refs() runs on CT {
+  if (log2str(t_recof5) != log2str(t_recof5_exp)) {
+    setverdict(fail, "Expected: ", t_recof5_exp, ", got: ", t_recof5);
+  }
+  else if (log2str(t_recof6) != log2str(t_recof6_exp)) {
+    setverdict(fail, "Expected: ", t_recof6_exp, ", got: ", t_recof6);
+  }
+  else if (log2str(t_recof7) != log2str(t_recof7_exp)) {
+    setverdict(fail, "Expected: ", t_recof7_exp, ", got: ", t_recof7);
+  }
+  else if (log2str(t_recof8) != log2str(t_recof8_exp)) {
+    setverdict(fail, "Expected: ", t_recof8_exp, ", got: ", t_recof8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_vt_w_refs_and_literals() runs on CT {
+  var template RecOfInt vt_recof1 := t_recof_op1 & { 4, 5 };
+  var template RecOfInt vt_recof1_exp := { 1, 2, 3, 4, 5};
+
+  var template RecOfInt vt_recof2 := t_recof_op1 & ?;
+  var template RecOfInt vt_recof2_exp := { 1, 2, 3, * };
+
+  var template RecOfInt vt_recof3 := ? & t_recof_op2;
+  var template RecOfInt vt_recof3_exp := { *, 4, 5 };
+
+  var template RecOfInt vt_recof4 := ? length(2..2) & { 4, 5 } & * length(3);
+  var template RecOfInt vt_recof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+  
+  if (log2str(vt_recof1) != log2str(vt_recof1_exp)) {
+    setverdict(fail, "Expected: ", vt_recof1_exp, ", got: ", vt_recof1);
+  }
+  else if (log2str(vt_recof2) != log2str(vt_recof2_exp)) {
+    setverdict(fail, "Expected: ", vt_recof2_exp, ", got: ", vt_recof2);
+  }
+  else if (log2str(vt_recof3) != log2str(vt_recof3_exp)) {
+    setverdict(fail, "Expected: ", vt_recof3_exp, ", got: ", vt_recof3);
+  }
+  else if (log2str(vt_recof4) != log2str(vt_recof4_exp)) {
+    setverdict(fail, "Expected: ", vt_recof4_exp, ", got: ", vt_recof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_vt_w_refs() runs on CT {
+  var template RecOfInt vt_recof1 := t_recof_op1 & t_recof_op2;
+  var template RecOfInt vt_recof1_exp := { 1, 2, 3, 4, 5 };
+
+  var template RecOfInt vt_recof2 := t_recof_op1 & t_recof_op3;
+  var template RecOfInt vt_recof2_exp := { 1, 2, 3, * };
+
+  var template RecOfInt vt_recof3 := t_recof_op3 & t_recof_op1;
+  var template RecOfInt vt_recof3_exp := { *, 1, 2, 3 };
+
+  var template RecOfInt vt_recof4 := t_recof_op4 & t_recof_op2 & t_recof_op5;
+  var template RecOfInt vt_recof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+  
+  if (log2str(vt_recof1) != log2str(vt_recof1_exp)) {
+    setverdict(fail, "Expected: ", vt_recof1_exp, ", got: ", vt_recof1);
+  }
+  else if (log2str(vt_recof2) != log2str(vt_recof2_exp)) {
+    setverdict(fail, "Expected: ", vt_recof2_exp, ", got: ", vt_recof2);
+  }
+  else if (log2str(vt_recof3) != log2str(vt_recof3_exp)) {
+    setverdict(fail, "Expected: ", vt_recof3_exp, ", got: ", vt_recof3);
+  }
+  else if (log2str(vt_recof4) != log2str(vt_recof4_exp)) {
+    setverdict(fail, "Expected: ", vt_recof4_exp, ", got: ", vt_recof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_vt_dbl_any_value() runs on CT {
+  var template RecOfInt vt_recof1 := ? & ?;
+  var template RecOfInt vt_recof1_exp := ?;
+  
+  var template RecOfInt vt_recof2 := ? & ? & t_recof_op1;
+  var template RecOfInt vt_recof2_exp := { *, 1, 2, 3 };
+  
+  var template RecOfInt vt_recof3 := t_recof_op3 & ?;
+  var template RecOfInt vt_recof3_exp := ?;
+  
+  var template RecOfInt vt_recof4 := ? & t_recof_op3;
+  var template RecOfInt vt_recof4_exp := ?;
+  
+  if (log2str(vt_recof1) != log2str(vt_recof1_exp)) {
+    setverdict(fail, "Expected: ", vt_recof1_exp, ", got: ", vt_recof1);
+  }
+  else if (log2str(vt_recof2) != log2str(vt_recof2_exp)) {
+    setverdict(fail, "Expected: ", vt_recof2_exp, ", got: ", vt_recof2);
+  }
+  else if (log2str(vt_recof3) != log2str(vt_recof3_exp)) {
+    setverdict(fail, "Expected: ", vt_recof3_exp, ", got: ", vt_recof3);
+  }
+  else if (log2str(vt_recof4) != log2str(vt_recof4_exp)) {
+    setverdict(fail, "Expected: ", vt_recof4_exp, ", got: ", vt_recof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, omit, omit, omit, { 9, 8 }, omit };
+
+  var template RecOfInt vt_recof1 := t_recof_op1 & v_rec.roi;
+  var template RecOfInt vt_recof1_exp := { 1, 2, 3, 9, 8 };
+  
+  var template RecOfInt vt_recof2 := v_rec.roi & t_recof_op1;
+  var template RecOfInt vt_recof2_exp := { 9, 8, 1, 2, 3 };
+  
+  var template RecOfInt vt_recof3 := c_recof & v_rec.roi;
+  var template RecOfInt vt_recof3_exp := { 1, 2, 9, 8 };
+  
+  var template RecOfInt vt_recof4 := v_rec.roi & c_recof;
+  var template RecOfInt vt_recof4_exp := { 9, 8, 1, 2 };
+  
+  var template RecOfInt vt_recof5 := ? & v_rec.roi;
+  var template RecOfInt vt_recof5_exp := { *, 9, 8 };
+  
+  var template RecOfInt vt_recof6 := v_rec.roi & ?;
+  var template RecOfInt vt_recof6_exp := { 9, 8, * };
+  
+  if (log2str(vt_recof1) != log2str(vt_recof1_exp)) {
+    setverdict(fail, "Expected: ", vt_recof1_exp, ", got: ", vt_recof1);
+  }
+  else if (log2str(vt_recof2) != log2str(vt_recof2_exp)) {
+    setverdict(fail, "Expected: ", vt_recof2_exp, ", got: ", vt_recof2);
+  }
+  else if (log2str(vt_recof3) != log2str(vt_recof3_exp)) {
+    setverdict(fail, "Expected: ", vt_recof3_exp, ", got: ", vt_recof3);
+  }
+  else if (log2str(vt_recof4) != log2str(vt_recof4_exp)) {
+    setverdict(fail, "Expected: ", vt_recof4_exp, ", got: ", vt_recof4);
+  }
+  else if (log2str(vt_recof5) != log2str(vt_recof5_exp)) {
+    setverdict(fail, "Expected: ", vt_recof5_exp, ", got: ", vt_recof5);
+  }
+  else if (log2str(vt_recof6) != log2str(vt_recof6_exp)) {
+    setverdict(fail, "Expected: ", vt_recof6_exp, ", got: ", vt_recof6);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_recof_vt_extra() runs on CT {
+  var template RecOfInt vt_recof1 := c_recof & { 4, 5 };
+  var template RecOfInt vt_recof1_exp := { 1, 2, 4, 5 };
+  
+  var template RecOfInt vt_recof2 := c_recof & ?;
+  var template RecOfInt vt_recof2_exp := { 1, 2, * };
+  
+  var template RecOfInt vt_recof3 := ? & c_recof;
+  var template RecOfInt vt_recof3_exp := { *, 1, 2 };
+  
+  if (log2str(vt_recof1) != log2str(vt_recof1_exp)) {
+    setverdict(fail, "Expected: ", vt_recof1_exp, ", got: ", vt_recof1);
+  }
+  else if (log2str(vt_recof2) != log2str(vt_recof2_exp)) {
+    setverdict(fail, "Expected: ", vt_recof2_exp, ", got: ", vt_recof2);
+  }
+  else if (log2str(vt_recof3) != log2str(vt_recof3_exp)) {
+    setverdict(fail, "Expected: ", vt_recof3_exp, ", got: ", vt_recof3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_recof_t_w_refs_and_literals());
+  execute(tc_recof_t_w_refs());
+  execute(tc_recof_vt_w_refs_and_literals());
+  execute(tc_recof_vt_w_refs());
+  execute(tc_recof_vt_dbl_any_value());
+  execute(tc_recof_vt_w_opt_fields());
+  execute(tc_recof_vt_extra());
+}
+
+}

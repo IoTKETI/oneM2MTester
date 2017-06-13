@@ -1,0 +1,206 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module uni
+{
+
+import from ReadXml all;
+import from rec { type Neg; function check_match; };
+
+type union U {
+  integer i,
+  charstring s,
+  record {
+    boolean b,
+    float f
+  } r
+};
+
+external function encU(in U u) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" };
+
+const U c_plain := {
+  s := "Howdy"
+}
+
+template Nodes t_plain := {
+  // node type                 , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "U", "", "" },
+  { XML_READER_TYPE_ELEMENT    , 1, "s", "", "" },
+  { XML_READER_TYPE_TEXT       , 2, "#text", "Howdy", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "s", "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "U", "", "" }
+}
+
+type octetstring myoctetstring;
+
+const U c_replace_other := {
+  s := "Howdy"
+}
+with {
+  // Replacing i when s is selected: NOP
+  erroneous (i) "value := 'BABEFACE'O "
+}
+
+const U c_plain_r := {
+  r := { true, 3.141592 }
+}
+
+template Nodes t_plain_r := {
+  // node type                 , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "U", "", "" },
+  { XML_READER_TYPE_ELEMENT    , 1, "r", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "b", "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "f", "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "3.141592", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f", "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 1, "r", "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "U", "", "" }
+}
+
+testcase u_plain() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encU(c_plain);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_plain);
+
+  o := encU(c_replace_other);
+  nodes := gather(o, ignore_ws);
+  // Result unaffected by modifying a non-selected alternative
+  check_match(nodes, t_plain);
+
+  o := encU(c_plain_r);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_plain_r);
+}
+
+/*-------------------- REPLACE --------------------*/
+
+const U c_replace := {
+  s := "Howdy"
+}
+with {
+  erroneous (s) "value := 'BABEFACE'O "
+}
+
+const U c_replace2 := { // "named"
+  s := "Howdy"
+}
+with {
+  erroneous (s) "value := myoctetstring : 'BABEFACE'O "
+}
+
+template Nodes t_replace := {
+  // node type                 , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "U", "", "" },
+  { XML_READER_TYPE_ELEMENT    , 1, "OCTET_STRING", "", "" },
+  { XML_READER_TYPE_TEXT       , 2, "#text", "BABEFACE", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "OCTET_STRING", "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "U", "", "" }
+}
+
+template Nodes t_replace2 := {
+  // node type                 , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "U", "", "" },
+  { XML_READER_TYPE_ELEMENT    , 1, "myoctetstring", "", "" },
+  { XML_READER_TYPE_TEXT       , 2, "#text", "BABEFACE", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "myoctetstring", "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "U", "", "" }
+}
+
+const U c_replace_raw := {
+  s := "Howdy"
+}
+with {
+  //before no-no with union ): erroneous (i) "before := 'BABEFACE'O "
+  erroneous (s) "value(raw) := 'E29795E280BFE280BFE29795'O "
+}
+
+//const U c_replace_raw := {
+//  s := "Howdy"
+//}
+//with {
+//  erroneous (s) "value(raw) := '111000101001011110010101111000101000000010111111111000101000000010111111111000101001011110010101'B "
+//}
+// Alas, this is not accepted; bitstring can only be used as an erroneous raw value for RAW or PER, not XER
+
+template Nodes t_replace_raw := {
+  // node type                 , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "U", "", "" },
+
+  { XML_READER_TYPE_TEXT       , 1, "#text", "\n" & "\xE2\x97\x95" & "\xE2\x80\xBF" & "\xE2\x80\xBF" & "\xE2\x97\x95" /* & "\t\t"*/, "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "U", "", "" }
+}
+
+testcase u_replace() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encU(c_replace);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace);
+
+  o := encU(c_replace2);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace2);
+
+  o := encU(c_replace_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_raw);
+}
+
+// -- -- -- -- -- -- -- -- before embedded field
+
+const U c_before_r_f := c_plain_r
+with {
+  erroneous (r.f) "before := myoctetstring : 'BABEFACE'O"
+}
+
+template Nodes t_before_r_f modifies t_plain_r :=
+{
+  -,-,-,-,-, // <U>, <r>, <b>, #text, </b>
+  // perturbation: an extra element
+  { XML_READER_TYPE_ELEMENT    , 2, "myoctetstring", "", "" }, //5
+  { XML_READER_TYPE_TEXT       , 3, "#text", "BABEFACE", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "myoctetstring", "", "" },
+  t_plain_r[5],
+  t_plain_r[6],
+  t_plain_r[7],
+  t_plain_r[8],
+  t_plain_r[9]
+}
+
+testcase u_before_embedded() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encU(c_before_r_f);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_r_f);
+}
+
+// Do not forget to add the testcase to the one and only control part in rec_of.ttcn
+}
+with {
+  encode "XML"
+}

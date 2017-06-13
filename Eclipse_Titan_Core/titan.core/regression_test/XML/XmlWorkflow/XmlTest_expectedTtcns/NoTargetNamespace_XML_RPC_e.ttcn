@@ -1,0 +1,175 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          NoTargetNamespace_XML_RPC.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- XML_RPC.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "NoTargetNamespace" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module NoTargetNamespace_XML_RPC {
+
+
+import from XSD all;
+
+
+/* The only two possible root elements are methodResponse and
+       methodCall so these are the only two I use a top-level
+       declaration for. */
+
+
+type record MethodCall
+{
+	record of enumerated {
+		methodName,
+		params
+	} order,
+	ASCIIString methodName,
+	record {
+		record of ParamType param_list
+	} params optional
+}
+with {
+  variant "name as uncapitalized";
+  variant "useOrder";
+  variant "element";
+  variant (params.param_list) "untagged";
+  variant (params.param_list[-]) "name as 'param'";
+};
+
+
+/* What can appear inside a fault is very restricted */
+type record MethodResponse
+{
+	union {
+		record {
+			ParamType param_
+		} params,
+		record {
+			record {
+				record {
+					MemberType member,
+					MemberType member_1
+				} struct
+			} value_
+		} fault
+	} choice
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (choice) "untagged";
+  variant (choice.params.param_) "name as 'param'";
+  variant (choice.fault.value_) "name as 'value'";
+  variant (choice.fault.value_.struct.member_1) "name as 'member'";
+};
+
+
+type record ParamType
+{
+	ValueType value_
+}
+with {
+  variant (value_) "name as 'value'";
+};
+
+
+/* I need to figure out how to say that this
+         is either a simple xsd:string type or that 
+         it contains one of these elements; but that otherwise
+         it does not have mixed content */
+type record ValueType
+{
+	record of XSD.String embed_values,
+	union {
+		XSD.Int i4,
+		XSD.Int int,
+		ASCIIString string,
+		XSD.Decimal double,
+		XSD.Base64Binary base64,
+		NumericBoolean boolean_,
+		XSD.DateTime dateTime_iso8601,
+		ArrayType array,
+		StructType struct
+	} choice
+}
+with {
+  variant "embedValues";
+  variant (choice) "untagged";
+  variant (choice.base64) "name as capitalized";
+  variant (choice.boolean_) "name as 'boolean'";
+  variant (choice.dateTime_iso8601) "name as 'dateTime.iso8601'";
+};
+
+
+type record StructType
+{
+	record length(1 .. infinity) of MemberType member_list
+}
+with {
+  variant (member_list) "untagged";
+  variant (member_list[-]) "name as 'member'";
+};
+
+
+type record MemberType
+{
+	XSD.String name,
+	ValueType value_
+}
+with {
+  variant (value_) "name as 'value'";
+};
+
+
+type record ArrayType
+{
+	record {
+		record of ValueType value_list
+	} data
+}
+with {
+  variant (data.value_list) "untagged";
+  variant (data.value_list[-]) "name as 'value'";
+};
+
+
+type XSD.String ASCIIString (pattern "([ -~]|\n|\r|\t)*");
+
+
+type XSD.Boolean NumericBoolean;
+
+
+}
+with {
+  encode "XML";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

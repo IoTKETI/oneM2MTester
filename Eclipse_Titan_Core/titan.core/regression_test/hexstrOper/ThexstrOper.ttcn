@@ -1,0 +1,102 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module ThexstrOper
+{
+type component hexstrOper_comptype { }
+
+type hexstring myhstr0
+type hexstring myhstr1 length(1)
+type hexstring myhstr2 length(0..1)
+type hexstring myhstr3 ('0'H, '1'H, '00'H, '01'H, '10'H, '11'H) length(1)
+type hexstring myhstr4 ('0'H, '1'H)
+type hexstring myhstr5 (int2hex(0, 1) & ''H, int2hex(1, 1))
+type myhstr5 myhstr6
+type myhstr6 myhstr7 (c_myhstr1, int2hex(hex2int(c_myhstr1), 1))
+type myhstr6 myhstr8 (int2hex(hex2int('0'H), 1))
+type hexstring myhstr9 (myhstr2, myhstr3)
+type hexstring myhstr10 length(0..infinity)  // Full set.
+
+const hexstring c_myhstr1 := '0'H
+const myhstr9 c_myhstr2 := c_myhstr1
+
+template hexstring t_myhstr1 := '0'H
+template myhstr9 t_myhstr2 := t_myhstr1
+template myhstr3 t_myhstr3 := '0'H length(1)
+// TITAN doesn't allow patterns to be other than `charstring' or `universal
+// charstring' types.  It's denied by the grammar.
+
+function f_hstr1() return myhstr6 {
+  return substr(replace(int2hex(0, 1) & int2hex(1, 1), 0, 1, '1'H), 0, 1)
+}
+
+testcase hexstrSubtypes() runs on hexstrOper_comptype {
+  var template myhstr1 vt_myhstr1 := '0'H  // Simple length.
+  var template myhstr2 vt_myhstr2 := ''H  // Length with range.
+  var template myhstr3 vt_myhstr3 := vt_myhstr1  // Values and length.
+  var template myhstr4 vt_myhstr4 := vt_myhstr1  // Values only.
+  var myhstr1 v_myhstr1 := '0'H
+  var myhstr2 v_myhstr2 := ''H
+  var myhstr3 v_myhstr3 := v_myhstr1
+  var myhstr4 v_myhstr4 := v_myhstr1
+
+  if (valueof(vt_myhstr1) == v_myhstr1 and v_myhstr2 == valueof(vt_myhstr2)) { setverdict(pass) }
+  else { setverdict(fail) }
+  if (valueof(vt_myhstr3) == v_myhstr3 and v_myhstr4 == valueof(vt_myhstr4)) { setverdict(pass) }
+  else { setverdict(fail) }
+  if (f_hstr1() == '1'H) { setverdict(pass) }
+  else { setverdict(fail) }
+}
+
+testcase hexstrIsvalue() runs on hexstrOper_comptype{
+  var hexstring hstr0;
+  var hexstring hstr1 := '1111'H;
+  var template hexstring thstr;
+
+  if ( isvalue(hstr0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(hstr1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(thstr) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase hexstrIsbound() runs on hexstrOper_comptype {
+  var hexstring hstr0;
+  var hexstring hstr1 := '1111'H;
+  var template hexstring thstr;
+
+  if ( isbound(hstr0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(hstr0[0]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(hstr1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(thstr) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase CR_TR00018474() runs on hexstrOper_comptype {
+  // Indexing of string template variables.
+  var template hexstring vth1 := 'AABBCCDDEE'H
+  var template hexstring vth2 := 'AABB?CC'H  // It's a pattern, cannot be indexed.
+  vth1[0] := 'B'H
+  if (match('BABBCCDDEE'H, vth1)) { setverdict(pass) } else { setverdict(fail) }
+  vth1[0] := 'B'H  // Indexed assignment notation cannot be used here.
+  vth1[1] := 'A'H  // Still works, nothing special.
+  if (match('BABBCCDDEE'H, vth1)) { setverdict(pass) } else { setverdict(fail) }
+}
+
+control {
+  const hexstring cl_1 := '0'H
+  var hexstring vl_1;
+
+  execute(hexstrSubtypes());
+  execute(hexstrIsvalue());
+  execute(hexstrIsbound());
+  execute(CR_TR00018474());
+}
+}

@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  
+  Baji, Laszlo
+  Balasko, Jeno
+  Baranyi, Botond
+  Delic, Adam
+  Lovassy, Arpad
+  Ormandi, Matyas
+  Szabo, Bence Janos
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="TITAN_Project_File_Information" type="TopLevelProjectType" />
+
+  <xs:complexType name="ConfigurationType">
+      <!--
+      Configuration data; also used by TXD's MasterConfiguration.
+      It does not have a "name" attribute.
+      -->
+      <xs:sequence>
+        <xs:element name="ProjectProperties" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MakefileSettings" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="generateMakefile" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="generateInternalMakefile" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="symboliclinklessBuild" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="useAbsolutePath" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="GNUMake" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="incrementalDependencyRefresh" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="dynamicLinking" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="functiontestRuntime" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="singleMode" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="codeSplitting" minOccurs="0" maxOccurs="1">
+                      <xs:simpleType>
+                        <xs:union>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:normalizedString">
+                              <xs:enumeration value=""/>
+                              <xs:enumeration value="none"/>
+                              <xs:enumeration value="type"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:positiveInteger">
+                              <xs:maxExclusive value="1000000"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:union>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="defaultTarget" minOccurs="0" maxOccurs="1">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:normalizedString">
+                          <xs:enumeration value="executable"/>
+                          <xs:enumeration value="library"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="targetExecutable" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+					<xs:element name="TTCN3preprocessor" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="TTCN3preprocessorDefines" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+					<xs:element name="TTCN3preprocessorUndefines" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="preprocessorDefines" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+					<xs:element name="preprocessorUndefines" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    
+                    <xs:element name="TTCN3preprocessorIncludes" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="0" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="preprocessorIncludes" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="0" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+
+                    <xs:element name="disableBER" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="disableRAW" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="disableTEXT" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="disableXER" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="disableJSON" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="forceXERinASN.1" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="defaultasOmit" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="enumHackProperty" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="forceOldFuncOutParHandling" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="gccMessageFormat" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="lineNumbersOnlyInMessages" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="includeSourceInfo" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="addSourceLineInfo" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="suppressWarnings" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="outParamBoundness" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="omitInValueList" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="warningsForBadVariants" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="activateDebugger" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="quietly" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="namingRules" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="disableSubtypeChecking" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="CxxCompiler" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="optimizationLevel" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="otherOptimizationFlags" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="ignoreUntaggedOnTopLevelUnion" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="profiledFileList" minOccurs="0" maxOccurs="1" type="ResourceType" />
+
+                    <xs:element name="SolarisSpecificLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Solaris8SpecificLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+					<xs:element name="FreeBSDSpecificLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="LinuxSpecificLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Win32SpecificLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="additionalObjects" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="linkerLibraries" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="linkerLibrarySearchPath" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="listItem" minOccurs="1" maxOccurs="unbounded" type="xs:normalizedString" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="disablePredefinedExternalFolder" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="useGoldLinker" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                    <xs:element name="freeTextLinkerOptions" minOccurs="0" maxOccurs="1" type="xs:normalizedString" /> 
+                    <xs:element name="buildLevel" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="ProjectSpecificRulesGenerator" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="GeneratorCommand" minOccurs="1" maxOccurs="1" type="xs:string" />
+                          <xs:element name="Targets" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Target" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:attribute name="name" type="xs:normalizedString" use="required" />
+                                    <xs:attribute name="placement" use="required">
+                                      <xs:simpleType>
+                                        <xs:restriction base="xs:normalizedString">
+                                          <xs:enumeration value="PHONY" />
+                                          <xs:enumeration value="TTCN3_MODULES" />
+                                          <xs:enumeration value="TTCN3_PP_MODULES" />
+                                          <xs:enumeration value="TTCN3_INCLUDES" />
+                                          <xs:enumeration value="ASN1_MODULES" />
+                                          <xs:enumeration value="USER_SOURCES" />
+                                          <xs:enumeration value="USER_HEADERS" />
+                                          <xs:enumeration value="USER_OBJECTS" />
+                                          <xs:enumeration value="OTHER_FILES" />
+                                        </xs:restriction>
+                                      </xs:simpleType>
+                                    </xs:attribute>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="LocalBuildSettings" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="MakefileFlags" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="MakefileScript" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="workingDirectory" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+			  
+			  <xs:element name="RemoteBuildProperties" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="RemoteHost" minOccurs="0" maxOccurs="unbounded" >
+						<xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Active" minOccurs="1" maxOccurs="1" type="xs:boolean" />
+						  <xs:element name="Name" minOccurs="1" maxOccurs="1" type="xs:string" />
+						  <xs:element name="Command" minOccurs="1" maxOccurs="1" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+					</xs:element>
+					<xs:element name="ParallelCommandExecution" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+					</xs:sequence>
+				 </xs:complexType>
+			  </xs:element>
+			  		  
+              <xs:element name="NamingCoventions" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="enableProjectSpecificSettings" minOccurs="0" maxOccurs="1" type="xs:string" />
+                    <xs:element name="TTCN3ModuleName" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="ASN1ModuleName" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="altstep" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="globalConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="externalConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="function" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="externalFunction" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="moduleParameter" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="globalPort" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="globalTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="testcase" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="globalTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="type" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="group" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="localConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="localVariable" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="localTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="localVariableTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="localTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="formalParameter" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="componentConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="componentVariable" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="componentTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="ConfigurationRequirements" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="configurationRequirement" minOccurs="0"  maxOccurs="unbounded" type="ConfigurationRequirementType" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="FolderProperties" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FolderResource" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FolderPath" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="FolderProperties" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="ExcludeFromBuild" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                          <xs:element name="centralStorage" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                          <xs:element name="NamingCoventions" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="enableFolderSpecificSettings" minOccurs="0" maxOccurs="1" type="xs:string" />
+                                <xs:element name="TTCN3ModuleName" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="ASN1ModuleName" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="altstep" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="globalConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="externalConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="function" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="externalFunction" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="moduleParameter" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="globalPort" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="globalTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="testcase" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="globalTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="type" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="group" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="localConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="localVariable" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="localTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="localVariableTemplate" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="localTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="formalParameter" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="componentConstant" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="componentVariable" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                                <xs:element name="componentTimer" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="FileProperties" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FileResource" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FilePath" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+                    <xs:element name="FileProperties" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="ExcludeFromBuild" minOccurs="0" maxOccurs="1" type="xs:boolean" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+
+  <xs:complexType name="NamedConfigurationType">
+      <!--
+      This is an extra indirection level. It adds the "name" attribute to
+      ConfigurationType.
+      -->
+      <xs:complexContent>
+        <xs:extension base="ConfigurationType">
+          <xs:attribute name="name" type="xs:normalizedString" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+
+  <xs:complexType name="ConfigurationRequirementType">
+    <xs:sequence>
+      <xs:element name="projectName" minOccurs="1" maxOccurs="1">
+        <xs:simpleType>
+          <xs:restriction base="xs:normalizedString">
+            <xs:minLength value="1" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:choice>
+	      <xs:element name="requiredConfiguration" minOccurs="1" maxOccurs="1">
+	        <xs:simpleType>
+	          <xs:restriction base="xs:normalizedString">
+	            <xs:minLength value="1" />
+	          </xs:restriction>
+	        </xs:simpleType>
+	      </xs:element>
+	      <xs:element name="rerquiredConfiguration" minOccurs="1" maxOccurs="1">
+	        <xs:simpleType>
+	          <xs:restriction base="xs:normalizedString">
+	            <xs:minLength value="1" />
+	          </xs:restriction>
+	        </xs:simpleType>
+	      </xs:element>
+      </xs:choice>      
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceType">
+    <xs:attribute name="projectRelativePath" type="xs:normalizedString" use="required" />
+    <xs:attribute name="relativeURI" type="xs:normalizedString" use="optional" />
+    <xs:attribute name="rawURI" type="xs:normalizedString" use="optional" />
+    <!-- FIXME: only one of the above two is allowed! -->
+  </xs:complexType>
+  
+  <xs:complexType name="ProjectType">
+	<xs:sequence>
+		<xs:element name="ProjectName" minOccurs="1" maxOccurs="1" type="xs:normalizedString" />
+		
+		<xs:element name="ReferencedProjects" minOccurs="0" maxOccurs="1">
+		  <xs:complexType>
+			<xs:sequence>
+			  <xs:element name="ReferencedProject" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:normalizedString" use="required" />
+					<xs:attribute name="projectLocationURI" type="xs:normalizedString" use="required" />
+					<xs:attribute name="tpdName" type="xs:normalizedString" use="optional" />
+				</xs:complexType>
+			  </xs:element>
+			</xs:sequence>
+		  </xs:complexType>
+		</xs:element>
+
+		<xs:element name="Folders" minOccurs="0" maxOccurs="1">
+		  <xs:complexType>
+			<xs:sequence>
+				<xs:element name="FolderResource" type="ResourceType" maxOccurs="unbounded" />
+			</xs:sequence>
+		  </xs:complexType>
+		</xs:element>
+
+		<xs:element name="Files" minOccurs="0" maxOccurs="1">
+		  <xs:complexType>
+			<xs:sequence>
+				<xs:element name="FileResource" type="ResourceType" maxOccurs="unbounded" />
+			</xs:sequence>
+		  </xs:complexType>
+		</xs:element>
+		
+		<xs:element name="PathVariables" minOccurs="0" maxOccurs="1">
+		  <xs:complexType>
+			<xs:sequence>
+			  <xs:element name="PathVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+				  <xs:attribute name="name" type="xs:normalizedString" use="required" />
+				  <xs:attribute name="value" type="xs:normalizedString" use="required" />
+				</xs:complexType>
+			  </xs:element>
+			</xs:sequence>
+		  </xs:complexType>
+		</xs:element>
+
+		<xs:element name="ActiveConfiguration" minOccurs="0" maxOccurs="1" type="xs:normalizedString" />
+		
+		<xs:element name="Configurations" minOccurs="0" maxOccurs="1">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element name="Configuration" minOccurs="0" maxOccurs="unbounded" type="NamedConfigurationType">
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+
+	</xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="PackedReferencedProjectsType">
+       <xs:sequence>
+          <xs:element name="PackedReferencedProject" minOccurs="0" maxOccurs="unbounded" type="ProjectType" />
+       </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TopLevelProjectType">
+  <!--
+  This is an extra indirection level. It adds the "version" attribute to
+  ProjectType and the optional element "PackedReferencedProjects"
+  -->
+	<xs:complexContent>
+		<xs:extension base="ProjectType">         
+			<xs:sequence minOccurs="0" maxOccurs="1">
+				<xs:element name="PackedReferencedProjects" type="PackedReferencedProjectsType" />
+			</xs:sequence>
+			<xs:attribute name="version" type="xs:decimal" use="required" />
+		</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

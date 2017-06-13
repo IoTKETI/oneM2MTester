@@ -1,0 +1,175 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module HQ30279A {	//^In TTCN-3 module//
+// "components should be initialized before templates" is not true.
+//
+//
+
+type record of integer integers;
+type set    of integer intset; // superset/subset needs set-of; record-of not good enough
+
+type component MTC {
+  var          integer ct_variable;
+  var template integer ct_template;
+  const        integer ct_const := 42;
+}
+
+template integer t_int(integer par) := par;
+
+type function int_ret_fn_type() return template integer;
+     function int_ret_fn     () return template integer { return 42; }
+
+modulepar int_ret_fn_type mp_int_ret_fn := refers(int_ret_fn);
+const     int_ret_fn_type co_int_ret_fn := refers(int_ret_fn);
+
+function forty_two() runs on MTC return integer
+{
+  return 42;
+}
+
+/* * * * * * */
+
+function f1(
+  integer pl_in
+    := ct_const
+) runs on MTC
+{}
+
+function f0(template intset z) runs on MTC
+{
+}
+
+function f2(	//^In function definition `f2':$//	//^In formal parameter list:$//
+  template integer f_par	//^In parameter `f_par':$//
+    := t_int(ct_variable)	//^In default value:$// \
+				//^error: default value cannot refer to a template field of the component in the `runs on' clause$//
+) runs on MTC
+{}
+
+function f_defval_tpl(  //^In function definition `f_defval_tpl':$//	//^In formal parameter list:$//
+  template integer f_par	//^In parameter `f_par':$//
+    := ct_template  	//^In default value:$// \
+    					//^error: default value cannot refer to a field of the component in the `runs on' clause$//
+) runs on MTC
+{}
+
+function f_defval_invoke(	//^In function definition `f_defval_invoke':$//	//^In formal parameter list:$//
+  template integer f_par	//^In parameter `f_par':$//
+    := mp_int_ret_fn.apply()	//^In default value:$// \
+    				//^error: default value can not be a function invocation$//
+) runs on MTC
+{}
+
+function f_defal_value_list(
+  template integer f_par
+    := (3, 14, 15, 9, 26)
+) runs on MTC
+{}
+
+function f_defval_compl_list(
+  template integer f_par
+    := complement (3, 14, 15, 9, 26)
+) runs on MTC
+{}
+
+function f_defval_range(
+  template integer f_par
+    := (7 .. ct_variable)
+) runs on MTC
+{}
+
+function f_defval_permutation(
+  template integers f_par
+    := { permutation (3, 14, 15, 9, 26) }
+) runs on MTC
+{}
+
+function f_defval_subset(
+  template intset f_par
+    := subset (3, 14, 15, 9, 26)
+) runs on MTC
+{}
+
+function f_defval_superset(
+  template intset f_par
+    := superset (3, 14, 15, 9, 26)
+) runs on MTC
+{}
+
+/* * * * Anything should be accepted as an actual parameter when _calling_ * * * */
+
+testcase tc_component_var () runs on MTC
+{
+  f2(ct_template)
+}
+
+testcase tc_not_used() runs on MTC
+{
+  f2(-)
+}
+
+testcase tc_omit() runs on MTC
+{
+  f2(omit)
+}
+
+testcase tc_any() runs on MTC
+{
+  f2(*)
+}
+
+testcase tc_any_or_omit() runs on MTC
+{
+  f2(?)
+}
+
+testcase tc_value_list() runs on MTC
+{
+  f2(integer : (3, 14, 15, 9, 26))
+  f2(          (3, 14, 15, 9, 26))
+}
+
+testcase tc_complemented_list() runs on MTC
+{
+  f2(integer : complement (3, 14, 15, 9, 26))
+  f2(          complement (3, 14, 15, 9, 26))
+}
+
+testcase tc_invoke() runs on MTC
+{
+  var int_ret_fn_type v_int_ret_fn := refers(int_ret_fn);
+  f2(v_int_ret_fn.apply());
+}
+
+testcase tc_superset() runs on MTC
+{
+  f0( superset (3, 14, 15, 9, 26) )
+}
+
+testcase tc_subset() runs on MTC
+{
+  f0( subset (3, 14, 15, 9, 26) )
+}
+
+
+control
+{
+  execute(tc_not_used())
+  execute(tc_omit())
+  execute(tc_any())
+  execute(tc_any_or_omit())
+  execute(tc_value_list())
+}
+
+}
+

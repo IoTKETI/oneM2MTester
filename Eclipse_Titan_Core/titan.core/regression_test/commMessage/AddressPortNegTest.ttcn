@@ -1,0 +1,123 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module AddressPortNegTest {
+
+    type record SIP_address_type
+    {
+      charstring      host optional,          // hostname, IPv4 or IPv6
+      integer         portField optional,     // represented as an integer
+      boolean         tcporudp optional  // true if TCP false if UDP
+    }
+ 
+
+    type SIP_address_type address;
+  
+    type port PortType1 message {
+             inout integer;
+    } with {extension "address"}
+
+    type port PortType2 message {
+             inout integer;
+    }
+
+    type component TestCaseComp {
+        port PortType1 p1;
+    }
+
+    type component TestCaseComp2 {
+        port PortType2 p1;
+    }
+
+    type component SystemComp {
+        port PortType1 p1;
+    }
+  
+  
+    testcase tc_neg_address_port_not_mapped() runs on TestCaseComp system SystemComp {
+    
+        var address v_addr := {"Host", 4400, false}
+
+        @try {
+          p1.send(5) to v_addr;
+          setverdict(fail, "Send operation succeeded. Expected error.");
+        }
+        @catch (msg) {
+          if (match(msg, pattern "Dynamic test case error: Port p1 has neither connections nor mappings. Message cannot be sent on it.")) {
+            setverdict(pass);
+          }
+          else {
+            setverdict(fail, "Incorrect error message received (receive test): ", msg);
+          }
+        }
+
+        // After map it is good
+        map(self:p1, system:p1);
+        p1.send(5) to v_addr;
+
+        setverdict(pass);
+    }
+
+
+
+        testcase tc_neg_address_port_not_mapped_system() runs on TestCaseComp system SystemComp {
+
+        @try {
+          p1.send(5) to system;
+          setverdict(fail, "Send operation succeeded. Expected error.");
+        }
+        @catch (msg) {
+          if (match(msg, pattern "Dynamic test case error: Port p1 has neither connections nor mappings. Message cannot be sent on it.")) {
+            setverdict(pass);
+          }
+          else {
+            setverdict(fail, "Incorrect error message received (receive test): ", msg);
+          }
+        }
+
+        // After map it is good
+        map(self:p1, system:p1);
+        p1.send(5) to system;
+
+        setverdict(pass);
+    }
+
+
+    testcase tc_neg_port_not_mapped_system() runs on TestCaseComp2 system SystemComp {
+
+        @try {
+          p1.send(5) to system;
+          setverdict(fail, "Send operation succeeded. Expected error.");
+        }
+        @catch (msg) {
+          if (match(msg, pattern "Dynamic test case error: Port p1 has neither connections nor mappings. Message cannot be sent on it.")) {
+            setverdict(pass);
+          }
+          else {
+            setverdict(fail, "Incorrect error message received (receive test): ", msg);
+          }
+        }
+
+        // After map it is good
+        map(self:p1, system:p1);
+        p1.send(5) to system;
+
+        setverdict(pass);
+    }
+
+    control {
+        execute(tc_neg_address_port_not_mapped());
+        execute(tc_neg_address_port_not_mapped_system());
+
+        execute(tc_neg_port_not_mapped_system());
+    }
+
+}

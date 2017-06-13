@@ -1,0 +1,28 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is accepted with a concrete value.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_1508_TemplateRestrictions_002 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmit := {1, true};
+
+	type component GeneralComp {}
+
+	testcase TC_Syn_1508_TemplateRestrictions_002() runs on GeneralComp 
+	{ setverdict(pass);	}
+	
+	control
+	{ execute(TC_Syn_1508_TemplateRestrictions_002()); }
+
+}

@@ -1,0 +1,42 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:22.2.2, single dimensional index redirect in any from port.receive statement
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// The following requirements are tested:
+// No binding of the incoming values to the terms of the expression or to the template 
+// shall occur.
+
+module Sem_220202_ReceiveOperation_023 {
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+    type component GeneralComp 
+	{
+		port P p;
+	}
+	    
+    testcase TC_Sem_220202_ReceiveOperation_023() runs on GeneralComp {
+        var template integer v_expectedValue := ?;
+		var template integer dummy_val := ?;
+
+		connect(self:p, self:p);
+        p.send(10);
+        p.receive(v_expectedValue);
+        // make sure the template variable hasn't changed:
+
+        if (istemplatekind(v_expectedValue, "AnyValue")) {setverdict(pass); } 
+        else { setverdict(fail); } 
+    }
+
+    control {
+        execute(TC_Sem_220202_ReceiveOperation_023(), 5.0);
+    }
+}

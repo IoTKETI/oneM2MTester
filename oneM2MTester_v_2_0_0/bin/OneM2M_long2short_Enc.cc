@@ -1,0 +1,1 @@
+/home/martin/ketiwork/workspace/oneM2MTester_v_2_0_0/src/Functions/OneM2M_long2short_Enc.cc

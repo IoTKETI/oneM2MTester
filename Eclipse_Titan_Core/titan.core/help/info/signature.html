@@ -1,0 +1,177 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>signature</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="setverdict.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="sizeof.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>signature</h1>
+<hr align="left" width="75%">
+<p>Procedure signatures (or signatures for short) are needed for procedure-based communication. Signatures are syntactically similar to <a href="function.html#5.">external
+functions</a> (contain the remote procedure prototype) while semantically are similar to <a href="type.html">type definitions</a> (used for template definitions). There are two classes of
+signatures:
+<ol>
+  <li><a href="#Blocking">Signature for blocking communication</a></li>
+  <li><a href="#Non-blocking">Signature for non-blocking communication</a></li>
+</ol>
+<ul>
+  <li>Signature definitions may have parameters. The direction of the parameters is as seen by the called party rather than the calling party.</li>
+  <li>Signature definitions may indicate that the remote procedure returns a value after its termination.</li>
+  <li>Signature definitions may indicate that the remote procedure may raise exception.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="exception.html"><b><font face="Courier New" color="#003258" size="4">exception</font></b></a></li>
+  <li><a href="in.html"><b><font face="Courier New" color="#003258" size="4">in</font></b></a></li>
+  <li><a href="inout.html"><b><font face="Courier New" color="#003258" size="4">inout</font></b></a></li>
+  <li><a href="noblock.html"><b><font face="Courier New" color="#003258" size="4">noblock</font></b></a></li>
+  <li><a href="out.html"><b><font face="Courier New" color="#003258" size="4">out</font></b></a></li>
+  <li><a href="return.html"><b><font face="Courier New" color="#003258" size="4">return</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<p>1. <a name="Blocking">Blocking</a> communication is blocking on the calling and the called side, i.e., TTCN-3 processing is suspended until the respective response has arrived.</p>
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>signature </b></font> <i>identifier&nbsp;</i> <font face="Courier New" color="#003258" size="5"><b>(</b></font> [ <i>parameter_list</i>
+    ] <font face="Courier New" color="#003258" size="5"><b>)</b></font>[ <font face="Courier New" color="#003258" size="5"><b>return</b></font> <i>return_type</i> ] [ <font face="Courier New"
+      color="#003258" size="5"><b>exception</b></font> <i>exception_list</i> ] <font face="Courier New" color="#003258" size="5"><b>;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>signature</b></font> keyword introduces the signature definition.</p>
+  </li>
+  <li>
+  <p><i>identifier</i> is the&nbsp;name used to refer to the structured type. Must begin with a letter, may contain letters, numbers and underscore characters. According to the&nbsp; <a
+    href="../docs/naming.pdf" target="_blank">Naming convention</a>, the prefix <b> S_</b> is recommended.</p>
+  </li>
+  <li>
+  <p>The optional <a name="parameter_list"> <i>parameter_list</i> </a> may contain some of the following (if more than one parameter applies, they are separated by comma)</p>
+  </li>
+  <ul>
+    <li>the <a href="in.html"><b><font face="Courier New" color="#003258" size="4">in</font></b></a> keyword, the type of the parameter and the name of the parameter</li>
+    <li>the <a href="inout.html"><b><font face="Courier New" color="#003258" size="4">inout</font></b></a> keyword, the type of the parameter and the name of the parameter</li>
+    <li>the <a href="out.html"><b><font face="Courier New" color="#003258" size="4">out</font></b></a> keyword, the type of the parameter and the name of the parameter<br>
+    &nbsp;</li>
+  </ul>
+  <li>
+  <p><a name="The">The</a> optional <font face="Courier New" color="#003258" size="4"><b>return</b></font> keyword indicates that the called procedure will return a value.</p>
+  </li>
+  <li><i>return_type</i> specifies the type of the value returned by the procedure.</li>
+</ul>
+<ul>
+  <li>
+  <p>The optional <font face="Courier New" color="#003258" size="4"><b>exception</b></font> keyword indicates that the called procedure may raise an exception.</p>
+  </li>
+  <li><i>exception_list</i> enumerates the (user defined or bulit-on) types of the values representing the exception. More than one types may be specified, they are separated by comma.</li>
+</ul>
+<hr align="left" width="75%" color="#0094D2">
+<p>2. <a name="Non-blocking"> Non-blocking</a> communication is only blocking on the called side,&nbsp; i.e., TTCN-3 processing is suspended on the called side until the response has been sent.</p>
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>signature </b></font> <i>identifier&nbsp;</i> <font face="Courier New" color="#003258" size="5"><b>(</b></font> [ <i>parameter_list</i>
+    ] <font face="Courier New" color="#003258" size="5"><b>)</b></font> <font face="Courier New" color="#003258" size="5"><b>noblock</b></font> [ <font face="Courier New" color="#003258" size="5"><b>exception</b></font>
+    <i>exception_list</i> ] <font face="Courier New" color="#003258" size="5"><b>;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>signature</b></font> keyword introduces the signature definition.</p>
+  </li>
+  <li>
+  <p><i>identifier</i> is the&nbsp;name used to refer to the structured type. Must begin with a letter, may contain letters, numbers and underscore characters. According to the&nbsp; <a
+    href="../docs/naming.pdf" target="_blank">Naming convention</a>, the prefix S_ is recommended.</p>
+  </li>
+  <li>
+  <p>The optional <i>parameter_list</i> may contain the following:&nbsp;</p>
+  </li>
+  <ul>
+    <li>
+    <p>the <a href="in.html"><b><font face="Courier New" color="#003258" size="4">in</font></b></a> keyword, the type of the parameter and the name of the parameter
+    </li>
+    </p>
+  </ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>noblock</b></font> keyword indicating that the procedure signature is intended for non-blocking communication.</p>
+  </li>
+  <li><i>return_type</i> specifies the type of the value returned by the procedure.</li>
+</ul>
+<ul>
+  <li>
+  <p>The optional <font face="Courier New" color="#003258" size="4"><b>exception</b></font> keyword indicates that the called procedure may raise an exception.</p>
+  </li>
+  <li><i>exception_list</i> enumerates the (user defined or bulit-on) types of the values representing the exception. More than one types may be specified, they are separated by comma.</li>
+</ul>
+<hr align="left" width="50%">
+<p>Example 1: signature for blocking communication
+<p><font face="Courier New">signature P_MyRemoteProcOne ();</font>
+<p>P_MyRemoteProcOne will be used for blocking procedure-based communication. It has neither parameters nor a return value.</p>
+<hr align="left" width="25%">
+<p>Example 2: signature for non-blocking communication
+<p><font face="Courier New">signature P_MyRemoteProcTwo () noblock;</font>
+<p>P_MyRemoteProcTwo will be used for non blocking procedure-based communication. It has neither parameters nor a return value.</p>
+<hr align="left" width="25%">
+<p>Example 3: parameters of procedure signatures
+<p><font face="Courier New">signature P_MyRemoteProcThree (in integer pl_Par1, out float pl_Par2, inout integer pl_Par3);</font>
+<p>P_MyRemoteProcThree will be used for blocking procedure-based communication. The procedure has three parameters: pl_Par1 an in parameter of type integer, pl_Par2 an out parameter of type float
+and pl_Par3 an inout parameter of type integer.</p>
+<hr align="left" width="25%">
+<p>Example 4: value returning remote procedures
+<p><font face="Courier New">signature P_MyRemoteProcFour (in integer pl_Par1) return integer;</font>
+<p>P_MyRemoteProcFour will be used for blocking procedure-based communication. The procedure has the in parameter pl_Par1 of type integer and returns a value of type integer after its termination.</p>
+<hr align="left" width="25%">
+<p>Example 5: specifying exceptions
+<p><font face="Courier New">signature P_MyRemoteProcFive (inout float pl_Par1) return integer exception (ExceptionType1, ExceptionType2);&nbsp;</font>
+<p>P_MyRemoteProcFive will be used for blocking procedure-based communication. It returns a float value in the inout parameter pl_Par1 and an integer value, or may raise exceptions of type
+ExceptionType1 or ExceptionType2</p>
+<hr align="left" width="25%">
+<p>Example 6: specifying exceptions for non-blocking communication
+<p><font face="Courier New">signature P_MyRemoteProcSix (in integer pl_Par1) noblock exception (integer, float);&nbsp;</font>
+<p>P_MyRemoteProcSix will be used for non-blocking procedure-based communication. In case of an unsuccessful termination, P_MyRemoteProcSix raises exceptions of type integer or float.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#signaturedef">BNF definition</a> of <font face="Courier New"> signature</font></p>
+</body>
+</html>

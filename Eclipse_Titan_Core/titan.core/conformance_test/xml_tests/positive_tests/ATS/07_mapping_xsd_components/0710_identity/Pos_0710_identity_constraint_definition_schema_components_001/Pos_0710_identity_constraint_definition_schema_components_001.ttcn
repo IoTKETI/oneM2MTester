@@ -1,0 +1,94 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:7.10, Verify that unique elements (and nested selector and field) are ignored during conversion
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// The XSD unique element enables to indicate that some XSD attribute or element
+// values shall be unique within a certain scope. As TTCN-3 does not allow 
+// a similar relational value constraint, mapping of the unique, key and keyref
+// elements are not supported by the present document, i.e. these elements shall
+// be ignored in the translation process.
+
+module Pos_0710_identity_constraint_definition_schema_components_001 {
+
+   import from schema_Pos_0710_identity_constraint_definition_schema_components_001 language "XSD" all;
+
+   template MyType m_msg := {
+       unitInventory_list := {
+           {
+			   unitId := 24,
+               item_list := { { 1004 }, { 1005 }, { 6028 }, { 7450 } }
+
+           }, {
+			   unitId := 30,
+               item_list := { { 1011 }, { 1042 }, { 5301 }, { 6001 } }
+           }
+       }
+   };
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Pos_0710_identity_constraint_definition_schema_components_001() runs on C system C {
+        var Raw v_rcv;
+
+        var Raw  v_Raw:= "<ns224:MyType xmlns:ns224='schema:Pos_0710_identity_constraint_definition_schema_components_001'>\n\t<unitInventory unitId='24'>\n\t\t<item itemId='1004'/>\n\t\t<item itemId='1005'/>\n\t\t<item itemId='6028'/>\n\t\t<item itemId='7450'/>\n\t</unitInventory>\n\t<unitInventory unitId='30'>\n\t\t<item itemId='1011'/>\n\t\t<item itemId='1042'/>\n\t\t<item itemId='5301'/>\n\t\t<item itemId='6001'/>\n\t</unitInventory>\n</ns224:MyType>\n\n";
+
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_0710_identity_constraint_definition_schema_components_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

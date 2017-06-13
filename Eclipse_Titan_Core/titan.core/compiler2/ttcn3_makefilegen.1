@@ -1,0 +1,207 @@
+.TH ttcn3_makefilegen 1 "October 2014" "Ericsson Telecom AB" "TTCN-3 Tools"
+.SH NAME
+ttcn3_makefilegen \- Makefile Generator
+.SH SYNOPSIS
+.B ttcn3_makefilegen
+.RB "[\| " \-acdEfglMnpRsSw " \|]"
+.RB "[\| " \-e
+.IR " ETS_name" " \|]"
+.RB "[\| " \-o
+.IR " dir|file" " \|]"
+.RB "[\| " \-O
+.IR " file" " \|]"
+.RB "[\| " \-z
+.IR " file" " \|] ..."
+TTCN3_module[.ttcn] ... ASN1_module[.asn] ... Testport_name[.cc] ...
+.br
+or
+.br
+.B ttcn3_makefilegen
+.B \-v
+.SH DESCRIPTION
+This manual page is a quick reference for the Makefile Generator
+of the TTCN-3 Test Executor. It only summarizes the meaning of
+all command line options. For more details please consult the
+.B Programmer's Technical Reference for TITAN TTCN-3 Test Executor.
+.SH OPTIONS
+The following options are supported (in alphabetical order):
+.TP 10
+.B \-a
+Refer to files using
+.I absolute
+path names in the generated Makefile. By default the Makefile uses relative
+path names to access files located outside the current working directory of
+the compiler. Files from the current working directory are always referenced
+using only the file name without any directory.
+.TP
+.B \-c
+Generate a Makefile that is capable of using pre-compiled C++ and object files
+from
+.I central
+directories in order to save disk space and compilation time.
+.TP
+.B \-d
+.I Dump
+the internal data structures used for Makefile generation. This option
+is mainly useful for debugging.
+.TP
+.BI \-e " ETS_name"
+Sets the name of the target binary program (i.e. the executable test
+suite) to
+.I ETS_name
+in the generated Makefile. If this option is omitted, the name of the
+first TTCN-3 module will be used as default.
+.TP
+.B \-E
+Instructs the variant attribute parser to display warnings instead of errors
+for unrecognized/erroneous attributes.
+.TP
+.B \-f
+Forces the Makefile Generator to
+.I overwrite
+the output files even if they exist or are unchanged.
+.TP
+.B \-g
+Generates a Makefile that can be used with
+.I GNU make
+only. The resulting Makefile will be smaller and less redundant. It
+exploits the pattern substitution features of GNU make, which may cause
+syntax errors with other versions of make.
+.TP
+.BI \-I " path"
+Adds the path to the list of search paths.
+.I path
+must be an
+absolute path. Used with the 
+.B -t
+option when the referenced projects
+can not be found at the projectRelativeURI location. In that case the
+tool will try to find the referenced TPD file using the search paths.
+The first TPD file found is taken. If the tpdName attribute is present in
+ ReferencedProject then the value of tpdName will be used as a TPD name
+during search. However if the tpdName attribute is missing then the value
+of the name attribute is taken with the .tpd suffix and used during the
+search.
+.TP
+.BI \-o " dir|file"
+Write the Makefile to the given directory or file.
+The current working directory is the default otherwise.
+If the given argument is an existing directory, the generated
+.I Makefile
+will be placed into that directory. Otherwise the given argument is assumed to be the name of the generated
+.I Makefile.
+.TP
+.BI \-O " file"
+Add
+.I file
+to the list of
+.I other files
+in the generated Makefile without analyzing the file's contents and suffix.
+This option can be used to temporarily exclude some TTCN-3, ASN.1 or C++ files
+from the build process, but add them to the archive created by the command
+.I make archive.
+.TP
+.B \-l
+Enable dynamic linking. All files of the project will be compiled with
+.I -fPIC
+and for each (static) object, a new shared object will be created. Then, these
+shared objects will be linked to the final executable instead of the (static)
+objects. It can be used to speed up the linking phase, in the price of somewhat lower
+performance and increased memory usage. It's recommended to use this flag only in the
+development phase of the project. This option is not supported on Windows.
+.TP
+.B \-M
+Allows the use of the value
+.B omit
+in template lists and complemented template lists (legacy behavior).
+If set, an omitted field will match a template list, if the value
+.B omit
+appears in the list, and it will match a complemented template list, if
+.B omit
+is not in the list (the
+.B ifpresent
+attribute can still be used for matching omitted fields). This also affects the
+.B ispresent
+operation and the
+.B present
+template restriction accordingly.
+.TP
+.B \-n
+Activates the debugger and generates extra code for storing debug information.
+.TP
+.B \-p
+Generate Makefile with
+.I TTCN-3 preprocessing.
+All the TTCN-3 source files with the
+.I ttcnpp
+extension will be preprocessed using the C preprocessor.
+.TP
+.B \-R
+Use function test runtime (TITAN_RUNTIME_2). Generates a Makefile that
+compiles and links the source code using the function test runtime.
+.TP
+.B \-s
+Generates a Makefile, which links the executable test suite with the
+.I single mode
+version of the base library. If this switch is omitted the executable is
+built for parallel mode by default.
+.TP
+.B \-S
+Supresses all 
+.I makefilegen
+warning messages.
+.TP
+.B \-v
+Prints
+.I version
+and license key information and exits.
+.TP 10
+.B \-w
+Suppresses all
+.I warning
+messages gerenated by TITAN.
+.TP
+.BI \-z " file"
+Enables code coverage and profiling in the TTCN-3 files listed in the
+.I file
+argument. The TTCN-3 files in the list must be separated by new lines and must
+also appear among the makefile generator's arguments (this switch is ignored if the
+.B \-t
+option is present).
+
+.SH ENVIRONMENT VARIABLES
+.TP
+.SM
+TTCN3_DIR
+The installation directory where the uncompressed binary package of
+TTCN-3 Test Executor can be found.
+.TP
+.SM
+TTCN3_LICENSE_FILE
+It shall point to the
+.I file
+.RB ( NB:
+.I not
+to its directory) that contains the personalized license key for the
+current user or host.
+.SH BUGS
+.LP
+For trouble reporting use the tool
+.BR "MTTSMS" "."
+For TR writers guide please visit the web page:
+.I http://ttcn.ericsson.se.
+.SH SEE ALSO
+.TP
+.SM
+Ericsson document 2/198 17-CRL 113 200 Uen:
+.B Programmer's Technical Reference for TITAN TTCN-3 Test Executor
+.SH AUTHOR
+This manpage is written by Janos Zoltan Szabo, Ericsson Telecom AB
+.br
+Copyright (c) 2000-2017 Ericsson Telecom AB
+.br
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+.br
+http://www.eclipse.org/legal/epl-v10.html

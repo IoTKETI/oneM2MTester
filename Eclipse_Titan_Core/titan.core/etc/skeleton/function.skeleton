@@ -1,0 +1,147 @@
+// Comment(s) to the function f_MyFunction
+function f_<FunctionName>(
+  in template <TypeId> pl_<formalParName1>,
+  out <TypeId> pl_<formalParName2>,
+  inout <TypeId> pl_<formalParName3>,
+  timer pl_<timerFormalParName>,
+  <PortTypeName>_PT pl_<portFormalParName>)
+{
+  //function body
+}
+
+// Comment(s) to the function f_MyPTCFunction1
+function f_<FunctionName2>(
+  in <TypeId> pl_<formalParName>)
+runs on <componentTypeName>_CT
+return <TypeId>
+{
+  //local definitions
+  const integer cl_<constantName> := 0;
+  var boolean <variableName> := true;
+  var <TypeId> vl_<localVariableName>;
+  var <componentTypeName>_CT vl_<CompReference>;
+  var default vl_<defaultReference1>, vl_<defaultReference2>, vl_<defaultReference3>;
+  timer Tl_<localTimer> := 5.0;
+  
+  vl_<defaultReference1> := activate(as_<altStepName1>());
+  vl_<defaultReference2> := activate(as_<altStepName2>(Tl_<localTimer>));
+  vl_<defaultReference3> := activate(as_<altStepName3>(<parameterName>));
+  
+  Tl_<localTimer>.start;
+  
+  //example alt statement
+  alt
+  {
+    [] // Entire heading fit into one line
+      <PortName>.receive(<TypeId>:?) from v_<addressVariableName> -> value vl_<localVariableName>
+      {
+        // 1st statement body
+      }
+    [] <PortName>.trigger(t_<templateName>)
+      -> value v_<ComponentTypeNameType> sender v_<CompReference>
+      {
+        // 2nd statement body
+      }
+    [<booleanCondition>] // More complicated alternative
+      <PortName>.receive(tr_<templateName>(
+        tr_<templateName>(
+        ?,
+        tr_<templateName>("baab")),
+        c_<constantName>))
+      from v_<addressVariableName>
+      -> value v_<TypeId>
+      {
+        // 3rd statement body
+      }
+    [] <PortName>.receive(charstring:?)
+      -> value v_<TypeId> sender vl_<CompReference>
+      {
+        // 4th statement body
+      }
+  } // alt
+  
+  //simple if example
+  if (Tl_<TimerName>.running){ Tl_<TimerName>.stop};
+  
+  // if-else and do-while example
+  do
+  {
+    <PortName>.send (t_<templateName>) to v_<variableName>;
+    <PortName>.receive(<TypeId>:?) -> value vl_<variableName>;
+    if (match(vl_<variableName>,t_<templateName>))
+    {
+      // statements
+      setverdict(pass);
+      <variableName> := false;
+    }
+    else
+    {
+      log ("MyFunc(W):IUT is not transparent")
+    }
+  } while (<variableName>)
+  
+  //for loop example
+  for(var integer <i> := 0; <i> < 8; <i> := <i> + 1)
+  {
+    <PortName>.send(t_<templateName>);
+    <PortName>.receive(t_<templateName>);
+  };
+  
+  // label-goto example
+  <PortName>.receive(charstring:"START");
+  
+label <labelId>;
+  <PortName>.send (t_<TypeId>);
+  <PortName>.receive (t_<TypeId>);
+  goto <labelId>;
+}  // function f_MyPTCFunction1
+
+// Comment to the function f_MyPTCFunction2
+function f_<FunctionName3>()
+runs on <componentTypeName>_CT
+{
+  //local definitions
+  var <TypeId> vl_<variableName>;
+  var <TypeId> vl_<variableName>;
+  var <TypeId> vl_<variableName>;
+  var <TypeId> vl_<variableName>;
+  
+  //infinite loop example
+  while(true)
+  {
+    //procedure based communication example
+    //handling outgoing blocking call
+    <PortName>.call(t_<templateName>, tspx_<testSuiteParameterName>) to v_<AddressVariable>
+    {
+      [] <PortName>.getreply(tr_<procedureTemplateName>)
+        from v_<AddressVariable>
+        -> value vl_<variableName> param(vl_<paramName>,vl_<paramName>)
+          sender v_<AddressVariable>
+        {
+          // statements
+        }
+      [] <PortName>.catch(S_<ProcedureSignatureName>, <ExceptionTypeId>:?)
+        {
+          // statements
+        }
+      [] <PortName>.catch(timeout)
+        {
+          // statements
+        }
+    }  // call
+    
+    //handling incoming blocking call
+    <PortName>.getcall(tr_<MyProcedure>)
+    from v_<AddressVariable>
+    -> param(vl_<paramName>, vl_<paramName>) sender v_<AddressVariable>;
+    if (<booleanCondition>)
+    {
+      <PortName>.reply(t_<ProcedureReply> value vl_<variableName>) to v_<AddressVar>;
+    }
+    else
+    {
+      <PortName>.raise(S_<ProcedureSignature>, <ExceptionType1>:cg_<errorCodeOne>)
+        to v_<AddressVar>;
+    }
+  }  // while
+}  // function f_MyPTCFunction2

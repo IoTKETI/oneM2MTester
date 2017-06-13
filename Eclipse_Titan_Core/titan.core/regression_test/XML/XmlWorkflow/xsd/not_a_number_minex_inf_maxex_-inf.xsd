@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="www.example.org/not_a_number/minex_inf/maxex_-inf">
+
+<xs:simpleType name="e9e">
+	<xs:restriction base="float">
+		<xs:minInclusive value="NaN"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:simpleType name="e9e_1">
+	<xs:restriction base="float">
+		<xs:minExclusive value="NaN"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:simpleType name="e9e_2">
+	<xs:restriction base="float">
+		<xs:minInclusive value="1.0"/>
+		<xs:maxInclusive value="NaN"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:simpleType name="e9e_3">
+	<xs:restriction base="float">
+		<xs:maxExclusive value="NaN"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:simpleType name="e9e_4">
+	<xs:restriction base="float">
+		<xs:maxExclusive value="-INF"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:simpleType name="e9e_5">
+	<xs:restriction base="float">
+		<xs:minExclusive value="INF"/>
+	</xs:restriction>
+</xs:simpleType> 
+
+<xs:element name="union_maxeclusive_NaN">
+	<xs:simpleType>
+	<union>
+		<xs:simpleType>
+			<xs:restriction base="xs:string"/>
+		</xs:simpleType>
+
+		<xs:simpleType>
+			<restriction base="xs:float">
+				<xs:maxExclusive value="NaN"/>
+			</restriction>
+		</xs:simpleType>
+
+		<xs:simpleType>
+			<restriction base="xs:integer"/>
+		</xs:simpleType>
+		</union>
+	</xs:simpleType>
+</xs:element>
+
+
+
+</xs:schema>

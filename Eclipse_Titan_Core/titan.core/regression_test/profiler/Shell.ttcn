@@ -1,0 +1,266 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module Shell
+{
+
+import from PIPEasp_Types all;
+import from PIPEasp_PortType all;
+import from PIPEasp_Templates all;
+
+
+modulepar float tsp_shellCmdTimeout := 20.0;
+
+type component PIPE_CT {
+  port PIPEasp_PT PIPE_PCO;
+  var ASP_PExecute v_ASP_PExecute;
+  var ASP_PResult v_ASP_PResult;
+  var ASP_PExecuteBinary v_ASP_PExecuteBinary;
+  var ASP_PResultBinary v_ASP_PResultBinary;
+  var ASP_PExecuteBackground v_ASP_PExecuteBackground;
+  var ASP_PStdin v_ASP_PStdin;
+  var ASP_PStdout v_ASP_PStdout;
+  var ASP_PStderr v_ASP_PStderr;
+  var ASP_PStdinBinary v_ASP_PStdinBinary;
+  var ASP_PStdoutBinary v_ASP_PStdoutBinary;
+  var ASP_PStderrBinary v_ASP_PStderrBinary;
+  var ASP_PKill v_ASP_PKill;
+  var ASP_PExit v_ASP_PExit;
+  var ASP_PLineMode v_ASP_PLineMode;
+  var ASP_PError v_ASP_PError;
+}
+
+type component Shell_CT extends PIPE_CT {
+    var boolean v_initialized:=false;
+}
+
+type component mtc_CT {}
+
+//=========================================================================
+// Constants
+//=========================================================================
+
+const integer c_shell_successWithoutWarningAndError:=0;
+const integer c_shell_success := 0;
+const integer c_shell_successWithWarning:=1;
+const integer c_shell_successWithoutError:=2;
+const integer c_shell_error:=256;
+const integer c_shell_error_noSuchFileOrDirectory:=512;
+
+//Expected and accepted diffs:
+// Line "Copyright Ericsson AB 2013"        - 4 diffs
+// Line "XSD to TTCN-3 Translator version:" - 4 diffs
+// Line "File"                              - 4 diffs
+// Line "Updated: "                         - 4 diffs
+// Line "module www_"                       - 4 diffs
+// Line "ETSI ES 201 873-9 V4.1.2"          - 2 diffs ???? << Fix it !
+// Line "variant \"namespace as"            - 4 diffs
+// Script counts the strings "\n" thus N different lines mean N-1 numOfDiff
+//Possible values: 19,21,23,25 but 21 and 25 should be eliminated!
+
+const integer c_numOfDiff_headerAndModuleName := 19;
+const integer c_numOfDiff_headerModNameAndNamespace := 23;
+const integer c_numOfDiff_headerModNameAndImport := 23;
+
+function f_countDelimiters(in charstring pl_string, in charstring pl_delimiter, inout integer pl_counter) {
+  pl_counter:=0;
+  var integer pos:=0;
+  var integer vl_size:=lengthof(pl_string);
+  var integer vl_delimsize:=lengthof(pl_delimiter);
+  while(pos<vl_size) {
+    if( substr(pl_string,pos,vl_delimsize)==pl_delimiter) { pl_counter:=pl_counter+1}
+    pos:=pos+1;
+  }
+}//f_
+
+//=========================================================================
+// f_compareFiles
+//=========================================================================
+//pl_diffLimit: upper limit of acceptable diff lines. 4 means one acceptable difference
+function f_compareFiles(in charstring pl_file1, in charstring pl_file2, in integer pl_diffLimit) runs on Shell_CT {
+  var integer vl_expectedResult:=0
+  if(pl_diffLimit>0) { vl_expectedResult:=256; }
+  var boolean vl_success:=false;
+  f_shell_command("diff -w " & pl_file1  & " " & pl_file2,"",vl_expectedResult,vl_success);
+
+  if(v_ASP_PResult.code==0)
+  {
+    setverdict(pass);
+  }
+  else if(v_ASP_PResult.code==256) {
+    var integer vl_counter:=0;
+    f_countDelimiters(v_ASP_PResult.stdout,"\n",vl_counter);
+    log("Counted lines: ",vl_counter, " diffLimit: ", pl_diffLimit)
+    if(vl_counter>pl_diffLimit) {
+      setverdict(fail);
+    }
+  } else { //e.g 512: No such file or directory
+    log("Wrong result code: ",v_ASP_PResult.code, " Expected result code: ", vl_expectedResult)
+    setverdict(fail);
+  }
+}//f_
+
+
+//********* SHELL Functions ***********************
+
+//=========================================================================
+// f_shell_init
+//=========================================================================
+function f_shell_init() runs on Shell_CT {
+  if(v_initialized) { return; }
+  map(self:PIPE_PCO, system:PIPE_PCO);
+  v_initialized:=true;
+}
+
+//=========================================================================
+// f_shell_cleanup
+//=========================================================================
+function f_shell_cleanup() runs on Shell_CT {
+  if(not v_initialized) { return; }
+  unmap(self:PIPE_PCO, system:PIPE_PCO);
+  v_initialized:=false;
+}
+//=========================================================================
+// f_setverdictfromBool
+//=========================================================================
+function f_setverdictfromBool(in boolean pl_result, in boolean pl_expected_result:=true) {
+  if(pl_result==pl_expected_result) {
+    setverdict(pass);
+  }else{
+    setverdict(fail);
+  }
+  return;
+}
+//=========================================================================
+//  f_shell_validateXml
+//  Compares pl_xmlFileContent (e.g encoding result) against pl_xsdFileName
+//=========================================================================
+function f_shell_validateXml(in octetstring pl_xmlFileContent, in charstring pl_xsdFileName, in integer pl_expected_result, inout boolean pl_success)
+runs on Shell_CT
+{
+  f_shell_command( "xmllint --noout --schema " & pl_xsdFileName & " - ",oct2char(pl_xmlFileContent), pl_expected_result, pl_success);
+}
+
+
+//=========================================================================
+//  f_shell_command
+//=========================================================================
+function f_shell_command(in charstring pl_command, in charstring pl_stdin, in integer pl_expected_result, inout boolean pl_success)
+runs on Shell_CT
+{
+  f_shell_init();
+
+  var integer vl_expectedCode:=-1;
+  if(pl_expected_result==c_shell_successWithoutWarningAndError or
+    pl_expected_result==c_shell_successWithWarning or
+    pl_expected_result==c_shell_successWithoutError) {
+    vl_expectedCode:=0
+  } else {
+    vl_expectedCode:= pl_expected_result;
+  }
+
+  log("Running: ", pl_command);
+  PIPE_PCO.send(t_PExecute(pl_command,pl_stdin));
+
+  timer t:=tsp_shellCmdTimeout;
+  t.start;
+  pl_success:=false;
+
+  alt {
+
+    [] PIPE_PCO.receive(t_PResult(?, ?, ?)) -> value v_ASP_PResult {
+        log("PResult msg received: ", v_ASP_PResult);
+
+        if(v_ASP_PResult.code==vl_expectedCode ) {
+          var charstring vl_pattern:="";
+          select(pl_expected_result) {
+            case(c_shell_successWithWarning) {
+              vl_pattern:="*(Warning|WARNING|warning)*";
+              if(regexp(v_ASP_PResult.stderr,vl_pattern,0)!=""){
+                log("That is an expected Warning!")
+                pl_success:=true;
+              } else {
+                log("No Warning in the stderr string but expected");
+                pl_success:=false;
+              }
+            }
+            case(c_shell_successWithoutWarningAndError) {
+              vl_pattern:="*(Error|ERROR|error)*";
+              if(regexp(v_ASP_PResult.stderr,vl_pattern,0)!=""){
+                log("That is an unexpected Error!")
+                pl_success:=false;
+              } else {
+                log("No Error in the stderr string");
+                pl_success:=true;
+              }
+              vl_pattern:="*(Warning|WARNING)*";
+              if(regexp(v_ASP_PResult.stderr,vl_pattern,0)!=""){
+                log("That is an unexpected Warning!")
+                pl_success:=false;
+              } else {
+                log("No Warning in the stderr string");
+                pl_success:=true;
+              }
+            }//case
+            case(c_shell_successWithoutError) {
+              vl_pattern:="*(Error|ERROR|error)*";
+              if(regexp(v_ASP_PResult.stderr,vl_pattern,0)!=""){
+                log("That is an unexpected Error!")
+                pl_success:=false;
+              } else {
+                log("No Error in the stderr string");
+                pl_success:=true;
+              }
+            }
+            case(c_shell_error) {
+              log("Command returned with ERROR as expected");
+              pl_success:=true;
+            }
+            case(c_shell_error_noSuchFileOrDirectory) {
+              log("Command returned with No such file or directory as expected");
+              pl_success:=true;
+            }
+            case else {
+              log("Other case");
+              pl_success:=false;
+            }
+          }//select
+          vl_pattern := "*(Memory leak at)*";
+          if (regexp(v_ASP_PResult.stderr,vl_pattern,0) != "") {
+            log("Memory leak detected during command execution.");
+            pl_success := false;
+          }
+        } else {
+          log("The result code(", v_ASP_PResult.code, ") is not the expected(", vl_expectedCode, ")");
+          pl_success:=false;
+        }//if
+      }
+    [] t.timeout {
+        pl_success:=false;
+      }
+  }//alt
+
+  f_shell_cleanup();
+  return;
+}//f_shell_command
+//=========================================================================
+//  Name: f_shellCommandWithVerdict
+//  Description: sets verdict for pass, if the command execution returns with the expected value
+//=========================================================================
+function f_shellCommandWithVerdict(in charstring pl_command, in charstring pl_stdin, in integer pl_expected_result) runs on Shell_CT {
+  var boolean vl_success:=false;
+  f_shell_command(pl_command, pl_stdin, pl_expected_result, vl_success);
+  f_setverdictfromBool(vl_success)
+}
+
+}  // end of module

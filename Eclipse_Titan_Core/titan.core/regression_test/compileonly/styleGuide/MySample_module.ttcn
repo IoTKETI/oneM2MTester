@@ -1,0 +1,511 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Forstner, Matyas
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module MySample_module.objid{ itu_t(0) identified_organization(4) etsi(0)
+  identified_organization(127) ericsson(5) testing(0) /*<further nodes>*/}
+{
+
+//=========================================================================
+// Import Part
+//=========================================================================
+
+import from Another_module.objid{0 4 0 127 5 0 /*<further nodes>*/} all;
+
+import from MyASN1_module.objid{0 4 0 127 5 0 /*<further nodes>*/} language
+  "ASN.1:2002" all;
+
+external const ExtConsType c_ExtConstName;
+
+external function f_ExtFuncName (in InParType pl_formalPar1, out OutParType
+  pl_formalPar2, inout InoutParType pl_formalPar3, in template MyMessageType
+  pl_formalPar4) return MyExtReturnType
+
+//=========================================================================
+// Module parameters
+//=========================================================================
+
+modulepar
+{
+  integer tsp_MyIntegerModulePar1 := 1;
+  integer tspc_MyIntegerModulePar2;
+  float tspx_MyIUTMaxResponseTime := 1.0
+}
+
+//=========================================================================
+// Data Types
+//=========================================================================
+
+//Simple data types
+type integer MyIntegerType (0..255) with {variant "COMP(2scompl)"};
+type charstring MyCharType1 length(0..7);
+type charstring MyCharType2 length(0..infinity);
+type charstring MyCharType3 ("a".."z");
+type MyCharType3 MyCharType4 length(0..7);
+type integer MySimpleReturnType with {extension "done"};
+
+//Structured data types
+type record MyMessageType
+{
+  MyEnumType header,
+  MyRecordType data,
+  integer footer optional
+}
+
+type enumerated MyEnumType
+{
+  enumValue1 (101),
+  enumValue2 (102)
+} with
+{
+  variant "FIELDLENGTH(16)";
+  variant "COMP(signbit)"
+}
+
+type record MyRecordType
+{
+  integer field1 (0..255),
+  bitstring field2 length(8),
+  MySetOfIntegerType field3 optional,
+  MyCharType4 field4 optional
+}
+
+type set length(0..7) of integer MySetOfIntegerType;
+
+type record MyStructuredReturnType
+{
+  integer field1 (0..255),
+  boolean field2 optional
+} with
+{
+  extension "done"
+}
+
+//Address type
+type octetstring address;
+
+//=========================================================================
+// Signatures
+//=========================================================================
+
+signature s_MyProcedureSignature(
+  in InParType pl_inPar,
+  out OutParType pl_outPar,
+  inout InoutParType pl_inoutPar)
+return MySignReturnType
+exception( integer, boolean, MyExceptionType1, MyExceptionType2,
+  MyExceptionType3, MyExceptionType4)
+
+//=========================================================================
+//Port types
+//=========================================================================
+
+type port MyTestPortmsg_PT message
+{
+  in MyCharType4, MyIntegerType;
+  out MyCharType2, MyEnumType;
+  inout MyMessageType;
+} with
+{
+  extension "address"
+}
+
+type port MyTestPortproc_PT procedure
+{
+  inout s_MyProcedureSignature;
+} with
+{
+  extension "address"
+}
+
+type port MyCoordPortType_PT message
+{
+  inout charstring;
+} with
+{
+  extension "internal"
+}
+
+//=========================================================================
+//Component types
+//=========================================================================
+
+type component Dummy_CT {}
+
+type component MyMTC_CT
+{
+  const float c_MyPi := 3.1415;
+  var integer v_MyComponentVar1;
+  var integer v_MyComponentVar2 := 0;
+  timer T_MyComponentTimer;
+  port MyCoordPortType_PT COORD;
+}
+
+type component MyPTC_CT
+{
+  const integer c_LAPD_N201 := 3;
+  var charstring v_CoordMessage;
+
+  var MyMessageType v_MyMessage;
+  var address v_AddressVar := 'DEADBEEF'O;
+  timer T_MyComponentTimer := tspx_MyIUTMaxResponseTime;
+  port MyTestPortmsg_PT PORT1, PORT2;
+  port MyTestPortproc_PT PORT3;
+
+  port MyCoordPortType_PT COORD;
+}
+
+type component MySystem_SCT
+{
+  port MyTestPortmsg_PT PORT1, PORT2;
+  port MyTestPortproc_PT PORT3;
+
+}
+
+type MyPTC_CT MyAlias_SCT;
+
+//=========================================================================
+// Constants
+//=========================================================================
+
+const integer cg_MyInt := 5;
+
+const octetstring cg_3octets := 'FABABA'O;
+
+const MyMessageType cg_MyMessageType :=
+{
+  header := enumValue1,
+  data :=
+  {
+    field1 := 0,
+    field2 := '10001000'B,
+    field3 := {1,2,3,4,5},
+    field4 := omit
+  },
+  footer := omit
+}
+
+//=========================================================================
+// Templates
+//=========================================================================
+
+//Message templates
+template MyCharType4 t_MySimpleTemplate := "baba";
+
+template MyCharType4 tr_MySimpleTemplate := ("baba", "abba");
+
+template MyCharType4 tr_MySimpleTemplatePard(
+  charstring pl_charValue) := ("baba", "abba", pl_charValue);
+
+template MyRecordType tr_MyRecord :=
+{
+  field1 := (1,2,3),
+  field2 := ?,
+  field3 := {1,2,?},
+  field4 := t_MySimpleTemplate ifpresent
+};
+
+template MyRecordType t_MyRecordPard (
+  template integer pl_formalPar1,
+  template charstring pl_formalPar2) :=
+{
+  field1 := pl_formalPar1,
+  field2 := '10001000'B,
+  field3 := {1,2,3},
+  field4 := pl_formalPar2
+};
+
+template MyRecordType tr_MyRecordPard (
+  template integer pl_formalPar1,
+  template charstring pl_formalPar2)
+modifies t_MyRecordPard :=
+{
+  field3 := *
+};
+
+template MyMessageType t_MyMessage :=
+{
+  header := enumValue1,
+  data := t_MyRecordPard(1,"abba"),
+  footer := omit
+}
+
+template MyMessageType tr_MyMessagePard(
+  template MyRecordType pl_formalPar1,
+  integer pl_formalPar2) :=
+{
+  header := ?,
+  data := pl_formalPar1,
+  footer := pl_formalPar2
+}
+
+//Procedure templates
+template s_MyProcedureSignature t_MyProcedure :=
+{
+  pl_inPar := 1,
+  pl_outPar := ?,
+  pl_inoutPar := 'BABA'O
+}
+
+template s_MyProcedureSignature tr_MyProcedure :=
+{
+  pl_inPar := ?,
+  pl_outPar := ?,
+  pl_inoutPar := ?
+}
+
+template s_MyProcedureSignature t_MyProcedureReply :=
+{
+  pl_inPar := 1,
+  pl_outPar := 2,
+  pl_inoutPar := 'ABBA'O
+}
+
+//=========================================================================
+// Altsteps
+//=========================================================================
+
+altstep as_MyAltStep1()
+runs on MyPTC_CT
+{
+  [] T_MyComponentTimer.timeout
+    {
+      setverdict(fail);
+    }
+}  // altstep as_MyAltStep1
+
+altstep as_MyAltStep2(
+  timer pl_timerPar)
+{
+  [] pl_timerPar.timeout
+    {
+      repeat;
+    }
+}  // altstep as_MyAltStep2
+
+altstep as_MyAltStep3(
+  MyTestPortmsg_PT pl_portPar)
+{
+  [] pl_portPar.receive
+    {
+      // statements
+      stop
+    }
+}  // altstep as_MyAltStep3
+
+//=========================================================================
+// Functions
+//=========================================================================
+
+function f_MyFunction(
+  in template InParType pl_formalPar1,
+  out OutParType pl_formalPar2,
+  inout InoutParType pl_formalPar3,
+  timer pl_timerFormalPar,
+  MyCoordPortType_PT pl_portFormalPar)
+{
+  //function body
+}
+
+function f_MyPTCFunction1(
+  in InParType pl_formalPar)
+runs on MyPTC_CT
+return MySimpleReturnType
+{
+  //local definitions
+  const integer cl_zero := 0;
+  var boolean flag := true;
+  var MyMessageType vl_MyMessage;
+  var Dummy_CT vl_MyCompReference;
+  var default vl_defaultReference1, vl_defaultReference2, vl_defaultReference3;
+  timer Tl_MyLocalTimer := 5.0;
+
+  vl_defaultReference1 := activate(as_MyAltStep1());
+  vl_defaultReference2 := activate(as_MyAltStep2(T_MyComponentTimer));
+  vl_defaultReference3 := activate(as_MyAltStep3(PORT2));
+
+  Tl_MyLocalTimer.start;
+
+  //example alt statement
+  alt
+  {
+    [] // Entire heading fit into one line
+      PORT1.receive(MyMessageType:?) from v_AddressVar -> value vl_MyMessage
+      {
+        // 1st statement body
+      }
+    [] PORT1.trigger(t_MyMessage)
+      -> value v_MyMessage sender v_AddressVar
+      {
+        // 2nd statement body
+      }
+    [booleanCondition] // More complicated alternative
+      PORT2.receive(tr_MyMessagePard(
+        tr_MyRecordPard(
+          ?,
+          tr_MySimpleTemplatePard("baab")),
+        c_LAPD_N201))
+      from v_AddressVar
+      -> value v_MyMessage
+      {
+        // 3rd statement body
+      }
+    [] COORD.receive(charstring:?)
+      -> value v_CoordMessage sender vl_MyCompReference
+      {
+        // 4th statement body
+      }
+  } // alt
+
+  //simple if example
+  if (Tl_MyLocalTimer.running){ Tl_MyLocalTimer.stop};
+
+  // if-else and do-while example
+  do
+  {
+    PORT1.send (t_MyMessage) to v_AddressVar;
+    PORT2.receive(MyMessageType:?) -> value vl_MyMessage;
+    if (match(vl_MyMessage,t_MyMessage))
+    {
+      // statements
+      setverdict(pass);
+      flag := false;
+    }
+    else
+    {
+      log ("MyFunc(W):IUT is not transparent")
+    }
+  } while (flag)
+
+  //for loop example
+  for(var integer i := 0; i<8; i := i+1)
+  {
+    PORT1.send(t_MyMessage);
+    PORT2.receive(t_MyMessage);
+  };
+
+  // label-goto example
+  COORD.receive(charstring:"START");
+
+label sendNextMessage;
+  PORT1.send (t_MyMessage);
+  PORT2.receive (t_MyMessage);
+  goto sendNextMessage;
+
+  // return example
+  return 0;
+}  // function f_MyPTCFunction1
+
+function f_MyPTCFunction2()
+runs on MyPTC_CT
+{
+  //local definitions
+  var MySignReturnType vl_ReturnValue;
+  var InParType vl_inParValue;
+  var OutParType vl_outParValue;
+  var InoutParType vl_inoutParValue;
+
+  //infinite loop example
+  while(true)
+  {
+    //procedure based communication example
+    //handling outgoing blocking call
+    PORT3.call(t_MyProcedure, tspx_MyIUTMaxResponseTime) to v_AddressVar
+    {
+      [] PORT3.getreply(tr_MyProcedure)
+        from v_AddressVar
+        -> value vl_ReturnValue param(vl_outParValue,vl_inoutParValue)
+          sender v_AddressVar
+        {
+          // statements
+        }
+      [] PORT3.catch(s_MyProcedureSignature, MyExceptionType1:?)
+        {
+          // statements
+        }
+      [] PORT3.catch(timeout)
+        {
+          // statements
+        }
+    }  // call
+
+    //handling incoming blocking call
+    PORT3.getcall(tr_MyProcedure)
+      from v_AddressVar
+      -> param(vl_inParValue, vl_inoutParValue) sender v_AddressVar;
+    if (booleanCondition)
+    {
+      PORT3.reply(t_MyProcedureReply value vl_ReturnValue) to v_AddressVar;
+    }
+    else
+    {
+      PORT3.raise(s_MyProcedureSignature, MyExceptionType1:cg_errorCodeOne)
+        to v_AddressVar;
+    }  }  // while
+}  // function f_MyPTCFunction2
+
+//=========================================================================
+// Testcases
+//=========================================================================
+
+testcase tc_ReceiveACK_Inopportune(
+  inout InoutParType pl_formalPar)
+runs on MyMTC_CT
+system MySystem_SCT
+{
+  //local definitions
+  const InParType cl_zero := 0;
+  var OutParType vl_OutParVar;
+  var MyPTC_CT vl_MyPTC;
+  var Dummy_CT vl_MyAlternPTCReference;
+  timer Tl_GUARD := 10.0;
+
+  // Test configuration setup example
+  vl_MyPTC := MyPTC_CT.create;
+  connect(vl_MyPTC:COORD, mtc:COORD);
+  map(vl_MyPTC:PORT1, system:PORT1);
+  map(vl_MyPTC:PORT2, system:PORT2);
+  map(vl_MyPTC:PORT3, system:PORT3);
+  vl_MyPTC.start(f_MyPTCFunction1(cl_zero));
+
+  // Single-line function call example
+  f_MyFunction(cl_zero, vl_OutParVar, pl_formalPar, Tl_GUARD, COORD);
+
+  // Handling termination of a PTC with return value
+  alt
+  {
+    [] vl_MyPTC.done (MySimpleReturnType:?) {setverdict(pass)}
+    [] vl_MyPTC.done {setverdict (inconc)}
+  }
+}  // testcase tc_ReceiveACK_Inopportune
+
+//=========================================================================
+// Control
+//=========================================================================
+
+control
+{
+//local definitions
+var InoutParType vl_CR := c_nullCR;
+
+if (execute (tc_MyPreviousTestCase(vl_CR)) != error)
+{
+  execute(tc_ReceiveACK_Inopportune(vl_CR))
+}
+else
+{
+  execute(tc_RestoreSUT())
+}
+}  // control
+}  // module
+with {encode "RAW"}

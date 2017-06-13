@@ -1,0 +1,439 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Koppany, Csaba
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module TtemplateSetof {
+type component templateSetof_mycomp {};
+type set of integer templateSetof_mysetof;
+type record templateSetof_rec {
+ templateSetof_mysetof x1,
+ templateSetof_mysetof x2,
+ templateSetof_mysetof x3 optional };
+template templateSetof_rec templateSetof_tSpec :={ //specific values
+ x1:={1,1},
+ x2:={2,1},
+ x3:={3,1} };
+template templateSetof_rec templateSetof_tList :={ //specific value and value list
+ x1:={1,1},
+ x2:=({2,1},{3,1},{6,1}),
+ x3:={3,1} };
+template templateSetof_rec templateSetof_tComp :={ //specific value and compl. list
+ x1:={1,1},
+ x2:=complement ({2,1},{3,1},{6,1}),
+ x3:={3,1} };
+template templateSetof_rec templateSetof_tOmit :={ //omitting values
+ x1:={1,1},
+ x2:={2,1},
+ x3:=omit } ;
+template templateSetof_rec templateSetof_tAny :={ //specific and any value
+ x1:={1,1},
+ x2:={2,1},
+ x3:=? } ;
+template templateSetof_rec templateSetof_tAnyorNone :={ //specific and AnyorNone value
+ x1:={1,1},
+ x2:={2,1},
+ x3:=* };
+template templateSetof_rec templateSetof_tLength1 :={ //specific value and length (fix)
+ x1:={1,1},
+ x2:={2,1},
+ x3:=* length(3) };
+template templateSetof_rec templateSetof_tLength2 :={ //specific value and length (range)
+ x1:={1,1},
+ x2:={2,1},
+ x3:=? length(2..4) };
+template templateSetof_rec templateSetof_tLength3 :={ //specific value and length (range, infinity)
+ x1:={1,1},
+ x2:={2,1},
+ x3:=? length(2..infinity) };
+//template templateSetof_rec templateSetof_tSuperset :={ //specific value and superset
+// x1:={1,1},
+// x2:={2,1},
+// x3:=? superset (1,4) };
+//template templateSetof_rec templateSetof_tSubset :={ //specific value and subset
+// x1:={1,1},
+// x2:={2,1},
+// x3:=? subset (1,2,3,4) };
+template templateSetof_rec templateSetof_tIfpresent :={ //specific value and ifpresent
+ x1:={1,1},
+ x2:={2,1},
+ x3:={3,1} ifpresent };
+template templateSetof_rec templateSetof_tLengthIfp :={ //specific value and length (fix), ifpresent
+ x1:={1,1},
+ x2:={2,1},
+ x3:=? length(3) ifpresent};
+template templateSetof_rec templateSetof_tAnyEl :={ //specific value and any element inside value
+ x1:={1,1},
+ x2:={2,1},
+ x3:={3,?,1} } ;
+template templateSetof_rec templateSetof_tAnyorNoneEl :={ //specific value and Any number of elements or none inside value
+ x1:={1,1},
+ x2:={2,1},
+ x3:={3,*,1} };
+
+testcase templateSetofSpec() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//specific value
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp };
+x2:={ x1:={1,1},  x2:={1,2},  x3:=temp }; // other order
+x3:={ x1:={2,1},  x2:={2,1},  x3:=temp };
+//match
+if (match(x1,templateSetof_tSpec)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: other order
+if (match(x2,templateSetof_tSpec)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x3,templateSetof_tSpec))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofList() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//value list
+x1:={ x1:={1,1},  x2:={6,1},  x3:=temp };
+x2:={ x1:={1,1},  x2:={7,1},  x3:=temp };
+x3:={ x1:={8,1},  x2:={6,1},  x3:=temp };
+//match
+if (match(x1,templateSetof_tList)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of list
+if (not(match(x2,templateSetof_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofComp() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//complemented list
+x1:={ x1:={1,1},  x2:={7,1},  x3:=temp };
+x2:={ x1:={1,1},  x2:={6,1},  x3:=temp };
+x3:={ x1:={2,1},  x2:={7,1},  x3:=temp };
+//match
+if (match(x1,templateSetof_tComp)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: in the list
+if (not(match(x2,templateSetof_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofOmit() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//omitting value
+x1:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp };
+x3:={ x1:={2,1},  x2:={2,1},  x3:=omit };
+//match
+if (match(x1,templateSetof_tOmit)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: not omitted
+if (not(match(x2,templateSetof_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofAny() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//any value
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x3:={ x1:={2,1},  x2:={2,1},  x3:=temp };
+//match
+if (match(x1,templateSetof_tAny)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: field omitted
+if (not(match(x2,templateSetof_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofAnyorNone() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp:={3,1};
+var templateSetof_rec x1,x2,x3;		//AnyorNone value
+x1:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp };
+x3:={ x1:={2,1},  x2:={2,1},  x3:=omit };
+//match: omitted
+if (match(x1,templateSetof_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: value
+if (match(x2,templateSetof_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tAnyorNone))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofLength1() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={1,2,3};	// length (fix)
+var templateSetof_mysetof temp2:={1,2};
+var templateSetof_rec x1,x2,x3,x4;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x3:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x4:={ x1:={1,1,1},  x2:={2,1},  x3:=temp1 };
+//match: proper size
+if (match(x1,templateSetof_tLength1)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: omitted
+if (match(x2,templateSetof_tLength1)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x3,templateSetof_tLength1))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateSetof_tLength1))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofLength2() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={1,2};	// length (range)
+var templateSetof_mysetof temp2:={1};
+var templateSetof_rec x1,x2,x3;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x3:={ x1:={1},  x2:={2,1},  x3:=temp1 };
+//match
+if (match(x1,templateSetof_tLength2)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x2,templateSetof_tLength2))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tLength2))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofLength3() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={1,2};	// length (range, infinity)
+var templateSetof_mysetof temp2:={1};
+var templateSetof_rec x1,x2,x3;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x3:={ x1:={1},  x2:={2,1},  x3:=temp1 };
+//match
+if (match(x1,templateSetof_tLength3)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x2,templateSetof_tLength3))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateSetof_tLength3))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+//testcase templateSetofSuperset() runs on templateSetof_mycomp {
+//var templateSetof_mysetof temp1:={1,4};	// superset
+//var templateSetof_mysetof temp2:={2,1,4};
+//var templateSetof_mysetof temp3:={1};
+//var templateSetof_rec x1,x2,x3,x4;
+//x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+//x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+//x3:={ x1:={1,1},  x2:={2,1},  x3:=temp3 };
+//x4:={ x1:={1},  x2:={2,1},  x3:=temp1 };
+//match: equal
+//if (match(x1,templateSetof_tSuperset)) {setverdict(pass);}
+// else {setverdict(fail);}
+//match: real superset
+//if (match(x2,templateSetof_tSuperset)) {setverdict(pass);}
+// else {setverdict(fail);}
+//no match: not superset
+//if (not(match(x3,templateSetof_tSuperset))) {setverdict(pass);}
+// else {setverdict(fail);}
+//no match: other field
+//if (not(match(x4,templateSetof_tSuperset))) {setverdict(pass);}
+// else {setverdict(fail);}
+//}
+
+//testcase templateSetofSubset() runs on templateSetof_mycomp {
+//var templateSetof_mysetof temp1:={1,4,2,3};		// subset
+//var templateSetof_mysetof temp2:={1,4};
+//var templateSetof_mysetof temp3:={2,1,4,7};
+//var templateSetof_rec x1,x2,x3,x4;
+//x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+//x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+//x3:={ x1:={1,1},  x2:={2,1},  x3:=temp3 };
+//x4:={ x1:={2,1},  x2:={2,1},  x3:=temp1 };
+//match: equal
+//if (match(x1,templateSetof_tSubset)) {setverdict(pass);}
+// else {setverdict(fail);}
+//match: real subset
+//if (match(x2,templateSetof_tSubset)) {setverdict(pass);}
+// else {setverdict(fail);}
+//no match: not subset
+//if (not(match(x3,templateSetof_tSubset))) {setverdict(pass);}
+// else {setverdict(fail);}
+//no match: other field
+//if (not(match(x4,templateSetof_tSubset))) {setverdict(pass);}
+// else {setverdict(fail);}
+//}
+
+testcase templateSetofIfpresent() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={3,1};	//ifpresent
+var templateSetof_mysetof temp2:={4,1};
+var templateSetof_rec x1,x2,x3,x4;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x3:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x4:={ x1:={2,1},  x2:={2,1},  x3:=omit };
+// match: present and match
+if (match(x1,templateSetof_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+// match: not present
+if (match(x2,templateSetof_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: present and not match
+if (not(match(x3,templateSetof_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: other field
+if (not(match(x4,templateSetof_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofLengthIfp() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={1,2,3};	// length (fix), ifpresent
+var templateSetof_mysetof temp2:={1,2};
+var templateSetof_rec x1,x2,x3,x4;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=omit };
+x3:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x4:={ x1:={1,1,1},  x2:={2,1},  x3:=temp1 };
+// match: proper size
+if (match(x1,templateSetof_tLengthIfp)) {setverdict(pass);}
+ else {setverdict(fail);}
+// match: omitted
+if (match(x2,templateSetof_tLengthIfp)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x3,templateSetof_tLengthIfp))) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: other field
+if (not(match(x4,templateSetof_tLengthIfp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofAnyEl() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={3,15,1};	// any element
+var templateSetof_mysetof temp2:={3,1};
+var templateSetof_mysetof temp3:={3,1,4,1};
+var templateSetof_mysetof temp4:={3,1,2};
+var templateSetof_rec x1,x2,x3,x4,x5;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x3:={ x1:={1,1},  x2:={2,1},  x3:=temp3 };
+x4:={ x1:={1,1},  x2:={2,1},  x3:=temp4 };
+x5:={ x1:={1},  x2:={2,1},  x3:=temp1 };
+// match
+if (match(x1,templateSetof_tAnyEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: no element
+if (not(match(x2,templateSetof_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: two element
+if (not(match(x3,templateSetof_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: wrong element
+if (match(x4,templateSetof_tAnyEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x5,templateSetof_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateSetofAnyorNoneEl() runs on templateSetof_mycomp {
+var templateSetof_mysetof temp1:={3,1}; 	//Any number of elements or none
+var templateSetof_mysetof temp2:={3,2,1};
+var templateSetof_mysetof temp3:={3,5,2,1};
+var templateSetof_mysetof temp4:={4,2,1};
+var templateSetof_rec x1,x2,x3,x4,x5;
+x1:={ x1:={1,1},  x2:={2,1},  x3:=temp1 };
+x2:={ x1:={1,1},  x2:={2,1},  x3:=temp2 };
+x3:={ x1:={1,1},  x2:={2,1},  x3:=temp3 };
+x4:={ x1:={1,1},  x2:={2,1},  x3:=temp4 };
+x5:={ x1:={1},  x2:={2,1},  x3:=temp3 };
+//match: no element
+if (match(x1,templateSetof_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: one element
+if (match(x2,templateSetof_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: two element
+if (match(x3,templateSetof_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other element
+if (not(match(x4,templateSetof_tAnyorNoneEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x5,templateSetof_tAnyorNoneEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+type set Block {}
+
+type set of Block Blocks;
+
+type set Request {
+  Blocks blocks optional
+}
+
+testcase HO91743() runs on templateSetof_mycomp {
+  var template Request vt_ReqO := { blocks := omit };
+  var template Request vt_ReqQ := { blocks := ? };
+  var template Request vt_ReqS := { blocks := * };
+  var template Block vt_b := {}
+
+  vt_ReqQ.blocks[3] := vt_b;
+  vt_ReqS.blocks[3] := vt_b;
+  // Indexing a template set-of which was omit used to DTE
+  // (in contrast to any-value and any-or-omit, which would create the set-of).
+  // HO91743 unifies the behaviour (set-of is created when indexing omit).
+  vt_ReqO.blocks[3] := vt_b;
+
+  if (lengthof(vt_ReqO.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+  if (sizeof  (vt_ReqO.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+
+  if (lengthof(vt_ReqQ.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+  if (sizeof  (vt_ReqQ.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+
+  if (lengthof(vt_ReqS.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+  if (sizeof  (vt_ReqS.blocks) == 4) { setverdict(pass); } else { setverdict(fail); }
+}
+
+control {
+ execute(templateSetofSpec());
+ execute(templateSetofList());
+ execute(templateSetofComp());
+ execute(templateSetofOmit());
+ execute(templateSetofAny());
+ execute(templateSetofAnyorNone());
+ execute(templateSetofLength1());
+ execute(templateSetofLength2());
+ execute(templateSetofLength3());
+// execute(templateSetofSuperset());
+// execute(templateSetofSubset());
+ execute(templateSetofIfpresent());
+ execute(templateSetofLengthIfp());
+ execute(templateSetofAnyEl());
+ execute(templateSetofAnyorNoneEl());
+ execute(HO91743());
+}
+}

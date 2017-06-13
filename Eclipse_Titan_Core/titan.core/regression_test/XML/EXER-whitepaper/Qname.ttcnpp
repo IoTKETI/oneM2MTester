@@ -1,0 +1,314 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Qname {
+modulepar boolean Qname_verbose := false;
+#define verbose Qname_verbose
+#include "../macros.ttcnin"
+
+type component Q {}
+
+type record QProductName {
+  universal charstring uri optional,
+  universal charstring name
+}
+with {
+  variant "XSD:QName"
+}
+
+type record QProduct {
+  QProductName prname,
+  float       cost
+}
+with {
+  variant "namespace as 'http://www.example.com' prefix 'exm'";
+  variant "element";
+}
+
+DECLARE_XER_ENCODERS(QProduct, prodQ);
+DECLARE_EXER_ENCODERS(QProduct, prodQ);
+
+// Example when the URI is present and different from the target namespace
+const QProduct table := {
+  prname := {
+    uri  := "http://www.furniture.com",
+    name := "table"
+  },
+  cost := 199.95
+}
+
+const universal charstring str_table_b :=
+"<QProduct>\n" &
+"\t<prname>\n" &
+"\t\t<uri>http://www.furniture.com</uri>\n" &
+"\t\t<name>table</name>\n" &
+"\t</prname>\n" &
+"\t<cost>199.950000</cost>\n" &
+"</QProduct>\n" &
+"\n";
+
+const universal charstring str_table_e_input :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname xmlns:b0='http://www.furniture.com'>" &
+"<!-- Here's a comment to try to confuse the parser -->b0:table</prname>\n" &
+"\t<cost>199.950000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+
+const universal charstring str_table_e :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname xmlns:b0='http://www.furniture.com'>b0:table</prname>\n" &
+"\t<cost>199.950000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+
+// Here's a superfluous namespace, which would confuse the old decoder
+const universal charstring str_table_e_xml :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname xmlns:xml='http://www.w3.org/XML/1998/namespace' xmlns:b0='http://www.furniture.com'>b0:table</prname>\n" &
+"\t<cost>199.950000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+
+
+// Example when the URI is missing
+const QProduct chair := {
+  prname := {
+    uri  := omit,
+    name := "chair"
+  },
+  cost := 89.99
+}
+
+const universal charstring str_chair_b :=
+"<QProduct>\n" &
+"\t<prname>\n" &
+"\t\t<name>chair</name>\n" &
+"\t</prname>\n" &
+"\t<cost>89.990000</cost>\n" &
+"</QProduct>\n" &
+"\n";
+
+const universal charstring str_chair_e :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname>chair</prname>\n" &
+"\t<cost>89.990000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+
+// Example when the URI is present but matches the target namespace
+const QProduct feather := {
+  prname := {
+    uri  := "http://www.example.com",
+    name := "feather"
+  },
+  cost := 0.1
+}
+
+const universal charstring str_feather_b :=
+"<QProduct>\n" &
+"\t<prname>\n" &
+"\t\t<uri>http://www.example.com</uri>\n" &
+"\t\t<name>feather</name>\n" &
+"\t</prname>\n" &
+"\t<cost>0.100000</cost>\n" &
+"</QProduct>\n" &
+"\n";
+
+const universal charstring str_feather_e :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname xmlns:b0='http://www.example.com'>b0:feather</prname>\n" &
+"\t<cost>0.100000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+// ^__ this is what we do
+//
+// v-- this is what we should do
+const universal charstring str_feather_e_correct :=
+"<exm:QProduct xmlns:exm='http://www.example.com'>\n" &
+"\t<prname>exm:feather</prname>\n" &
+"\t<cost>0.100000</cost>\n" &
+"</exm:QProduct>\n" &
+"\n";
+
+testcase enc_qn() runs on Q {
+  CHECK_METHOD(bxer_enc_prodQ, table, str_table_b);
+  CHECK_METHOD(exer_enc_prodQ, table, str_table_e);
+
+  CHECK_METHOD(bxer_enc_prodQ, chair, str_chair_b);
+  CHECK_METHOD(exer_enc_prodQ, chair, str_chair_e);
+
+  CHECK_METHOD(bxer_enc_prodQ, feather, str_feather_b);
+  //optimization not performed
+  CHECK_METHOD(exer_enc_prodQ, feather, str_feather_e);
+}
+
+testcase dec_qn() runs on Q {
+  CHECK_DECODE(bxer_dec_prodQ, str_table_b  , QProduct, table);
+  CHECK_DECODE(bxer_dec_prodQ, str_chair_b  , QProduct, chair);
+  CHECK_DECODE(bxer_dec_prodQ, str_feather_b, QProduct, feather);
+
+  CHECK_DECODE(exer_dec_prodQ, str_table_e          , QProduct, table);
+  CHECK_DECODE(exer_dec_prodQ, str_table_e_input    , QProduct, table);
+  CHECK_DECODE(exer_dec_prodQ, str_table_e_xml      , QProduct, table);
+
+  CHECK_DECODE(exer_dec_prodQ, str_chair_e          , QProduct, chair);
+
+  CHECK_DECODE(exer_dec_prodQ, str_feather_e        , QProduct, feather);
+  CHECK_DECODE(exer_dec_prodQ, str_feather_e_correct, QProduct, feather);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+type record AProduct {
+  QProductName name,
+  float cost
+}
+with {
+  variant "namespace as 'http://www.example.com' prefix 'exm'";
+  variant "element";
+  variant (name) "attribute"
+}
+
+DECLARE_XER_ENCODERS(AProduct, prodA);
+DECLARE_EXER_ENCODERS(AProduct, prodA);
+
+// Example when the URI is present and different from the target namespace
+const AProduct atable := {
+  name := {
+    uri  := "http://www.furniture.com",
+    name := "table"
+  },
+  cost := 199.99
+}
+
+const universal charstring str_atable_b :=
+"<AProduct>\n" &
+"\t<name>\n" &
+"\t\t<uri>http://www.furniture.com</uri>\n" &
+"\t\t<name>table</name>\n" &
+"\t</name>\n" &
+"\t<cost>199.990000</cost>\n" &
+"</AProduct>\n" &
+"\n";
+
+const universal charstring str_atable_e :=
+"<exm:AProduct xmlns:exm='http://www.example.com' xmlns:b0='http://www.furniture.com' name='b0:table'>\n" &
+"\t<cost>199.990000</cost>\n" &
+"</exm:AProduct>\n" &
+"\n";
+
+// A spurious but harmless extra namespace
+const universal charstring str_atable_e_xml :=
+"<exm:AProduct xmlns:xml='http://www.w3.org/XML/1998/namespace'" &
+" xmlns:exm='http://www.example.com' xmlns:b0='http://www.furniture.com' name='b0:table'>\n" &
+"\t<cost>199.990000</cost>\n" &
+"</exm:AProduct>\n" &
+"\n";
+
+
+// Example when the URI is missing
+const AProduct achair := {
+  name := {
+    uri  := omit,
+    name := "chair"
+  },
+  cost := 69.99
+}
+
+const universal charstring str_achair_b :=
+"<AProduct>\n" &
+"\t<name>\n" &
+"\t\t<name>chair</name>\n" &
+"\t</name>\n" &
+"\t<cost>69.990000</cost>\n" &
+"</AProduct>\n" &
+"\n";
+
+const universal charstring str_achair_e :=
+"<exm:AProduct xmlns:exm='http://www.example.com' name='chair'>\n" &
+"\t<cost>69.990000</cost>\n" &
+"</exm:AProduct>\n" &
+"\n";
+
+// Example when the URI is present but matches the target namespace
+const AProduct afeather := {
+  name := {
+    uri  := "http://www.example.com",
+    name := "feather"
+  },
+  cost := 0.111
+}
+
+const universal charstring str_afeather_b :=
+"<AProduct>\n" &
+"\t<name>\n" &
+"\t\t<uri>http://www.example.com</uri>\n" &
+"\t\t<name>feather</name>\n" &
+"\t</name>\n" &
+"\t<cost>0.111000</cost>\n" &
+"</AProduct>\n" &
+"\n";
+
+const universal charstring str_afeather_e :=
+"<exm:AProduct xmlns:exm='http://www.example.com' xmlns:b0='http://www.example.com' name='b0:feather'>\n" &
+"\t<cost>0.111000</cost>\n" &
+"</exm:AProduct>\n" &
+"\n";
+// ^__ this is what we do
+//
+// v-- this is what we should do
+const universal charstring str_afeather_e_correct :=
+"<exm:AProduct xmlns:exm='http://www.example.com' name='exm:feather'>\n" &
+"\t<cost>0.111000</cost>\n" &
+"</exm:AProduct>\n" &
+"\n";
+
+
+testcase enc_qn_a() runs on Q {
+  CHECK_METHOD(bxer_enc_prodA, atable, str_atable_b);
+  CHECK_METHOD(exer_enc_prodA, atable, str_atable_e);
+
+  CHECK_METHOD(bxer_enc_prodA, achair, str_achair_b);
+  CHECK_METHOD(exer_enc_prodA, achair, str_achair_e);
+
+  CHECK_METHOD(bxer_enc_prodA, afeather, str_afeather_b);
+  CHECK_METHOD(exer_enc_prodA, afeather, str_afeather_e);
+}
+
+testcase dec_qn_a() runs on Q {
+  CHECK_DECODE(bxer_dec_prodA, str_atable_b, AProduct, atable);
+  CHECK_DECODE(bxer_dec_prodA, str_achair_b, AProduct, achair);
+  CHECK_DECODE(bxer_dec_prodA, str_afeather_b, AProduct, afeather);
+
+  CHECK_DECODE(exer_dec_prodA, str_atable_e, AProduct, atable);
+  CHECK_DECODE(exer_dec_prodA, str_atable_e_xml, AProduct, atable);
+
+  CHECK_DECODE(exer_dec_prodA, str_achair_e, AProduct, achair);
+
+  CHECK_DECODE(exer_dec_prodA, str_afeather_e, AProduct, afeather);
+  CHECK_DECODE(exer_dec_prodA, str_afeather_e_correct, AProduct, afeather);
+}
+
+control {
+  execute(enc_qn());
+  execute(dec_qn());
+
+  execute(enc_qn_a());
+  execute(dec_qn_a());
+}
+
+}
+with {
+  encode "XML";
+
+}

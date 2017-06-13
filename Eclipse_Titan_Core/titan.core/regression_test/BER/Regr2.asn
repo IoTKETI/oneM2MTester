@@ -1,0 +1,188 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Forstner, Matyas
+--   Koppany, Csaba
+--   Szabados, Kristof
+--
+--/////////////////////////////////////////////////////////////////////////////
+Regr2
+DEFINITIONS
+
+AUTOMATIC TAGS
+EXTENSIBILITY IMPLIED
+
+::=
+
+BEGIN
+
+EXPORTS ;
+IMPORTS c6a, T4, c4e FROM Regr1;
+
+T10 ::= CHOICE {
+  f1 BOOLEAN,
+  f2 CHOICE {
+    f1 INTEGER,
+    f2 BIT STRING
+  }
+}
+c10a T10 ::= f1 : TRUE
+c10b T10 ::= f2 : f2 : c6a
+d10a OCTET STRING ::= '8001FF'H
+d10b OCTET STRING ::= 'A104810200C3'H
+
+T11 ::= [APPLICATION 1] CHOICE {
+  f12 T12,
+  f13 T13,
+  f14 T14,
+  f15 T15,
+  f16 T16,
+  f17 T17,
+  f18 T18,
+  f19 T19,
+  f20 T20,
+  f21 T21,
+  f22 T22
+}
+
+T12 ::= SEQUENCE {
+  f1 INTEGER,
+  f2 [3] BOOLEAN
+}
+c11-12a T11 ::= f12 : {f1 3, f2 TRUE}
+d11-12a OCTET STRING ::= '6108A0060201038301FF'H
+
+T13 ::= SEQUENCE {
+  f-mand INTEGER,
+  f-opt INTEGER OPTIONAL,
+  f-def INTEGER DEFAULT 2002
+}
+c11-13a T11 ::= f13 : {f-mand 255, f-def 2002}
+d11-13a OCTET STRING ::= '6106A104800200FF'H
+c11-13b T11 ::= f13 : {f-mand -255, f-opt 83, f-def 0}
+d11-13b OCTET STRING ::= '610CA10A8002FF01810153820100'H
+
+T14 ::= SEQUENCE {
+  f1 INTEGER,
+  f2 OCTET STRING,
+  COMPONENTS OF T13,
+  f3 NULL OPTIONAL
+}
+c11-14a T11 ::= f14 : {f1 3378, f2 'BA3'H, f-mand -553}
+d11-14a OCTET STRING ::= '610EA20C80020D328102BA308202FDD7'H
+c11-14b T11 ::= f14 : {f1 245, f2 '110'B, f-mand 337, f-def -1, f3 NULL}
+d11-14b OCTET STRING ::= '6112A210800200F58101C0820201518401FF8500'H
+
+T15 ::= SEQUENCE {
+  f3 T4,
+  COMPONENTS OF T12
+}
+c11-15a T11 ::= f15 : {f3 c4e, f1 -337, f2 FALSE}
+d11-15a OCTET STRING ::= '610CA30A8001038102FEAF820100'H
+
+T16 ::= SEQUENCE OF INTEGER
+c11-16a T11 ::= f16 : {1, 2, 3, 4}
+c11-16b T11 ::= f16 : {}
+d11-16a OCTET STRING ::= '610EA40C020101020102020103020104'H
+d11-16b OCTET STRING ::= '6102A400'H
+
+T17 ::= SEQUENCE OF T11
+c11-17a T11 ::= f17 : {c11-15a, c11-16a, c11-13b, c11-14b, c11-12a}
+d11-17a OCTET STRING ::='614CA54A610CA30A8001038102FEAF820100610E
+  A40C020101020102020103020104610CA10A8002FF018101538201006112A21
+  0800200F58101C0820201518401FF85006108A0060201038301FF'H
+
+T18 ::= SET {
+  f1 INTEGER,
+  ...,
+  f4 OCTET STRING,
+  f5 BIT STRING OPTIONAL,
+  ...,
+  f2 BOOLEAN DEFAULT TRUE,
+  f3 NULL
+}
+c11-18a T11 ::= f18 : {f1 18, f3 NULL, f4 '101'H, f5 'B'H}
+d11-18a OCTET STRING ::= '610F A60D 800112 8200 83021010 840204B0'H
+
+T19 ::= SET OF INTEGER
+c11-19a T11 ::= f19 : {4, 2, 3, 1}
+c11-19b T11 ::= f19 : {}
+c11-19c T11 ::= f19 : {4, 2, 3, 1, 4}
+d11-19a OCTET STRING ::= '610EA70C020101020102020103020104'H
+d11-19b OCTET STRING ::= '6102A700'H
+d11-19c OCTET STRING ::= '6111A70F020101020102020103020104020104'H
+
+T20 ::= EXTERNAL
+c11-20a T11 ::= f20 : {
+  identification presentation-context-id : 555,
+  data-value-descriptor "What is the matter?",
+  data-value '00FF00'H
+}
+d11-20a OCTET STRING ::=
+  '6120 A81E 0202022B 07135768617420697320746865206D61747465723F 810300FF00'H
+
+etsi-objid RELATIVE-OID ::= {itu-t(0) identified-organization(4) etsi(0)}
+etsi-ericsson RELATIVE-OID ::= {reserved(127) etsi-identified-organization(0)
+                                ericsson(5) 3 4}
+T21 ::= RELATIVE-OID
+c11-21a T11 ::= f21 : {iso(1) member-body(2) bsi(826) disc(0)
+                       ericsson(1249)}
+c11-21b T11 ::= f21 : {etsi-objid etsi-ericsson}
+d11-21a OCTET STRING ::= '610989070102863A008961'H
+d11-21b OCTET STRING ::= '610A89080004007F00050304'H
+
+nagykisarvizturo UniversalString ::=
+  {nagyarvizturo, " ", {0,0,0,173}, " ", kisarvizturo}
+/* UTF8: ... 20C2AD20 ... */
+
+nagyarvizturo UniversalString ::= {
+  {0,0,0,193}, "RV", {0,0,0,205}, "ZT", {0,0,1,112}, "R", {0,0,1,80},
+  " T", {0,0,0,220}, "K", {0,0,0,214}, "RF", {0,0,0,218}, "R", {0,0,0,211}, "G", {0,0,0,201}, "P"
+}
+/*
+UTF8: "
+                c3815256        c38d5a54        c5b052c5        902054c3
+                9c4bc396        5246c39a        52c39347        c38950
+"
+*/
+
+kisarvizturo UniversalString ::= {
+  {0,0,0,225}, "rv", {0,0,0,237}, "zt", {0,0,1,113}, "r", {0,0,1,81},
+  " t", {0,0,0,252}, "k", {0,0,0,246}, "rf", {0,0,0,250}, "r", {0,0,0,243}, "g", {0,0,0,233}, "p"
+}
+/*
+UTF8: "
+                c3a17276        c3ad7a74        c5b172c5        912074c3
+                bc6bc3b6        7266c3ba        72c3b367        c3a970
+"
+*/
+
+T22 ::= UTF8String
+c11-22a T11 ::= f22 : nagykisarvizturo
+d11-22a OCTET STRING ::=
+ '61448A42
+  C3815256C38D5A54C5B052C5902054C39C4BC3965246C39A52C39347C38950
+  20C2AD20
+  C3A17276C3AD7A74C5B172C5912074C3BC6BC3B67266C3BA72C3B367C3A970'H
+
+/* extra checks for semantic analyzer */
+
+/* extra check 1 */
+
+XC-T2 ::= CHOICE {
+  f2 XC-T1,
+  f3 [2] XC-T1,
+  f4 NULL
+}
+
+XC-T1 ::= CHOICE {
+  f1 XC-T2
+}
+
+END

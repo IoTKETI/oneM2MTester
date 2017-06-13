@@ -1,0 +1,51 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2017 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+/* state machine of port connection endpoints */
+
+digraph state_mach_conn_endpoint {
+  // states
+  node [fontsize=16];
+  // start state (invisible)
+  START [style=invis];
+
+  // durable states
+  node[shape=box,style="filled,rounded"];
+  IDLE;
+  CONNECTED;
+
+  // transient states
+  node[shape=box,style=rounded];
+  LISTENING;
+  LAST_MSG_SENT;
+  LAST_MSG_RCVD;
+
+  // edges
+  edge [fontsize=12];
+  START -> IDLE [arrowtail=odot];
+
+  // state transitions for connect() operation
+  IDLE -> LISTENING [label="CONNECT_LISTEN/\nstarting server,\nCONNECT_LISTEN_ACK"];
+  LISTENING -> CONNECTED [label="incoming connection accepted/\nclosing server,\nCONNECTED"];
+  IDLE -> CONNECTED [label="CONNECT/\nconnection establishment"];
+
+  // state transitions for disconnect() operation
+  CONNECTED -> LAST_MSG_SENT [label="DISCONNECT_REQ/\nlast_message"];
+  CONNECTED -> LAST_MSG_RCVD [label="last_message/\nlast_message"];
+  LAST_MSG_SENT -> IDLE [label="last_message/\nconnection termination"];
+  LAST_MSG_RCVD -> IDLE [label="connection terminated/\nDISCONNECTED"];
+
+  // handling of connection-related errors
+  edge [fontsize=12,style=dashed];
+  IDLE -> IDLE [label="CONNECT_LISTEN,\nserver starting failed/\nCONNECT_ERROR"];
+  IDLE -> IDLE [label="CONNECT,\nconnection establishment failed/\nCONNECT_ERROR"];
+  LISTENING -> IDLE [label="DISCONNECT/\nclosing server"];
+  CONNECTED -> IDLE [label="component terminates\nor connection breakdown/\nDISCONNECTED"];
+  CONNECTED -> IDLE [label="DISCONNECT,\nsending of last_message failed/\nDISCONNECTED"];
+  CONNECTED -> IDLE [label="last_message,\nsending of last_message failed/\nDISCONNECTED"];
+  LAST_MSG_SENT -> IDLE [label="component terminates\nor connection breakdown/\nDISCONNECTED"];
+}

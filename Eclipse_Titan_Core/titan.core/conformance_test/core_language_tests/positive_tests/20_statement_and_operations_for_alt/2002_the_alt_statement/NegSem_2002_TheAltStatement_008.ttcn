@@ -1,0 +1,43 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:20.2, running (timer) in alt branch event
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Also, the event operation shall not use the operations create, running, alive
+// and activate.
+
+module NegSem_2002_TheAltStatement_008 {
+
+    type port MyPort message {
+        inout boolean
+    } with {extension "internal"}
+    
+    type component GeneralComp { 
+	    port MyPort p;
+    }
+    
+    testcase TC_NegSem_2002_TheAltStatement_008() runs on GeneralComp {
+        timer t_tmr := 1.0;
+
+        connect(self:p, self: p);
+
+        t_tmr.start;
+	    p.send(true);
+
+	    alt {
+		    [] p.receive(boolean:t_tmr.running) {
+			    setverdict(pass);
+		    }
+	    }
+    }
+    
+    control {
+	    execute(TC_NegSem_2002_TheAltStatement_008());
+    }
+}

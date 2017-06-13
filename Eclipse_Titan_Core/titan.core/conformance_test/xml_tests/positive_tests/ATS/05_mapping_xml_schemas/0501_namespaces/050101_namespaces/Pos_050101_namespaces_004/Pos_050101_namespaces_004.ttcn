@@ -1,0 +1,92 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:5.1.1, Verify that two schemas with no target namespace are correctly translated
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// A single XML Schema may be composed of a single or several schema element information 
+// items, and shall be translated to one or more TTCN-3 modules, corresponding to schema 
+// components that have the same target namespace. For XSD schemas with the same target 
+// namespace (including absence of the target namespace) exactly one TTCN-3 module shall
+// be generated.
+// The names of the TTCN 3 modules generated based on this clause shall be the result of 
+// applying the name transformation rules in clause 5.2.2 to ... the predefined name 
+// "NoTargetNamespace".
+
+module Pos_050101_namespaces_004 {
+
+    import from NoTargetNamespace language "XSD" all;
+
+	external function enc_MyType(in MyType2 pdu) return octetstring
+  	with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType2
+  	with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    template MyType2 m_msg := 4;
+
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout MyType, Raw;
+    }	with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+
+    testcase TC_Pos_050101_namespaces_004() runs on C system C {
+        var Raw v_rcv;
+        var universal charstring v_matchError;
+
+		var Raw  v_Raw:="<MyType2>4</MyType2>\n" 
+
+        connect(self:p, self:p1);
+
+        // encode the message
+        p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw)) {
+                    alt {
+                        // match decoded value to pass test
+                        [] p1.receive(Raw:?) {
+                           	if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else {
+								setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));
+							}	
+                        }
+                    }
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_050101_namespaces_004(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

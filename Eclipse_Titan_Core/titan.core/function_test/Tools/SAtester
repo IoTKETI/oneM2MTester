@@ -1,0 +1,285 @@
+#!/bin/sh
+# the next line restarts using expect \
+exec expect "$0" "$@"
+
+#wait to delete a file until it finished running
+proc _delete_files {filelist} {
+	foreach filename $filelist {
+		while { [file exists $filename] } {
+			if [ catch {file delete $filename} ] then {
+				puts "couldn't delete $filename , trying again in 1 sec"
+				exec sleep 1
+			}
+		}
+	}
+}
+
+proc _cleanup {} {
+	_delete_files [list Temp.log Temp.exe Temp \
+		Temp.o TempA.o EncRAW.o EncBER.o \
+		Temp.cc Temp.hh TempA.cc TempA.hh compile]
+}
+
+
+
+proc _errorlog {message} {
+
+	global err_counter
+	global errorfileID
+	global TCtitle
+
+	puts $errorfileID "------------------------------------------------------------------"
+	puts $errorfileID " FAILED TEST CASE: $TCtitle"
+	puts $errorfileID " ERROR MESSAGE   : $message"
+	puts $errorfileID "------------------------------------------------------------------"
+	puts $errorfileID ""
+	incr err_counter
+}
+
+proc _compiler_err {} {
+	global sh_id
+	send -i $sh_id "compiler Temp.ttcn\n"
+	set timeout 10
+	expect {
+		timeout  {_cleanup}
+		-i $sh_id "FATAL" {_errorlog "FATAL ERROR"; _cleanup}
+		-i $sh_id "egmentation" {_errorlog "SEGMENTATION FAULT"; _cleanup}
+		-i $sh_id "leakage" {_errorlog "MEMORY LEAKAGE"; _cleanup}
+	}
+	send -i $sh_id "\n"
+	expect {"$"}
+}
+
+
+
+proc _compiler {message} {
+	global sh_id
+	send -i $sh_id "compiler Temp.ttcn \n"
+	set timeout 10
+	puts ">>>DEBUG:$sh_id"
+	expect {
+	timeout {
+		puts "\n---------------------------------------"
+		puts "ERROR! NOT MATCHING MESSAGE, EXPECTED: "
+		puts $message
+		puts "---------------------------------------"
+		_errorlog "NOT MATCHING MESSAGE \n\n$message"
+		}
+	-i $sh_id -exact $message {
+		puts "\n---------------------------------------"
+		puts "MATCHING MESSAGE, EXPECTED:   "
+		puts $message
+		puts "---------------------------------------"
+		}
+	}
+	puts "ended at: [exec date +"%H:%M:%S"]"
+	_cleanup
+
+
+}
+
+proc _executor {message coverage_args} {
+	global sh_id
+
+	if {![file exists Makefile]} {
+		puts "Can not find Makefile, you need one so that you can execute test case!!"
+		return
+	}
+	if {![file exists Temp.cfg]} {
+		puts "Can not find Temp.cfg, you need one so that you can execute test case!!"
+		return
+	}
+  
+	spawn make clean
+	set timeout 20
+	expect {
+		-i $spawn_id -re "^.*\r\n" {exp_continue}
+		-i $spawn_id eof
+		wait -i $spawn_id
+	}
+	
+	spawn make
+	set timeout 120
+	expect {
+		-i $spawn_id -re ".*\r\n" {exp_continue}
+		-i $spawn_id eof 
+		wait -i $spawn_id
+	}
+
+	if {![file exists Temp] && ![file exists Temp.exe]} {
+		puts "\n---------------------------------------"
+		puts "Executable Temp cannot be found !!"
+		puts "---------------------------------------"
+		_errorlog "EXECUTABLE CANNOT BE FOUND"
+		return
+	}
+	
+	set timeout 30
+	expect {
+		-i $sh_id -re "\r\n.*>>>> "
+	}
+	
+	send -i $sh_id "./Temp Temp.cfg\n"
+	set timeout 120
+	expect {
+		-i $sh_id eof {_errorlog "NOT MATCHING MESSAGE, MESSAGE EXPECTED:  \n\n$message"}
+		-i $sh_id "leak at" {_errorlog "MEMORY LEAKAGE"}
+		-i $sh_id -exact $message {
+			puts "\n---------------------------------------"
+			puts "MATCHING MESSAGE, EXPECTED:   "
+			puts $message
+			puts "---------------------------------------"
+			expect {
+				-i $sh_id eof
+				-i $sh_id -re ".*\r\n" {exp_continue}
+				-i $sh_id -exact ">>>> " {}
+				}
+			}
+		-i $sh_id -re ".*\r\n" {exp_continue}
+		-i $sh_id -exact ">>>> " {
+			puts "\n---------------------------------------"
+			puts "NOT MATCHING MESSAGE, EXPECTED:   "
+			puts $message
+			puts "---------------------------------------"
+			_errorlog "NOT MATCHING MESSAGE, MESSAGE EXPECTED:  \n\n$message"}
+		timeout {
+			puts "\n---------------------------------------"
+			puts "ERROR! TIMEOUT OCCURED, MESSAGE EXPECTED:  "
+			puts $message
+			puts "---------------------------------------"
+			_errorlog "TIMEOUT OCCURED, NOT MATCHING MESSAGE \n\n$message"
+			}
+		}
+	puts "ended at: [exec date +"%H:%M:%S"]"
+	_cleanup
+}
+
+spawn sh
+set sh_id $spawn_id
+send -i $sh_id "PS1='>>>> '\n"
+
+set tc_counter 0
+set err_counter 0
+set errpostfix "_error"
+set coverage_args ""
+set start_date [exec date +"%H:%M:%S"]
+
+if {[lindex $argv 0] == "-coverage"} {set argv [lrange $argv 1 end]; set coverage_args "COVERAGE=1"; puts "Coverage mode enabled!"}
+# RT2 comes after coverage
+if {[lindex $argv 0] == "-rt2"}      {set argv [lrange $argv 1 end]; set env(RT2) yes; puts "Function-test runtime enabled!"}
+
+set errorfilename $argv$errpostfix
+
+# The whole argument list is treated as a single file.
+if {[file exists $argv]} {set TIfileID [open $argv r]} else {puts "File $argv does not exist!"}
+if {[file exists Temp.ttcn]} {file delete Temp.ttcn}
+if {[file exists TempA.asn]} {file delete Temp.asn}
+if {[file exists $errorfilename]} {file delete $errorfilename}
+
+while {-1 != [gets $TIfileID Line]} {
+	if {[string first <TC $Line 0] == 0} {incr tc_counter}
+}
+close $TIfileID
+
+puts "\n-------------------------------------------------"
+puts "$tc_counter test case(s) were found in file $argv"
+puts "-------------------------------------------------"
+
+set i 1
+set errorfileID [open $errorfilename w]
+set TIfileID [open $argv r]
+
+while {$i <= $tc_counter} {
+
+	set tc_state ""
+
+	set tempfileID [open Temp.ttcn w]
+
+	while {(-1 != [gets $TIfileID Line])&&(0 != [string first <TC $Line 0])} {}
+
+	set TCtitle $Line
+
+	while {(-1 != [gets $TIfileID Line])&&(0 != [string first <STATIC $Line 0])} {}
+
+	if {0 == [string first <STATIC:ASN $Line 0]} {
+		set asnfileID [open TempA.asn w]
+		while {(-1 != [gets $TIfileID Line])&&(0 != [string first <STATIC $Line 0])} {puts $asnfileID $Line}
+		close $asnfileID
+	}
+
+	puts $tempfileID "module Temp {"
+
+	while {(-1 != [gets $TIfileID Line])&&(0 != [string first <RESULT> $Line 0])} {
+
+		if {0 == [string first <TTCN_TC:PURE_EXEC $Line 0]} {
+			set tc_state "pure_execute"
+		} else {
+			if {0 == [string first <TTCN_TC $Line 0]} {
+				puts $tempfileID "\ntype component TempComp {}\ntestcase TC() runs on TempComp \{"
+				set tc_state "present"
+			}
+
+			if {0 == [string first <TTCN_TC:EXEC $Line 0]} {set tc_state "execute"}
+		}
+
+		if {(0 != [string first # $Line 0])&&(0 != [string first <TT $Line 0])} {puts $tempfileID $Line}
+
+	}
+
+	if {($tc_state == "present")||($tc_state == "execute")} {puts $tempfileID "\} \n\ncontrol \{ \nexecute (TC()) \n\}";}
+
+	puts $tempfileID "}"
+
+	close $tempfileID
+
+
+	puts "\n-------------------------------------------------"
+	puts "Compiling test case $TCtitle ($i/$tc_counter)"
+	puts "started at: [exec date +"%H:%M:%S"]"
+	puts "-------------------------------------------------"
+
+	set result_mess ""
+
+	while {(-1 != [gets $TIfileID Line])&&(0 != [string first <END_TC> $Line 0])} {
+			if {([string length $Line] > 3)&&(0 != [string first # $Line 0])} {
+			if {$result_mess != ""} {set result_mess "$result_mess\n\n"}
+			set result_mess "$result_mess$Line"
+			}
+	}
+
+	if {([string length $result_mess] > 3)&&($tc_state != "execute")&&($tc_state != "pure_execute")} {_compiler $result_mess}
+	if {([string length $Line] > 3)&&($tc_state == "execute")} {_executor $result_mess $coverage_args}
+	if {([string length $Line] > 3)&&($tc_state == "pure_execute")} {
+		_executor $result_mess $coverage_args
+	}
+
+	incr i
+} 
+
+close $TIfileID
+close $errorfileID
+if {$err_counter == 0} {file delete $errorfilename}
+
+set timeout 1
+# What's this?
+send -i $sh_id "rm -f *%\n"
+
+puts "\nCOMPILED $tc_counter TEST CASES"
+puts "$err_counter TEST CASE FAILED"
+if {$err_counter != 0} {
+  puts "SEE DETAILS IN $errorfilename FILE"
+}
+
+# starting end ending time
+puts "started at: $start_date"
+puts "finished at: [exec date +"%H:%M:%S"]"
+
+#exit $err_counter
+
+send -i $sh_id "exit \n"
+	expect {
+		timeout {
+			exit $err_counter
+		}
+}
+exit $err_counter

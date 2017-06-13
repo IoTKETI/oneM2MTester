@@ -1,0 +1,270 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Lovassy, Arpad
+ *   Ormandi, Matyas
+ *
+ ******************************************************************************/
+//
+//  File:          http_jabber_org_protocol_pubsub_event.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Sun Jan  6 13:51:49 2013
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- pubsub#event.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "http://jabber.org/protocol/pubsub#event" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//
+//XEP-0060: Publish-Subscribe
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module http_jabber_org_protocol_pubsub_event {
+
+
+import from XSD all;
+
+
+import from jabber_x_data all;
+
+
+/* xmlns:xdata='jabber:x:data' is needed to trick the converter */
+
+
+/* The protocol documented by this schema is defined in
+      XEP-0060: http://xmpp.org/extensions/xep-0060.html */
+
+
+/* http://xmpp.org/schemas/x-data.xsd */
+
+
+type record Event
+{
+	union {
+		Collection collection,
+		Configuration configuration,
+		Delete delete,
+		Items items,
+		Purge purge,
+		Subscription subscription
+	} choice
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (choice) "untagged";
+};
+
+
+type record Collection
+{
+	XSD.String node optional,
+	union {
+		Associate associate,
+		Disassociate disassociate
+	} choice
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+variant (choice) "untagged";
+};
+
+
+type record Associate
+{
+	XSD.String node//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+//variant (base) "untagged";
+};
+
+
+type record Disassociate
+{
+	XSD.String node//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+//variant (base) "untagged";
+};
+
+
+type record Configuration
+{
+	XSD.String node optional,
+	record {
+		X x
+	} sequence optional
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+variant (sequence) "untagged";
+variant (sequence.x) "namespace as 'jabber:x:data' prefix 'xdata'";
+};
+
+
+type record Delete
+{
+	XSD.String node,
+	Redirect redirect optional
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+};
+
+
+type record Items
+{
+	XSD.String node,
+	union {
+		record of Item item_list,
+		record length(1 .. infinity) of Retract retract_list
+	} choice
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+variant (choice) "untagged";
+variant (choice.item_list) "untagged";
+variant (choice.retract_list) "untagged";
+};
+
+
+type record Item
+{
+	XSD.String id optional,
+	XSD.String node optional,
+	XSD.String publisher optional,
+	union {
+		XSD.String elem,
+		XSD.String alma
+	} choice optional
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (id) "attribute";
+variant (node) "attribute";
+variant (publisher) "attribute";
+variant (choice) "untagged";
+variant (choice.elem) "anyElement except unqualified, 'http://jabber.org/protocol/pubsub#event'";
+};
+
+
+type record Purge
+{
+	XSD.String node//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (node) "attribute";
+//variant (base) "untagged";
+};
+
+
+type record Redirect
+{
+	XSD.String uri//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (uri) "attribute";
+//variant (base) "untagged";
+};
+
+
+type record Retract
+{
+	XSD.String id//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (id) "attribute";
+//variant (base) "untagged";
+};
+
+
+type record Subscription
+{
+	XSD.DateTime expiry optional,
+	XSD.String jid,
+	XSD.String node optional,
+	XSD.String subid optional,
+	enumerated {
+		none_,
+		pending,
+		subscribed,
+		unconfigured
+	} subscription optional//,
+	//Empty base
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (expiry) "attribute";
+variant (jid) "attribute";
+variant (node) "attribute";
+variant (subid) "attribute";
+variant (subscription) "text 'none_' as 'none'";
+variant (subscription) "attribute";
+//variant (base) "untagged";
+};
+
+
+type enumerated Empty
+{
+	x
+}
+with {
+variant "text 'x' as ''";
+variant "name as uncapitalized";
+};
+
+
+}
+with {
+encode "XML";
+variant "namespace as 'http://jabber.org/protocol/pubsub#event'";
+variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+variant "elementFormQualified";
+}

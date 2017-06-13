@@ -1,0 +1,36 @@
+/****************************************************************************************
+* Copyright (c) 2017  Korea Electronics Technology Institute.							*
+* All rights reserved. This program and the accompanying materials						*
+* are made available under the terms of                                         		*
+* - Eclipse Public License v1.0(http://www.eclipse.org/legal/epl-v10.html),     		*
+* - BSD-3 Clause Licence(http://www.iotocean.org/license/),                    			* 
+* - MIT License   (https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE), * 
+* - zlib License  (https://github.com/leethomason/tinyxml2#license).                    *	
+*																						*
+* Contributors:																			*
+*   Ting Martin MIAO - initial implementation                                   		*   
+*   Nak-Myoung Sung                                                             		*
+*                                                                               		* 
+* Updated:  2017-05-13                                                          		*
+*****************************************************************************************/
+// Description:																	
+//    oneM2MTester_Functions.ttcn  														
+
+module oneM2MTester_Functions {	
+	
+	import from IPL4asp_Types all;
+	import from IPL4asp_PortType all;
+	import from HTTPmsg_MessageLen all;
+  
+    function f_COAP_getMsgLength(in octetstring stream, inout IPL4asp_Types.ro_integer args) return integer {
+		return lengthof(stream);
+		// Only for UDP
+		// For TCP other frameing is needed (see IETF: COAP mapping to TCP);
+	}
+	
+	function f_HTTP_getMessageLength(in octetstring stream, inout IPL4asp_Types.ro_integer args) return integer  {
+      	return f_HTTPMessage_len(stream);
+    }
+
+  
+}//end_of_namespace

@@ -1,0 +1,1473 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Baranyi, Botond
+.*   Szabo, Bence Janos
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+.*
+:docname.Test Description
+:docno.9/152 91-CRL 113 200/5 Uen
+:rev.A
+:date.2015-04-27
+.*
+:prep.ETH/XZ Botond Baranyi
+:appr.ETH/XZ (Elemer Lelik)
+:checked.ETHBAAT
+.*
+:title.Test description - XER coder
+:contents level=3.
+.*---------------------------------------------------------------------*
+:h1.PREREQUISITES AND PREPARATIONS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Scope of the Test Object
+.*---------------------------------------------------------------------*
+:xmp tab=1 nokeep.
+
+This TD contains test cases related to TTCN3 Executor's XER coder function.
+For now, only "anyElement" variants are tested.
+
+:exmp.
+
+:p.:us.Revision Information:eus.
+
+:xmp nokeep.
+:us.History:eus.
+
+REV   DATE         PREPARED   CHANGE
+===   ==========   ========   ======
+A     2014-04-29   EBOTBAR    New document
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+:p.:us.Software Tools:eus.
+:xmp tab=2 nokeep.
+
+	SAtester
+
+:exmp.
+:np.
+.*---------------------------------------------------------------------*
+:h1.REQUIREMENT-BASED TESTS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2. Negative tests with encoding "anyElement from ..." variants
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element from unqualified namespace
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h4. Encoding record template with explicitly unspecified field
+.*---------------------------------------------------------------------*
+
+.*---------------------------------------------------------------------*
+:h4. Too many fraction digits when fractionDigits is 2
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Too many fraction digits when fractionDigits is 2>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type float MyFloat
+with {
+  encode "XML";
+  variant "fractionDigits 2";
+  variant "XSD:decimal";
+};
+
+external function ef_xer_dec(in octetstring par) return MyFloat
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_dec_fractiondigits() runs on Test_CT {
+  var universal charstring xml := "<MyFloat>1234567890.111</MyFloat>\n";
+  ef_xer_dec(unichar2oct(xml));
+  setverdict(pass);
+}
+
+control {
+  execute(tc_dec_fractiondigits());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.MyFloat': The float value (1234567890.111) contains too many fractionDigits. Expected 2 or less
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4. Too many fraction digits when fractionDigits is 0
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Too many fraction digits when fractionDigits is 0>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type float MyFloat
+with {
+  encode "XML";
+  variant "fractionDigits 0";
+  variant "XSD:decimal";
+};
+
+external function ef_xer_dec(in octetstring par) return MyFloat
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_dec_fractiondigits() runs on Test_CT {
+  var universal charstring xml := "<MyFloat>1234567890.1</MyFloat>\n";
+  ef_xer_dec(unichar2oct(xml));
+  setverdict(pass);
+}
+
+control {
+  execute(tc_dec_fractiondigits());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.MyFloat': The float value (1234567890.1) contains too many fractionDigits. Expected 0 or less
+
+<END_TC>  
+  
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h4. Too many fraction digits when fractionDigits is 2 in attribute
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Too many fraction digits when fractionDigits is 2 in attribute>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type float MyFloat
+with {
+  encode "XML";
+  variant "XSD:decimal";
+};
+
+type record MyRec {
+  MyFloat myfloat
+} 
+with {
+  encode "XML";
+  variant (myfloat) "fractionDigits 2";
+  variant (myfloat) "attribute";
+};
+
+external function ef_xer_dec(in octetstring par) return MyRec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_dec_fractiondigits_attr() runs on Test_CT {
+  var universal charstring xml := "<MyRec myfloat='1234567890.111'></MyRec>\n";
+  ef_xer_dec(unichar2oct(xml));
+  setverdict(pass);
+}
+
+control {
+  execute(tc_dec_fractiondigits_attr());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.MyRec': Component 'myfloat': The float value (1234567890.111) contains too many fractionDigits. Expected 2 or less.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4. Too many fraction digits when fractionDigits is 0 in attribute
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Too many fraction digits when fractionDigits is 0 in attribute>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type float MyFloat
+with {
+  encode "XML";
+  variant "XSD:decimal";
+};
+
+type record MyRec {
+  MyFloat myfloat
+} 
+with {
+  encode "XML";
+  variant (myfloat) "fractionDigits 0";
+  variant (myfloat) "attribute";
+};
+
+external function ef_xer_dec(in octetstring par) return MyRec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_dec_fractiondigits_attr() runs on Test_CT {
+  var universal charstring xml := "<MyRec myfloat='1234567890.1'></MyRec>\n";
+  ef_xer_dec(unichar2oct(xml));
+  setverdict(pass);
+}
+
+control {
+  execute(tc_dec_fractiondigits_attr());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.MyRec': Component 'myfloat': The float value (1234567890.1) contains too many fractionDigits. Expected 0 or less.
+
+<END_TC>  
+  
+:exmp.
+
+
+:xmp tab=0.
+
+<TC - Encoding record with any element from unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from unqualified";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec v_good := { 3, "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_good); 
+
+  var any_elem_rec v_bad := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element from specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record with any element from specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from 'http://www.somewhere.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec v_good := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_good); 
+
+  var any_elem_rec v_bad := { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhereelse.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element from multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record with any element from multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec v_good1 := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_good1); 
+
+  var any_elem_rec v_good2 := { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  os_enc := ef_xer_enc(v_good2);
+
+  var any_elem_rec v_good3 := { 3, "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_good3);
+
+  var any_elem_rec v_bad := { 0, "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.someotherplace.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element from unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element from unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from unqualified";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_good); 
+
+  var any_elem_rec_of v_bad := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhere.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element from specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element from specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from 'http://www.somewhere.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_good); 
+
+  var any_elem_rec_of v_bad := { "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhereelse.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element from multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element from multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>",
+    "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>",
+    "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_good); 
+
+  var any_elem_rec_of v_bad := { "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.someotherplace.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2. Negative tests with encoding "anyElement except ..." variants
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element except unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record with any element except unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except unqualified";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc; 
+   
+  var any_elem_rec v_good := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_good);
+
+  var any_elem_rec v_bad := { 3, "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_bad); 
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: The unqualified XML namespace is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element except specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record with any element except specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec v_good1 := { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  os_enc := ef_xer_enc(v_good1);
+
+  var any_elem_rec v_good2 := { 3, "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_good2); 
+
+  var any_elem_rec v_bad := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad); 
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record with any element except multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record with any element except multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec v_good := { 0, "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  os_enc := ef_xer_enc(v_good);
+
+  var any_elem_rec v_bad := { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element except unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element except unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except unqualified";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_good);
+
+  var any_elem_rec_of v_bad := { "<something>not very important</something>" };
+  os_enc := ef_xer_enc(v_bad); 
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: The unqualified XML namespace is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element except specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element except specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except 'http://www.somewhere.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  os_enc := ef_xer_enc(v_good);
+
+  var any_elem_rec_of v_bad := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad); 
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Encoding record of with any element except multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record of with any element except multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_enc(in any_elem_rec_of par) return octetstring 
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var octetstring os_enc;    
+
+  var any_elem_rec_of v_good := { "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  os_enc := ef_xer_enc(v_good);
+
+  var any_elem_rec_of v_bad := { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  os_enc := ef_xer_enc(v_bad); 
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+Dynamic test case error: While XER-encoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2. Negative tests with decoding "anyElement from ..." variants
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element from unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element from unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from unqualified";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+    
+  // encoded { 3, "<something>not very important</something>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E333C2F6E6F745F757365643E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element from specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element from specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from 'http://www.somewhere.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E36313C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhereelse.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element from multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element from multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement from unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_good1 := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good1);
+
+  // encoded { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_good2 := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E36313C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good2);
+
+  // encoded { 3, "<something>not very important</something>" };
+  var octetstring v_good3 := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E333C2F6E6F745F757365643E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good3);
+
+  // encoded { 0, "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E303C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D656F74686572706C6163652E636F6D223E677265656E3C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.someotherplace.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element from unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element from unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from unqualified";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+    
+  // encoded { "<something>not very important</something>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhere.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element from specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element from specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from 'http://www.somewhere.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhereelse.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element from multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element from multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement from unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>",
+  //           "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>",
+  //           "<something>not very important</something>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D656F74686572706C6163652E636F6D223E677265656E3C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.someotherplace.com" is not in the allowed namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2. Negative tests with decoding "anyElement except ..." variants
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element except unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element except unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except unqualified";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+   
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { 3, "<something>not very important</something>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E333C2F6E6F745F757365643E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: The unqualified XML namespace is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element except specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element except specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+
+  // encoded { 61, "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E36313C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record with any element except multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record with any element except multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record any_elem_rec {
+  integer not_used,
+  universal charstring any_elem
+} with {
+  encode "XML";
+  variant(any_elem) "anyElement except unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec v_res;
+
+  // encoded { 0, "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E303C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D656F74686572706C6163652E636F6D223E677265656E3C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { -5, "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265633E0A093C6E6F745F757365643E2D353C2F6E6F745F757365643E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265633E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec': Component 'any_elem': While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element except unqualified namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element except unqualified namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except unqualified";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+    
+  // encoded { "<something>not very important</something>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C736F6D657468696E673E6E6F74207665727920696D706F7274616E743C2F736F6D657468696E673E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: The unqualified XML namespace is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element except specific namespace
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element except specific namespace>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except 'http://www.somewhere.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhere.com"">red</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D6577686572652E636F6D223E7265643C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhere.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Decoding record of with any element except multiple namespaces
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoding record of with any element except multiple namespaces>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record of universal charstring any_elem_rec_of with {
+  encode "XML";
+  variant([-]) "anyElement except unqualified, 'http://www.somewhere.com', 'http://www.somewhereelse.com'";
+}
+
+external function ef_xer_dec(in octetstring par) return any_elem_rec_of
+  with { extension "prototype(convert) decode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_any_elem() runs on Test_CT {
+  var any_elem_rec_of v_res;
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.someotherplace.com"">green</xyz:color>" };
+  var octetstring v_good := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D656F74686572706C6163652E636F6D223E677265656E3C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_good);
+
+  // encoded { "<xyz:color xmlns:xyz=""http://www.somewhereelse.com"">blue</xyz:color>" };
+  var octetstring v_bad := '3C616E795F656C656D5F7265635F6F663E0A093C78797A3A636F6C6F7220786D6C6E733A78797A3D22687474703A2F2F7777772E736F6D657768657265656C73652E636F6D223E626C75653C2F78797A3A636F6C6F723E0A3C2F616E795F656C656D5F7265635F6F663E0A0A'O;
+  v_res := ef_xer_dec(v_bad);
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_any_elem());
+}
+
+<RESULT>
+
+Dynamic test case error: While XER-decoding type '@Temp.any_elem_rec_of': Index 0: While checking anyElement: XML namespace "http://www.somewhereelse.com" is in the excluded namespace list.
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4. Encoding record template with explicitly unspecified field
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoding record template with explicitly unspecified field>
+
+<STATIC>
+
+type component Test_CT{};
+
+<TTCN_TC:PURE_EXEC>
+
+type record MyType
+{
+  universal charstring foo
+}
+with {
+  encode "XML";
+  variant "element";
+};
+
+external function ef_xer_enc(in MyType par) return octetstring
+  with { extension "prototype(convert) encode (XER:XER_EXTENDED) errorbehavior(ALL:ERROR)" }
+
+testcase tc_enc_explicitly_unspecified() runs on Test_CT {
+  template MyType myTemp := { foo := - };
+
+  var octetstring v_res := ef_xer_enc(valueof(myTemp));
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_enc_explicitly_unspecified());
+}
+
+<RESULT>
+
+Dynamic test case error: Performing a valueof or send operation on a non-specific template of type @Temp.MyType
+
+<END_TC>  
+  
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h1.REFERENCES
+.*---------------------------------------------------------------------*
+:nl. Requirement specification(s):
+:nl.-------------------------------
+:list.
+:li. 8/ETH/RUS-2003:0087 Uen - Requirement Specification for TITAN's encoder/decoder functions
+:elist.
+
+:etext.

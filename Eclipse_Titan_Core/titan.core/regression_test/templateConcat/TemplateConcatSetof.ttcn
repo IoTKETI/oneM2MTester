@@ -1,0 +1,255 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating set of templates
+module TemplateConcatSetof {
+
+import from Types all;
+
+const SetOfInt c_setof := { 1, 2 };
+
+template SetOfInt t_setof_op1 := { 1, 2, 3 };
+template SetOfInt t_setof_op2 := { 4, 5 };
+template SetOfInt t_setof_op3 := ?;
+template SetOfInt t_setof_op4 := ? length(2..2);
+template SetOfInt t_setof_op5 := * length(3);
+
+template SetOfInt t_setof1 := t_setof_op1 & { 4, 5 };
+template SetOfInt t_setof1_exp := { 1, 2, 3, 4, 5};
+
+template SetOfInt t_setof2 := t_setof_op1 & ?;
+template SetOfInt t_setof2_exp := { 1, 2, 3, * };
+
+template SetOfInt t_setof3 := ? & t_setof_op2;
+template SetOfInt t_setof3_exp := { *, 4, 5 };
+
+template SetOfInt t_setof4 := ? length(2..2) & { 4, 5 } & * length(3);
+template SetOfInt t_setof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+
+template SetOfInt t_setof5 := t_setof_op1 & t_setof_op2;
+template SetOfInt t_setof5_exp := { 1, 2, 3, 4, 5 };
+
+template SetOfInt t_setof6 := t_setof_op1 & t_setof_op3;
+template SetOfInt t_setof6_exp := { 1, 2, 3, * };
+
+template SetOfInt t_setof7 := t_setof_op3 & t_setof_op1;
+template SetOfInt t_setof7_exp := { *, 1, 2, 3 };
+
+template SetOfInt t_setof8 := t_setof_op4 & t_setof_op2 & t_setof_op5;
+template SetOfInt t_setof8_exp := { ?, ?, 4, 5, ?, ?, ? };
+
+
+testcase tc_setof_t_w_refs_and_literals() runs on CT {
+  if (log2str(t_setof1) != log2str(t_setof1_exp)) {
+    setverdict(fail, "Expected: ", t_setof1_exp, ", got: ", t_setof1);
+  }
+  else if (log2str(t_setof2) != log2str(t_setof2_exp)) {
+    setverdict(fail, "Expected: ", t_setof2_exp, ", got: ", t_setof2);
+  }
+  else if (log2str(t_setof3) != log2str(t_setof3_exp)) {
+    setverdict(fail, "Expected: ", t_setof3_exp, ", got: ", t_setof3);
+  }
+  else if (log2str(t_setof4) != log2str(t_setof4_exp)) {
+    setverdict(fail, "Expected: ", t_setof4_exp, ", got: ", t_setof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_t_w_refs() runs on CT {
+  if (log2str(t_setof5) != log2str(t_setof5_exp)) {
+    setverdict(fail, "Expected: ", t_setof5_exp, ", got: ", t_setof5);
+  }
+  else if (log2str(t_setof6) != log2str(t_setof6_exp)) {
+    setverdict(fail, "Expected: ", t_setof6_exp, ", got: ", t_setof6);
+  }
+  else if (log2str(t_setof7) != log2str(t_setof7_exp)) {
+    setverdict(fail, "Expected: ", t_setof7_exp, ", got: ", t_setof7);
+  }
+  else if (log2str(t_setof8) != log2str(t_setof8_exp)) {
+    setverdict(fail, "Expected: ", t_setof8_exp, ", got: ", t_setof8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_vt_w_refs_and_literals() runs on CT {
+  var template SetOfInt vt_setof1 := t_setof_op1 & { 4, 5 };
+  var template SetOfInt vt_setof1_exp := { 1, 2, 3, 4, 5};
+
+  var template SetOfInt vt_setof2 := t_setof_op1 & ?;
+  var template SetOfInt vt_setof2_exp := { 1, 2, 3, * };
+
+  var template SetOfInt vt_setof3 := ? & t_setof_op2;
+  var template SetOfInt vt_setof3_exp := { *, 4, 5 };
+
+  var template SetOfInt vt_setof4 := ? length(2..2) & { 4, 5 } & * length(3);
+  var template SetOfInt vt_setof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+  
+  if (log2str(vt_setof1) != log2str(vt_setof1_exp)) {
+    setverdict(fail, "Expected: ", vt_setof1_exp, ", got: ", vt_setof1);
+  }
+  else if (log2str(vt_setof2) != log2str(vt_setof2_exp)) {
+    setverdict(fail, "Expected: ", vt_setof2_exp, ", got: ", vt_setof2);
+  }
+  else if (log2str(vt_setof3) != log2str(vt_setof3_exp)) {
+    setverdict(fail, "Expected: ", vt_setof3_exp, ", got: ", vt_setof3);
+  }
+  else if (log2str(vt_setof4) != log2str(vt_setof4_exp)) {
+    setverdict(fail, "Expected: ", vt_setof4_exp, ", got: ", vt_setof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_vt_w_refs() runs on CT {
+  var template SetOfInt vt_setof1 := t_setof_op1 & t_setof_op2;
+  var template SetOfInt vt_setof1_exp := { 1, 2, 3, 4, 5 };
+
+  var template SetOfInt vt_setof2 := t_setof_op1 & t_setof_op3;
+  var template SetOfInt vt_setof2_exp := { 1, 2, 3, * };
+
+  var template SetOfInt vt_setof3 := t_setof_op3 & t_setof_op1;
+  var template SetOfInt vt_setof3_exp := { *, 1, 2, 3 };
+
+  var template SetOfInt vt_setof4 := t_setof_op4 & t_setof_op2 & t_setof_op5;
+  var template SetOfInt vt_setof4_exp := { ?, ?, 4, 5, ?, ?, ? };
+  
+  if (log2str(vt_setof1) != log2str(vt_setof1_exp)) {
+    setverdict(fail, "Expected: ", vt_setof1_exp, ", got: ", vt_setof1);
+  }
+  else if (log2str(vt_setof2) != log2str(vt_setof2_exp)) {
+    setverdict(fail, "Expected: ", vt_setof2_exp, ", got: ", vt_setof2);
+  }
+  else if (log2str(vt_setof3) != log2str(vt_setof3_exp)) {
+    setverdict(fail, "Expected: ", vt_setof3_exp, ", got: ", vt_setof3);
+  }
+  else if (log2str(vt_setof4) != log2str(vt_setof4_exp)) {
+    setverdict(fail, "Expected: ", vt_setof4_exp, ", got: ", vt_setof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_vt_dbl_any_value() runs on CT {
+  var template SetOfInt vt_setof1 := ? & ?;
+  var template SetOfInt vt_setof1_exp := ?;
+  
+  var template SetOfInt vt_setof2 := ? & ? & t_setof_op1;
+  var template SetOfInt vt_setof2_exp := { *, 1, 2, 3 };
+  
+  var template SetOfInt vt_setof3 := t_setof_op3 & ?;
+  var template SetOfInt vt_setof3_exp := ?;
+  
+  var template SetOfInt vt_setof4 := ? & t_setof_op3;
+  var template SetOfInt vt_setof4_exp := ?;
+  
+  if (log2str(vt_setof1) != log2str(vt_setof1_exp)) {
+    setverdict(fail, "Expected: ", vt_setof1_exp, ", got: ", vt_setof1);
+  }
+  else if (log2str(vt_setof2) != log2str(vt_setof2_exp)) {
+    setverdict(fail, "Expected: ", vt_setof2_exp, ", got: ", vt_setof2);
+  }
+  else if (log2str(vt_setof3) != log2str(vt_setof3_exp)) {
+    setverdict(fail, "Expected: ", vt_setof3_exp, ", got: ", vt_setof3);
+  }
+  else if (log2str(vt_setof4) != log2str(vt_setof4_exp)) {
+    setverdict(fail, "Expected: ", vt_setof4_exp, ", got: ", vt_setof4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, omit, omit, omit, omit, { 9, 8 } };
+
+  var template SetOfInt vt_setof1 := t_setof_op1 & v_rec.soi;
+  var template SetOfInt vt_setof1_exp := { 1, 2, 3, 9, 8 };
+  
+  var template SetOfInt vt_setof2 := v_rec.soi & t_setof_op1;
+  var template SetOfInt vt_setof2_exp := { 9, 8, 1, 2, 3 };
+  
+  var template SetOfInt vt_setof3 := c_setof & v_rec.soi;
+  var template SetOfInt vt_setof3_exp := { 1, 2, 9, 8 };
+  
+  var template SetOfInt vt_setof4 := v_rec.soi & c_setof;
+  var template SetOfInt vt_setof4_exp := { 9, 8, 1, 2 };
+  
+  var template SetOfInt vt_setof5 := ? & v_rec.soi;
+  var template SetOfInt vt_setof5_exp := { *, 9, 8 };
+  
+  var template SetOfInt vt_setof6 := v_rec.soi & ?;
+  var template SetOfInt vt_setof6_exp := { 9, 8, * };
+  
+  if (log2str(vt_setof1) != log2str(vt_setof1_exp)) {
+    setverdict(fail, "Expected: ", vt_setof1_exp, ", got: ", vt_setof1);
+  }
+  else if (log2str(vt_setof2) != log2str(vt_setof2_exp)) {
+    setverdict(fail, "Expected: ", vt_setof2_exp, ", got: ", vt_setof2);
+  }
+  else if (log2str(vt_setof3) != log2str(vt_setof3_exp)) {
+    setverdict(fail, "Expected: ", vt_setof3_exp, ", got: ", vt_setof3);
+  }
+  else if (log2str(vt_setof4) != log2str(vt_setof4_exp)) {
+    setverdict(fail, "Expected: ", vt_setof4_exp, ", got: ", vt_setof4);
+  }
+  else if (log2str(vt_setof5) != log2str(vt_setof5_exp)) {
+    setverdict(fail, "Expected: ", vt_setof5_exp, ", got: ", vt_setof5);
+  }
+  else if (log2str(vt_setof6) != log2str(vt_setof6_exp)) {
+    setverdict(fail, "Expected: ", vt_setof6_exp, ", got: ", vt_setof6);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_setof_vt_extra() runs on CT {
+  var template SetOfInt vt_setof1 := c_setof & { 4, 5 };
+  var template SetOfInt vt_setof1_exp := { 1, 2, 4, 5 };
+  
+  var template SetOfInt vt_setof2 := c_setof & ?;
+  var template SetOfInt vt_setof2_exp := { 1, 2, * };
+  
+  var template SetOfInt vt_setof3 := ? & c_setof;
+  var template SetOfInt vt_setof3_exp := { *, 1, 2 };
+  
+  if (log2str(vt_setof1) != log2str(vt_setof1_exp)) {
+    setverdict(fail, "Expected: ", vt_setof1_exp, ", got: ", vt_setof1);
+  }
+  else if (log2str(vt_setof2) != log2str(vt_setof2_exp)) {
+    setverdict(fail, "Expected: ", vt_setof2_exp, ", got: ", vt_setof2);
+  }
+  else if (log2str(vt_setof3) != log2str(vt_setof3_exp)) {
+    setverdict(fail, "Expected: ", vt_setof3_exp, ", got: ", vt_setof3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_setof_t_w_refs_and_literals());
+  execute(tc_setof_t_w_refs());
+  execute(tc_setof_vt_w_refs_and_literals());
+  execute(tc_setof_vt_w_refs());
+  execute(tc_setof_vt_dbl_any_value());
+  execute(tc_setof_vt_w_opt_fields());
+  execute(tc_setof_vt_extra());
+}
+
+}

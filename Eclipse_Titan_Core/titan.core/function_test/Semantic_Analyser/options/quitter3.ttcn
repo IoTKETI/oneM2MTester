@@ -1,0 +1,36 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module quitter3 { //^In TTCN-3 module `quitter3'//
+//
+// A module with three errors
+//
+  type record R {
+    integer i,
+    charstring s
+  }
+
+  control { //^In control part//
+    var R v_r := { z := true } //^In variable definition// \
+    //^error: Reference to non-existent field `z' in record value for type// \
+    //^Valid fields: i,s$//
+
+    v_r := 42; //^In variable assignment:$// \
+    //^error: Record value was expected for type//
+    
+    v_r := v_r + 1; //^In variable assignment:$// \
+    //^In the first operand of operation `\+':$// \
+    //^error: First operand of operation `\+' should be integer or float value$// \
+    //^error: The operands of operation *`\+' should be of same type$//
+  }
+}
+

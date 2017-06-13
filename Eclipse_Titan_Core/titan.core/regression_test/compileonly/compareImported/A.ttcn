@@ -1,0 +1,38 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module A {
+import from C all;
+
+type enumerated E { e }
+type record R1 { integer r1 }
+type record R2 { R1 r1, R1 r2 }
+type record of R2 L
+modulepar { E mp }
+modulepar {
+L l := { { r1 := { 1 }, r2 := { 2 } }, { r1 := { 1 } } }
+}
+
+control {
+// Test for TR HL17944.
+var integer myvar
+if (myvar == 0) {
+myvar := myconst
+} else {
+if (myvar < myconst) {
+log(myconst)
+}
+}
+}
+}

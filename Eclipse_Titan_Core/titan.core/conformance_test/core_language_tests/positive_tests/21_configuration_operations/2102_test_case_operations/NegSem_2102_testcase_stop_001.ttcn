@@ -1,0 +1,26 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:21.2, Stopping test case
+ ** @verdict  pass reject
+ ***************************************************/
+// Explicit test case termination test
+module NegSem_2102_testcase_stop_001 {
+    type component GeneralComp {}
+    
+	testcase TC_NegSem_2102_testcase_stop_001() runs on GeneralComp {
+        var boolean v_b := true;
+		
+		setverdict(pass, "Unexpected termination with verdict pass");
+
+        testcase.stop("Expected Termination with verdict error"); 
+		// stop runing test case now with verdict error
+	}
+    
+    control {
+        execute(TC_NegSem_2102_testcase_stop_001());
+    }
+}

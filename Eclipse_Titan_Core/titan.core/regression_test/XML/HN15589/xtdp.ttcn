@@ -1,0 +1,103 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+//	Generated from file(s):
+//
+//	- XTDP-Message.xsd
+
+
+module xtdp {
+
+
+
+
+
+import from xtdl all;
+
+
+/* ***********************************************************************
+     *                        XTDP ELEMENT TYPES                           *
+     *********************************************************************** */
+
+
+/* Corrected by ethgry from: "(\p{L}|\d|_|\-|\.|\/){1,}"/> */
+/* FIXME: IDENTIFIER CONVENSION IS CHANGED! FIRST CHARACTER SHALL NOT BE "_" "-" OR "."; IS IT OK? */
+type charstring XTDP_Identifier (pattern "[a-zA-Z0-9]([a-zA-Z0-9]|_|\-|.|/)#(1,)")
+with {
+variant "name as 'XTDP-Identifier'";
+};
+
+
+/* ***********************************************************************
+ *                        XTDP INFORMATION ELEMENTS                    *
+ *********************************************************************** */
+
+
+type record XTDP_AddRequest
+{
+	integer requestId,
+	XTDP_Identifier parentWidgetId optional,
+	Widgets widgets
+}
+with {
+variant "name as 'XTDP-AddRequest'";
+variant (widgets) "namespace as 'http://ttcn.ericsson.se/protocolModules/xtdp/xtdl' prefix 'xtdl'";
+};
+
+
+/* ***********************************************************************
+*                                   XTDP MESSAGES                     *
+*********************************************************************** */
+
+
+type record XTDP_AddRequests
+{
+	record length(1 .. infinity) of XTDP_AddRequest xTDP_AddRequest_list
+}
+with {
+variant "name as 'XTDP-AddRequests'";
+variant (xTDP_AddRequest_list) "untagged";
+variant (xTDP_AddRequest_list[-]) "name as 'XTDP-AddRequest'";
+};
+
+
+/* ethgry: "noNamespaceSchemaLocation" is deleted; how to know about this attribute,
+            if the schema is not available? */
+/* ethgry: transactionID is added to allow handling several procedures at the same time */
+type record XTDP_Message
+{
+	integer transactionID optional,
+	union {
+		XTDP_AddRequests xTDP_AddRequests,
+		charstring xTDP_AuthChallenge,
+		charstring xTDP_AuthResponse,
+		charstring xTDP_Bye
+	} choice
+}
+with {
+variant "name as 'XTDP-Message'";
+variant "element";
+variant (transactionID) "attribute";
+variant (choice) "untagged";
+variant (choice.xTDP_AddRequests) "name as 'XTDP-AddRequests'";
+variant (choice.xTDP_AuthChallenge) "name as 'XTDP-AuthChallenge'";
+variant (choice.xTDP_AuthResponse) "name as 'XTDP-AuthResponse'";
+variant (choice.xTDP_Bye) "name as 'XTDP-Bye'";
+};
+
+
+}
+with {
+encode "XML";
+variant "namespace as 'http://ttcn.ericsson.se/protocolModules/xtdp/xtdp'";
+variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

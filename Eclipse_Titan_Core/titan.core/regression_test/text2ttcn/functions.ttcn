@@ -1,0 +1,575 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module functions {
+
+import from types all;
+
+
+group g_boolean {
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_bool(template boolean pl_b, in RoB pl_rob) {
+    var integer s:=lengthof(pl_rob)
+    log("Template: ", pl_b, " values to be matched:", pl_rob)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rob[i],pl_b )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rob[i],pl_b ));
+      } else {
+        setverdict(fail, int2str(i)&". nok"); log( match(pl_rob[i],pl_b ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_bool(template boolean pl_b, in RoB pl_rob) {
+    var integer s:=lengthof(pl_rob)
+    log("Template: ", pl_b, " values not to be matched:", pl_rob)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rob[i],pl_b )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rob[i],pl_b ));
+      } else {
+        setverdict(pass, int2str(i)&". ok"); log( match(pl_rob[i],pl_b ));
+      }
+    }
+  } with { extension "transparent" }
+
+
+  function f_checkMatchingValues_bool(template boolean pl_b, in RoB pl_good_values, in RoB pl_wrong_values) {
+    f_checkMatchingGoodValues_bool(pl_b,pl_good_values);
+    f_checkMatchingWrongValues_bool(pl_b,pl_wrong_values);
+  }
+
+}
+
+group g_integer {
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_int(template integer pl_i, in RoI pl_roi) {
+    var integer s:=lengthof(pl_roi)
+    log("Template: ", pl_i, " values to be matched:", pl_roi)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roi[i],pl_i )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_roi[i],pl_i ));
+      } else {
+        setverdict(fail, int2str(i)&". nok"); log( match(pl_roi[i],pl_i ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_int(template integer pl_i, in RoI pl_roi) {
+    var integer s:=lengthof(pl_roi)
+    log("Template: ", pl_i, " values not to be matched:", pl_roi)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roi[i],pl_i )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_roi[i],pl_i ));
+      } else {
+        setverdict(pass, int2str(i)&". ok"); log( match(pl_roi[i],pl_i ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_int(template integer pl_i, in RoI pl_good_values, in RoI pl_wrong_values) {
+    f_checkMatchingGoodValues_int( pl_i, pl_good_values);
+    f_checkMatchingWrongValues_int( pl_i, pl_wrong_values);
+  }
+
+}//g_integer
+
+group g_float{
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_float(template float pl_f, in RoF pl_rof) {
+    var integer s:=lengthof(pl_rof)
+    log("Template: ", pl_f, " values to be matched:", pl_rof)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rof[i],pl_f )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rof[i],pl_f ));
+      } else {
+        setverdict(fail, int2str(i)&". nok"); log( match(pl_rof[i],pl_f ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_float(template float pl_f, in RoF pl_rof) {
+    var integer s:=lengthof(pl_rof)
+    log("Template: ", pl_f, " values not to be matched:", pl_rof)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rof[i],pl_f )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rof[i],pl_f ));
+      } else {
+        setverdict(pass, int2str(i)&". ok"); log( match(pl_rof[i],pl_f ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_float(template float pl_f, in RoF pl_good_values, in RoF pl_wrong_values) {
+    f_checkMatchingGoodValues_float( pl_f, pl_good_values);
+    f_checkMatchingWrongValues_float( pl_f, pl_wrong_values);
+  }
+} //g_float
+
+group g_bitstring {
+
+}//g_bitstring
+
+group g_octetstring {
+
+
+}//g_octetstring
+
+group g_hexstring {
+
+
+}//g_hexstring
+
+group g_charstring {
+
+  function f_checkMatchingGoodValues_cs(template charstring pl_cs,in RoCS pl_rocs) {
+    var integer s:=lengthof(pl_rocs);
+    log("Template: ", pl_cs, " values to be matched:", pl_rocs);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rocs[i],pl_cs )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rocs[i],pl_cs ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rocs[i],pl_cs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_cs(template charstring pl_cs, in RoCS pl_rocs) {
+    var integer s:=lengthof(pl_rocs)
+    log("Template: ", pl_cs, " values not to be matched:", pl_rocs)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rocs[i], pl_cs )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rocs[i],pl_cs ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rocs[i],pl_cs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_cs(template charstring pl_cs,in RoCS pl_good_values, in RoCS pl_wrong_values) {
+    f_checkMatchingGoodValues_cs( pl_cs,  pl_good_values);
+    f_checkMatchingWrongValues_cs( pl_cs, pl_wrong_values);
+  }
+
+  function f_checkMatchingGoodValues_rcs(template RCS pl_rcs,in RoRCS pl_rorcs) {
+    var integer s:=lengthof(pl_rorcs);
+    log("Template: ", pl_rcs, " values to be matched:", pl_rorcs);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorcs[i],pl_rcs )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorcs[i],pl_rcs ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorcs[i],pl_rcs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rcs(template RCS pl_rcs, in RoRCS pl_rorcs) {
+    var integer s:=lengthof(pl_rorcs)
+    log("Template: ", pl_rcs, " values not to be matched:", pl_rorcs)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorcs[i], pl_rcs )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorcs[i],pl_rcs ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorcs[i],pl_rcs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_rcs(template RCS pl_rcs,in RoRCS pl_good_values, in RoRCS pl_wrong_values) {
+    f_checkMatchingGoodValues_rcs( pl_rcs,  pl_good_values);
+    f_checkMatchingWrongValues_rcs( pl_rcs, pl_wrong_values);
+  }
+}//g_charstring
+
+group g_record {
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_rec(template REC pl_rec,in RoREC pl_rorec) {
+    var integer s:=lengthof(pl_rorec);
+    log("Template: ", pl_rec, " values to be matched:", pl_rorec);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorec[i],pl_rec )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorec[i],pl_rec ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorec[i],pl_rec ));
+      }
+    }
+  } //with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rec(template REC pl_rec, in RoREC pl_rorec) {
+    var integer s:=lengthof(pl_rorec)
+    log("Template: ", pl_rec, " values not to be matched:", pl_rorec)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorec[i], pl_rec )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorec[i],pl_rec ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorec[i],pl_rec ));
+      }
+    }
+  } //with { extension "transparent" }
+
+  function f_checkMatchingValues_rec(template REC pl_rec,in RoREC pl_good_values, in RoREC pl_wrong_values) {
+    f_checkMatchingGoodValues_rec( pl_rec,  pl_good_values);
+    f_checkMatchingWrongValues_rec( pl_rec, pl_wrong_values);
+  }
+
+  function f_checkMatchingGoodValues_rec2(template REC2 pl_rec,in RoREC2 pl_rorec) {
+    var integer s:=lengthof(pl_rorec);
+    log("Template: ", pl_rec, " values to be matched:", pl_rorec);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorec[i],pl_rec )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorec[i],pl_rec ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorec[i],pl_rec ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rec2(template REC2 pl_rec, in RoREC2 pl_rorec) {
+    var integer s:=lengthof(pl_rorec)
+    log("Template: ", pl_rec, " values not to be matched:", pl_rorec)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorec[i], pl_rec )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorec[i],pl_rec ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorec[i],pl_rec ));
+      }
+    }
+  } with { extension "transparent" }
+
+}//g_record
+
+group g_recordof {
+
+  // ====record of integer:======
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_roi(template RoI pl_roi,in RoRoI pl_roroi) {
+    var integer s:=lengthof(pl_roroi);
+    log("Template: ", pl_roi, " values to be matched:", pl_roroi);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roroi[i],pl_roi )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_roroi[i],pl_roi ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_roroi[i],pl_roi ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_roi(template RoI pl_roi, in RoRoI pl_roroi) {
+    var integer s:=lengthof(pl_roroi)
+    log("Template: ", pl_roi, " values not to be matched:", pl_roroi)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roroi[i], pl_roi )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_roroi[i],pl_roi ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_roroi[i],pl_roi ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_roi(template RoI pl_roi,in RoRoI pl_good_values, in RoRoI pl_wrong_values) {
+    f_checkMatchingGoodValues_roi( pl_roi,  pl_good_values);
+    f_checkMatchingWrongValues_roi( pl_roi, pl_wrong_values);
+  }
+
+  // ====record of float:======
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_rof(template RoF pl_rof,in RoRoF pl_rorof) {
+    var integer s:=lengthof(pl_rorof);
+    log("Template: ", pl_rof, " values to be matched:", pl_rorof);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorof[i],pl_rof )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorof[i],pl_rof ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorof[i],pl_rof ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rof(template RoF pl_rof, in RoRoF pl_rorof) {
+    var integer s:=lengthof(pl_rorof)
+    log("Template: ", pl_rof, " values not to be matched:", pl_rorof)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorof[i], pl_rof )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorof[i],pl_rof ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorof[i],pl_rof ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_rof(template RoF pl_rof,in RoRoF pl_good_values, in RoRoF pl_wrong_values) {
+    f_checkMatchingGoodValues_rof( pl_rof,  pl_good_values);
+    f_checkMatchingWrongValues_rof( pl_rof, pl_wrong_values);
+  }
+}//g_recordof
+
+group g_array {
+
+  //============ AI3 =============================
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_ai3(template AI3 pl_ai3,in RoAI3 pl_rofai3, in boolean pl_successExpected:=true) {
+    var integer s:=lengthof(pl_rofai3);
+    log("Template: ", pl_ai3, " values to be matched:", pl_rofai3);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if(pl_successExpected) {
+        if( match(pl_rofai3[i],pl_ai3 )) {
+          setverdict(pass); log(int2str(i)&". ok");log( match(pl_rofai3[i],pl_ai3 ));
+        } else {
+          setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rofai3[i],pl_ai3 ));
+        }
+      }else //not pl_successExpected
+      {
+        @try {
+          log(match(pl_rofai3[i], pl_ai3 ))
+          setverdict(fail);
+        }
+        @catch(err_str) {
+          log( "Expected error: ", err_str);
+          setverdict(pass) 
+        }       
+      }
+    }
+  } //with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_ai3(template AI3 pl_ai3, in RoAI3 pl_rofai3, in boolean pl_successExpected:=true) {
+    var integer s:=lengthof(pl_rofai3)
+    log("Template: ", pl_ai3, " values not to be matched:", pl_rofai3)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if(pl_successExpected) {
+        if( match(pl_rofai3[i], pl_ai3 )) {
+          setverdict(fail); log(int2str(i)&". nok");log( match(pl_rofai3[i],pl_ai3 ));
+        } else {
+          setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rofai3[i],pl_ai3 ));
+        } 
+      } else //not pl_successExpected
+      {
+        @try {
+          log(match(pl_rofai3[i], pl_ai3 ));
+          setverdict(fail);
+        }
+        @catch(err_str) {
+          log( "Expected error: ", err_str);
+          setverdict(pass) 
+        }
+      } 
+    }
+  } //with { extension "transparent" }
+
+  function f_checkMatchingValues_ai3(template AI3 pl_ai3,in RoAI3 pl_good_values, in RoAI3 pl_wrong_values, in boolean pl_successExpected := true) {
+    f_checkMatchingGoodValues_ai3( pl_ai3,  pl_good_values, pl_successExpected);
+    f_checkMatchingWrongValues_ai3( pl_ai3, pl_wrong_values, pl_successExpected);
+  }
+
+  //=== AI2x3 ====
+
+function f_check_AI2x3(template AI2x3 pl_t, RoAI2x3 pl_goodV, RoAI2x3 pl_badV) {
+  var integer NG := lengthof(pl_goodV);
+  var integer NB := lengthof(pl_badV);
+  for(var integer i:=0;i< NG;i:=i+1) {
+    if( match(pl_goodV[i],pl_t)) { 
+      setverdict(pass) 
+    } else { 
+      setverdict(fail, pl_goodV[i], " should match with ", pl_t );
+    }
+  }
+
+  for(var integer i:=0;i< NB;i:=i+1) {
+    if( not match(pl_badV[i],pl_t)) { 
+      setverdict(pass);
+    } else { 
+      setverdict(fail, pl_badV[i], " must not match with ", pl_t );
+    }
+  }
+} with { extension "transparent" }
+
+  //======= RAI3 ========
+
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_rai3(template RAI3 pl_rai3,in RoRAI3 pl_rorai3) {
+    var integer s:=lengthof(pl_rorai3);
+    log("Template: ", pl_rai3, " values to be matched:", pl_rorai3);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorai3[i],pl_rai3 )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorai3[i],pl_rai3 ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorai3[i],pl_rai3 ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rai3(template RAI3 pl_rai3, in RoRAI3 pl_rorai3) {
+    var integer s:=lengthof(pl_rorai3)
+    log("Template: ", pl_rai3, " values not to be matched:", pl_rorai3)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorai3[i], pl_rai3 )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorai3[i],pl_rai3 ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorai3[i],pl_rai3 ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_rai3(template RAI3 pl_rai3,in RoRAI3 pl_good_values, in RoRAI3 pl_wrong_values) {
+    f_checkMatchingGoodValues_rai3( pl_rai3,  pl_good_values);
+    f_checkMatchingWrongValues_rai3( pl_rai3, pl_wrong_values);
+  }
+
+  //   //============= REC_BAI3 ====================
+  //     // setverdict is pass if every value is matching
+  //   function f_checkMatchingGoodValues_bai3(template AI3 pl_ai3,in RoAI3 pl_rofai3) {
+  //     var integer s:=lengthof(pl_rofai3);
+  //     log("Template: ", pl_ai3, " values to be matched:", pl_rofai3);
+  //     for( var integer i :=0; i<s;i:=i+1) {
+  //       if( match(pl_rofai3[i],pl_ai3 )) {
+  //         setverdict(pass); log(int2str(i)&". ok");log( match(pl_rofai3[i],pl_ai3 ));
+  //       } else {
+  //         setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rofai3[i],pl_ai3 ));
+  //       }
+  //     }
+  //   } with { extension "transparent" }
+  // 
+  //   function f_checkMatchingWrongValues_bai3(template AI3 pl_ai3, in RoAI3 pl_rofai3) {
+  //     var integer s:=lengthof(pl_rofai3)
+  //     log("Template: ", pl_ai3, " values not to be matched:", pl_rofai3)
+  //     for( var integer i :=0; i<s;i:=i+1) {
+  //       if( match(pl_rofai3[i], pl_ai3 )) {
+  //         setverdict(fail); log(int2str(i)&". nok");log( match(pl_rofai3[i],pl_ai3 ));
+  //       } else {
+  //         setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rofai3[i],pl_ai3 ));
+  //       }
+  //     }
+  //   } with { extension "transparent" }
+  // 
+  //   function f_checkMatchingValues_bai3(template AI3 pl_ai3,in RoAI3 pl_good_values, in RoAI3 pl_wrong_values) {
+  //     f_checkMatchingGoodValues_ai3( pl_ai3,  pl_good_values);
+  //     f_checkMatchingWrongValues_ai3( pl_ai3, pl_wrong_values);
+  //   }
+
+}//g_array
+
+
+group g_set {
+
+  //SET
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_set(template SET pl_set,in RoSET pl_roset) {
+    var integer s:=lengthof(pl_roset);
+    log("Template: ", pl_set, " values to be matched:", pl_roset);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roset[i],pl_set )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_roset[i],pl_set ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_roset[i],pl_set ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_set(template SET pl_set, in RoSET pl_roset) {
+    var integer s:=lengthof(pl_roset)
+    log("Template: ", pl_set, " values not to be matched:", pl_roset)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_roset[i], pl_set )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_roset[i],pl_set ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_roset[i],pl_set ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_set(template SET pl_set,in RoSET pl_good_values, in RoSET pl_wrong_values) {
+    f_checkMatchingGoodValues_set( pl_set,  pl_good_values);
+    f_checkMatchingWrongValues_set( pl_set, pl_wrong_values);
+  }
+
+  //RSET
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_rset(template RSET pl_rset,in RoRSET pl_rorset) {
+    var integer s:=lengthof(pl_rorset);
+    log("Template: ", pl_rset, " values to be matched:", pl_rorset);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorset[i],pl_rset )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorset[i],pl_rset ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorset[i],pl_rset ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rset(template RSET pl_rset, in RoRSET pl_rorset) {
+    var integer s:=lengthof(pl_rorset)
+    log("Template: ", pl_rset, " values not to be matched:", pl_rorset)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorset[i], pl_rset )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorset[i],pl_rset ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorset[i],pl_rset ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_rset(template RSET pl_rset,in RoRSET pl_good_values, in RoRSET pl_wrong_values) {
+    f_checkMatchingGoodValues_rset( pl_rset,  pl_good_values);
+    f_checkMatchingWrongValues_rset( pl_rset, pl_wrong_values);
+  }
+
+}//g_set
+
+group g_setof {
+  //RSoCS = record of charstring
+  // setverdict is pass if every value is matching
+  function f_checkMatchingGoodValues_rsocs(template RSoCS pl_rsocs,in RoRSoCS pl_rorsocs) {
+    var integer s:=lengthof(pl_rorsocs);
+    log("Template: ", pl_rsocs, " values to be matched:", pl_rorsocs);
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorsocs[i],pl_rsocs )) {
+        setverdict(pass); log(int2str(i)&". ok");log( match(pl_rorsocs[i],pl_rsocs ));
+      } else {
+        setverdict(fail); log(int2str(i)&". nok"); log( match(pl_rorsocs[i],pl_rsocs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingWrongValues_rsocs(template RSoCS pl_rsocs, in RoRSoCS pl_rorsocs) {
+    var integer s:=lengthof(pl_rorsocs)
+    log("Template: ", pl_rsocs, " values not to be matched:", pl_rorsocs)
+    for( var integer i :=0; i<s;i:=i+1) {
+      if( match(pl_rorsocs[i], pl_rsocs )) {
+        setverdict(fail); log(int2str(i)&". nok");log( match(pl_rorsocs[i],pl_rsocs ));
+      } else {
+        setverdict(pass); log(int2str(i)&". ok"); log( match(pl_rorsocs[i],pl_rsocs ));
+      }
+    }
+  } with { extension "transparent" }
+
+  function f_checkMatchingValues_rsocs(template RSoCS pl_rsocs,in RoRSoCS pl_good_values, in RoRSoCS pl_wrong_values) {
+    f_checkMatchingGoodValues_rsocs( pl_rsocs,  pl_good_values);
+    f_checkMatchingWrongValues_rsocs( pl_rsocs, pl_wrong_values);
+  }
+
+}//g_setof
+
+group g_enumerated {
+
+}//g_enumerated
+
+group g_union {
+
+}//g_union
+
+group g_anytype {
+
+}//g_anytype
+
+}

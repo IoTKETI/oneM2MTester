@@ -1,0 +1,49 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:20.2, Ensure that an altstep invocation works as expected (loopback case).
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+module Sem_2002_TheAltStatement_006 {
+
+	type port MyPort message {
+		inout charstring
+	} with {extension "internal"}
+
+	type component GeneralComp { 
+		port MyPort p;
+	}
+
+	template charstring m_testOne := "ping1";
+	template charstring m_testTwo := "ping2";
+
+	altstep a_test() runs on GeneralComp {
+		[] p.receive(m_testOne) {
+			setverdict(pass);
+		}
+	}
+
+	testcase TC_Sem_2002_TheAltStatement_006() runs on GeneralComp {
+
+		connect(self:p, self:p);
+		p.send(m_testOne);
+
+		alt {
+			[] a_test();
+			[else] {
+				setverdict(fail);
+			}
+		}
+	
+		setverdict(pass);
+	}
+
+	control {
+		execute(TC_Sem_2002_TheAltStatement_006());
+	}
+
+}

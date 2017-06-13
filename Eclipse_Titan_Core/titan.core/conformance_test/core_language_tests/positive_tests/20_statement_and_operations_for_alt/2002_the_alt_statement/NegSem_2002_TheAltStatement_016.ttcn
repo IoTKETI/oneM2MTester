@@ -1,0 +1,49 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:20.2, create in altstep branch
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Also, the altstep invocation parameters shall not use the operations create,
+// running, alive and activate.
+
+module NegSem_2002_TheAltStatement_016 {
+
+    type port MyPort message {
+        inout boolean
+    } with {extension "internal"}
+    
+    type component GeneralComp { 
+	    port MyPort p;
+    }
+    
+    altstep a_receive(boolean p_bool) runs on GeneralComp {
+        [] p.receive(p_bool) {
+			setverdict(pass);
+		}
+    }
+    
+    altstep a_timeout() {
+        [] any timer.timeout {
+        }
+    }
+    
+    testcase TC_NegSem_2002_TheAltStatement_016() runs on GeneralComp {
+
+        connect(self:p, self: p);
+	    p.send(true);
+
+	    alt {
+		    [] a_receive(activate(a_timeout()) != null);
+	    }
+    }
+    
+    control {
+	    execute(TC_NegSem_2002_TheAltStatement_016());
+    }
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      targetNamespace="www.example.org/type/substitution/simple/cascade"
+      xmlns="www.example.org/type/substitution/simple/cascade">
+
+<xsd:element name="elem" type="xsd:string"/>
+<xsd:element name="elem1" type="stringtype"/>
+<xsd:element name="elem2" type="stringtype2"/>
+<xsd:element name="elem3" type="stringtype3"/>
+
+<xsd:simpleType name="stringtype">
+	<xsd:restriction base="xsd:string"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="stringtype2">
+	<xsd:restriction base="stringtype">
+		<xsd:length value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="stringtype3">
+	<xsd:restriction base="stringtype2">
+		<xsd:length value="5"/>
+                <xsd:pattern value="dd"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="stringtype4">
+	<xsd:restriction base="stringtype3">
+		<xsd:length value="5"/>
+                <xsd:pattern value="d"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+</xsd:schema>
+

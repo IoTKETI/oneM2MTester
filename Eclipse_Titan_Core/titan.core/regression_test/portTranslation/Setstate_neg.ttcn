@@ -1,0 +1,126 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module Setstate_neg {
+
+	function int_to_char_bad(in integer i, out charstring j) {
+		if (i == -1) {
+			port.setstate(i);
+		} else {
+			port.setstate(1); // Not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function int_to_char_bad2(in integer i, out charstring j) {
+		if (i == 4) {
+			port.setstate(i);
+		} else {
+			port.setstate(1); // Not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function int_to_char_bad3(in integer i, out charstring j) {
+		if (i != 5) {
+			port.setstate(1); // Not translated
+		}
+		// otherwise the state will remain unset which will cause an error.
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function int_to_char(in integer i, out charstring j) {
+		j := "abc";
+		port.setstate(0); // translated
+	} with {
+		extension "prototype(fast)";
+	}
+
+	/* Types */
+
+	type port NP1 message {
+		out charstring
+	} with {
+		extension "provider"
+	}
+
+	type port NPT2 message map to NP1 {
+		out integer to charstring with int_to_char_bad() : charstring with int_to_char_bad2() : charstring with int_to_char_bad3() : charstring with int_to_char()
+	}
+
+
+	type component MyComp {
+		port NPT2 p;
+	}
+
+	type component System {
+		port NP1 p1
+	}
+
+
+	testcase tc_setstate_neg_test() runs on MyComp system System {
+		map(self:p, system:p1);
+		@try {
+			p.send(-1);
+			setverdict(fail);
+		} @catch(e) {
+			if (match(e, "Dynamic test case error: The value of the first parameter in the setstate operation must be 0, 1, 2 or 3.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		@try {
+			p.send(4);
+			setverdict(fail);
+		} @catch(e) {
+			if (match(e, "Dynamic test case error: The value of the first parameter in the setstate operation must be 0, 1, 2 or 3.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		@try {
+			p.send(5);
+			setverdict(fail);
+		} @catch(e) {
+			if (match(e, "Dynamic test case error: The state of the port p remained unset after the mapping function @Setstate_neg.int_to_char_bad3 finished.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		@try {
+			var charstring cs;
+			int_to_char(4, cs);
+			setverdict(fail);
+		} @catch(e) {
+			if (match(e, "Dynamic test case error: setstate operation was called without being in a translation procedure.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		// Will be successful
+		p.send(6);
+	}
+
+	control {
+		execute(tc_setstate_neg_test());
+	}
+}

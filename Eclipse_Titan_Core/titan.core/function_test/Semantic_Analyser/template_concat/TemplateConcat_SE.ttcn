@@ -1,0 +1,122 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module TemplateConcat_SE { //^In TTCN-3 module//
+
+/* types */
+type record of integer RecOfInt;
+type set of integer SetOfInt;
+
+type record Rec {
+  integer num,
+  charstring str
+}
+with {
+  encode "JSON";
+}
+
+type octetstring OctSubtype length(6);
+type bitstring BitSubtype length(1..4);
+type hexstring HexSubtype length(4..6);
+type charstring CharSubtype (pattern "ab*xy");
+type universal charstring UnicharSubtype (char(0, 0, 0, 0)..char(0, 0, 0, 255));
+
+/* helper constants and templates */
+const integer c_len := 3;
+
+const charstring c_char := "xyz";
+
+template RecOfInt t_recof := { 1, 2 };
+template SetOfInt t_setof := { 1, 2 };
+
+template hexstring t_hex_anyoromit := *;
+template hexstring t_hex_anyvalue_lenres := ? length(1..3);
+template hexstring t_hex_anyoromit_lenres := * length(1..3);
+
+template charstring t_char_anyvalue := ?;
+template universal charstring t_unichar_anyoromit := *;
+
+template octetstring t_oct_value_list := ('AB'O, 'AC'O, 'AD'O);
+template bitstring t_bit_complement_list := complement('110'B, '101'B, '100'B);
+template hexstring t_hex_decmatch := decmatch Rec: { num := 3, str := ? };
+template charstring t_char_value_range := ("a".."z");
+template universal charstring t_unichar_value_list_and_range := (char(0, 0, 0, 1), char(0, 0, 0, 5), (char(0, 0, 1, 0)..char(0, 0, 1, 255)));
+template SetOfInt t_setof_subset := subset(1, 2, 3);
+template SetOfInt t_setof_superset := superset(1, 2, 3);
+
+template hexstring t_hex_value := 'AB7'H;
+
+template universal charstring t_unichar_value := char(0, 0, 0, 221) & "x,y" & char(0, 0, 1, 117);
+
+modulepar template boolean mpt_bool := true;
+
+function f_oct_temp() return template octetstring { return ?; }
+
+/* testing operands: incorrect usage of '?' and '*' */
+template octetstring t_oct1 := 'AB12'O & *; //^In template definition// //^In template concatenation// //^In second operand// //any or omit with no length restriction is not a valid concatenation operand//
+template bitstring t_bit1 := * & '110'B; //^In template definition// //^In template concatenation// //^In first operand// //any or omit with no length restriction is not a valid concatenation operand//
+template hexstring t_hex1 := 'AB7'H & t_hex_anyoromit; //^In template definition// //^In template concatenation// //^In second operand// //any or omit with no length restriction is not a valid concatenation operand//
+template RecOfInt t_recof1 := t_recof & * & { 3, 4 }; //^In template definition// //^In template concatenation//2 //^In first operand// //^In second operand// //any or omit with no length restriction is not a valid concatenation operand//
+template SetOfInt t_setof1 := t_setof & *; //^In template definition// //^In template concatenation// //^In second operand// //any or omit with no length restriction is not a valid concatenation operand//
+
+template octetstring t_oct2 := 'AB12'O & ? length(1..2); //^In template definition// //^In template concatenation// //^In second operand// //any value with non-fixed length restriction is not a valid concatenation operand//
+template bitstring t_bit2 := ? length(1..infinity) & '110'B; //^In template definition// //^In template concatenation// //^In first operand// //any value with non-fixed length restriction is not a valid concatenation operand//
+template hexstring t_hex2 := 'AB7'H & t_hex_anyvalue_lenres; //^In template definition// //^In template concatenation// //^In second operand// //any value with non-fixed length restriction is not a valid concatenation operand//
+template RecOfInt t_recof2 := t_recof & ? length(1..c_len) & { 3, 4 }; //^In template definition// //^In template concatenation//2 //^In first operand// //^In second operand// //any value with non-fixed length restriction is not a valid concatenation operand//
+template SetOfInt t_setof2 := t_setof & ? length(c_len..6); //^In template definition// //^In template concatenation// //^In second operand// //any value with non-fixed length restriction is not a valid concatenation operand//
+
+template octetstring t_oct3 := 'AB12'O & * length(1..2); //^In template definition// //^In template concatenation// //^In second operand// //any or omit with non-fixed length restriction is not a valid concatenation operand//
+template bitstring t_bit3 := * length(1..infinity) & '110'B; //^In template definition// //^In template concatenation// //^In first operand// //any or omit with non-fixed length restriction is not a valid concatenation operand//
+template hexstring t_hex3 := 'AB7'H & t_hex_anyoromit_lenres; //^In template definition// //^In template concatenation// //^In second operand// //any or omit with non-fixed length restriction is not a valid concatenation operand//
+template RecOfInt t_recof3 := t_recof & * length(1..c_len) & { 3, 4 }; //^In template definition// //^In template concatenation//2 //^In first operand// //^In second operand// //any or omit with non-fixed length restriction is not a valid concatenation operand//
+template SetOfInt t_setof3 := t_setof & * length(c_len..6); //^In template definition// //^In template concatenation// //^In second operand// //any or omit with non-fixed length restriction is not a valid concatenation operand//
+
+template charstring t_char1 := "abc" & ?; //^In template definition// //^In template concatenation// //^In second operand// //any value is not allowed in charstring template concatenation//
+template charstring t_char2 := * & "abc"; //^In template definition// //^In template concatenation// //^In first operand// //any or omit is not allowed in charstring template concatenation//
+template charstring t_char3 := t_char_anyvalue & "abc"; //^In template definition// //^In template concatenation// //^In first operand// //any value is not allowed in charstring template concatenation//
+template charstring t_char4 := "ab" & * length(1) & "cd" & ? length(1..2) & "ef"; //^In template definition// //^In template concatenation//4 //^In first operand//3 //^In second operand//2 //any value is not allowed in charstring template concatenation// //any or omit is not allowed in charstring template concatenation//
+
+template universal charstring t_unichar1 := "abc" & ?; //^In template definition// //^In template concatenation// //^In second operand// //any value is not allowed in universal charstring template concatenation//
+template universal charstring t_unichar2 := * & char(0, 0, 1, 117); //^In template definition// //^In template concatenation// //^In first operand// //any or omit is not allowed in universal charstring template concatenation//
+template universal charstring t_unichar3 := t_unichar_anyoromit & "abc" & char(0, 0, 0, 245); //^In template definition// //^In template concatenation//2 //^In first operand//2 //any or omit is not allowed in universal charstring template concatenation//
+template universal charstring t_unichar4 := char(0, 0, 1, 22) & * length(1) & char(0, 0, 0, 188) & ? length(1..2) & "ef"; //^In template definition// //^In template concatenation//4 //^In first operand//3 //^In second operand//2 //any value is not allowed in universal charstring template concatenation// //any or omit is not allowed in universal charstring template concatenation//
+
+/* testing operands: incorrect operand type */
+template octetstring t_oct4 := 'AB12'O & "xy"; //^In template definition// //^In template concatenation// //^In second operand// //Type mismatch: a value or template of type `octetstring' was expected instead of `charstring'//
+template bitstring t_bit4 := ? & c_len; //^In template definition// //^In template concatenation// //^In second operand// //Type mismatch: a value or template of type `bitstring' was expected instead of `integer'//
+template hexstring t_hex4 := 'AB7'H & * length(3) & t_unichar_anyoromit; //^In template definition// //^In template concatenation// //^In second operand// //Type mismatch: a value or template of type `hexstring' was expected instead of `universal charstring'//
+template RecOfInt t_recof4 := f_oct_temp() & { 5, 6 } & ?; //^In template definition// //^In template concatenation// //^In first operand// //Type mismatch: a value or template of type `@TemplateConcat_SE.RecOfInt' was expected instead of `octetstring'//
+template SetOfInt t_setof4 := t_setof & ? length(2) & mpt_bool; //^In template definition// //^In template concatenation// //^In second operand// //Type mismatch: a value or template of type `@TemplateConcat_SE.SetOfInt' was expected instead of `boolean'//
+
+template octetstring t_oct5 := ? length(1) & t_oct_value_list; //^In template definition// //^In template concatenation// //^In second operand// //value list match is not a valid concatenation operand//
+template bitstring t_bit5 := t_bit_complement_list & '111'B; //^In template definition// //^In template concatenation// //^In first operand// //complemented list match is not a valid concatenation operand//
+template hexstring t_hex5 := 'AB7'H & t_hex_decmatch & * length(2); //^In template definition// //^In template concatenation//2 //^In first operand// //^In second operand// //decoded content match is not a valid concatenation operand//
+template charstring t_char5 := "abc" & t_char_value_range; //^In template definition// //^In template concatenation// //^In second operand// //value range match is not a valid concatenation operand//
+template universal charstring t_unichar5 := t_unichar_value_list_and_range & char(0, 0, 1, 117); //^In template definition// //^In template concatenation// //^In first operand// //value list match is not a valid concatenation operand//
+template RecOfInt t_recof5 := t_recof & { 1, 2, -, 4 }; //^In template definition// //^In template concatenation// //^In second operand// //^In component #3// //Not used symbol `-' is not allowed in this context//
+template SetOfInt t_setof5 := t_setof_subset & ? & t_setof_superset; //^In template definition// //^In template concatenation//2 //^In first operand//2 //^In second operand// //subset match is not a valid concatenation operand// //superset match is not a valid concatenation operand//
+
+/* testing expression evaluation: invalid result length restriction */
+template octetstring t_oct6 := ('1A'O & ? length(2) & 'DEF6'O) length(6); //^In template definition// //There are fewer \(5\) elements in the string than it is allowed by the length restriction \(6\)//
+template bitstring t_bit6 := (? length(1..1) & '1010'B & ?) length(1..4); //^In template definition// //There are more \(at least 5\) elements in the string than it is allowed by the length restriction \(at most 4\)//
+template hexstring t_hex6 := (t_hex_value & * length(3) & '5'H) length(4..6); //^In template definition// //There are more \(7\) elements in the string than it is allowed by the length restriction \(at most 6\)//
+template charstring t_char6 := ("abc" & c_char) length(7..infinity); //^In template definition// //There are fewer \(6\) elements in the string than it is allowed by the length restriction \(at least 7\)//
+template universal charstring t_unichar6 := (c_char & t_unichar_value) length(0..7); //^In template definition// //There are more \(8\) elements in the string than it is allowed by the length restriction \(at most 7\)//
+
+/* testing expression evaluation: result conflicts with type restrictions */
+template OctSubtype t_oct7 := '1A'O & ? length(2) & 'DEF6'O; //^In template definition// //At least 6 string elements must be present in the octetstring//
+template BitSubtype t_bit7 := ? length(1..1) & '1010'B & ?; //^In template definition// //There must not be more than 4 string elements in the bitstring//
+template HexSubtype t_hex7 := t_hex_value & * length(3) & '5'H; //^In template definition// //There must not be more than 6 string elements in the hexstring//
+template CharSubtype t_char7 := "abc" & c_char; //^In template definition// //is not a valid value for type `charstring' which has subtype//
+template UnicharSubtype t_unichar7 := c_char & t_unichar_value; //^In template definition// //is not a valid value for type `universal charstring' which has subtype//
+
+}

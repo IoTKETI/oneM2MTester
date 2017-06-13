@@ -1,0 +1,178 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module ErroneousAttributes_SE { //^In TTCN-3 module//
+
+type record Rec {
+  integer num,
+  charstring str
+}
+
+type record of integer IntList;
+
+type union Uni {
+  integer i,
+  charstring cs,
+  IntList list
+}
+
+type charstring StringArray[3];
+
+type enumerated Enum { val1, val2 };
+
+function f_int(in integer x) return integer {
+  return x;
+}
+
+
+const Rec c_rec := { num := 1, str := "a" } with { erroneous(num) "value := 6" }
+
+const IntList c_list := { 1, 2, 3 } with { erroneous([1]) "after := omit all" }
+
+const Uni c_uni := { i := 10 } with { erroneous(i) "value := charstring:\"abc\"" }
+
+const StringArray c_arr := { "x", "y", "z" } with { erroneous([1]) "before := omit all" } //^In constant definition// //field qualifiers are only allowed for record, set and union types//
+
+const integer c_int := -5 with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const float c_float := 12.5 with { erroneous(not_a_field) "value := 100" } //^In constant definition// //field qualifiers are only allowed for record, set and union types//
+
+const boolean c_bool := true with { erroneous([0]) "value := 100" } //^In constant definition// //field qualifiers are only allowed for record, set and union types//
+
+const bitstring c_bit := '1010'B with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const hexstring c_hex := '1234ABC'H with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const octetstring c_oct := '1234ABCD'O with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const charstring c_char := "xyz" with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const universal charstring c_unichar := char(0, 0, 1, 117) with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const objid c_objid := objid { 0 1 10 } with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+const Enum c_enum := val1 with { erroneous "value := 100" } //^In constant definition// //At least one qualifier must be specified for the `erroneous' attribute//
+
+template Rec t_rec := { num := 1, str := "a" } with { erroneous(num) "after := omit all" }
+
+template IntList t_list := { 1, 2, 3 } with { erroneous([0]) "value := c_rec" }
+
+template Uni t_uni := { list := { 1, 2, 3 } } with { erroneous(list[1]) "value := f_int(5)" } //^In template definition// //Reference to a constant value was expected instead of the return value of function//
+
+template Rec t_rec_pard(in integer p) := { num := p, str := "a" } with { erroneous(str) "value := charstring: \"a\"" }
+
+template IntList t_list_pard(in integer p) := { 1, 2, p } with { erroneous([1]) "value := p" } //^In template definition// //There is no local or imported definition with name `p'//
+
+template Uni t_uni_pard(in charstring p) := { cs := p } with { erroneous(cs) "value := 10" }
+
+
+function f_bad_updates() { //^In function definition//
+  @update(c_int) with { erroneous "value := -1" } //^In @update statement// //Type `integer' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_float) with { erroneous "value := -1" } //^In @update statement// //Type `float' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_bool) with { erroneous "value := -1" } //^In @update statement// //Type `boolean' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_bit) with { erroneous "value := -1" } //^In @update statement// //Type `bitstring' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_hex) with { erroneous "value := -1" } //^In @update statement// //Type `hexstring' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_oct) with { erroneous "value := -1" } //^In @update statement// //Type `octetstring' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_char) with { erroneous "value := -1" } //^In @update statement// //Type `charstring' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_unichar) with { erroneous "value := -1" } //^In @update statement// //Type `universal charstring' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_objid) with { erroneous "value := -1" } //^In @update statement// //Type `objid' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_enum) with { erroneous "value := -1" } //^In @update statement// //Type `@ErroneousAttributes_SE.Enum' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_arr) with { erroneous "value := -1" } //^In @update statement// //Type `charstring\[3\]' cannot have erroneous attributes// //At least one qualifier must be specified for the `erroneous' attribute//
+
+  @update(c_rec) with { encode "XML" } //^In @update statement// //Only `erroneous' attributes are allowed in an `@update' statement//
+  @update(c_rec) with { optional "implicit omit" } //^In @update statement// //Only `erroneous' attributes are allowed in an `@update' statement//
+  @update(c_rec) with { variant(num) "name as 'int'" } //^In @update statement// //Only `erroneous' attributes are allowed in an `@update' statement//
+  @update(c_rec) with { extension "transparent" } //^In @update statement// //Only `erroneous' attributes are allowed in an `@update' statement//
+  @update(c_rec) with { display(str) "red" } //^In @update statement// //Only `erroneous' attributes are allowed in an `@update' statement//
+  
+  @update(c_rec) with { erroneous "value := -1" } //^In @update statement// //At least one qualifier must be specified for the `erroneous' attribute//
+  @update(c_rec) with { erroneous(not_a_field) "value := -1" } //^In @update statement// //Reference to non-existent field `not_a_field' in type `@ErroneousAttributes_SE.Rec'//
+  @update(c_rec.num) with { erroneous "value := -1" } //^In @update statement// //At least one qualifier must be specified for the `erroneous' attribute// //Field names and array indexes are not allowed in this context//
+  
+  @update(f_good_updates); //^In @update statement// //Reference to constant or template definition was expected instead of function//
+  @update(CT); //^In @update statement// //Reference to constant or template definition was expected instead of type//
+  @update(Sig); //^In @update statement// //Reference to constant or template definition was expected instead of type//
+  @update(PT); //^In @update statement// //Reference to constant or template definition was expected instead of type//
+}
+
+signature Sig(inout integer p);
+
+type port PT procedure {
+  inout Sig;
+}
+with {
+  extension "internal";
+}
+
+type component CT {
+  port PT pt;
+}
+
+function f_good_updates() runs on CT {
+  var integer v := 0;
+  @update(c_rec) with { erroneous(str) "value := c_rec.num" }
+  
+  while (v > 0) {
+    @update(c_list) with { erroneous([1]) "before := omit all" }
+  }
+  
+  if (v == 10) {
+    @update(c_uni) with { erroneous(i) "value := f_int(3)" }
+  }
+  else {
+    @update(t_rec) with { erroneous(num) "after := omit all" }
+  }
+  
+  do {
+    @update(t_list) with { erroneous([2]) "value := f_int(v)" }
+  }
+  while (v < 10);
+  
+  for (v := 1; v < 2; v := v + 1) {
+    @update(t_uni) with { erroneous(list[0]) "value := f_int(v + 1) * (v - 10)" }
+  }
+  
+  select (v) {
+    case (1) {
+      @update(t_rec_pard) with { erroneous(str) "value := valueof(t_rec_pard(v))" }
+    }
+    case else {
+      @update(t_list_pard) with { erroneous([1]) "value := int2str(v)" }
+    }
+  }
+  
+  timer tmr;
+  tmr.start(0.1);
+  alt {
+    [] tmr.timeout {
+      @update(t_uni_pard) with { erroneous(cs) "value := encvalue(c_list)" }
+    }
+  }
+  
+  interleave {
+    [] tmr.timeout {
+      @update(c_rec) with { erroneous(str) "value := omit" }
+    }
+  }
+  
+  pt.call(Sig : { v }, 0.3) {
+    [] pt.catch(timeout) {
+      @update(c_rec) with { erroneous(str) "before := omit all" }
+    }
+  }
+}
+
+}
+with {
+  encode "JSON";
+  extension "anytype integer,Rec";
+}

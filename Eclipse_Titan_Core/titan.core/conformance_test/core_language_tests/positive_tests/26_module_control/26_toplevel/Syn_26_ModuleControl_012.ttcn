@@ -1,0 +1,32 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:26, Ensure that the repeat construct in the control part is accepted.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_26_ModuleControl_012 {
+
+	type component GeneralComp {}
+
+	testcase TC_Syn_26_ModuleControl_012() runs on GeneralComp 
+	{ setverdict(pass);	}
+
+	control{
+		timer t_timer;
+		t_timer.start(20E-3);
+		alt {
+			[] t_timer.timeout {
+				repeat;
+			}
+			[else] {
+			}
+		}
+
+		execute(TC_Syn_26_ModuleControl_012()); //not part of the test
+	}
+
+}

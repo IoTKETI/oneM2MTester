@@ -1,0 +1,62 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Bence Janos Szabo – initial implementation
+ *
+ ******************************************************************************/
+module AttributeFormWithNs {
+
+type component CT {};
+
+type record MyType {
+	integer attr1,
+	charstring attr2,
+	charstring field
+}
+with {
+  variant (attr1) "attribute";
+  variant (attr1) "form as qualified"
+  variant (attr2) "attribute";
+}
+
+
+external function enc_MyType(in MyType pdu) return octetstring
+with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+
+external function dec_MyType(in octetstring stream) return MyType
+with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+const MyType c_instance := { attr1 := 3, attr2 := "attr", field := "field"};
+
+const universal charstring c_result := "<myns:MyType xmlns:myns='schema:AttributeFormDefaultWithoutNs' myns:attr1='3' attr2='attr'>\n\t<myns:field>field</myns:field>\n</myns:MyType>\n\n";
+
+testcase tc_test() runs on CT {
+	var octetstring octet_result := enc_MyType(c_instance)
+	var universal charstring result := oct2unichar(octet_result);
+	if (result != c_result) {
+		setverdict(fail);
+	}
+
+	var MyType result_instance := dec_MyType(octet_result);
+	if (result_instance != c_instance) {
+		setverdict(fail);
+	}
+
+	setverdict(pass);
+}
+
+control {
+	execute(tc_test());
+}
+
+} with {
+encode "XML";
+variant "namespace as 'schema:AttributeFormDefaultWithoutNs' prefix 'myns'";
+variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+variant "elementFormQualified";
+}

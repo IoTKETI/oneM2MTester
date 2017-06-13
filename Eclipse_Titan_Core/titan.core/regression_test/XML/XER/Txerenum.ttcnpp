@@ -1,0 +1,162 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txerenum {
+
+modulepar boolean Txerenum_verbose := false;
+#define verbose Txerenum_verbose
+
+#include "../macros.ttcnin"
+
+import from AsnValues all;
+type component TENUM {}
+
+type enumerated enumeger { Fred, Barney, Wilma, Betty }
+
+DECLARE_XER_ENCODERS (enumeger, enum);
+DECLARE_EXER_ENCODERS(enumeger, enum);
+DECLARE_XER_ENCODERS (renum, renum);
+DECLARE_EXER_ENCODERS(renum, renum);
+
+type record renum {
+    enumeger e optional
+}
+
+const charstring e_freddy := "<enumeger><Fred/></enumeger>\n";
+const charstring e_barney := "<enumeger><Barney/></enumeger>\n";
+const charstring e_wilma  := "<enumeger><Wilma/></enumeger>\n";
+const charstring e_betty  := "<enumeger><Betty/></enumeger>\n";
+
+// GLOBAL-DEFAULTS MODIFIED-ENCODINGS implied for TTCN module,
+// hence TextEnumerated (X.693 amd1 clause 10.2.7 c)
+const charstring exer_freddy := "<enumeger>Fred</enumeger>\n\n";
+const charstring exer_barney := "<enumeger>Barney</enumeger>\n\n";
+const charstring exer_wilma  := "<enumeger>Wilma</enumeger>\n\n";
+const charstring exer_betty  := "<enumeger>Betty</enumeger>\n\n";
+
+testcase encode_enum() runs on TENUM
+{
+    var enumeger szaki := Fred;
+    var universal charstring expected := e_freddy;
+    CHECK_METHOD(cxer_enc_enum, szaki, expected);
+    CHECK_METHOD(bxer_enc_enum, szaki, expected & lf);
+    expected := exer_freddy;
+    CHECK_METHOD(exer_enc_enum, szaki, expected);
+
+    szaki    := Barney;
+    expected := e_barney;
+    CHECK_METHOD(cxer_enc_enum, szaki, expected);
+    CHECK_METHOD(bxer_enc_enum, szaki, expected & lf);
+    expected := exer_barney;
+    CHECK_METHOD(exer_enc_enum, szaki, expected);
+
+    szaki    := Wilma;
+    expected := e_wilma;
+    CHECK_METHOD(cxer_enc_enum, szaki, expected);
+    CHECK_METHOD(bxer_enc_enum, szaki, expected & lf);
+    expected := exer_wilma;
+    CHECK_METHOD(exer_enc_enum, szaki, expected);
+
+    szaki    := Betty;
+    expected := e_betty;
+    CHECK_METHOD(cxer_enc_enum, szaki, expected);
+    CHECK_METHOD(bxer_enc_enum, szaki, expected & lf);
+    expected := exer_betty;
+    CHECK_METHOD(exer_enc_enum, szaki, expected);
+}
+
+testcase decode_enum() runs on TENUM
+{
+    var enumeger expected := Fred;
+    CHECK_DECODE2(        enum,    e_freddy, enumeger, expected);
+    CHECK_DECODE(exer_dec_enum, exer_freddy, enumeger, expected);
+
+    expected := Barney;
+    CHECK_DECODE2(        enum,    e_barney, enumeger, expected);
+    CHECK_DECODE(exer_dec_enum, exer_barney, enumeger, expected);
+
+    expected := Wilma;
+    CHECK_DECODE2(        enum,    e_wilma, enumeger, expected);
+    CHECK_DECODE(exer_dec_enum, exer_wilma, enumeger, expected);
+
+    expected := Betty;
+    CHECK_DECODE2(        enum,    e_betty, enumeger, expected);
+    CHECK_DECODE(exer_dec_enum, exer_betty, enumeger, expected);
+}
+
+const charstring e_mpty := "<renum/>\n";
+testcase encode_enum_omit() runs on TENUM
+{
+    var renum rec := { omit };
+    var universal charstring expected := e_mpty;
+    CHECK_METHOD(cxer_enc_renum, rec, expected);
+    CHECK_METHOD(bxer_enc_renum, rec, expected & lf);
+    CHECK_METHOD(exer_enc_renum, rec, expected & lf);
+}
+
+testcase decode_enum_omit() runs on TENUM
+{
+    var renum expected := { omit };
+    CHECK_DECODE2(        renum, e_mpty, renum, expected);
+    CHECK_DECODE(exer_dec_renum, e_mpty, renum, expected);
+}
+
+// - - - - - - - - - - - verdicttype acts like an enum - - - - - - - - - - -
+
+DECLARE_XER_ENCODERS(verdicttype, verdi)
+DECLARE_EXER_ENCODERS(verdicttype, verdi)
+
+const verdicttype nix  := none;
+const verdicttype ok   := pass;
+const verdicttype dunno:= inconc;
+const verdicttype epic := fail;
+const verdicttype yikes:= error;
+
+const universal charstring str_none := "<verdicttype>none</verdicttype>\n";
+const universal charstring str_ok   := "<verdicttype>pass</verdicttype>\n";
+const universal charstring str_dunno:= "<verdicttype>inconc</verdicttype>\n";
+const universal charstring str_epic := "<verdicttype>fail</verdicttype>\n";
+const universal charstring str_yikes:= "<verdicttype>error</verdicttype>\n";
+
+testcase encode_verdict() runs on TENUM
+{
+    CHECK_METHOD(bxer_enc_verdi, nix  , str_none );
+    CHECK_METHOD(bxer_enc_verdi, ok   , str_ok   );
+    CHECK_METHOD(bxer_enc_verdi, dunno, str_dunno);
+    CHECK_METHOD(bxer_enc_verdi, epic , str_epic );
+    CHECK_METHOD(bxer_enc_verdi, yikes, str_yikes);
+    // TODO other values
+}
+
+testcase decode_verdict() runs on TENUM
+{
+    CHECK_DECODE(bxer_dec_verdi, str_none , verdicttype, nix  );
+    CHECK_DECODE(bxer_dec_verdi, str_ok   , verdicttype, ok   );
+    CHECK_DECODE(bxer_dec_verdi, str_dunno, verdicttype, dunno);
+    CHECK_DECODE(bxer_dec_verdi, str_epic , verdicttype, epic );
+    CHECK_DECODE(bxer_dec_verdi, str_yikes, verdicttype, yikes);
+}
+
+control {
+    execute(encode_enum());
+    execute(decode_enum());
+    execute(encode_enum_omit())
+    execute(decode_enum_omit())
+    execute(encode_verdict());
+    execute(decode_verdict());
+}
+
+}
+with {
+  encode "XML";
+  extension "version R8E";
+}

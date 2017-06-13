@@ -1,0 +1,34 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module quitter3Q1 { //^In TTCN\-3 module `quitter3Q1'//
+//
+// A module with three errors. Quit after the first.
+//
+  type record R {
+    integer i,
+    charstring s
+  }
+
+  control { //^In control part//
+    var R v_r := { z := true } //^In variable definition// \
+    //^error: Reference to non-existent field `z' in record value for type//
+
+    /* The message  "Valid fields: i,s" does not appear because
+    ** the error limit (1) has been reached */
+    
+    v_r := 42; /* no error here */
+    
+    v_r := v_r + 1; /* no error here */
+  }
+}
+

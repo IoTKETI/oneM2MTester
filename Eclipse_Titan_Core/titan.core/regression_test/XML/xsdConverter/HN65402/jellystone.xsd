@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+          xmlns="http://ttcn.ericsson.se/xsd2ttcn/HN65402"
+          targetNamespace="http://ttcn.ericsson.se/xsd2ttcn/HN65402"
+          attributeFormDefault="unqualified"
+          elementFormDefault="qualified"
+>
+
+    <xsd:complexType name="BooBoo">
+      <xsd:attribute name="Food" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <!-- Must come before YogiBear to trigger the bug -->
+    <xsd:complexType name="RangerSmith">
+       <xsd:complexContent>
+          <xsd:extension base="YogiBear">
+             <xsd:attribute name="Gun" type="xsd:string" />
+          </xsd:extension>
+       </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="YogiBear">
+      <xsd:complexContent>
+        <xsd:extension base="BooBoo">
+          <xsd:attribute name="Basket" type="xsd:string" use="required" />
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
+

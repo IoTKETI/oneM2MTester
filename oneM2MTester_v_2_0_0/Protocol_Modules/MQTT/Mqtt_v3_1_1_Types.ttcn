@@ -1,0 +1,171 @@
+/******************************************************************************
+* Copyright (c) 2016  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*  Mate Kovacs - initial implementation and initial documentation
+******************************************************************************/
+//
+//  File:               Mqtt_v3.1.1_Types.ttcn
+//  Rev:                R1A
+//  Prodnr:             CNL 113 831 
+
+module Mqtt_v3_1_1_Types
+{
+  external function f_MQTT_v3_1_1_enc(in MQTT_v3_1_1_Message msg, out octetstring str) return integer;
+  external function f_MQTT_v3_1_1_dec(in octetstring str, out MQTT_v3_1_1_Message msg) return integer;
+  
+  type octetstring OCT0_65535   length(0..65535);
+  type universal charstring UCHAR0_65535    length(0..65535);
+  type bitstring BIT1n length(1);
+  type bitstring BIT4n length(4);
+  type integer INT0_255 (0..255);
+  
+  type enumerated QoS
+  {
+    AT_MOST_ONCE_DELIVERY(0),
+    AT_LEAST_ONCE_DELIVERY(1),
+    EXACTLY_ONE_DELIVERY(2),
+    RESERVED(3)
+  }
+  
+  type record Header
+  {
+    BIT4n                         flags 
+  }
+  
+  type record MQTT_v3_1_1_PublishHeader
+  {
+    BIT1n                         dup_flag,
+    QoS                           qos_level,
+    BIT1n                         retain_flag
+  }
+  
+  type record MQTT_v3_1_1_ConnectFlags
+  {
+    BIT1n                         user_name_flag,
+    BIT1n                         password_flag,
+    BIT1n                         will_retain,
+    QoS                           will_qos,
+    BIT1n                         will_flag,
+    BIT1n                         clean_session
+  }
+
+  type record MQTT_v3_1_1_ConnectPayload
+  {
+    UCHAR0_65535                  client_identifier,
+    UCHAR0_65535                  will_topic optional,
+    OCT0_65535                    will_message optional,
+    UCHAR0_65535                  user_name optional,
+    OCT0_65535                    password optional
+  }
+  
+  type record MQTT_v3_1_1_Connect
+  {
+    Header                        header,
+    UCHAR0_65535                  name,
+    integer                       protocol_level (0..255),
+    MQTT_v3_1_1_ConnectFlags      flags,
+    integer                       keep_alive (0..65535),
+    MQTT_v3_1_1_ConnectPayload    payload
+  }
+  
+  type record MQTT_v3_1_1_Connack
+  {
+    Header                        header,
+    BIT1n                         session_present_flag,
+    integer                       connect_return_code (0..255)
+  }
+  
+  type record MQTT_v3_1_1_Publish
+  {
+    MQTT_v3_1_1_PublishHeader     header,
+    UCHAR0_65535                  topic_name,
+    integer                       packet_identifier (0..65535) optional,
+    octetstring                   payload
+  }
+  
+  type record MQTT_v3_1_1_Identifier
+  {
+    Header                        header,
+    integer                       packet_identifier (0..65535)
+  }
+  
+  type record MQTT_v3_1_1_SubscribePayload
+  {
+    UCHAR0_65535                  topic_filter,
+    QoS                           requested_qos
+  }
+  
+  type record of MQTT_v3_1_1_SubscribePayload MQTT_v3_1_1_SubscribePayloadList;
+  
+  type record MQTT_v3_1_1_Subscribe
+  {
+    Header                              header,
+    integer                             packet_identifier (0..65535),
+    MQTT_v3_1_1_SubscribePayloadList    payload
+  }
+  
+  type record of INT0_255 IntegerList;
+  
+  type record MQTT_v3_1_1_SubackPayload
+  {
+    IntegerList                   return_code
+  }
+  
+  type record MQTT_v3_1_1_Suback
+  {
+    Header                        header,
+    integer                       packet_identifier (0..65535),
+    MQTT_v3_1_1_SubackPayload     payload
+  }
+  
+  type record of UCHAR0_65535 UCHAR0_65535List;
+  
+  type record MQTT_v3_1_1_UnsubscribePayload
+  {
+    UCHAR0_65535List              topic_filter
+  }
+  
+  type record MQTT_v3_1_1_Unsubscribe
+  {
+    Header                              header,
+    integer                             packet_identifier (0..65535),
+    MQTT_v3_1_1_UnsubscribePayload      payload
+  }
+  
+  type record MQTT_v3_1_1_Empty
+  {
+    Header                              header
+  }
+  
+  type union MQTT_v3_1_1_ReqResp
+  {
+    MQTT_v3_1_1_Connect           connect_msg,
+    MQTT_v3_1_1_Connack           connack,
+    MQTT_v3_1_1_Publish           publish,
+    MQTT_v3_1_1_Identifier        puback,
+    MQTT_v3_1_1_Identifier        pubrec,
+    MQTT_v3_1_1_Identifier        pubrel,
+    MQTT_v3_1_1_Identifier        pubcomp,
+    MQTT_v3_1_1_Subscribe         subscribe,
+    MQTT_v3_1_1_Suback            suback,
+    MQTT_v3_1_1_Unsubscribe       unsubscribe,
+    MQTT_v3_1_1_Identifier        unsuback,
+    MQTT_v3_1_1_Empty             pingreq,
+    MQTT_v3_1_1_Empty             pingresp,
+    MQTT_v3_1_1_Empty             disconnect_msg
+  }
+
+  type union MQTT_v3_1_1_Message
+  {
+    MQTT_v3_1_1_ReqResp           msg,
+    octetstring                   raw_message
+  }
+  
+  
+}
+

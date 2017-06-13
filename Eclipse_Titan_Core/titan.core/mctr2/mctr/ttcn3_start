@@ -1,0 +1,341 @@
+#!/bin/sh
+
+###############################################################################
+# Copyright (c) 2000-2015 Ericsson Telecom AB
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+###############################################################################
+
+
+# hide next line from expect \
+if [ "xy" != "x`expect -c 'puts "y"'`" ]; then
+# hide next line from expect \
+  echo "$0 requires 'expect'. Please install 'expect' and make sure it is in the PATH.";
+# hide next line from expect \
+  exit 1
+# hide next line from expect \
+fi
+
+
+
+
+# the next line restarts using expect \
+exec expect "$0" "$@"
+
+#####################################################
+##                                                 ##
+##  EXPECT script to automate TTCN-3 testing       ##
+##                                                 ##
+##  ETH/RUS Tibor Csöndes       2003.05.22.  v1.1  ##
+##  ETH/RZX Janos Zoltan Szabo  2005.01.01.  v1.2  ##
+##  ETH/RZX Tibor Csöndes       2005.03.23.  v1.3  ##
+##  ETH/RZR Csaba Ráduly        2010.04.06.  v1.4  ##
+##  ETH/XZD Jeno Balasko        2010.10.14   v1.5  ##
+##  ETH/XZD Jeno Balasko        2011.11.23   v1.6  ##
+##  ETH/XZR Adam Delic          2012.02.22   v1.7  ##
+#####################################################
+
+puts "ttcn3_start: Starting the test suite"
+
+# Procedure for waiting the command prompt of MC
+
+proc wait_mc_prompt {} {
+    global mctr_id
+    set prompt "MC2> "
+    expect {
+	-i $mctr_id -exact "$prompt" {
+	} -i $mctr_id -re "^$prompt.*\r\n" {
+	    send -i $mctr_id "\r"
+	    exp_continue
+	} -i $mctr_id -re "^.*\r\n" {
+	    exp_continue
+	} -i $mctr_id eof {
+	    wait -i $mctr_id
+	    puts "ttcn3_start: error: MC has terminated unexpectedly"
+	    exit 5
+	}
+    }
+}
+
+# Procedure for cleaning up after a fatal error
+
+proc error_cleanup {error_msg error_retcode} {
+    global mctr_id hc_id
+    puts "ttcn3_start: error: $error_msg"
+    send -i $mctr_id "exit\r"
+    expect -i $mctr_id eof
+    expect -i $hc_id eof
+    wait -i $hc_id
+    wait -i $mctr_id
+    exit $error_retcode
+}
+
+# procedure for parsing and extracting options from argv
+# http://wiki.tcl.tk/17342
+proc getopt {_argv name {_var ""} {default ""}} {
+    upvar 1 $_argv argv $_var var
+    set pos [lsearch -regexp $argv ^$name]
+    if {$pos>=0} {
+        set to $pos
+        # It would be better to use operator "ne" instead of "!=", but
+        # rhea has only Tcl 8.3.1 (vintage 2001) which doesn't understand it
+        if {$_var != ""} {
+            set var [lindex $argv [incr to]]
+        }
+        set argv [lreplace $argv $pos $to]
+        return 1
+    } else {
+        if {[llength [info level 0]] == 5} {set var $default}
+        return 0
+    }
+}
+
+set ip ""
+getopt argv -ip ip
+
+# Checking the number of arguments
+
+if {[llength $argv] < 1} {
+    puts "usage: ttcn3_start \[-ip host_ip_address\] executable \[file.cfg\] {module_name\[.testcase_name\]}"
+    exit 2
+}
+
+
+# Setting the executable name variable ETS from argument
+
+set first_arg [lindex $argv 0]
+
+if {[file exists $first_arg]} {
+    set ETS $first_arg
+} elseif {[file exists $first_arg.exe]} {
+    set ETS $first_arg.exe
+} else {
+    puts "ttcn3_start: cannot find executable $first_arg"
+    exit 3
+}
+
+
+# Setting ETS_basename: executable name without extension
+
+if {[string tolower [string range $ETS [expr [string length $ETS] - 4] end]] == ".exe"} {
+    set ETS_basename [string range $ETS 0 [expr [string length $ETS] - 5]]
+} else {
+    set ETS_basename $ETS
+}
+
+if {[string index $ETS 0] != "/"} {
+    # Add a ./ prefix if ETS is a relative pathname
+    set ETS ./$ETS
+}
+
+# Setting the configuration file variable config_file
+
+if {[llength $argv] > 1 && [file exists [lindex $argv 1]]} {
+    set config_file [lindex $argv 1]
+    set start_index 2
+} else {
+    puts "ttcn3_start: warning: no configuration file was specified or the file name was misspelled"
+    set start_index 1
+    if {[file exists $ETS_basename.cfg]} {
+      set config_file $ETS_basename.cfg
+      puts "ttcn3_start: note: using default configuration file $ETS_basename.cfg"
+    }
+    # if 2nd parameter exists then it must be an existing test case
+    if {[llength $argv] > 1} {
+      # run $ETS -l to list test cases and check the 2nd parameter against that list
+      # if its not in the list stop with an error
+      # (the control part is also in the list but it works as if it was a testcase)
+      set second_argument [lindex $argv 1]
+      spawn $ETS -l
+      expect eof
+      set tc_name_found 0
+      # split into testcases on newlines
+      set testcase_names [split $expect_out(buffer)]
+      foreach testcase_name $testcase_names {
+        if {$second_argument==$testcase_name} {
+	  set tc_name_found 1
+	  break
+	}
+      }
+      if {$tc_name_found==0} {
+	puts "ttcn3_start: error: the second parameter is neither a configuration file nor an existing test case"
+	exit 11
+      }
+    }
+}
+
+
+# Checking TTCN3_DIR environment variable and setting mctr_cli
+
+if {[info exists env(TTCN3_DIR)]} {
+    set mctr $env(TTCN3_DIR)/bin/mctr_cli
+} else {
+    puts "ttcn3_start: warning: TTCN3_DIR environment variable is not set"
+    set mctr mctr_cli
+}
+
+set timeout -1
+
+# Setting the hostname
+
+set hostname [info hostname]
+if { $ip != "" } {
+    set hostname $ip
+}
+
+# Start Main Controller
+
+if {[info exists config_file]} {
+    spawn $mctr $config_file
+} else {
+    spawn $mctr
+}
+
+set mctr_id $spawn_id
+expect {
+    -re "Listening on( IP address )?(\[a-zA-Z0-9\.:%\]*)( and)? TCP port (\[0-9\]+)\..*\r\n" {
+        if { $ip != "" } {
+          set hostname $ip
+          puts ">>> Branch 1"
+        } elseif { $expect_out(2,string) != "" } {
+          set hostname $expect_out(2,string)
+          puts ">>>Branch 2"
+        } else {
+          puts "$hostname is the default"
+        }
+	set port $expect_out(4,string)
+	wait_mc_prompt
+    } -re "Entering batch mode\..*\r" {
+	puts "ttcn3_start: error: this script cannot be used when MC is run in batch mode"
+	puts "    hint: Remove option NumHCs from section \[MAIN_CONTROLLER\] of the"
+	puts "          configuration file."
+	exec kill -KILL [exp_pid]
+	wait -i $mctr_id
+	exit 4
+    }
+    -re "Error was found.*\r" {
+       puts "Please check the error message above"
+	     exit 4
+    }
+    eof {
+      spawn $mctr -v
+      expect eof
+      puts "ttcn3_start: The Main controller exited unexpectedly. In case of license problem you can order license at ttcn.ericsson.se"
+    	exit 4
+    }
+}
+
+# Start Host controller
+
+spawn $ETS $hostname $port
+set hc_id $spawn_id
+expect {
+    -i $hc_id -exact "TTCN-3 Host Controller" {
+    } -i $hc_id -re ".*\r" {
+	exp_continue
+    } -i $hc_id eof {
+	error_cleanup "program $ETS is not a TTCN-3 executable in parallel mode" 6
+    }
+}
+
+expect {
+    -i $hc_id -re "Dynamic test case error" {
+	error_cleanup "program $ETS could not connect to the MC" 7
+    } -i $hc_id -re ".*\r" {
+	exp_continue
+    } -i $mctr_id "New HC connected from " {
+    } -i $hc_id eof {
+        error_cleanup "Host Controller with id $hc_id stopped unexpectedly" 10
+    }
+}
+
+
+# Create Main Test Component
+
+send -i $mctr_id "cmtc\r"
+expect {
+	-i $mctr_id -re "MTC is created\..*\r\n" {
+          wait_mc_prompt
+        } -i $mctr_id -re "Cannot create MTC"  {
+                error_cleanup "the MTC cannot be created. " 8
+        } -i $mctr_id -re "No such host:\..*\r\n"  {
+                error_cleanup "the MTC cannot be created on an unknown host. " 9
+        } -i $hc_id eof {
+                error_cleanup "Something went wrong... " 10
+        }
+}
+
+# Start Main Test Component
+
+if {$start_index < [llength $argv]} {
+    # Use the list of test cases given in the command line.
+    for {set i $start_index} {$i < [llength $argv]} {incr i} {
+	send -i $mctr_id "smtc [lindex $argv $i]\r"
+	expect {
+	    -i $hc_id -re ".*\r" {
+        	exp_continue
+	    } -i $mctr_id -exact "Test execution finished." {
+	    } -i $mctr_id -exact "MTC terminated." {
+		error_cleanup "the MTC terminated unexpectedly" 10
+	    }
+	}
+    }
+} elseif {[info exists config_file]} {
+    # The configuration file is present. Use its [EXECUTE] section.
+    send -i $mctr_id "smtc\r"
+    expect {
+	-i $hc_id -re ".*\r" {
+            exp_continue
+	} -i $mctr_id -exact "Execution of \[EXECUTE\] section finished." {
+	} -i $mctr_id -exact "No \[EXECUTE\] section was given in the configuration file." {
+	} -i $mctr_id -exact "MTC terminated." {
+	    error_cleanup "the MTC terminated unexpectedly" 10
+	}
+    }
+} else {
+    # There is neither testcase name nor configuration file.
+    # Use the name of the executable as smtc argument.
+    set last_slash [string last "/" $ETS_basename]
+    if {$last_slash == -1} {
+	set module_name $ETS_basename
+    } else {
+	set module_name [string range $ETS_basename [expr $last_slash + 1] end]
+    }
+    send -i $mctr_id "smtc $module_name\r"
+    expect {
+	-i $hc_id -re ".*\r" {
+            exp_continue
+	} -i $mctr_id -exact "Test execution finished." {
+	} -i $mctr_id -exact "MTC terminated." {
+	    error_cleanup "the MTC terminated unexpectedly" 10
+	}
+    }
+}
+
+
+# Exit Main Test Component
+
+send -i $mctr_id "emtc\r"
+expect -i $mctr_id -re "MTC terminated\..*\r\n"
+wait_mc_prompt
+
+# Quit from Main Controller
+
+send -i $mctr_id "exit\r"
+
+# Catch the last lines of the output
+
+expect {
+    -i $hc_id eof {
+	expect -i $mctr_id eof
+    } -i $mctr_id eof {
+	expect -i $hc_id eof
+    }
+}
+
+# Wait until both MC and HC terminate
+
+wait -i $hc_id
+wait -i $mctr_id

@@ -1,0 +1,187 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Delic, Adam
+.*   Szabados, Kristof
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+
+.* EDML webpage:       http://cpi.ericsson.se/dwaxe/
+.* EDML2PDF converter: http://dwaxe.ericsson.se/x2pdf
+.* EDML user guide:    http://www.lmc.ericsson.se/~lmcmarg/isit/edml_ug.html
+
+.* Document header information
+:docname.Test Description
+:docno.??/152 91-CRL 113 200 Uen
+:rev.A
+:date.2007.08.16.
+
+:prep.ETH/RZD Adam Delic (+36 1 7992)
+:appr.ETH/RZ (Zsolt Szendrei)
+:checked.ETHGRY
+
+:title.Test description of the Titan regression test : log files
+:contents level=2.
+.*---------------------------------------------------------------------*
+:h1.Introduction
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Revision history
+.*---------------------------------------------------------------------*
+:xmp tab=2.
+REV   DATE         PREPARED   CHANGE
+__________________________________________________
+PA1   2007-01-31   EDMDELI    New document for TITAN R7B
+A     2007-03-06   ETHNBA     Approved after review
+:exmp.
+.*---------------------------------------------------------------------*
+:h2.Purpose
+.*---------------------------------------------------------------------*
+The purpose of this Test Description is to define and describe the regression
+test activity for the TTCN-3 compiler:
+:nl.SA-10/x: Log files.
+:p.The specification of the test cases can be found in this document.
+.*---------------------------------------------------------------------*
+:h1.Test environment
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Hardware
+.*---------------------------------------------------------------------*
+No specific hardware requirement.
+.*---------------------------------------------------------------------*
+:h2.Software
+.*---------------------------------------------------------------------*
+Tests shall be carried out on the following platforms:
+:list.
+:li D='1.'.Solaris 8 (Sun OS 5.8) (gcc 3.0.4)
+:li D='2.'.SUSE Linux Enterprise server 8 (2.4.19-4GB) (gcc 3.2)
+:li D='3.'.CYGWIN_NT-5.0 (Cygwin DLL: 1.5.12) on Windows 2000 (gcc 3.3.3)
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Configuration
+.*---------------------------------------------------------------------*
+The test environment had been setup in CVS. The tester program is stored in:
+:nl.TTCNv3/function_test/Tools/SAtester.pl
+:nl.Test cases are stored with extension .script in the directory:
+:nl.TTCNv3/regression_test/
+.*---------------------------------------------------------------------*
+:h2.Installation
+.*---------------------------------------------------------------------*
+Install proper TITAN binaries on the used platforms and make sure that
+your environment settings are correct:
+:list.
+:li D='1.'.TTCN3_DIR is set
+:li D='2.'.$TTCN3_DIR/bin is added to the PATH variable
+:li D='3.'.$TTCN3_DIR/lib is added to the LD_LIBRARY_PATH variable
+:li D='4.'.Perl 5.6.0 or higher is available on the platform
+:li D='5.'.Create a symlink to your Perl binary into the directory where the
+test cases are stored:
+:nl.ln -s <your Perl> perl
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+A tester program had been written in Perl especially for the Semantic Analyser
+tests. For the list of command line parameters, type 'SAtester.pl -help', for the
+complete documentation, type 'SAtester.pl -doc'.
+:p.Test cases are specified in the Test Description documents in EDML format.
+The tester program parses these files and generates the TTCN-3/ASN.1 modules, then
+calls the compiler to compile them. The result printout is then matched against
+different patterns to be able to set the verdict. Test cases contain not only
+the source modules, but the patterns as well.
+:p.The tester program allows one-by-one execution of test cases and batched
+execution as well.
+:p.NOTE: the tester program requires Perl 5.6.0 or higher.
+.*---------------------------------------------------------------------*
+:h1.Test cases
+.*---------------------------------------------------------------------*
+Ref [1]: SA-10/x: Log files
+
+.*---------------------------------------------------------------------*
+:h2.Log files
+.*---------------------------------------------------------------------*
+This test case group covers the requirement SA-10/1.
+
+The test cases below check the content of log files. In Titan R7B the log
+format has been enhanced. The following is checked: log event types and 
+severities, component instance names, the content of log messages. In addition
+the tests implicitly check the Titan config files for the component instance
+names (in both file name and [LOGGING] section) and the log event types.
+
+.*---------------------------------------------------------------------*
+:h3. Test case 1: Generate PTC and MTC logs, connect ports and send messages between components
+.*---------------------------------------------------------------------*
+Creates component ring of PTC components connected to each other. The MTC
+is the beginning and end of the ring. PTC instance names and the log severity
+to be logged by the component is taken from module parameters which are set in
+the configuration file. The configuration file LogFilesInc.cfg contains the 
+module paramters. The MTC sends a message which is passed along the PTC ring
+and finally returned to the MTC. The names of logfiles are specified in the 
+LogFiles.cfg file, this will be tested in test case 2. The LogFiles.cfg file 
+has a FileMask specified for every component, which is set according to the given
+module parameters. The content of the created log files is based on this setting,
+this will be checked in test case 2.
+
+.*---------------------------------------------------------------------*
+:h3. Test case 2: Check the content of PTC log files created in test case 1
+.*---------------------------------------------------------------------*
+Reads every PTC log file created in test case 1, according to the cfg files.
+Log file reading is done by an external function, the log file lines are read into
+charstrings which are then checked with the TTCN-3 regexp() function. The test case
+verdict is pass only if all checked lines match the regexp. Existance and position
+of specific log lines are checked.
+Every PTC logs one severity: the severity, it's log event types, the log strings
+and component instance names are checked.
+Severities:
+:list.
+:li PORTEVENT
+:li MATCHING
+:li USER
+:li PARALLEL
+:li EXECUTOR
+:li VERDICTOP
+:elist.
+
+.*---------------------------------------------------------------------*
+:h3. Test case 3: Check the content of MTC log file created in test case 1
+.*---------------------------------------------------------------------*
+Reads the MTC.log file and checks it's content: the severity, it's log event types,
+the log strings and component instance names are checked. Existance and position
+of specific log lines are checked.
+Checks for the following severities/log event types:
+:list.
+:li EXECUTOR_COMPONENT
+:li EXECUTOR_LOGOPTIONS
+:li TIMEROP_START
+:li TIMEROP_STOP
+:li TESTCASE_START
+:li TESTCASE_FINISH
+:li PARALLEL_PTC
+:li VERDICTOP_FINAL
+:li PARALLEL_PORTCONN
+:elist.
+
+.*---------------------------------------------------------------------*
+:h3. Test case 4: Generate PTC logs, procedure based communication, check PTC log files
+.*---------------------------------------------------------------------*
+Generates log files for two PTC components, the components make procedure based 
+communication. PTC log files are checked for correct content: the severity, 
+it's log event types, the log strings and component instance names are checked.
+Existance and position of specific log lines are checked.
+Checks for the following severities/log event types:
+:list.
+:li PORTEVENT_PCOUT
+:li PORTEVENT_PQUEUE
+:li MATCHING_PCSUCCESS
+:li PORTEVENT_PCIN
+:li USER_UNQUALIFIED
+:li PORTEVENT_PCOUT
+:elist.

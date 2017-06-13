@@ -1,0 +1,577 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Ormandi, Matyas
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          urn_ietf_params_xml_ns_conference_info.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Thu Sep  5 17:34:58 2013
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- HQ73011.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "urn:ietf:params:xml:ns:conference-info" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module urn_ietf_params_xml_ns_conference_info {
+
+
+import from XSD all;
+
+
+const State_type c_defaultForEmpty_1 := full;
+
+
+/* CONFERENCE ELEMENT */
+
+
+type Conference_type Conference_info
+with {
+  variant "name as 'conference-info'";
+  variant "element";
+};
+
+
+/* CONFERENCE TYPE */
+
+
+type record Conference_type
+{
+	XSD.UnsignedInt attr optional,
+	XSD.AnyURI entity,
+	State_type state optional,
+	record of XSD.String attr_1 optional,
+	Conference_description_type conference_description optional,
+	Host_type host_info optional,
+	Conference_state_type conference_state optional,
+	Users_type users optional,
+	Uris_type sidebars_by_ref optional,
+	Sidebars_by_val_type sidebars_by_val optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'conference-type'";
+  variant (attr) "attribute";
+  variant (entity) "attribute";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr_1) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (attr_1) "name as 'attr'";
+  variant (conference_description) "name as 'conference-description'";
+  variant (host_info) "name as 'host-info'";
+  variant (conference_state) "name as 'conference-state'";
+  variant (sidebars_by_ref) "name as 'sidebars-by-ref'";
+  variant (sidebars_by_val) "name as 'sidebars-by-val'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* STATE TYPE */
+
+
+type enumerated State_type
+{
+	deleted,
+	full,
+	partial
+}
+with {
+  variant "name as 'state-type'";
+};
+
+
+/* CONFERENCE DESCRIPTION TYPE */
+
+
+type record Conference_description_type
+{
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	XSD.String subject optional,
+	XSD.String free_text optional,
+	Keywords_type keywords optional,
+	Uris_type conf_uris optional,
+	Uris_type service_uris optional,
+	XSD.UnsignedInt maximum_user_count optional,
+	Conference_media_type available_media optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'conference-description-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (free_text) "name as 'free-text'";
+  variant (conf_uris) "name as 'conf-uris'";
+  variant (service_uris) "name as 'service-uris'";
+  variant (maximum_user_count) "name as 'maximum-user-count'";
+  variant (available_media) "name as 'available-media'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* HOST TYPE */
+
+
+type record Host_type
+{
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	XSD.AnyURI web_page optional,
+	Uris_type uris optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'host-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (web_page) "name as 'web-page'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* CONFERENCE STATE TYPE */
+
+
+type record Conference_state_type
+{
+	record of XSD.String attr optional,
+	XSD.UnsignedInt user_count optional,
+	XSD.Boolean active optional,
+	XSD.Boolean locked optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'conference-state-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (user_count) "name as 'user-count'";
+  //variant (active) "text 'true' as '1'";
+  //variant (active) "text 'false' as '0'";
+  //variant (locked) "text 'true' as '1'";
+  //variant (locked) "text 'false' as '0'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* CONFERENCE MEDIA TYPE */
+
+
+type record Conference_media_type
+{
+	record of XSD.String attr optional,
+	record length(1 .. infinity) of Conference_medium_type entry_list
+}
+with {
+  variant "name as 'conference-media-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (entry_list) "untagged";
+  variant (entry_list[-]) "name as 'entry'";
+};
+
+
+/* CONFERENCE MEDIUM TYPE */
+
+
+type record Conference_medium_type
+{
+	XSD.String label_,
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	XSD.String type_,
+	Media_status_type status optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'conference-medium-type'";
+  variant (label_) "name as 'label'";
+  variant (label_) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (type_) "name as 'type'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* URIs TYPE */
+
+
+type record Uris_type
+{
+	State_type state optional,
+	record of XSD.String attr optional,
+	record length(1 .. infinity) of Uri_type entry_list
+}
+with {
+  variant "name as 'uris-type'";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (entry_list) "untagged";
+  variant (entry_list[-]) "name as 'entry'";
+};
+
+
+/* URI TYPE */
+
+
+type record Uri_type
+{
+	record of XSD.String attr optional,
+	XSD.AnyURI uri,
+	XSD.String display_text optional,
+	XSD.String purpose optional,
+	Execution_type modified optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'uri-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* KEYWORDS TYPE */
+
+
+type record of XSD.String Keywords_type
+with {
+  variant "name as 'keywords-type'";
+  variant "list";
+};
+
+
+/* USERS TYPE */
+
+
+type record Users_type
+{
+	State_type state optional,
+	record of XSD.String attr optional,
+	record of User_type user_list,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'users-type'";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (user_list) "untagged";
+  variant (user_list[-]) "name as 'user'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* USER TYPE */
+
+
+type record User_type
+{
+	XSD.AnyURI entity optional,
+	State_type state optional,
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	Uris_type associated_aors optional,
+	User_roles_type roles optional,
+	User_languages_type languages optional,
+	XSD.AnyURI cascaded_focus optional,
+	record of Endpoint_type endpoint_list,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'user-type'";
+  variant (entity) "attribute";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (associated_aors) "name as 'associated-aors'";
+  variant (cascaded_focus) "name as 'cascaded-focus'";
+  variant (endpoint_list) "untagged";
+  variant (endpoint_list[-]) "name as 'endpoint'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* USER ROLES TYPE */
+
+
+type record User_roles_type
+{
+	record of XSD.String attr optional,
+	record length(1 .. infinity) of XSD.String entry_list
+}
+with {
+  variant "name as 'user-roles-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (entry_list) "untagged";
+  variant (entry_list[-]) "name as 'entry'";
+};
+
+
+/* USER LANGUAGES TYPE */
+
+
+type record of XSD.Language User_languages_type
+with {
+  variant "name as 'user-languages-type'";
+  variant "list";
+};
+
+
+/* ENDPOINT TYPE */
+
+
+type record Endpoint_type
+{
+	XSD.String entity optional,
+	State_type state optional,
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	Execution_type referred optional,
+	Endpoint_status_type status optional,
+	Joining_type joining_method optional,
+	Execution_type joining_info optional,
+	Disconnection_type disconnection_method optional,
+	Execution_type disconnection_info optional,
+	record of Media_type media_list,
+	Call_type call_info optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'endpoint-type'";
+  variant (entity) "attribute";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (joining_method) "name as 'joining-method'";
+  variant (joining_info) "name as 'joining-info'";
+  variant (disconnection_method) "name as 'disconnection-method'";
+  variant (disconnection_info) "name as 'disconnection-info'";
+  variant (media_list) "untagged";
+  variant (media_list[-]) "name as 'media'";
+  variant (call_info) "name as 'call-info'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* ENDPOINT STATUS TYPE */
+
+
+type enumerated Endpoint_status_type
+{
+	alerting,
+	connected,
+	dialing_in,
+	dialing_out,
+	disconnected,
+	disconnecting,
+	muted_via_focus,
+	on_hold,
+	pending
+}
+with {
+  variant "text 'dialing_in' as 'dialing-in'";
+  variant "text 'dialing_out' as 'dialing-out'";
+  variant "text 'muted_via_focus' as 'muted-via-focus'";
+  variant "text 'on_hold' as 'on-hold'";
+  variant "name as 'endpoint-status-type'";
+};
+
+
+/* JOINING TYPE */
+
+
+type enumerated Joining_type
+{
+	dialed_in,
+	dialed_out,
+	focus_owner
+}
+with {
+  variant "text 'dialed_in' as 'dialed-in'";
+  variant "text 'dialed_out' as 'dialed-out'";
+  variant "text 'focus_owner' as 'focus-owner'";
+  variant "name as 'joining-type'";
+};
+
+
+/* DISCONNECTION TYPE */
+
+
+type enumerated Disconnection_type
+{
+	booted,
+	busy,
+	departed,
+	failed
+}
+with {
+  variant "name as 'disconnection-type'";
+};
+
+
+/* EXECUTION TYPE */
+
+
+type record Execution_type
+{
+	record of XSD.String attr optional,
+	XSD.DateTime when optional,
+	XSD.String reason optional,
+	XSD.AnyURI by optional
+}
+with {
+  variant "name as 'execution-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* CALL TYPE */
+
+
+type record Call_type
+{
+	record of XSD.String attr optional,
+	union {
+		Sip_dialog_id_type sip,
+		record of XSD.String elem_list
+	} choice
+}
+with {
+  variant "name as 'call-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (choice) "untagged";
+  variant (choice.elem_list) "untagged";
+  variant (choice.elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* SIP DIALOG ID TYPE */
+
+
+type record Sip_dialog_id_type
+{
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	XSD.String call_id,
+	XSD.String from_tag,
+	XSD.String to_tag,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'sip-dialog-id-type'";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (call_id) "name as 'call-id'";
+  variant (from_tag) "name as 'from-tag'";
+  variant (to_tag) "name as 'to-tag'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* MEDIA TYPE */
+
+
+type record Media_type
+{
+	XSD.String id,
+	record of XSD.String attr optional,
+	XSD.String display_text optional,
+	XSD.String type_ optional,
+	XSD.String label_ optional,
+	XSD.String src_id optional,
+	Media_status_type status optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'media-type'";
+  variant (id) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (display_text) "name as 'display-text'";
+  variant (type_) "name as 'type'";
+  variant (label_) "name as 'label'";
+  variant (src_id) "name as 'src-id'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+};
+
+
+/* MEDIA STATUS TYPE */
+
+
+type enumerated Media_status_type
+{
+	inactive,
+	recvonly,
+	sendonly,
+	sendrecv
+}
+with {
+  variant "name as 'media-status-type'";
+};
+
+
+/* SIDEBARS BY VAL TYPE */
+
+
+type record Sidebars_by_val_type
+{
+	State_type state optional,
+	record of XSD.String attr optional,
+	record of Conference_type entry_list
+}
+with {
+  variant "name as 'sidebars-by-val-type'";
+  variant (state) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (state) "attribute";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:conference-info'";
+  variant (entry_list) "untagged";
+  variant (entry_list[-]) "name as 'entry'";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'urn:ietf:params:xml:ns:conference-info' prefix 'tns'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

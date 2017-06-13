@@ -1,0 +1,66 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module ae_clash_SE {	//^In TTCN-3 module `ae_clash_SE'://
+/*
+19.2.11 A type with this (ANY-ELEMENT) final encoding instruction shall not also have any of the final encoding instructions
+ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE. 
+*/
+
+/* Note: do not use more than one regex that can match the same line.
+   E.g. /error:.+ATTRIBUTE/ and /error:.+BASE64/ instead of the long regex
+*/
+
+type universal charstring AE_a //^In type definition//  \
+  //^error: A type with ANY-ELEMENT may not have any of the following encoding instructions: ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE// \
+  //^error: A type with ATTRIBUTE shall not also have any of the final encoding instructions ANY-ELEMENT//
+with {
+  variant "anyElement"
+  variant "attribute"
+}
+
+type universal charstring AE_b //^In type definition// \
+//^error: A type with ANY-ELEMENT may not have any of the following encoding instructions: ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE// \
+//^error: A type with BASE64 shall not have any of the final encoding instructions ANY-ELEMENT or WHITESPACE//
+with {
+  variant "anyElement"
+  variant "XSD:base64Binary"
+}
+
+type universal charstring AE_d //^In type definition// \
+//^error: A type with ANY-ELEMENT may not have any of the following encoding instructions: ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE// \
+//^error: A type with DEFAULT-FOR-EMPTY shall not have any of the final encoding instructions ANY-ELEMENT, ATTRIBUTE, UNTAGGED//
+with {
+  variant "anyElement"
+  variant "defaultForEmpty as 'x'"
+}
+
+type universal charstring AE_u //^In type definition// \
+//^error: A type with ANY-ELEMENT may not have any of the following encoding instructions: ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE// \
+//^error: A type with final encoding attribute UNTAGGED shall not have any of the final encoding instructions ANY-ATTRIBUTES, ANY-ELEMENT, ATTRIBUTE, DEFAULT-FOR-EMPTY, EMBED-VALUES, PI-OR-COMMENT, USE-NIL or USE-TYPE//
+with {
+  variant "anyElement"
+  variant "untagged"
+}
+
+type universal charstring AE_w //^In type definition// \
+//^error: A type with ANY-ELEMENT may not have any of the following encoding instructions: ATTRIBUTE, BASE64, DEFAULT-FOR-EMPTY, PI-OR-COMMENT, UNTAGGED or WHITESPACE//
+with {
+  variant "anyElement"
+  variant "whiteSpace collapse"
+}
+
+
+}
+with {
+encode "XML";
+}

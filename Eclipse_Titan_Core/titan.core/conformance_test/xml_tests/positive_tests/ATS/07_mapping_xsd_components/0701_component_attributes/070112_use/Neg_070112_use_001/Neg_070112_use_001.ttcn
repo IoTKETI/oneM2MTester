@@ -1,0 +1,62 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:7.1.12, Verify that attribute with required use cannot be omitted
+ ** @verdict  pass reject
+***************************************************/
+// The following requirements are tested:
+// If the value of the use attribute is required, the TTCN-3 field corresponding
+// to the XSD attribute shall be mandatory (i.e. without optional).
+
+module Neg_070112_use_001 {
+
+   import from schema_Neg_070112_use_001 language "XSD" all;
+
+   template MyType m_msg := {
+       foo := {
+           attr := omit,
+           base := 5
+       }
+   };
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Neg_070112_use_001() runs on C system C {
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+        log("template should either be rejected by compiler or by runtime latest while encoding");
+
+        setverdict(fail, "Invalid template should not be encoded");
+
+    }
+
+    control {
+        execute(TC_Neg_070112_use_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

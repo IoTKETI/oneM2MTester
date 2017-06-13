@@ -1,0 +1,1416 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module charstring_test {
+
+//=========================================================================
+// Import Part
+//=========================================================================
+
+import from types all;
+import from functions all;
+
+//=========================================================================
+// Module Parameters
+//=========================================================================
+modulepar {
+  
+  //modulepar charstrings not modified from cfg file
+  template charstring tspt_cs_v := "ABBA";
+  template charstring tspt_cs_o := omit;
+  template charstring tspt_cs_a := *;
+  template charstring tspt_cs_q := ?;
+  template charstring tspt_cs_al1 := * length(2); //length restriction
+  template charstring tspt_cs_al2 := * length(2..4);
+  template charstring tspt_cs_ql1 := ? length(2);
+  template charstring tspt_cs_ql2 := ? length(2..4);
+  template charstring tspt_cs_vl1 := ("ABBA");
+  template charstring tspt_cs_vl2 := ("ABBA","baba");
+  template charstring tspt_cs_vl3 := ("ABBA","baba","Bye");
+  template charstring tspt_cs_c1 := complement("ABBA")
+  template charstring tspt_cs_c2 := complement("ABBA","baba");
+  template charstring tspt_cs_c3 := complement("ABBA","baba","Bye");
+  template charstring tspt_cs_r1 := ("A".."B"); //range
+  template charstring tspt_cs_r2 := ("a".."c");
+  template charstring tspt_cs_pa := pattern "abc*xyz"
+  template charstring tspt_cs_pq := pattern "abc?xyz"
+  
+  template charstring tspt_cs_vifp := "ABBA" ifpresent;
+  template charstring tspt_cs_oifp := omit ifpresent;
+  template charstring tspt_cs_aifp := * ifpresent;
+  template charstring tspt_cs_qifp := ? ifpresent;
+  template charstring tspt_cs_al1ifp := * length(2) ifpresent; //length restriction
+  template charstring tspt_cs_al2ifp := * length(2..4) ifpresent;
+  template charstring tspt_cs_ql1ifp := ? length(2) ifpresent;
+  template charstring tspt_cs_ql2ifp := ? length(2..4) ifpresent;
+  template charstring tspt_cs_vl1ifp := ("ABBA") ifpresent;
+  template charstring tspt_cs_vl2ifp := ("ABBA","baba") ifpresent;
+  template charstring tspt_cs_vl3ifp := ("ABBA","baba","Bye") ifpresent;
+  template charstring tspt_cs_c1ifp := complement("ABBA") ifpresent
+  template charstring tspt_cs_c2ifp := complement("ABBA","baba") ifpresent;
+  template charstring tspt_cs_c3ifp := complement("ABBA","baba","Bye") ifpresent;
+  template charstring tspt_cs_r1ifp := ("A".."B") ifpresent; //range
+  template charstring tspt_cs_r2ifp := ("a".."c") ifpresent;
+  template charstring tspt_cs_paifp := pattern "abc*xyz"  ifpresent
+  template charstring tspt_cs_pqifp := pattern "abc?xyz"  ifpresent  
+  
+  //modulepar charstrings modified from cfg file
+  template charstring tspt_cs_mod4v := * //after mod:"ABBA";
+  template charstring tspt_cs_mod4o := * //omit;
+  template charstring tspt_cs_mod4ol := * //omit;
+  template charstring tspt_cs_mod4a := "A" //*;
+  template charstring tspt_cs_mod4q := "" //?;
+  template charstring tspt_cs_mod4al1 := "A" //* length(2); //length restriction
+  template charstring tspt_cs_mod4al2 := "Original" //mofified for: * length(2..4);
+  template charstring tspt_cs_mod4ql1 := "Original" //mofified for:? length(2);
+  template charstring tspt_cs_mod4ql2 := "Original" //mofified for:? length(2..4);
+  template charstring tspt_cs_mod4vl1 := ("ABBA") //TODO: Adam //It should be mofified for: ("ABBA");
+  template charstring tspt_cs_mod4vl2 := "Original" //mofified for:("ABBA","baba");
+  template charstring tspt_cs_mod4vl3 := "Original" //mofified for:("ABBA","baba","Bye");
+  template charstring tspt_cs_mod4c1 := "Original" //mofified for:complement("ABBA")
+  template charstring tspt_cs_mod4c2 := "Original" //mofified for:complement("ABBA","baba");
+  template charstring tspt_cs_mod4c3 := "Original" //mofified for:complement("ABBA","baba","Bye");
+  template charstring tspt_cs_mod4r1 := "Original" //mofified for:("A".."B"); //range
+  template charstring tspt_cs_mod4r2 := "Original" //mofified for:("a".."c");
+  template charstring tspt_cs_mod4pa := "Original" //mofified for:pattern "abc*xyz"
+  template charstring tspt_cs_mod4pq := "Original" //mofified for:pattern "abc?xyz"
+  
+  template charstring tspt_cs_mod4vifp := "Original" //mofified for:"ABBA" ifpresent;
+  template charstring tspt_cs_mod4oifp := "Original" //mofified for:omit ifpresent;
+  template charstring tspt_cs_mod4aifp := "Original" //mofified for:* ifpresent;
+  template charstring tspt_cs_mod4qifp := "Original" //mofified for:? ifpresent;
+  template charstring tspt_cs_mod4al1ifp := "Original" //mofified for:* length(2) ifpresent; //length restriction
+  template charstring tspt_cs_mod4al2ifp := "Original" //mofified for:* length(2..4) ifpresent;
+  template charstring tspt_cs_mod4ql1ifp := "Original" //mofified for:? length(2) ifpresent;
+  template charstring tspt_cs_mod4ql2ifp := "Original" //mofified for:? length(2..4) ifpresent;
+  template charstring tspt_cs_mod4vl1ifp :=  ("ABBA") ifpresent //TODO: Adam //It should be mofified for: ("ABBA");
+  template charstring tspt_cs_mod4vl2ifp := "Original" //mofified for:("ABBA","baba") ifpresent;
+  template charstring tspt_cs_mod4vl3ifp := "Original" //mofified for:("ABBA","baba","Bye") ifpresent;
+  template charstring tspt_cs_mod4c1ifp := "Original" //mofified for:complement("ABBA") ifpresent
+  template charstring tspt_cs_mod4c2ifp := "Original" //mofified for:complement("ABBA","baba") ifpresent;
+  template charstring tspt_cs_mod4c3ifp := "Original" //mofified for:complement("ABBA","baba","Bye") ifpresent;
+  template charstring tspt_cs_mod4r1ifp := "Original" //mofified for:("A".."B") ifpresent; //range
+  template charstring tspt_cs_mod4r2ifp := "Original" //mofified for:("a".."c") ifpresent;
+  template charstring tspt_cs_mod4paifp := "Original" //mofified for:pattern "abc*xyz"  ifpresent
+  template charstring tspt_cs_mod4pqifp := "Original" //mofified for:pattern "abc?xyz"  ifpresent  
+  
+}
+
+//=========================================================================
+// Templates
+//=========================================================================
+// not modulepars
+template charstring t_cs_v := "ABBA";
+template charstring t_cs_o := omit;
+template charstring t_cs_a := *;
+template charstring t_cs_q := ?;
+template charstring t_cs_al1 := * length(2); //length restriction
+template charstring t_cs_al2 := * length(2..4);
+template charstring t_cs_ql1 := ? length(2);
+template charstring t_cs_ql2 := ? length(2..4);
+template charstring t_cs_vl1 := ("ABBA");
+template charstring t_cs_vl2 := ("ABBA","baba");
+template charstring t_cs_vl3 := ("ABBA","baba","Bye");
+template charstring t_cs_c1 := complement("ABBA")
+template charstring t_cs_c2 := complement("ABBA","baba");
+template charstring t_cs_c3 := complement("ABBA","baba","Bye");
+template charstring t_cs_r1 := ("A".."B"); //range
+template charstring t_cs_r2 := ("a".."c");
+template charstring t_cs_pa := pattern "abc*xyz"
+template charstring t_cs_pq := pattern "abc?xyz"
+
+template charstring t_cs_vifp := "ABBA" ifpresent;
+template charstring t_cs_oifp := omit ifpresent;
+template charstring t_cs_aifp := * ifpresent;
+template charstring t_cs_qifp := ? ifpresent;
+template charstring t_cs_al1ifp := * length(2) ifpresent; //length restriction
+template charstring t_cs_al2ifp := * length(2..4) ifpresent;
+template charstring t_cs_ql1ifp := ? length(2) ifpresent;
+template charstring t_cs_ql2ifp := ? length(2..4) ifpresent;
+template charstring t_cs_vl1ifp := ("ABBA") ifpresent;
+template charstring t_cs_vl2ifp := ("ABBA","baba") ifpresent;
+template charstring t_cs_vl3ifp := ("ABBA","baba","Bye") ifpresent;
+template charstring t_cs_c1ifp := complement("ABBA") ifpresent
+template charstring t_cs_c2ifp := complement("ABBA","baba") ifpresent;
+template charstring t_cs_c3ifp := complement("ABBA","baba","Bye") ifpresent;
+template charstring t_cs_r1ifp := ("A".."B") ifpresent; //range
+template charstring t_cs_r2ifp := ("a".."c") ifpresent;
+template charstring t_cs_paifp := pattern "abc*xyz"  ifpresent
+template charstring t_cs_pqifp := pattern "abc?xyz"  ifpresent
+
+//=========================================================================
+// Functions
+//=========================================================================
+function f_string2ttcn_cs_t(in charstring pl_cs, in template charstring pl_expected_result) {
+  var template charstring vl_result;
+  @try {
+    string2ttcn(pl_cs,vl_result);
+    setverdict(pass) 
+  }
+  @catch(err_str) {
+    log("string2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log(pl_expected_result);
+  log(vl_result);
+  if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+function f_string2ttcn_cs_t_str(in charstring pl_cs, in charstring pl_expected_result) {
+  var template charstring vl_result;
+  @try {
+    string2ttcn(pl_cs,vl_result);
+    setverdict(pass) 
+  }
+  @catch(err_str) {
+    log("str2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log("Expected result: ", pl_expected_result);
+  log("Result: ", vl_result);
+  if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+//template string -> variable conversion
+//expected result: error
+function f_string2ttcn_cs_v(in charstring pl_cs, in template charstring pl_expected_result, in boolean pl_ok_expected) {
+  var charstring vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("string2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("string2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ",pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//this function is the same but uses
+function f_string2ttcn_cs_v_str(in charstring pl_cs, charstring pl_expected_result, in boolean pl_ok_expected) {
+  var charstring vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("str2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("str2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ", pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//rrec
+
+function f_string2ttcn_rcs_t(in charstring pl_rcs, in template RCS pl_expected_result) {
+  var template RCS vl_result;
+  @try {
+    string2ttcn(pl_rcs,vl_result);
+    setverdict(pass) 
+  }
+  @catch(err_str) {
+    log("string2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log(pl_expected_result);
+  log(vl_result);
+  if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+function f_string2ttcn_rcs_t_str(in charstring pl_cs, in charstring pl_expected_result) {
+  var template RCS vl_result;
+  @try {
+    string2ttcn(pl_cs,vl_result);
+    setverdict(pass) 
+  }
+  @catch(err_str) {
+    log("str2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log("Expected result: ", pl_expected_result);
+  log("Result: ", vl_result);
+  if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+//template string -> variable conversion
+//expected result: error
+function f_string2ttcn_rcs_v(in charstring pl_cs, in template RCS pl_expected_result, in boolean pl_ok_expected) {
+  var RCS vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("string2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("string2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ",pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//this function is the same but uses
+function f_string2ttcn_rcs_v_str(in charstring pl_cs, charstring pl_expected_result, in boolean pl_ok_expected) {
+  var RCS vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("str2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("str2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ", pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//=========================================================================
+// Testcases
+//=========================================================================
+
+testcase tc_cs_v() runs on MC {
+  var RoCS vl_good_values := {"ABBA"}
+  var RoCS vl_wrong_values := {"","A","AB","ABB","ABBAB","abba","anything","XXXX","ABCDE"}
+  f_checkMatchingValues_cs(t_cs_v, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_o() runs on MC {
+  var RoCS vl_good_values := {}
+  var RoCS vl_wrong_values := {"","A","AB","ABB","ABBAB","abba","anything","XXXX","ABCDE"}
+  f_checkMatchingValues_cs(t_cs_o, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_a() runs on MC {
+  var RoCS vl_good_values := {"","A","AB","ABB","ABBAB","abba","anything","XXXX","ABCDE"}
+  var RoCS vl_wrong_values := {}
+  f_checkMatchingValues_cs(t_cs_a, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_q() runs on MC {
+  var RoCS vl_good_values := {"","A","AB","ABB","ABBAB","abba","anything","XXXX","ABCDE"}
+  var RoCS vl_wrong_values := {}
+  f_checkMatchingValues_cs(t_cs_q, vl_good_values,vl_wrong_values);
+}
+
+// t_cs_al1 := * length(2); //length restriction
+testcase tc_cs_al1() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  "}
+  var RoCS vl_wrong_values := {"","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_al1, vl_good_values,vl_wrong_values);
+}
+
+// t_cs_al1 := * length(2..4); //length restriction
+testcase tc_cs_al2() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  ","123", "ABC","abc","ABBA"}
+  var RoCS vl_wrong_values := {"","A", "ABBAB","anything","XXXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_al2, vl_good_values,vl_wrong_values);
+}
+
+// t_cs_al1 := ? length(2); //length restriction
+testcase tc_cs_ql1() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  "}
+  var RoCS vl_wrong_values := {"","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_ql1, vl_good_values,vl_wrong_values);
+}
+
+// t_cs_al1 := ? length(2..4); //length restriction
+testcase tc_cs_ql2() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  ","123", "ABC","abc","ABBA"}
+  var RoCS vl_wrong_values := {"","A", "ABBAB","anything","XXXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_ql2, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_vl1() runs on MC {
+  var RoCS vl_good_values := {"ABBA"}
+  var RoCS vl_wrong_values := {"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_vl1, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_vl2() runs on MC {
+  var RoCS vl_good_values := {"ABBA","baba"}
+  var RoCS vl_wrong_values := {"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_vl2, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_vl3() runs on MC {
+  var RoCS vl_good_values := {"ABBA","baba","Bye"}
+  var RoCS vl_wrong_values := {"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_vl3, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_c1() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  var RoCS vl_wrong_values := {"ABBA"}
+  f_checkMatchingValues_cs(t_cs_c1, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_c2() runs on MC {
+  var RoCS vl_good_values :={"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  var RoCS vl_wrong_values :=  {"ABBA","baba"}
+  f_checkMatchingValues_cs(t_cs_c2, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_c3() runs on MC {
+  var RoCS vl_good_values := {"AB", "ab","ba","12","A1","  ""","A","ABB","ABBAB","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  var RoCS vl_wrong_values := {"ABBA","baba","Bye"}
+  f_checkMatchingValues_cs(t_cs_c3, vl_good_values,vl_wrong_values);
+}
+
+//("A".."B")
+testcase tc_cs_r1() runs on MC {
+  var RoCS vl_good_values := {"A","B","ABBA","AB","AAAAAA","BBBBB","ABBABABA"}
+  var RoCS vl_wrong_values := { "ab","ba","Bye","12","A1","  ","abba","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_r1, vl_good_values,vl_wrong_values);
+}
+//"a".."c"
+testcase tc_cs_r2() runs on MC {
+  var RoCS vl_good_values := {"","a","b","c","ab","cba","abbac","abbababa","cabacccc"}
+  var RoCS vl_wrong_values := {"A","B","ABBA","AB","AAAAAAc","BBBBB","ABBABABAc", "Bye","12","abcA1","  ","anything","XXXX","ABCDE","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}
+  f_checkMatchingValues_cs(t_cs_r2, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_pa() runs on MC {
+  var RoCS vl_good_values := { "abcxyz","abcAxyz","abc45xyz" }
+  var RoCS vl_wrong_values := { "ab","ba","Bye", "abcyz"}
+  f_checkMatchingValues_cs(t_cs_pa, vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_pq() runs on MC {
+  var RoCS vl_good_values := {"abcAxyz","abc4xyz" }
+  var RoCS vl_wrong_values := { "ab","ba","Bye", "abcxyz","abc45xyz"}
+  f_checkMatchingValues_cs(t_cs_pq, vl_good_values,vl_wrong_values);
+}
+
+//=== charstring embedded in record ====
+
+testcase tc_cs_v_emb() runs on MC {
+  var RoRCS vl_good_values := {{cs:="ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_v), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_o_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:=omit}};
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_o), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_a_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_a), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_q_emb() runs on MC {
+  var RoRCS vl_good_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{omit}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_q), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := * length(2); //length restriction
+testcase tc_cs_al1_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_al1), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := * length(2..4); //length restriction
+testcase tc_cs_al2_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_al2), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := ? length(2); //length restriction
+testcase tc_cs_ql1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{omit},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_ql1), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := ? length(2..4); //length restriction
+testcase tc_cs_ql2_emb() runs on MC {
+  var RoRCS vl_good_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{omit},{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_ql2), vl_good_values,vl_wrong_values);
+}
+//("ABBA")
+testcase tc_cs_vl1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl1), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba")
+testcase tc_cs_vl2_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"},{"baba"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl2), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba","Bye")
+testcase tc_cs_vl3_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"},{"baba"},{"Bye"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl3), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA")
+testcase tc_cs_c1_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  """},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c1), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA","baba");
+testcase tc_cs_c2_emb() runs on MC {
+  var RoRCS vl_good_values :={{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values :=  {{"ABBA"},{"baba"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c2), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA","baba","Bye");
+testcase tc_cs_c3_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"},{"baba"},{"Bye"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c3), vl_good_values,vl_wrong_values);
+}
+
+//("A".."B")
+testcase tc_cs_r1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAA"},{"BBBBB"},{"ABBABABA"}}
+  var RoRCS vl_wrong_values := {{omit},{"ab"},{"ba"},{"Bye"},{"12"},{"A1"},{"  "},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_r1),vl_good_values,vl_wrong_values);
+}
+//"a".."c"
+testcase tc_cs_r2_emb() runs on MC {
+  var RoRCS vl_good_values := {{""},{"a"},{"b"},{"c"},{"ab"},{"cba"},{"abbac"},{"abbababa"},{"cabacccc"}}
+  var RoRCS vl_wrong_values := {{omit},{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAAc"},{"BBBBB"},{"ABBABABAc"},{ "Bye"},{"12"},{"abcA1"},{"  "},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_r2), vl_good_values,vl_wrong_values);
+}
+//pattern "abc*xyz"
+testcase tc_cs_pa_emb() runs on MC {
+  var RoRCS vl_good_values := {{ "abcxyz"},{"abcAxyz"},{"abc45xyz" }}
+  var RoRCS vl_wrong_values := {{""},{"ab"},{"ba"},{"Bye"},{"abcyz"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_pa), vl_good_values,vl_wrong_values);
+}
+//pattern "abc?xyz"
+testcase tc_cs_pq_emb() runs on MC {
+  var RoRCS vl_good_values := {{"abcAxyz"},{"abc4xyz" }}
+  var RoRCS vl_wrong_values := {{ "ab"},{"ba"},{"Bye"},{ "abcxyz"},{"abc45xyz"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_pq), vl_good_values,vl_wrong_values);
+}
+
+//=========== Charstring Tests without Module Params and with "ifpresent" clause
+//=== charstring embedded in record ====
+
+testcase tc_cs_vifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:="ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_oifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:=omit}};
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_oifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_aifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_aifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_qifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_qifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := * length(2); //length restriction
+testcase tc_cs_al1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_al1ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := * length(2..4); //length restriction
+testcase tc_cs_al2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_al2ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1 := ? length(2); //length restriction
+testcase tc_cs_ql1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_ql1ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(t_cs_al1ifp := ? length(2..4); //length restriction
+testcase tc_cs_ql2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_ql2ifp), vl_good_values,vl_wrong_values);
+}
+//("ABBA")
+testcase tc_cs_vl1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl1ifp), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba")
+testcase tc_cs_vl2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"},{"baba"}}
+  var RoRCS vl_wrong_values := {{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl2ifp), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba","Bye")
+testcase tc_cs_vl3ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"},{"baba"},{"Bye"}}
+  var RoRCS vl_wrong_values := {{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_vl3ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA")
+testcase tc_cs_c1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  """},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c1ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA","baba");
+testcase tc_cs_c2ifp_emb() runs on MC {
+  var RoRCS vl_good_values :={{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values :=  {{"ABBA"},{"baba"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c2ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA","baba","Bye");
+testcase tc_cs_c3ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"},{"baba"},{"Bye"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_c3ifp), vl_good_values,vl_wrong_values);
+}
+
+//("A".."B")
+testcase tc_cs_r1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAA"},{"BBBBB"},{"ABBABABA"}}
+  var RoRCS vl_wrong_values := {{"ab"},{"ba"},{"Bye"},{"12"},{"A1"},{"  "},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_r1ifp),vl_good_values,vl_wrong_values);
+}
+//"a".."c"
+testcase tc_cs_r2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"a"},{"b"},{"c"},{"ab"},{"cba"},{"abbac"},{"abbababa"},{"cabacccc"}}
+  var RoRCS vl_wrong_values := {{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAAc"},{"BBBBB"},{"ABBABABAc"},{ "Bye"},{"12"},{"abcA1"},{"  "},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_r2ifp), vl_good_values,vl_wrong_values);
+}
+//pattern "abc*xyz"
+testcase tc_cs_paifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"abcxyz"},{"abcAxyz"},{"abc45xyz" }}
+  var RoRCS vl_wrong_values := {{""},{"ab"},{"ba"},{"Bye"},{"abcyz"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_paifp), vl_good_values,vl_wrong_values);
+}
+//pattern "abc?xyz"
+testcase tc_cs_pqifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"abcAxyz"},{"abc4xyz" }}
+  var RoRCS vl_wrong_values := {{"ab"},{"ba"},{"Bye"},{ "abcxyz"},{"abc45xyz"}}
+  f_checkMatchingValues_rcs(t_rcs(t_cs_pqifp), vl_good_values,vl_wrong_values);
+}
+
+
+//=========== Charstring Tests with Module Parameters ======
+testcase tc_cs_ModulePar_emb() runs on MC {
+  log(t_rcs(tspt_cs_mod4v));
+  if(log2str(t_rcs(tspt_cs_mod4v)) != "{ cs := \"ABBA\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4o));
+  if(log2str(t_rcs(tspt_cs_mod4o)) != "{ cs := omit }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4a));
+  if(log2str(t_rcs(tspt_cs_mod4a)) != "{ cs := * }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4q));
+  if(log2str(t_rcs(tspt_cs_mod4q)) != "{ cs := ? }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al1));
+  if(log2str(t_rcs(tspt_cs_mod4al1)) != "{ cs := * length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al2));
+  if(log2str(t_rcs(tspt_cs_mod4al2)) != "{ cs := * length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql1));
+  if(log2str(t_rcs(tspt_cs_mod4ql1)) != "{ cs := ? length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql2));
+  if(log2str(t_rcs(tspt_cs_mod4ql2)) != "{ cs := ? length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(">",t_rcs(tspt_cs_mod4vl1),"<");
+  if(log2str(t_rcs(tspt_cs_mod4vl1)) != "{ cs := \"ABBA\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl2));
+  if(log2str(t_rcs(tspt_cs_mod4vl2)) != "{ cs := (\"ABBA\", \"baba\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl3));
+  if(log2str(t_rcs(tspt_cs_mod4vl3)) != "{ cs := (\"ABBA\", \"baba\", \"Bye\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c1));
+  if(log2str(t_rcs(tspt_cs_mod4c1)) != "{ cs := complement (\"ABBA\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c2));
+  if(log2str(t_rcs(tspt_cs_mod4c2)) != "{ cs := complement (\"ABBA\", \"baba\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c3));
+  if(log2str(t_rcs(tspt_cs_mod4c3)) != "{ cs := complement (\"ABBA\", \"baba\", \"Bye\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r1));
+  if(log2str(t_rcs(tspt_cs_mod4r1)) != "{ cs := (\"A\" .. \"B\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r2));
+  if(log2str(t_rcs(tspt_cs_mod4r2)) != "{ cs := (\"a\" .. \"c\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pa));
+  if(log2str(t_rcs(tspt_cs_mod4pa)) != "{ cs := pattern \"abc*xyz\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pq));
+  if(log2str(t_rcs(tspt_cs_mod4pq)) != "{ cs := pattern \"abc?xyz\" }") {setverdict(fail)} else {setverdict(pass)};
+  //==
+  log(t_rcs(tspt_cs_mod4vifp));
+  if(log2str(t_rcs(tspt_cs_mod4vifp)) != "{ cs := \"ABBA\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4oifp));
+  if(log2str(t_rcs(tspt_cs_mod4oifp)) != "{ cs := omit ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4aifp));
+  if(log2str(t_rcs(tspt_cs_mod4aifp)) != "{ cs := * ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4qifp));
+  if(log2str(t_rcs(tspt_cs_mod4qifp)) != "{ cs := ? ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al1ifp));
+  if(log2str(t_rcs(tspt_cs_mod4al1ifp)) != "{ cs := * length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al2ifp));
+  if(log2str(t_rcs(tspt_cs_mod4al2ifp)) != "{ cs := * length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql1ifp));
+  if(log2str(t_rcs(tspt_cs_mod4ql1ifp)) != "{ cs := ? length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql2ifp));
+  if(log2str(t_rcs(tspt_cs_mod4ql2ifp)) != "{ cs := ? length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl1ifp));
+  if(log2str(t_rcs(tspt_cs_mod4vl1ifp)) != "{ cs := \"ABBA\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl2ifp));
+  if(log2str(t_rcs(tspt_cs_mod4vl2ifp)) != "{ cs := (\"ABBA\", \"baba\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl3ifp));
+  if(log2str(t_rcs(tspt_cs_mod4vl3ifp)) != "{ cs := (\"ABBA\", \"baba\", \"Bye\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c1ifp));
+  if(log2str(t_rcs(tspt_cs_mod4c1ifp)) != "{ cs := complement (\"ABBA\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c2ifp));
+  if(log2str(t_rcs(tspt_cs_mod4c2ifp)) != "{ cs := complement (\"ABBA\", \"baba\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c3ifp));
+  if(log2str(t_rcs(tspt_cs_mod4c3ifp)) != "{ cs := complement (\"ABBA\", \"baba\", \"Bye\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r1ifp));
+  if(log2str(t_rcs(tspt_cs_mod4r1ifp)) != "{ cs := (\"A\" .. \"B\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r2ifp));
+  if(log2str(t_rcs(tspt_cs_mod4r2ifp)) != "{ cs := (\"a\" .. \"c\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4paifp));
+  if(log2str(t_rcs(tspt_cs_mod4paifp)) != "{ cs := pattern \"abc*xyz\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pqifp));
+  if(log2str(t_rcs(tspt_cs_mod4pqifp)) != "{ cs := pattern \"abc?xyz\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+}
+
+
+testcase tc_cs_mod4v_emb() runs on MC {
+  var RoRCS vl_good_values := {{cs:="ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4v), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4o_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:=omit}};
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4o), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4a_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4a), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4q_emb() runs on MC {
+  var RoRCS vl_good_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{omit}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4q), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al1 := * length(2); //length restriction
+testcase tc_cs_mod4al1_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4al1), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al2 := * length(2..4); //length restriction
+testcase tc_cs_mod4al2_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4al2), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4ql1 := ? length(2); //length restriction
+testcase tc_cs_mod4ql1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{omit},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4ql1), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4ql2 := ? length(2..4); //length restriction
+testcase tc_cs_mod4ql2_emb() runs on MC {
+  var RoRCS vl_good_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{omit},{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4ql2), vl_good_values,vl_wrong_values);
+}
+//("ABBA")
+/* TODO:Adam*/
+testcase tc_cs_mod4vl1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl1), vl_good_values,vl_wrong_values);
+}
+
+//("ABBA", "baba")
+testcase tc_cs_mod4vl2_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"},{"baba"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl2), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba","Bye")
+testcase tc_cs_mod4vl3_emb() runs on MC {
+  var RoRCS vl_good_values := {{"ABBA"},{"baba"},{"Bye"}}
+  var RoRCS vl_wrong_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl3), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA")
+testcase tc_cs_mod4c1_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  """},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c1), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA","baba");
+testcase tc_cs_mod4c2_emb() runs on MC {
+  var RoRCS vl_good_values :={{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values :=  {{"ABBA"},{"baba"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c2), vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//complement("ABBA","baba","Bye");
+testcase tc_cs_mod4c3_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"},{"baba"},{"Bye"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c3), vl_good_values,vl_wrong_values);
+}
+
+//("A".."B")
+testcase tc_cs_mod4r1_emb() runs on MC {
+  var RoRCS vl_good_values := {{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAA"},{"BBBBB"},{"ABBABABA"}}
+  var RoRCS vl_wrong_values := {{omit},{"ab"},{"ba"},{"Bye"},{"12"},{"A1"},{"  "},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4r1),vl_good_values,vl_wrong_values);
+}
+//"a".."c"
+testcase tc_cs_mod4r2_emb() runs on MC {
+  var RoRCS vl_good_values := {{""},{"a"},{"b"},{"c"},{"ab"},{"cba"},{"abbac"},{"abbababa"},{"cabacccc"}}
+  var RoRCS vl_wrong_values := {{omit},{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAAc"},{"BBBBB"},{"ABBABABAc"},{ "Bye"},{"12"},{"abcA1"},{"  "},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4r2), vl_good_values,vl_wrong_values);
+}
+//pattern "abc*xyz"
+testcase tc_cs_mod4pa_emb() runs on MC {
+  var RoRCS vl_good_values := {{ "abcxyz"},{"abcAxyz"},{"abc45xyz" }}
+  var RoRCS vl_wrong_values := {{""},{"ab"},{"ba"},{"Bye"},{"abcyz"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4pa), vl_good_values,vl_wrong_values);
+}
+//pattern "abc?xyz"
+testcase tc_cs_mod4pq_emb() runs on MC {
+  var RoRCS vl_good_values := {{"abcAxyz"},{"abc4xyz" }}
+  var RoRCS vl_wrong_values := {{ "ab"},{"ba"},{"Bye"},{ "abcxyz"},{"abc45xyz"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4pq), vl_good_values,vl_wrong_values);
+}
+
+//===
+testcase tc_cs_mod4vifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:="ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4oifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{cs:=omit}};
+  var RoRCS vl_wrong_values := {{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4oifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4aifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {{}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4aifp), vl_good_values,vl_wrong_values);
+}
+
+testcase tc_cs_mod4qifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"A"},{"AB"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"}}
+  var RoRCS vl_wrong_values := {}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4qifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al1 := * length(2); //length restriction
+testcase tc_cs_mod4al1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4al1ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al1 := * length(2..4); //length restriction
+testcase tc_cs_mod4al2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4al2ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al1 := ? length(2); //length restriction
+testcase tc_cs_mod4ql1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4ql1ifp), vl_good_values,vl_wrong_values);
+}
+
+// t_rcs(tspt_cs_mod4al1ifp := ? length(2..4); //length restriction
+testcase tc_cs_mod4ql2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{"123"},{ "ABC"},{"abc"},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{""},{"A"},{ "ABBAB"},{"anything"},{"XXXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4ql2ifp), vl_good_values,vl_wrong_values);
+}
+//("ABBA")
+/* TODO:Adam*/
+testcase tc_cs_mod4vl1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"}}
+  var RoRCS vl_wrong_values := {{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl1ifp), vl_good_values,vl_wrong_values);
+}
+
+//("ABBA","baba") //TR: HR98602, 'Matching fault in case of template ("A","B") ifpresent'
+testcase tc_cs_mod4vl2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"},{"baba"}}
+  var RoRCS vl_wrong_values := {{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl2ifp), vl_good_values,vl_wrong_values);
+}
+//("ABBA","baba","Bye")
+testcase tc_cs_mod4vl3ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"ABBA"},{"baba"},{"Bye"}}
+  var RoRCS vl_wrong_values := {{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4vl3ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA")
+testcase tc_cs_mod4c1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  """},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c1ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA","baba");
+testcase tc_cs_mod4c2ifp_emb() runs on MC {
+  var RoRCS vl_good_values :={{omit},{"AB"},{"ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values :=  {{"ABBA"},{"baba"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c2ifp), vl_good_values,vl_wrong_values);
+}
+//complement("ABBA","baba","Bye");
+testcase tc_cs_mod4c3ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"AB"},{ "ab"},{"ba"},{"12"},{"A1"},{"  "},{""},{"A"},{"ABB"},{"ABBAB"},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  var RoRCS vl_wrong_values := {{"ABBA"},{"baba"},{"Bye"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4c3ifp), vl_good_values,vl_wrong_values);
+}
+
+//("A".."B")
+testcase tc_cs_mod4r1ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAA"},{"BBBBB"},{"ABBABABA"}}
+  var RoRCS vl_wrong_values := {{"ab"},{"ba"},{"Bye"},{"12"},{"A1"},{"  "},{"abba"},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4r1ifp),vl_good_values,vl_wrong_values);
+}
+//"a".."c"
+testcase tc_cs_mod4r2ifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{""},{"a"},{"b"},{"c"},{"ab"},{"cba"},{"abbac"},{"abbababa"},{"cabacccc"}}
+  var RoRCS vl_wrong_values := {{"A"},{"B"},{"ABBA"},{"AB"},{"AAAAAAc"},{"BBBBB"},{"ABBABABAc"},{ "Bye"},{"12"},{"abcA1"},{"  "},{"anything"},{"XXXX"},{"ABCDE"},{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4r2ifp), vl_good_values,vl_wrong_values);
+}
+//pattern "abc*xyz"
+testcase tc_cs_mod4paifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"abcxyz"},{"abcAxyz"},{"abc45xyz" }}
+  var RoRCS vl_wrong_values := {{""},{"ab"},{"ba"},{"Bye"},{"abcyz"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4paifp), vl_good_values,vl_wrong_values);
+}
+//pattern "abc?xyz"
+testcase tc_cs_mod4pqifp_emb() runs on MC {
+  var RoRCS vl_good_values := {{omit},{"abcAxyz"},{"abc4xyz" }}
+  var RoRCS vl_wrong_values := {{"ab"},{"ba"},{"Bye"},{ "abcxyz"},{"abc45xyz"}}
+  f_checkMatchingValues_rcs(t_rcs(tspt_cs_mod4pqifp), vl_good_values,vl_wrong_values);
+}
+
+//=
+testcase tc_cs_ttcn2string_emb() runs on MC {
+  log(t_rcs(tspt_cs_mod4v));
+  if(ttcn2string(t_rcs(tspt_cs_mod4v)) != "{ cs := \"ABBA\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4o));
+  if(ttcn2string(t_rcs(tspt_cs_mod4o)) != "{ cs := omit }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4a));
+  if(ttcn2string(t_rcs(tspt_cs_mod4a)) != "{ cs := * }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4q));
+  if(ttcn2string(t_rcs(tspt_cs_mod4q)) != "{ cs := ? }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al1));
+  if(ttcn2string(t_rcs(tspt_cs_mod4al1)) != "{ cs := * length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al2));
+  if(ttcn2string(t_rcs(tspt_cs_mod4al2)) != "{ cs := * length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql1));
+  if(ttcn2string(t_rcs(tspt_cs_mod4ql1)) != "{ cs := ? length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql2));
+  if(ttcn2string(t_rcs(tspt_cs_mod4ql2)) != "{ cs := ? length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(">",t_rcs(tspt_cs_mod4vl1),"<");
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl1)) != "{ cs := \"ABBA\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl2));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl2)) != "{ cs := (\"ABBA\", \"baba\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl3));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl3)) != "{ cs := (\"ABBA\", \"baba\", \"Bye\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c1));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c1)) != "{ cs := complement (\"ABBA\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c2));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c2)) != "{ cs := complement (\"ABBA\", \"baba\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c3));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c3)) != "{ cs := complement (\"ABBA\", \"baba\", \"Bye\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r1));
+  if(ttcn2string(t_rcs(tspt_cs_mod4r1)) != "{ cs := (\"A\" .. \"B\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r2));
+  if(ttcn2string(t_rcs(tspt_cs_mod4r2)) != "{ cs := (\"a\" .. \"c\") }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pa));
+  if(ttcn2string(t_rcs(tspt_cs_mod4pa)) != "{ cs := pattern \"abc*xyz\" }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pq));
+  if(ttcn2string(t_rcs(tspt_cs_mod4pq)) != "{ cs := pattern \"abc?xyz\" }") {setverdict(fail)} else {setverdict(pass)};
+  //==
+  log(t_rcs(tspt_cs_mod4vifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vifp)) != "{ cs := \"ABBA\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4oifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4oifp)) != "{ cs := omit ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4aifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4aifp)) != "{ cs := * ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4qifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4qifp)) != "{ cs := ? ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al1ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4al1ifp)) != "{ cs := * length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4al2ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4al2ifp)) != "{ cs := * length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql1ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4ql1ifp)) != "{ cs := ? length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4ql2ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4ql2ifp)) != "{ cs := ? length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl1ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl1ifp)) != "{ cs := \"ABBA\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl2ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl2ifp)) != "{ cs := (\"ABBA\", \"baba\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4vl3ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4vl3ifp)) != "{ cs := (\"ABBA\", \"baba\", \"Bye\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c1ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c1ifp)) != "{ cs := complement (\"ABBA\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c2ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c2ifp)) != "{ cs := complement (\"ABBA\", \"baba\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4c3ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4c3ifp)) != "{ cs := complement (\"ABBA\", \"baba\", \"Bye\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r1ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4r1ifp)) != "{ cs := (\"A\" .. \"B\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4r2ifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4r2ifp)) != "{ cs := (\"a\" .. \"c\") ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4paifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4paifp)) != "{ cs := pattern \"abc*xyz\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rcs(tspt_cs_mod4pqifp));
+  if(ttcn2string(t_rcs(tspt_cs_mod4pqifp)) != "{ cs := pattern \"abc?xyz\" ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+}
+
+//==== string2ttcn testcases ===============================================================
+//These testcases tests if
+// 1. string2ttcn can generate the expected template
+// 2. string2ttcn can generate the expected value, if possible/required (=true the third arg)
+//===========================================================================================
+testcase tc_cs_string2ttcn_mod4v() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4v)),t_rcs(tspt_cs_mod4v));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4v)),t_rcs(tspt_cs_mod4v),true);
+}
+
+testcase tc_cs_string2ttcn_mod4o() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4o)),t_rcs(tspt_cs_mod4o));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4o)),t_rcs(tspt_cs_mod4o),true);
+}
+
+//omit length
+testcase tc_cs_string2ttcn_mod4ol() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4ol)),t_rcs(tspt_cs_mod4ol));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4ol)),t_rcs(tspt_cs_mod4ol),false);
+}
+
+testcase tc_cs_string2ttcn_mod4a() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4a)),t_rcs(tspt_cs_mod4a));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4a)),t_rcs(tspt_cs_mod4a),false);
+}
+
+testcase tc_cs_string2ttcn_mod4q() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4q)),t_rcs(tspt_cs_mod4q));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4q)),t_rcs(tspt_cs_mod4q),false);
+}
+
+testcase tc_cs_string2ttcn_mod4al1() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4al1)),t_rcs(tspt_cs_mod4al1));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4al1)),t_rcs(tspt_cs_mod4al1),false);
+}
+
+testcase tc_cs_string2ttcn_mod4al2() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4al2)),t_rcs(tspt_cs_mod4al2));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4al2)),t_rcs(tspt_cs_mod4al2),false);
+}
+
+testcase tc_cs_string2ttcn_mod4ql1() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4ql1)),t_rcs(tspt_cs_mod4ql1));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4ql1)),t_rcs(tspt_cs_mod4ql1),false);
+}
+
+testcase tc_cs_string2ttcn_mod4ql2() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4ql2)),t_rcs(tspt_cs_mod4ql2));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4ql2)),t_rcs(tspt_cs_mod4ql2),false);
+}
+
+testcase tc_cs_string2ttcn_mod4vl1() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl1)),t_rcs(tspt_cs_mod4vl1));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl1)),t_rcs(tspt_cs_mod4vl1),true);
+}
+
+testcase tc_cs_string2ttcn_mod4vl2() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl2)),t_rcs(tspt_cs_mod4vl2));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl2)),t_rcs(tspt_cs_mod4vl2),false);
+}
+
+testcase tc_cs_string2ttcn_mod4vl3() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl3)),t_rcs(tspt_cs_mod4vl3));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl3)),t_rcs(tspt_cs_mod4vl3),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c1() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c1)),t_rcs(tspt_cs_mod4c1));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c1)),t_rcs(tspt_cs_mod4c1),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c2() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c2)),t_rcs(tspt_cs_mod4c2));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c2)),t_rcs(tspt_cs_mod4c2),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c3() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c3)),t_rcs(tspt_cs_mod4c3));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c3)),t_rcs(tspt_cs_mod4c3),false);
+}
+
+testcase tc_cs_string2ttcn_mod4r1() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4r1)),t_rcs(tspt_cs_mod4r1));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4r1)),t_rcs(tspt_cs_mod4r1),false);
+}
+
+testcase tc_cs_string2ttcn_mod4r2() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4r2)),t_rcs(tspt_cs_mod4r2));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4r2)),t_rcs(tspt_cs_mod4r2),false);
+}
+
+testcase tc_cs_string2ttcn_mod4pa() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4pa)),t_rcs(tspt_cs_mod4pa));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4pa)),t_rcs(tspt_cs_mod4pa),false);
+}
+
+testcase tc_cs_string2ttcn_mod4pq() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4pq)),t_rcs(tspt_cs_mod4pq));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4pq)),t_rcs(tspt_cs_mod4pq),false);
+}
+
+// ifp
+
+testcase tc_cs_string2ttcn_mod4vifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vifp)),t_rcs(tspt_cs_mod4vifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vifp)),t_rcs(tspt_cs_mod4vifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4oifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4oifp)),t_rcs(tspt_cs_mod4oifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4oifp)),t_rcs(tspt_cs_mod4oifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4aifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4aifp)),t_rcs(tspt_cs_mod4aifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4aifp)),t_rcs(tspt_cs_mod4aifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4qifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4qifp)),t_rcs(tspt_cs_mod4qifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4qifp)),t_rcs(tspt_cs_mod4qifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4al1ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4al1ifp)),t_rcs(tspt_cs_mod4al1ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4al1ifp)),t_rcs(tspt_cs_mod4al1ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4al2ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4al2ifp)),t_rcs(tspt_cs_mod4al2ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4al2ifp)),t_rcs(tspt_cs_mod4al2ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4ql1ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4ql1ifp)),t_rcs(tspt_cs_mod4ql1ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4ql1ifp)),t_rcs(tspt_cs_mod4ql1ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4ql2ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4ql2ifp)),t_rcs(tspt_cs_mod4ql2ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4ql2ifp)),t_rcs(tspt_cs_mod4ql2ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4vl1ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl1ifp)),t_rcs(tspt_cs_mod4vl1ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl1ifp)),t_rcs(tspt_cs_mod4vl1ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4vl2ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl2ifp)),t_rcs(tspt_cs_mod4vl2ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl2ifp)),t_rcs(tspt_cs_mod4vl2ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4vl3ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4vl3ifp)),t_rcs(tspt_cs_mod4vl3ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4vl3ifp)),t_rcs(tspt_cs_mod4vl3ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c1ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c1ifp)),t_rcs(tspt_cs_mod4c1ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c1ifp)),t_rcs(tspt_cs_mod4c1ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c2ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c2ifp)),t_rcs(tspt_cs_mod4c2ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c2ifp)),t_rcs(tspt_cs_mod4c2ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4c3ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4c3ifp)),t_rcs(tspt_cs_mod4c3ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4c3ifp)),t_rcs(tspt_cs_mod4c3ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4r1ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4r1ifp)),t_rcs(tspt_cs_mod4r1ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4r1ifp)),t_rcs(tspt_cs_mod4r1ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4r2ifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4r2ifp)),t_rcs(tspt_cs_mod4r2ifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4r2ifp)),t_rcs(tspt_cs_mod4r2ifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4paifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4paifp)),t_rcs(tspt_cs_mod4paifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4paifp)),t_rcs(tspt_cs_mod4paifp),false);
+}
+
+testcase tc_cs_string2ttcn_mod4pqifp() runs on MC {
+  f_string2ttcn_rcs_t(ttcn2string(t_rcs(tspt_cs_mod4pqifp)),t_rcs(tspt_cs_mod4pqifp));
+  f_string2ttcn_rcs_v(ttcn2string(t_rcs(tspt_cs_mod4pqifp)),t_rcs(tspt_cs_mod4pqifp),false);
+}
+
+control { 
+  
+  log("***charstring tests****");
+  execute(tc_cs_v());
+  execute(tc_cs_o());
+  execute(tc_cs_a());
+  execute(tc_cs_q());
+  execute(tc_cs_al1());
+  execute(tc_cs_al2());  
+  execute(tc_cs_ql1());
+  execute(tc_cs_ql2());
+  //execute(tc_cs_c());
+  execute(tc_cs_vl1());
+  execute(tc_cs_vl2());
+  execute(tc_cs_vl3());
+  execute(tc_cs_c1());
+  execute(tc_cs_c2());
+  execute(tc_cs_c3());
+  execute(tc_cs_r1());
+  execute(tc_cs_r2());
+  execute(tc_cs_pa());
+  execute(tc_cs_pq());
+  //=== charstring embedded in record ====
+  execute(tc_cs_v_emb());
+  execute(tc_cs_o_emb());
+  execute(tc_cs_a_emb());
+  execute(tc_cs_q_emb());
+  execute(tc_cs_al1_emb());
+  execute(tc_cs_al2_emb());  
+  execute(tc_cs_ql1_emb());
+  execute(tc_cs_ql2_emb());
+  //execute(tc_cs_c_emb());
+  execute(tc_cs_vl1_emb());
+  execute(tc_cs_vl2_emb());
+  execute(tc_cs_vl3_emb());
+  execute(tc_cs_c1_emb());
+  execute(tc_cs_c2_emb());
+  execute(tc_cs_c3_emb());
+  execute(tc_cs_r1_emb());
+  execute(tc_cs_r2_emb());
+  execute(tc_cs_pa_emb());
+  execute(tc_cs_pq_emb());
+  //embedded + ifpresent
+  execute(tc_cs_vifp_emb());
+  execute(tc_cs_oifp_emb());
+  execute(tc_cs_aifp_emb());
+  execute(tc_cs_qifp_emb());
+  execute(tc_cs_al1ifp_emb());
+  execute(tc_cs_al2ifp_emb());  
+  execute(tc_cs_ql1ifp_emb());
+  execute(tc_cs_ql2ifp_emb());
+  execute(tc_cs_vl1ifp_emb());
+  //execute(tc_cs_vl2ifp_emb());
+  execute(tc_cs_vl3ifp_emb());
+  execute(tc_cs_c1ifp_emb());
+  execute(tc_cs_c2ifp_emb());
+  execute(tc_cs_c3ifp_emb());
+  execute(tc_cs_r1ifp_emb());
+  execute(tc_cs_r2ifp_emb());
+  execute(tc_cs_paifp_emb());
+  execute(tc_cs_pqifp_emb());
+  
+  //======modified modulepar template wth type of charstring====
+  execute(tc_cs_ModulePar_emb());
+  execute(tc_cs_mod4v_emb());
+  execute(tc_cs_mod4o_emb());
+  execute(tc_cs_mod4a_emb());
+  execute(tc_cs_mod4q_emb());
+  execute(tc_cs_mod4al1_emb());
+  execute(tc_cs_mod4al2_emb());  
+  execute(tc_cs_mod4ql1_emb());
+  execute(tc_cs_mod4ql2_emb());
+  execute(tc_cs_mod4vl1_emb());
+  execute(tc_cs_mod4vl2_emb());
+  execute(tc_cs_mod4vl3_emb());
+  execute(tc_cs_mod4c1_emb());
+  execute(tc_cs_mod4c2_emb());
+  execute(tc_cs_mod4c3_emb());
+  execute(tc_cs_mod4r1_emb());
+  execute(tc_cs_mod4r2_emb());
+  execute(tc_cs_mod4pa_emb());
+  execute(tc_cs_mod4pq_emb());
+  //embedded + ifpresent
+  execute(tc_cs_mod4vifp_emb());
+  execute(tc_cs_mod4oifp_emb());
+  execute(tc_cs_mod4aifp_emb());
+  execute(tc_cs_mod4qifp_emb());
+  execute(tc_cs_mod4al1ifp_emb());
+  execute(tc_cs_mod4al2ifp_emb());  
+  execute(tc_cs_mod4ql1ifp_emb());
+  execute(tc_cs_mod4ql2ifp_emb());
+  execute(tc_cs_mod4vl1ifp_emb()); //Adam solved
+  execute(tc_cs_mod4vl2ifp_emb()); //Fixed: TR: HR98602, 'Matching fault in case of template ("A","B") ifpresent'
+  execute(tc_cs_mod4vl3ifp_emb());
+  execute(tc_cs_mod4c1ifp_emb());
+  execute(tc_cs_mod4c2ifp_emb());
+  execute(tc_cs_mod4c3ifp_emb());
+  execute(tc_cs_mod4r1ifp_emb());
+  execute(tc_cs_mod4r2ifp_emb());
+  execute(tc_cs_mod4paifp_emb());
+  execute(tc_cs_mod4pqifp_emb());
+  
+  //ttcn2string:
+  execute(tc_cs_ttcn2string_emb());
+  execute(tc_cs_string2ttcn_mod4v());
+  execute(tc_cs_string2ttcn_mod4o());
+  execute(tc_cs_string2ttcn_mod4ol());
+  execute(tc_cs_string2ttcn_mod4a());
+  execute(tc_cs_string2ttcn_mod4q());
+  execute(tc_cs_string2ttcn_mod4al1());
+  execute(tc_cs_string2ttcn_mod4al2());
+  execute(tc_cs_string2ttcn_mod4ql1());
+  execute(tc_cs_string2ttcn_mod4ql2());
+  execute(tc_cs_string2ttcn_mod4vl1());
+  execute(tc_cs_string2ttcn_mod4vl2());
+  execute(tc_cs_string2ttcn_mod4vl3());
+  execute(tc_cs_string2ttcn_mod4c1());
+  execute(tc_cs_string2ttcn_mod4c2());
+  execute(tc_cs_string2ttcn_mod4c3());
+  execute(tc_cs_string2ttcn_mod4r1());
+  execute(tc_cs_string2ttcn_mod4r2());
+  execute(tc_cs_string2ttcn_mod4pa());
+  execute(tc_cs_string2ttcn_mod4pq());
+  //ttcn2string with ifpresent
+  execute(tc_cs_string2ttcn_mod4vifp());
+  execute(tc_cs_string2ttcn_mod4oifp());
+  execute(tc_cs_string2ttcn_mod4aifp());
+  execute(tc_cs_string2ttcn_mod4qifp());
+  execute(tc_cs_string2ttcn_mod4al1ifp());
+  execute(tc_cs_string2ttcn_mod4al2ifp());
+  execute(tc_cs_string2ttcn_mod4ql1ifp());
+  execute(tc_cs_string2ttcn_mod4ql2ifp());
+  execute(tc_cs_string2ttcn_mod4vl1ifp());
+  execute(tc_cs_string2ttcn_mod4vl2ifp());
+  execute(tc_cs_string2ttcn_mod4vl3ifp());
+  execute(tc_cs_string2ttcn_mod4c1ifp());
+  execute(tc_cs_string2ttcn_mod4c2ifp());
+  execute(tc_cs_string2ttcn_mod4c3ifp());
+  execute(tc_cs_string2ttcn_mod4r1ifp());
+  execute(tc_cs_string2ttcn_mod4r2ifp());
+  execute(tc_cs_string2ttcn_mod4paifp());
+  execute(tc_cs_string2ttcn_mod4pqifp()); 
+  
+}
+
+}

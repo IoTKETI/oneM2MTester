@@ -1,0 +1,367 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Delic, Adam
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module isprecho_OK {
+
+type component PDTestComponent {};
+
+/*--- ISPRESENT  --------------------------------------------------*/
+
+type record iptype1 {integer i optional}
+type record iptype2 {integer i, iptype1 r optional}
+type set iptype3 {integer i optional}
+type set iptype4 {integer i, iptype3 r optional}
+
+const iptype1 ipcon1 := {1}
+const iptype1 ipcon2 := {omit}
+const iptype2 ipcon3 := {1, {1}}
+const iptype2 ipcon4 := {1, {omit}}
+const iptype3 ipcon5 := {i := 1}
+const iptype3 ipcon6 := {i := omit}
+const iptype4 ipcon7 := {i := 1, r := {i := 1}}
+const iptype4 ipcon8 := {i := 1, r := {i := omit}}
+const iptype2 ipcon9 := {1, omit}
+const iptype4 ipcon10 := {i := 1, r := omit}
+
+
+
+modulepar boolean ipbool1 := ispresent(ipcon1.i)
+modulepar boolean ipbool2 := ispresent(ipcon2.i)
+modulepar boolean ipbool3 := ispresent(ipcon3.r.i)
+modulepar boolean ipbool4 := ispresent(ipcon4.r.i)
+modulepar boolean ipbool5 := ispresent(ipcon5.i)
+modulepar boolean ipbool6 := ispresent(ipcon6.i)
+modulepar boolean ipbool7 := ispresent(ipcon7.r.i)
+modulepar boolean ipbool8 := ispresent(ipcon8.r.i)
+modulepar boolean ipbool9 := ispresent(ipcon9.r)
+modulepar boolean ipbool10 := ispresent(ipcon10.r)
+
+
+testcase ispres() runs on PDTestComponent{
+
+	if (ipbool1 and ispresent(ipcon1.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool2 and not ispresent(ipcon2.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (ipbool3 and ispresent(ipcon3.r.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool4 and not ispresent(ipcon4.r.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (ipbool5 and ispresent(ipcon5.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool6 and not ispresent(ipcon6.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (ipbool7 and ispresent(ipcon7.r.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool8 and not ispresent(ipcon8.r.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool9 and not ispresent(ipcon9.r))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not ipbool10 and not ispresent(ipcon10.r))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+
+type union ictype1 {integer i, boolean b}
+type record of ictype1 ictype2
+
+const ictype1 iccon1 := {i := 1}
+const ictype2 iccon2 := {{i := 1},{b := true}}
+
+modulepar boolean icbool1 := ischosen(iccon1.i)
+modulepar boolean icbool2 := ischosen(iccon1.b)
+modulepar boolean icbool3 := ischosen(iccon2[0].i)
+modulepar boolean icbool4 := ischosen(iccon2[0].b)
+
+testcase ischo() runs on PDTestComponent{
+	if (icbool1 and ischosen(iccon1.i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not icbool2 and not ischosen(iccon1.b))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if (icbool3 and ischosen(iccon2[0].i))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (not icbool4 and not ischosen(iccon2[0].b))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+}
+
+
+type record MyRecord {
+  record {
+    boolean innerField1 optional,
+    integer innerField2 optional,
+    MyRecord innerField3 optional
+  } field1 optional,
+  integer field2
+}
+
+type record R { integer f1 optional, integer f2 optional }
+template R t1 := { f1 := 1, f2 := (2..4) }
+template R t2 := { f1 := omit, f2 := (5..7) ifpresent }
+template R t3 := { f1 := *, f2 := ? }
+
+type record RI { integer i optional }
+type record of integer ROI;
+type record of ROI ROROI;
+
+type record R1 { integer i }
+type record R2 { R1 r }
+
+testcase tc_extendedIspresent() runs on PDTestComponent
+{
+  var template ROROI roroi := { {1,2},{3,4},? }
+  if (ispresent(roroi[1])) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(roroi[1][1])) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(roroi[1][2])) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(roroi[2])) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(roroi[2][1])) { setverdict(pass); } else { setverdict(fail); }
+
+  if (ispresent(ROROI:?)) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(RI:{?})) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(ispresent("not present"))) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(isbound(isvalue(2)))) { setverdict(pass); } else { setverdict(fail); }
+
+  var ROI roi := {1,2,3}
+  var RI ri := { i:=1 }
+  if (ispresent(roi[ri.i])) { setverdict(pass); } else { setverdict(fail); }
+
+  var template R2 tr2 := { r := ? }
+  if (ispresent(tr2.r.i)) { setverdict(pass); } else { setverdict(fail); }
+
+  var MyRecord vl_MyRecord := { field1 := { omit, omit, omit }, field2 := 5 }
+  if (ispresent(vl_MyRecord.field1)) { setverdict(pass); } else { setverdict(fail); }
+  vl_MyRecord.field1 := omit;
+  if (not ispresent(vl_MyRecord.field1)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(vl_MyRecord.field1.innerField1)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(vl_MyRecord.field1.innerField3.field2)) { setverdict(pass); } else { setverdict(fail); }
+  
+  var template MyRecord vlt_MyRecord := { field1 := ?, field2 := 5 }
+  if (ispresent(vlt_MyRecord.field1)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(vlt_MyRecord.field1.innerField1)) { setverdict(pass); } else { setverdict(fail); }
+
+  if (ispresent(t1.f1)) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(t1.f2)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(t2.f1)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(t2.f2)) { setverdict(pass); } else { setverdict(fail); }
+  if (not ispresent(t3.f1)) { setverdict(pass); } else { setverdict(fail); }
+  if (ispresent(t3.f2)) { setverdict(pass); } else { setverdict(fail); }
+}
+
+type record Rec1 { integer f }
+type record Rec2 { integer f optional }
+type union Uni { integer u }
+
+testcase f_TC_isBoundValuePresent_Integer_Template() runs on PDTestComponent
+{
+  var template integer vt_int;
+  if (isbound(vt_int)) {setverdict(fail)}
+  if (isvalue(vt_int)) {setverdict(fail)}
+  if (ispresent(vt_int)) {setverdict(fail)}
+
+  vt_int:=5;
+  if (not isbound(vt_int)) {setverdict(fail)}
+  if (not isvalue(vt_int)) {setverdict(fail)}
+  if (not ispresent(vt_int)) {setverdict(fail)}
+
+  vt_int := omit;
+  if (not isbound(vt_int)) {setverdict(fail)}
+  if (isvalue(vt_int)) {setverdict(fail)}
+  if (ispresent(vt_int)) {setverdict(fail)}
+
+  vt_int:=?;
+  if (not isbound(vt_int)) {setverdict(fail)}
+  if (isvalue(vt_int)) {setverdict(fail)}
+  if (not ispresent(vt_int)) {setverdict(fail)}
+
+  vt_int:=*;
+  if (not isbound(vt_int)) {setverdict(fail)}
+  if (isvalue(vt_int)) {setverdict(fail)}
+  if (ispresent(vt_int)) {setverdict(fail)}
+
+  setverdict(pass);
+}
+
+testcase f_TC_isBoundValuePresent_RecordWithMandatoryField_Template() runs on PDTestComponent
+{
+  var template Rec1 vl_Rec1;
+  if (isbound(vl_Rec1)) {setverdict(fail)}
+  if (isvalue(vl_Rec1)) {setverdict(fail)}
+  if (ispresent(vl_Rec1)) {setverdict(fail)}
+  
+  vl_Rec1:=?;
+  if (not isbound(vl_Rec1)) {setverdict(fail)}
+  if (isvalue(vl_Rec1)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec1.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec1.f)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1.f)) {setverdict(fail)}
+
+  vl_Rec1:=*;
+  if (not isbound(vl_Rec1)) {setverdict(fail)}
+  if (isvalue(vl_Rec1)) {setverdict(fail)}
+  if (ispresent(vl_Rec1)) {setverdict(fail)}
+
+  if (isbound(vl_Rec1.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec1.f)) {setverdict(fail)} 
+  vl_Rec1:=*; 
+  if (ispresent(vl_Rec1.f)) {setverdict(fail)}
+
+  vl_Rec1:={f:=5};
+  if (not isbound(vl_Rec1)) {setverdict(fail)}
+  if (not isvalue(vl_Rec1)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec1.f)) {setverdict(fail)}
+  if (not isvalue(vl_Rec1.f)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1.f)) {setverdict(fail)}
+
+  vl_Rec1:={f:=?};
+  if (not isbound(vl_Rec1)) {setverdict(fail)}
+  if (isvalue(vl_Rec1)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec1.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec1.f)) {setverdict(fail)}
+  if (not ispresent(vl_Rec1.f)) {setverdict(fail)}
+
+  setverdict(pass);
+}
+
+testcase f_TC_isBoundValuePresent_RecordWithOptionalField_Template() runs on PDTestComponent
+{
+  var template Rec2 vl_Rec2;
+  if (isbound(vl_Rec2)) {setverdict(fail)}
+  if (isvalue(vl_Rec2)) {setverdict(fail)}
+  if (ispresent(vl_Rec2)) {setverdict(fail)}
+
+  vl_Rec2:=?;
+  if (not isbound(vl_Rec2)) {setverdict(fail)}
+  if (isvalue(vl_Rec2)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec2.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec2.f)) {setverdict(fail)}
+  vl_Rec2:=?;
+  if (ispresent(vl_Rec2.f)) {setverdict(fail)}
+
+  vl_Rec2:=*;
+  if (not isbound(vl_Rec2)) {setverdict(fail)}
+  if (isvalue(vl_Rec2)) {setverdict(fail)}
+  if (ispresent(vl_Rec2)) {setverdict(fail)}
+
+  if (isbound(vl_Rec2.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec2.f)) {setverdict(fail)}
+  vl_Rec2:=*;
+  if (ispresent(vl_Rec2.f)) {setverdict(fail)}
+
+  vl_Rec2:={f:=5};
+  if (not isbound(vl_Rec2)) {setverdict(fail)}
+  if (not isvalue(vl_Rec2)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec2.f)) {setverdict(fail)}
+  if (not isvalue(vl_Rec2.f)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2.f)) {setverdict(fail)}
+
+  vl_Rec2:={f:=?};
+  if (not isbound(vl_Rec2)) {setverdict(fail)}
+  if (isvalue(vl_Rec2)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec2.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec2.f)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2.f)) {setverdict(fail)}
+
+  vl_Rec2:={f:=*};
+  if (not isbound(vl_Rec2)) {setverdict(fail)}
+  if (isvalue(vl_Rec2)) {setverdict(fail)}
+  if (not ispresent(vl_Rec2)) {setverdict(fail)}
+
+  if (not isbound(vl_Rec2.f)) {setverdict(fail)}
+  if (isvalue(vl_Rec2.f)) {setverdict(fail)}
+  if (ispresent(vl_Rec2.f)) {setverdict(fail)}
+
+  setverdict(pass);
+}
+
+testcase f_TC_isBoundValuePresent_Union_Template() runs on PDTestComponent
+{
+  var template Uni vl_Uni;
+  if (isbound(vl_Uni)) {setverdict(fail)}
+  if (isvalue(vl_Uni)) {setverdict(fail)}
+  if (ispresent(vl_Uni)) {setverdict(fail)}
+
+  vl_Uni:=?;
+  if (not isbound(vl_Uni)) {setverdict(fail)}
+  if (isvalue(vl_Uni)) {setverdict(fail)}
+  if (not ispresent(vl_Uni)) {setverdict(fail)}
+
+  if (not isbound(vl_Uni.u)) {setverdict(fail)}
+  if (isvalue(vl_Uni.u)) {setverdict(fail)}
+  vl_Uni:=?;
+  if (ispresent(vl_Uni.u)) {setverdict(fail)}
+
+  vl_Uni:={u:=5};
+  if (not isbound(vl_Uni)) {setverdict(fail)}
+  if (not isvalue(vl_Uni)) {setverdict(fail)}
+  if (not ispresent(vl_Uni)) {setverdict(fail)}
+
+  if (not isbound(vl_Uni.u)) {setverdict(fail)}
+  if (not isvalue(vl_Uni.u)) {setverdict(fail)}
+  if (not ispresent(vl_Uni.u)) {setverdict(fail)}
+
+  vl_Uni:={u:=?};
+  if (not isbound(vl_Uni)) {setverdict(fail)}
+  if (isvalue(vl_Uni)) {setverdict(fail)}
+  if (not ispresent(vl_Uni)) {setverdict(fail)}
+
+  if (not isbound(vl_Uni.u)) {setverdict(fail)}
+  if (isvalue(vl_Uni.u)) {setverdict(fail)}
+  if (not ispresent(vl_Uni.u)) {setverdict(fail)}
+
+  setverdict(pass);
+}
+
+testcase HO90059() runs on PDTestComponent { // TemplateInstance with ifpresent is not a Value
+  if (log2str(1 ifpresent)=="1 ifpresent") { setverdict(pass) } else { setverdict(fail) }
+  if (ispresent(1 ifpresent)==false) { setverdict(pass) } else { setverdict(fail) }
+  setverdict(pass);
+}
+
+control {
+	execute (ispres());
+	execute (ischo());
+  execute (tc_extendedIspresent());
+  execute (f_TC_isBoundValuePresent_Integer_Template());
+  execute (f_TC_isBoundValuePresent_RecordWithMandatoryField_Template());
+  execute (f_TC_isBoundValuePresent_RecordWithOptionalField_Template());
+  execute (f_TC_isBoundValuePresent_Union_Template());
+  execute (HO90059());
+}
+
+}

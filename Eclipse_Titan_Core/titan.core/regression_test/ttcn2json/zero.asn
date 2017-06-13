@@ -1,0 +1,94 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Baranyi, Botond
+--
+--/////////////////////////////////////////////////////////////////////////////
+
+Zero
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+IMPORTS ;
+
+-- encodable types
+SeqOfInt ::= SEQUENCE OF INTEGER
+
+SeqProduct ::= SEQUENCE {
+  name UniversalString,
+  price REAL,
+  id OCTET STRING OPTIONAL,
+  available BOOLEAN
+}
+
+Number ::= CHOICE {
+  decimal INTEGER,
+  binary BIT STRING,
+  hexadecimal OCTET STRING
+}
+
+AnyString ::= CHOICE {
+  generalstr GeneralString,
+  numericstr NumericString,
+  utf8str UTF8String,
+  printablestr PrintableString,
+  universalstr UniversalString,
+  bmpstr BMPString,
+  graphicstr GraphicString,
+  ia5str IA5String,
+  teletexstr TeletexString,
+  videotexstr VideotexString,
+  visiblestr VisibleString
+}
+
+ManyStrings ::= SEQUENCE OF AnyString
+
+Big-Set ::= SET {
+  product SeqProduct,
+  numbers SET OF Number,
+  strings ManyStrings,
+  color ENUMERATED { red, blue, green, yellow }
+}
+
+Big-Choice ::= CHOICE {
+  numbers SET OF Number,
+  strings ManyStrings
+}
+
+Season ::= ENUMERATED {
+  spring (1), summer (2), fall (3), winter (4)
+}
+
+SelectionType ::= numbers < Big-Choice
+
+NullType ::= NULL
+
+ObjIdType ::= OBJECT IDENTIFIER
+
+RelObjIdType ::= RELATIVE-OID
+
+-- non-encodable types
+
+EmbPdvType ::= EMBEDDED PDV
+
+ExtType ::= EXTERNAL
+
+GenTimeType ::= GeneralizedTime
+
+UtcTimeType ::= UTCTime
+
+ObjDescType ::= ObjectDescriptor
+
+END
+

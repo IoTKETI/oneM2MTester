@@ -1,0 +1,297 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_complextype_aliases.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Jun 17 13:42:09 2015
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- complextype_aliases.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/complextype/aliases" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_complextype_aliases {
+
+
+import from XSD all;
+
+
+const XSD.Integer c_defaultForEmpty_1 := 2;
+
+
+/* Theese types needed to force the nameconversion */
+
+
+type XSD.AnyType ComplexTypeExtensionNotAlias
+with {
+  variant "name as 'ComplexTypeExtensionNotAlias_'";
+  variant "element";
+};
+
+
+type XSD.AnyType ComplexTypeRestrictionAlias
+with {
+  variant "name as 'ComplexTypeRestrictionAlias_'";
+  variant "element";
+};
+
+
+type record ComplexType
+{
+	XSD.Integer elem
+};
+
+
+type ComplexType ComplexTypeExtensionAlias;
+
+
+/* Not alias because extended with attr attribute */
+
+
+type record ComplexTypeExtensionNotAlias_1
+{
+	XSD.String attr optional,
+	XSD.Integer elem
+}
+with {
+  variant "name as 'ComplexTypeExtensionNotAlias'";
+  variant (attr) "attribute";
+};
+
+
+type ComplexTypeExtensionNotAlias_1 ComplexTypeExtensionAlias2;
+
+
+/* Not alias because extended with elem1 element */
+
+
+type record ComplexTypeExtensionNotAlias2
+{
+	XSD.String attr optional,
+	XSD.Integer elem,
+	XSD.Integer elem1
+}
+with {
+  variant (attr) "attribute";
+};
+
+
+type ComplexTypeExtensionNotAlias2 ComplexTypeExtensionAlias3;
+
+
+/* Not alias because extended with optional sequence */
+
+
+type record ComplexTypeExtensionNotAlias3
+{
+	XSD.String attr optional,
+	XSD.Integer elem,
+	XSD.Integer elem1,
+	record {
+		XSD.Integer elem2
+	} sequence optional
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence) "untagged";
+};
+
+
+type ComplexTypeExtensionNotAlias3 ComplexTypeExtensionAlias4;
+
+
+/* Resitrictions */
+
+
+type record ComplexType2
+{
+	XSD.String attr optional,
+	record length(0 .. 2) of record {
+		XSD.Integer elem optional,
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+type ComplexType2 ComplexTypeRestrictionAlias_1
+with {
+  variant "name as 'ComplexTypeRestrictionAlias'";
+};
+
+
+type ComplexTypeRestrictionAlias_1 ComplexTypeRestrictionAlias2;
+
+
+/* Not alias because the minOccurs of the sequence is restricted to 1 */
+
+
+type record ComplexTypeRestrictionNotAlias
+{
+	XSD.String attr optional,
+	record length(1 .. 2) of record {
+		XSD.Integer elem optional,
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+/* Not alias because the minOccurs of the elem element is restricted to 1 */
+
+
+type record ComplexTypeRestrictionNotAlias2
+{
+	XSD.String attr optional,
+	record length(0 .. 2) of record {
+		XSD.Integer elem,
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+/* Not alias because of the elem element is removed */
+
+
+type record ComplexTypeRestrictionNotAlias3
+{
+	XSD.String attr optional,
+	record length(0 .. 2) of record {
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+/* Not alias because of the attr attribute is required */
+
+
+type record ComplexTypeRestrictionNotAlias4
+{
+	XSD.String attr,
+	record length(0 .. 2) of record {
+		XSD.Integer elem optional,
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+/* Alias attribute is not mentioned */
+
+
+type ComplexTypeRestrictionAlias2 ComplexTypeRestrictionAlias3;
+
+
+/* Not alias because of the elem element's fixed value is 2 */
+
+
+type record ComplexTypeRestrictionNotAlias5
+{
+	XSD.String attr optional,
+	record length(0 .. 2) of record {
+		XSD.Integer elem (c_defaultForEmpty_1) optional,
+		record length(1 .. 2) of XSD.Integer elem1_list
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (sequence_list[-].elem1_list) "untagged";
+  variant (sequence_list[-].elem1_list[-]) "name as 'elem1'";
+};
+
+
+/* Not alias because of the elem1 element removed and the elem element is not optional */
+
+
+type record ComplexTypeRestrictionNotAlias6
+{
+	XSD.String attr optional,
+	record length(0 .. 2) of record {
+		XSD.Integer elem (c_defaultForEmpty_1)
+	} sequence_list
+}
+with {
+  variant (attr) "attribute";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].elem) "defaultForEmpty as c_defaultForEmpty_1";
+};
+
+
+/* Not alias because everything is removed */
+
+
+type record ComplexTypeRestrictionNotAlias7
+{
+
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/complextype/aliases' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

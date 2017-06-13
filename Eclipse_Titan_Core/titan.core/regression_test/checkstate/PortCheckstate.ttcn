@@ -1,0 +1,321 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+
+module PortCheckstate
+{
+    type port MyPort message    
+    {
+    inout charstring
+    } with { extension "internal" }
+
+    type component MyMTCType
+    {
+        port MyPort MyPCO1;
+        port MyPort MyPCO2;
+    }
+
+    type component MTCType
+    {
+        port MyPort MyPCO3;
+        port MyPort MyPCO4;
+    }
+
+    testcase tc_checkstate() runs on MyMTCType system MTCType
+    {
+        var boolean myPortState;
+        var charstring started := "Started";
+        myPortState := MyPCO1.checkstate(started) and MyPCO2.checkstate("Started");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := MyPCO1.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        map(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := MyPCO2.checkstate("Linked");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := MyPCO2.checkstate("Mapped");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := MyPCO2.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+        var MyMTCType myComp1 := MyMTCType.create;
+        connect(myComp1:MyPCO2, mtc:MyPCO2);
+
+        myPortState := MyPCO2.checkstate("Connected");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        disconnect(myComp1:MyPCO2, mtc:MyPCO2);
+
+        myPortState := MyPCO2.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := MyPCO2.checkstate("Mapped");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := MyPCO2.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        all port.stop;
+
+        if(MyPCO2.checkstate("Stopped")) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    testcase tc_any_checkstate() runs on MyMTCType system MTCType
+    {
+        var boolean myPortState;
+        myPortState := any port.checkstate("Started");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := any port.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        map(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := any port.checkstate("Linked");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := any port.checkstate("Mapped");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := any port.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+        var MyMTCType myComp1 := MyMTCType.create;
+        connect(myComp1:MyPCO2, mtc:MyPCO2);
+
+        myPortState := any port.checkstate("Connected");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        disconnect(myComp1:MyPCO2, mtc:MyPCO2);
+
+        myPortState := any port.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := any port.checkstate("Mapped");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := any port.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        all port.stop;
+
+        if(any port.checkstate("Stopped")) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    testcase tc_all_checkstate() runs on MyMTCType system MTCType
+    {
+        var boolean myPortState := all port.checkstate("Started");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := all port.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        map(mtc:MyPCO1, system:MyPCO3);
+
+        myPortState := all port.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := all port.checkstate("Mapped");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        map(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := all port.checkstate("Linked");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := all port.checkstate("Mapped");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        myPortState := all port.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO1, system:MyPCO3);
+        var MyMTCType myComp1 := MyMTCType.create;
+        connect(myComp1:MyPCO1, mtc:MyPCO1);
+
+        myPortState := all port.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+        var MyMTCType myComp2 := MyMTCType.create;
+        connect(myComp2:MyPCO2, mtc:MyPCO2);
+
+        myPortState := all port.checkstate("Connected");
+        if(myPortState == true) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        disconnect(myComp1:MyPCO1, mtc:MyPCO1);
+
+        myPortState := all port.checkstate("Connected");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO2, system:MyPCO4);
+
+        myPortState := all port.checkstate("Mapped");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        unmap(mtc:MyPCO1, system:MyPCO3);
+        myPortState := all port.checkstate("Linked");
+        if(myPortState == false) {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        all port.stop;
+
+        if(all port.checkstate("Stopped")) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control
+    {
+	    execute(tc_checkstate());
+	    execute(tc_any_checkstate());
+	    execute(tc_all_checkstate());
+    }
+}

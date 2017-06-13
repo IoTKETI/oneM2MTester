@@ -1,0 +1,68 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_anyattr_in_complex.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Oct 28 13:30:35 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- anyattr_in_complex.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/anyattr/in/complex" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_anyattr_in_complex {
+
+
+import from XSD all;
+
+
+type record DependentLocalityType
+{
+	record of record {
+		record of XSD.String attr optional
+	} dependentLocalityName_list,
+	record {
+	} dependentLocalityNumber optional
+}
+with {
+  variant (dependentLocalityName_list) "untagged";
+  variant (dependentLocalityName_list[-]) "name as 'DependentLocalityName'";
+  variant (dependentLocalityName_list[-].attr) "anyAttributes except unqualified, 'www.example.org/anyattr/in/complex'";
+  variant (dependentLocalityNumber) "name as capitalized";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/anyattr/in/complex' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

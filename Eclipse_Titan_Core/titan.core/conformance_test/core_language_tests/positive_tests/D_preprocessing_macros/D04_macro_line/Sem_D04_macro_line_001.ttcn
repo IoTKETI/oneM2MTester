@@ -1,0 +1,30 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:D, Ensure that __LINE__ macro stores the actual line number when it is called
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+// In this case the line number when the macro is called at line 15.
+module Sem_D04_macro_line_001 {
+
+    type component GeneralComp {}
+    function f1 ( ) runs on GeneralComp {}
+	
+    testcase TC_Sem_D04_macro_line_001() runs on GeneralComp system GeneralComp {
+        
+        const integer MyConst:= __LINE__; // line 18
+		
+        if (match(MyConst, 18)) {
+            setverdict(pass);
+        } else {
+            setverdict(fail, "Expected line 23, wrong line number");
+        }
+    }
+
+    control {
+        execute(TC_Sem_D04_macro_line_001());
+    }
+}

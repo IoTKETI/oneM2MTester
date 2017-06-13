@@ -1,0 +1,43 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module transparent {
+
+type component Glass {}
+
+// A hypothetical comparator function.
+// By setting it to transparent, the setverdict line would be logged
+// as if it happened in the caller (the testcase).
+function compare(in charstring act, in template charstring exp)
+{
+  if (match(act, exp))
+  { setverdict(pass); }
+  else { setverdict(fail, match(act, exp)); }
+}
+with {
+  extension "transparent";
+}
+
+template charstring super := pattern "*fragil*";
+
+testcase comp() runs on Glass
+{
+  var charstring inx := "Supercalifragilistic";
+  compare(inx, super);      
+}
+
+control
+{
+  execute(comp());
+}
+
+}

@@ -1,0 +1,318 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+
+module IsTemplateKind
+{
+
+type component MTCType {}
+
+
+type record of integer RoI; 
+type set of integer SoI;
+type record of MyMessageType RoM;
+type set of MyMessageType SoM;
+type record of RoI RoRoI;
+type set of integer MySetOfType (0 .. 10);
+
+type record MyMessageType
+{
+    integer field1,
+    charstring field2,
+    boolean field3 optional,
+    integer field4[4]
+}
+
+type record MyBinaryMessage
+{
+    octetstring payload
+} 
+
+type record MyPayload
+{
+    integer field1,
+    integer field2
+} with {
+    encode "XML"
+}
+
+template octetstring mw_t1 := decmatch MyPayload:{field1 := 1, field2 := ? };
+
+
+testcase tc_istemplatekind() runs on MTCType system MTCType
+{
+var template integer vt_1 := 3;
+
+template MyMessageType vt_2 :=
+{
+	field1 := 3+2, // specific value of integer type
+	field2 := "My string", // specific value of charstring type
+	field3 := true, // specific value of boolean type
+	field4 := {1,2,3,4} // specific value of integer array
+} 
+
+var template integer vt_3 := 3 ifpresent;
+var template integer vt_4 := ?;
+var template integer vt_5 := (1,2,3);
+var template RoI vt_5_5 := {1,2,3};
+var template integer vt_6 := (0, all from vt_5_5);
+var template integer vt_7 := complement(2,3,4);
+var template integer vt_8 := *;
+var template integer vt_9 := (1 .. 8);
+var template MySetOfType vt_10 := superset (1,2,3);
+var template MySetOfType vt_11 := subset (1,2,3);
+var template integer vt_12 := omit;
+
+template RoI vt_13 := {1,2,3,?};
+
+template RoI vt_14 := {1,2,3,*};
+
+template RoI vt_15 := { 3, 5, permutation(2,3,4) };
+
+template RoI vt_16 := omit;
+
+template RoI vt_17 := { 3, 5, permutation(2,3,4) } length(5..8);
+
+template RoI vt_18 := { 3, 5, permutation(2,3,4) } length(5..8) ifpresent;
+
+template charstring vt_19 := pattern "ab??xyz*0"; 
+
+template RoM vt_20 := { vt_2, ? }; 
+
+template RoRoI vt_21 := { {(3,4)}, {5,6}, ? };
+
+template MyMessageType vt_22 :=
+{
+	field1 := 3+2, // specific value of integer type
+	field2 := ?,
+	field3 := true, // specific value of boolean type
+	field4 := {1,2,3,4}
+} 
+
+var boolean v_res;
+
+v_res := istemplatekind(vt_1, "value"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "value"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_3, "value"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "value"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_5, "list"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "list"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_6, "list"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_7, "complement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_6, "complement"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "?"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "AnyValue"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_3, "AnyValue"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_8, "*"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_8, "AnyValueOrNone"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "AnyValueOrNone"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_9, "range"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "range"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_10, "superset"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_11, "superset"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_11, "subset"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_10, "subset"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_12, "omit"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "omit"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_8, "omit"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "omit"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_22, "decmatch"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(mw_t1, "decmatch"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_13, "AnyElement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_20, "AnyElement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_21, "AnyElement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_14, "AnyElement"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_14, "AnyElementsOrNone"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_13, "AnyElementsOrNone"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_15, "permutation"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_14, "permutation"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_16, "omit"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_15, "omit"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_17, "length"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_15, "length"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_18, "ifpresent"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_17, "ifpresent"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_19, "pattern"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_17, "pattern"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "AnyValue"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "AnyValueOrNone"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "complement"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "list"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "ifpresent"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_3, "permutation"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_22, "AnyElement"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }      
+
+}
+
+testcase tc_istemplatekind_set() runs on MTCType system MTCType {
+template SoI vt_1 := {1,2,3,?};
+
+template SoI vt_2 := {1,2,3,*};
+
+template SoI vt_3 := omit;
+
+template SoI vt_4 := { 3, 5, 4, 6, 8 } length(5..8);
+
+template SoI vt_5 := { 3, 5, 4,5,6 } length(5..8) ifpresent;
+
+template MyMessageType vt_6 :=
+ {
+ field1 := 3+2, // specific value of integer type
+ field2 := "My string", // specific value of charstring type
+ field3 := true, // specific value of boolean type
+ field4 := {1,2,3,4} // specific value of integer array
+ } 
+
+template SoM vt_7 := { vt_6, ? };
+
+var boolean v_res;
+
+
+v_res := istemplatekind(vt_1, "AnyElement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_7, "AnyElement"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "AnyElement"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "AnyElementsOrNone"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_1, "AnyElementsOrNone"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_3, "omit"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "omit"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "length"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_2, "length"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_5, "ifpresent"); // true
+if(v_res == true) { setverdict(pass); } else { setverdict(fail); }
+
+v_res := istemplatekind(vt_4, "ifpresent"); // false
+if(v_res == false) { setverdict(pass); } else { setverdict(fail); }
+}
+   
+control
+{
+    execute(tc_istemplatekind());
+    execute(tc_istemplatekind_set());
+}
+
+}

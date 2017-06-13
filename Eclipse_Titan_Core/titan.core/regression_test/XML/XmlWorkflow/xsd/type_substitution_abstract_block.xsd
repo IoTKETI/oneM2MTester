@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:tys="www.example.org/type/substitution/abstract/block"
+ targetNamespace="www.example.org/type/substitution/abstract/block" blockDefault="extension">
+
+
+<xsd:element name="head" type="tys:ParentType"/>
+
+<!-- SUBSTITUTABLE PARENT TYPE -->
+<!-- type substitutiongroup generated, because has elemet declaration -->
+<xsd:complexType name="ParentType" abstract="true" block="restriction extension">
+	<xsd:sequence>
+		<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string" />
+		<xsd:element name="bar" type="xsd:string"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="RestrictedTypeElem" type="tys:restrictedType"/>
+<!-- type substitutiongroup generated, because has elemet declaration -->
+<xsd:complexType name="restrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="tys:ParentType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="1" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- type substitutiongroup generated, because the parent has elemet declaration -->
+<xsd:complexType name="restrictedType2">
+	<xsd:complexContent>
+		<xsd:restriction base="tys:restrictedType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="2" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Added to restrictedtype_derivations -->
+<xsd:complexType name="restrictedType2.1">
+	<xsd:complexContent>
+		<xsd:restriction base="tys:restrictedType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="2" maxOccurs="5" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- No type substitutiongroup generated, because the parent lacks elemet declaration -->
+<xsd:complexType name="restrictedType3">
+	<xsd:complexContent>
+		<xsd:restriction base="tys:restrictedType2">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="3" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:element name="extendedElement" type="tys:extendedType"/>
+<xsd:complexType name="extendedType" block="restriction">
+	<xsd:complexContent>
+		<xsd:extension base="tys:ParentType">
+			<xsd:sequence>
+			</xsd:sequence>
+			<xsd:attribute name="attr1" type="string" />
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="restrictedExtendedType">
+	<xsd:complexContent>
+		<xsd:restriction base="tys:extendedType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr1" type="string" use="prohibited" />
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+</xsd:schema>

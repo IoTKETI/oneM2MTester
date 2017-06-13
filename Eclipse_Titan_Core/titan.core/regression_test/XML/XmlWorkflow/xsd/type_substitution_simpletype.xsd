@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/type/substitution/simpletype"
+ targetNamespace="www.example.org/type/substitution/simpletype">
+
+
+<xsd:element name="head" type="string" />
+
+<xsd:element name="head_" type="string" />
+
+<xsd:element name="head2" type="this:stringtype" />
+
+<xsd:simpleType name="stringtype">
+	<xsd:restriction base="string"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="stringtype2">
+	<xsd:restriction base="this:stringtype">
+		<xsd:length value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:element name="int" type="xsd:integer"/>
+
+<xsd:simpleType name="extInt">
+	<xsd:restriction base="xsd:integer"/>
+</xsd:simpleType>
+
+
+
+<!-- Test if the elements are changed in a complextype -->
+<xsd:element name="elem" type="base64Binary"/>
+
+<xsd:simpleType name="CrypBinary">
+	<xsd:restriction base="base64Binary">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:element name="SignatureValue" type="this:Signature"/> 
+
+<xsd:complexType name="Signature">
+	<xsd:simpleContent>
+		<xsd:extension base="base64Binary">
+			<xsd:attribute name="Id" type="ID"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+
+<xsd:element name="Data" type="this:DataType"/> 
+
+<xsd:complexType name="DataType">
+	<xsd:sequence>
+		<xsd:choice>
+			<xsd:element name="SKI" type="base64Binary"/>
+			<xsd:element name="Cert" type="base64Binary"/>
+		</xsd:choice>
+	</xsd:sequence>
+</xsd:complexType>
+
+
+</xsd:schema>

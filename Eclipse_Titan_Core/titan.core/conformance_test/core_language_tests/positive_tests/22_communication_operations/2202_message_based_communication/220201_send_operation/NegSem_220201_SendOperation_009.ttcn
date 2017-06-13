@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:22.2.1, null address in the to clause of send operation
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirements are tested:
+// No AddressRef shall contain the special value null at the time of the operation.
+
+module NegSem_220201_SendOperation_009 {
+	
+	type port P message {
+		inout integer;        
+	} with {extension "internal"}
+    
+    type integer address;
+    
+    type component GeneralComp 
+	{
+		port P p;
+	}
+		
+    testcase TC_NegSem_220201_SendOperation_009() runs on GeneralComp {
+        var address v_addr := null;
+
+		connect(self:p, self:p);
+
+        p.send(1) to v_addr;
+        p.receive(integer:?);
+        setverdict(pass);
+    }
+
+    control {
+        execute(TC_NegSem_220201_SendOperation_009(), 5.0);
+    }
+}

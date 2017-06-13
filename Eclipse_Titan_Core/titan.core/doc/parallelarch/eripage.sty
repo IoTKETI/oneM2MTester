@@ -1,0 +1,234 @@
+%%% Package for Ericsson style page headers, written by
+%%% KI/ERA/T/D Michael Eriksson <eramer@era-t.ericsson.se>
+%%% in September 1997.
+%%%
+%%% Somewhat modified by Zsolt Haraszti, 1999
+%%% Even more somewhat modified by Vicknesan Ayadurai, November 2000
+%%%
+%%% Some fragments can be traced to an earlier file by
+%%% Svante Signell.
+
+\RequirePackage{lastpage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The document info fields
+
+\newtoks\Document
+\newtoks\Prepared
+\newtoks\Tel
+\newtoks\Date
+\newtoks\Rev
+\newtoks\Documentno
+\newtoks\Checked
+\newtoks\Approved
+\newtoks\Yourdate
+\newtoks\Ref
+\newtoks\File
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some \textheight juggling (semi-kludgy)
+
+\newlength\thadjust \thadjust=0pt
+
+%\topmargin      -22.8mm
+%\setlength{\oddsidemargin}{24.0mm}
+%\setlength{\evensidemargin}{24.0mm}
+% %\evensidemargin -4.0mm
+% %\textheight     252.0mm
+\textwidth      148.0mm
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fonts
+
+% The Ericsson logo
+%\def\ERICSSON{{\fontfamily{erl}\fontsize{28}{24}\selectfont Ericsson}}
+\def\ERICSSON{\includegraphics[scale=0.15]{erilogo_black_on_white.eps}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The common part of the headers
+
+\def\epcommon#1{\vbox{%
+\def\innerwidth{0.15pt}
+\def\outerwidth{0.3pt}
+\def\hdrspace{2pt}
+\def\tablevrule{\vrule height 9pt depth -2.5pt width\innerwidth}
+\def\innervrule{\omit \hbox to \hdrspace{\tablevrule\hss}}
+\def\smallfont{\sffamily\fontsize{6}{7}}
+\def\bigfont{%
+\rmfamily%
+\long\def\@temp{cmr}%
+\ifx\rmdefault\@temp\fontsize{10}{11}\else\fontsize{11}{12}\fi}
+\def\ehdr##1##2{%
+\raise 2.5pt\hbox{\smallfont\selectfont##1%
+\def\@temp{##2}%
+\ifx\@temp\@empty\else\,-\,\fontshape{sl}\selectfont##2\fi}}
+\def\etext##1{{\bigfont\selectfont##1}}
+\def\tablehrule##1{\noalign{\hrule height ##1}}
+\def\hrulefil##1{\leaders\hrule height ##1 \hfill}
+\tabskip=0pt\offinterlineskip%
+\halign{
+  \hbox{\vrule height 9pt depth 4pt width 0pt}##&
+  \vrule width \outerwidth ##&
+  %%% This is the "prepared/approved box width %%%
+  \hbox to 52mm{\hskip\hdrspace##\hss}&
+  %%% This is the "telephone/checked box width %%%
+  \hbox to 37mm{\hskip\hdrspace##\hss}&
+  \vrule width\innerwidth##&
+  %%% This is the "date/date box width %%%
+  \hbox to 35mm{\hskip\hdrspace##\hss}& 
+  %%% This is the "Rev box width %%%
+  \hbox to 8mm{\hskip\hdrspace##\hss}&
+  \vrule width\innerwidth##&
+  \hbox to 42mm{\hskip\hdrspace##\hss}&
+  ##\vrule width\outerwidth\cr
+&\omit&&&\omit&
+  \ehdr{Dokument}{Document}&&\omit&\hskip 20mm\relax\ehdr{Blad}{Sheet}\cr
+\rlap{\vbox to 0pt{\vskip -18pt\hskip 1mm\ERICSSON\vss}}&\omit&&&\omit&
+  {\etext{\the\Document}}&&
+  \omit&\hskip 20mm\etext{\arabic{page} (\pageref{LastPage})}\cr
+#1%expand style specific part
+}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Normal header
+
+\def\epnormal{%
+\tablehrule{\outerwidth}&&
+\ehdr{Uppgjord}{Prepared}&
+\innervrule\ehdr{Tfn}{Telephone}&&
+\ehdr{Datum}{Date}&
+\innervrule \ehdr{Rev}{}&&
+\ehdr{Dokumentnr}{Document no}&
+\cr
+&&\etext{\the\Prepared}&
+\etext{\the\Tel}&&
+\etext{\the\Date}&
+\etext{\the\Rev}&&
+\etext{\the\Documentno}&
+\cr
+\tablehrule{\innerwidth}&&
+\ehdr{Godk\"and}{Approved}&
+\innervrule \ehdr{Kontr.}{Checked}&&
+\ehdr{Ert datum}{Your date}&&\omit\tablevrule&
+\ehdr{Tillh\"or/referens}{File/reference}&
+\cr
+%%%%&&\etext{\the\Approved}&&&
+&&\etext{\the\Approved}&
+\etext{\the\Checked}&&
+\etext{\the\Yourdate}&&\omit&
+\etext{\the\Ref}&
+\cr
+\tablehrule{\outerwidth}\cr
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Minimal header
+
+\def\epsmall{%
+\omit&&&&&&&&&\cr
+\multispan4\hfill&\multispan6\hrulefil{\outerwidth}\cr
+&\omit&&&&
+\ehdr{Datum}{Date}&
+\innervrule \ehdr{Rev}{}&&
+\ehdr{Dokumentnr}{Document no}&
+\cr
+&\omit&&&&
+\etext{\the\Date}&
+\etext{\the\Rev}&&
+\etext{\the\Documentno}&
+\cr
+\multispan4\hfill&\multispan6\hrulefil{\outerwidth}\cr
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define the actual page styles
+
+\def\eppscommon#1#2{
+\setlength\headheight{#2}
+\setlength\topmargin{-.625in}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-1in} % 1 inch offset inherent in TeX
+\addtolength{\textheight}{-\topmargin}
+\addtolength{\textheight}{-\headheight}
+\addtolength{\textheight}{-\headsep}
+\addtolength{\textheight}{-1in} % bottom margin
+%\setlength{\oddsidemargin}{.75in}
+% \setlength\textwidth{\paperwidth}
+% \addtolength{\textwidth}{-1in} % 1 inch offset inherent in TeX
+% \addtolength{\textwidth}{-\oddsidemargin}
+% \addtolength{\textwidth}{-1.25in} % right margin
+\renewcommand{\@oddfoot}{}%
+\renewcommand{\@evenfoot}{}%
+\renewcommand{\@oddhead}{%
+\global\advance\textheight by \thadjust \global\thadjust=0pt
+\rlap{%
+\hskip-1in\vbox to \headheight{\epcommon{#1}\vss}\hfill}}
+\renewcommand{\@evenhead}{\@oddhead}
+}
+
+\def\fullsize{88pt}
+\def\ps@erifull{\eppscommon{\epnormal}{\fullsize}}
+\def\smallsize{53pt}
+\def\ps@erismall{\eppscommon{\epsmall}{\smallsize}}
+\def\ps@eriplain{\ps@erismall%
+\thadjust=\fullsize \advance\thadjust by -\smallsize%
+\addtolength{\textheight}{-\thadjust}\thispagestyle{erifull}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Extra commands
+
+% Distribution list (\distribution{Info list}{Distribution list})
+
+\newcommand{\Distribution}[2]{
+\newlength{\distwidth}\setlength{\distwidth}{\paperwidth}
+  \addtolength{\distwidth}{-2in}
+\newlength{\colsep}\setlength{\colsep}{15mm}
+\newlength{\colwidth}\setlength{\colwidth}{.5\distwidth}
+  \addtolength{\colwidth}{-\colsep}
+\par\hspace{-\parindent}\hspace{-\oddsidemargin}%
+\mbox{\parbox[t]{\colwidth}{\textbf{\strut Info:}\\#1}%
+\hspace{\colsep}\parbox[t]{\colwidth}{\textbf{\strut Distribution:}\\#2}}
+\vskip 8ex
+}
+
+% 1: Short name of the working item
+% 2: Brief description of the item
+% 3: Added benefit
+% 4: Required work
+% 5: Resource requirements
+% 6: Dependencies, timing information
+\newcommand{\workingitem}[6]{%
+   \subsubsection{#1}
+   #2$~$\\[1mm]
+   {\bf Added benefit:} #3\\[1mm]
+   {\bf Required work:} #4\\[1mm]
+   {\bf Resource requirement:} #5\\[1mm]
+   {\bf Schedule constraints, dependencies:} #6
+}
+
+% Title
+\newcommand{\Title}[1]{
+\begin{center}
+{\sf\LARGE\bfseries \lineskip 1ex \begin{tabular}[t]{c}#1\end{tabular}\par}%
+\end{center}
+\vskip 4ex
+}
+
+% Make section and subsection sans
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\sf\LARGE\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\sf\Large\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\sf\large\bfseries}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% That's all folks...
+
+\endinput

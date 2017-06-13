@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    targetNamespace="www.example.org/pref1"
+    xmlns:ns="www.example.org/pref1"
+    xmlns:ns2="www.example.org/pref2"
+    xmlns:ns3="www.example.org/pref3">
+  <import namespace="www_example_org_pref2" schemaLocation="www_example_org_pref2.xsd" />
+  <import namespace="www_example_org_pref3" schemaLocation="www_example_org_pref3.xsd" />
+  <element name="MyElement">
+	<complexType>
+		<sequence>
+			<element name="myField" type="integer" />
+			<element name="myField2" type="ns2:MyType"/>
+			<element ref="ns2:MyElement"/>
+			<element ref="ns2:MyElement2"/>
+		</sequence>
+		<attribute ref="ns2:MyElement"/>
+		<attribute ref="ns2:MyElement2"/>
+	</complexType>
+  </element>
+
+  <element name="MyElement" type="ns2:MyElement"/>
+
+  <element name="MyElement" type="ns2:MyElement2"/>
+
+</schema>

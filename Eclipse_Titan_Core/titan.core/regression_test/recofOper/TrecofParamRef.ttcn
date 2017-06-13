@@ -1,0 +1,722 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module TrecofParamRef {
+
+import from BerType language "ASN.1:1997" all with { encode "DER:1997" };
+
+// This module contains test cases, where a record of/set of and one of its elements are passed
+// as inout parameters to a function. Inside this function modifications to the element will also modify
+// the record of, while modifications to the record of may (in our case WILL) modify the element.
+
+type component CT_Empty {};
+
+// 1. Assignment
+type record of integer RoI;
+
+function f_param_ref_assign(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  p_roi := { 10 };
+
+  if (p_roi == { 10 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 10 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+testcase tc_param_ref_assign() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_assign(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+// 2. Concatenation
+function f_param_ref_concat(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  const RoI c := { 9, 8, 7 };
+
+  p_roi := c & { 4, 5 };
+
+  if (p_roi == { 9, 8, 7, 4, 5 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 9, 8, 7, 4, 5 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 9, 8, 7, 4, 5, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 9, 8, 7, 4, 5, 20 }"); }
+
+  p_roi := p_roi & { 6, 7 };
+
+  if (p_roi == { 9, 8, 7, 4, 5, 20, 6, 7 }) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: { 9, 8, 7, 4, 5, 20, 6, 7 }"); }
+}
+
+testcase tc_param_ref_concat() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_concat(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 9, 8, 7, 4, 5, 20, 6, 7 }") { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", v_roi, ", expected: { 9, 8, 7, 4, 5, 20, 6, 7 }"); }
+}
+
+// 3. Replacing
+function f_param_ref_replace(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  const RoI c1 := { 7, 6 };
+  const RoI c2 := { 5, 4, 3 };
+
+  p_roi := replace(p_roi, 2, 4, c1);
+
+  if (p_roi == { 0, 1, 7, 6 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 0, 1, 7, 6 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 0, 1, 7, 6, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 0, 1, 7, 6, <unbound>, 20 }"); }
+
+  p_roi := replace(p_roi, 4, 2, c2);
+  
+  if (p_roi == { 0, 1, 7, 6, 5, 4, 3 }) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: { 0, 1, 7, 6, 5, 4, 3 }"); }
+
+  if (p_elem == 4) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 4"); }
+}
+
+testcase tc_param_ref_replace() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_replace(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 0, 1, 7, 6, 5, 4, 3 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 0, 1, 7, 6, 5, 4, 3 }"); }
+}
+
+// 4. JSON decoding
+type record of integer RoI_json with { encode "JSON" };
+
+external function f_enc_json(in RoI_json x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+
+external function f_dec_json(in octetstring os, out RoI_json x)
+  with { extension "prototype(fast) decode(JSON)" }
+
+function f_param_ref_json(inout RoI_json p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI_json enc_val := { 10, 16 };
+  var octetstring os := f_enc_json(enc_val);
+  f_dec_json(os, p_roi);
+
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, 16, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, 16, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  enc_val := { 3, 2, 1, 9, 8, 7, 6 };
+  os := f_enc_json(enc_val);
+  f_dec_json(os, p_roi);
+  
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (p_elem == 7) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 7"); }
+}
+
+testcase tc_param_ref_json() runs on CT_Empty
+{
+  var RoI_json v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_json(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 3, 2, 1, 9, 8, 7, 6 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 3, 2, 1, 9, 8, 7, 6 }"); }
+}
+
+// 5. XER decoding
+type record of integer RoI_xer with { encode "XML" };
+
+external function f_enc_xer(in RoI_xer x) return octetstring
+  with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_xer(in octetstring os, out RoI_xer x)
+  with { extension "prototype(fast) decode(XER:XER_EXTENDED)" }
+
+function f_param_ref_xer(inout RoI_xer p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI_xer enc_val := { 10, 16 };
+  var octetstring os := f_enc_xer(enc_val);
+  f_dec_xer(os, p_roi);
+
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, 16, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, 16, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  enc_val := { 3, 2, 1, 9, 8, 7, 6 };
+  os := f_enc_xer(enc_val);
+  f_dec_xer(os, p_roi);
+  
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (p_elem == 7) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 7"); }
+}
+
+testcase tc_param_ref_xer() runs on CT_Empty
+{
+  var RoI_xer v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_xer(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 3, 2, 1, 9, 8, 7, 6 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 3, 2, 1, 9, 8, 7, 6 }"); }
+}
+
+// 6. TEXT decoding
+type record of integer RoI_text with { encode "TEXT"; variant "BEGIN('numbrz:'),END(';'),SEPARATOR(' ')"; };
+
+external function f_enc_text(in RoI_text x) return charstring
+  with { extension "prototype(convert) encode(TEXT)" }
+
+external function f_dec_text(in charstring cs, out RoI_text x)
+  with { extension "prototype(fast) decode(TEXT)" }
+
+function f_param_ref_text(inout RoI_text p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI_text enc_val := { 10, 16 };
+  var charstring cs := f_enc_text(enc_val);
+  f_dec_text(cs, p_roi);
+
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, 16, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, 16, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  enc_val := { 3, 2, 1, 9, 8, 7, 6 };
+  cs := f_enc_text(enc_val);
+  f_dec_text(cs, p_roi);
+  
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (p_elem == 7) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 7"); }
+}
+
+testcase tc_param_ref_text() runs on CT_Empty
+{
+  var RoI_text v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_text(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 3, 2, 1, 9, 8, 7, 6 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 3, 2, 1, 9, 8, 7, 6 }"); }
+}
+
+// 7. RAW decoding
+type record of integer RoI_raw with { encode "RAW"; variant "" };
+
+external function f_enc_raw(in RoI_raw x) return octetstring
+  with { extension "prototype(convert) encode(RAW)" }
+
+external function f_dec_raw(in octetstring os, out RoI_raw x)
+  with { extension "prototype(fast) decode(RAW)" }
+
+function f_param_ref_raw(inout RoI_raw p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI_raw enc_val := { 10, 16 };
+  var octetstring os := f_enc_raw(enc_val);
+  f_dec_raw(os, p_roi);
+
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, 16, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, 16, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  enc_val := { 3, 2, 1, 9, 8, 7, 6 };
+  os := f_enc_raw(enc_val);
+  f_dec_raw(os, p_roi);
+  
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (p_elem == 7) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 7"); }
+}
+
+testcase tc_param_ref_raw() runs on CT_Empty
+{
+  var RoI_raw v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_raw(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 3, 2, 1, 9, 8, 7, 6 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 3, 2, 1, 9, 8, 7, 6 }"); }
+}
+
+// 8. BER decoding, using record of integer type defined in BerType.asn
+
+external function f_enc_ber(in RoI_ber x) return octetstring
+  with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+
+external function f_dec_ber(in octetstring os, out RoI_ber x)
+  with { extension "prototype(fast) decode(BER:BER_ACCEPT_ALL)" }
+
+function f_param_ref_ber(inout RoI_ber p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI_ber enc_val := { 10, 16 };
+  var octetstring os := f_enc_ber(enc_val);
+  f_dec_ber(os, p_roi);
+
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, 16, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, 16, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  enc_val := { 3, 2, 1, 9, 8, 7, 6 };
+  os := f_enc_ber(enc_val);
+  f_dec_ber(os, p_roi);
+  
+  if (p_roi == enc_val) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_roi, ", expected: ", enc_val); }
+
+  if (p_elem == 7) { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_elem, ", expected: 7"); }
+}
+
+testcase tc_param_ref_ber() runs on CT_Empty
+{
+  var RoI_ber v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_ber(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 3, 2, 1, 9, 8, 7, 6 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 3, 2, 1, 9, 8, 7, 6 }"); }
+}
+
+// 9. The record of is embedded in another structure
+type record EmbRec {
+  charstring text,
+  RoI numbers
+}
+
+function f_param_ref_emb_recof(inout EmbRec p_rec, inout integer p_elem) runs on CT_Empty
+{
+  p_rec := { "second", { 10 } };
+
+  if (p_rec == { "second", { 10 } }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_rec, ", expected: { text := \"second\", numbers := { 10 } }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_rec) == "{ text := \"second\", numbers := { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_rec, ", expected: { text := \"second\", numbers := { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }"); }
+}
+
+testcase tc_param_ref_emb_recof() runs on CT_Empty
+{
+  var EmbRec v_rec := { "first", { 0, 1, 2, 3, 4, 5 } };
+  f_param_ref_emb_recof(v_rec, v_rec.numbers[5]);
+  
+  if (log2str(v_rec) == "{ text := \"second\", numbers := { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_rec, ", expected: { text := \"second\", numbers := { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }"); }
+}
+
+// 10. The second parameter is not the whole element type, just a part of it
+type record ElemType {
+  integer num,
+  charstring str
+}
+
+type record of ElemType Elems;
+
+function f_param_ref_emb_elem(inout Elems p_elems, inout integer p_num) runs on CT_Empty
+{
+  p_elems := { { 10, "ten" } };
+
+  if (p_elems == { { 10, "ten" } }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_elems, ", expected: { { num := 10, str := \"ten\" } }"); }
+
+  if (log2str(p_num) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_num, ", expected: <unbound>"); }
+
+  p_num := 20;
+
+  if (log2str(p_elems) == "{ { num := 10, str := \"ten\" }, <unbound>, { num := 20, str := <unbound> } }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_elems, ", expected: { { num := 10, str := \"ten\" }, <unbound>, { num := 20, str := <unbound> } }"); }
+}
+
+testcase tc_param_ref_emb_elem() runs on CT_Empty
+{
+  var Elems v_elems := { { 1, "one" }, { 2, "two" }, { 3, "three" }, { 4, "four" } };
+  f_param_ref_emb_elem(v_elems, v_elems[2].num);
+  
+  if (log2str(v_elems) == "{ { num := 10, str := \"ten\" }, <unbound>, { num := 20, str := <unbound> } }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_elems, ", expected: { { num := 10, str := \"ten\" }, <unbound>, { num := 20, str := <unbound> } }"); }
+}
+
+// 11. Two embedded functions, each called with a reference to one of the elements in the record of
+function f_param_ref_emb_inner(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  p_roi := { 10 };
+
+  if (p_roi == { 10 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 10 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, 20 }"); }
+}
+
+function f_param_ref_emb_outer(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  f_param_ref_emb_inner(p_roi, p_roi[3]);
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 30;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, 20, <unbound>, 30 }") { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, 20, <unbound>, 30 }"); }
+}
+
+testcase tc_param_ref_emb_func() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_emb_outer(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 10, <unbound>, <unbound>, 20, <unbound>, 30 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 10, <unbound>, <unbound>, 20, <unbound>, 30 }"); }
+}
+
+// 12. The element as out parameter instead of inout (it will be set to unbound at the begining of the function)
+function f_param_ref_out_par(inout RoI p_roi, out integer p_elem) runs on CT_Empty
+{
+  if (log2str(p_roi) == "{ 0, 1, 2, 3, <unbound>, 5 }") { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 0, 1, 2, 3, <unbound>, 5 }"); }
+
+  p_roi := { 9, 8, 7, 6, 5 };
+
+  if (p_elem == 5) { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: 5"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 9, 8, 7, 6, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 9, 8, 7, 6, 20 }"); }
+}
+
+testcase tc_param_ref_out_par() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_out_par(v_roi, v_roi[4]);
+  
+  if (log2str(v_roi) == "{ 9, 8, 7, 6, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_roi, ", expected: { 9, 8, 7, 6, 20 }"); }
+}
+
+// 13. Copying the array
+function f_param_ref_copy(inout RoI p_roi, inout integer p_elem) runs on CT_Empty
+{
+  var RoI v_copy := p_roi;
+  p_roi := { 10 };
+
+  if (p_roi == { 10 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 10 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  if (v_copy == { 0, 1, 2, 3, 4, 5 }) { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_copy, ", expected: { 0, 1, 2, 3, 4, 5 }"); }
+  
+  v_copy := p_roi;
+  v_copy[5] := 11;
+  v_copy[2] := 3;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@5 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+testcase tc_param_ref_copy() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  var RoI v_copy := v_roi;
+  f_param_ref_copy(v_roi, v_roi[5]);
+  
+  if (log2str(v_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@6 got: ", v_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  if (v_copy == { 0, 1, 2, 3, 4, 5 }) { setverdict(pass); }
+  else { setverdict(fail, "@7 got: ", v_copy, ", expected: { 0, 1, 2, 3, 4, 5 }"); }
+}
+
+// 14. Arrays
+type integer Ints[6];
+function f_param_ref_array(inout Ints p_arr, inout integer p_elem) runs on CT_Empty
+{
+  p_arr := { 10, 12, 14, 16, 18, 20 };
+
+  if (p_elem == 20) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_elem, ", expected: 20"); }
+
+  p_elem := 7;
+
+  if (log2str(p_arr) == "{ 10, 12, 14, 16, 18, 7 }") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_arr, ", expected: { 10, 12, 14, 16, 18, 7 }"); }
+}
+
+testcase tc_param_ref_array() runs on CT_Empty
+{
+  var Ints v_arr := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_array(v_arr, v_arr[5]);
+  
+  if (log2str(v_arr) == "{ 10, 12, 14, 16, 18, 7 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", v_arr, ", expected: { 10, 12, 14, 16, 18, 7 }"); }
+}
+
+// 15. Multiple array indexes
+type record of EmbRec EmbRecs;
+
+function f_param_ref_multi(inout EmbRecs p_recs, inout integer p_elem) runs on CT_Empty
+{
+  p_recs := { { "just one", { 10 } } };
+
+  if (p_recs == { { "just one", { 10 } } }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_recs, ", expected: { { text := \"just one\", numbers := { 10 } } }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_recs) == "{ { text := \"just one\", numbers := { 10 } }, <unbound>, { text := <unbound>, numbers := { <unbound>, 20 } } }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_recs, ", expected: { { text := \"just one\", numbers := { 10 } }, <unbound>, { text := <unbound>, numbers := { <unbound>, 20 } } }"); }
+}
+
+testcase tc_param_ref_multi() runs on CT_Empty
+{
+  var EmbRecs v_recs := { { "first", { 5, 10, 15 } }, { "second", { 7 } }, { "third", { 1, 2, 3 } } };
+  f_param_ref_multi(v_recs, v_recs[2].numbers[1]);
+  
+  if (log2str(v_recs) == "{ { text := \"just one\", numbers := { 10 } }, <unbound>, { text := <unbound>, numbers := { <unbound>, 20 } } }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_recs, ", expected: { { text := \"just one\", numbers := { 10 } }, <unbound>, { text := <unbound>, numbers := { <unbound>, 20 } } }"); }
+}
+
+// 16. Template parameter
+function f_param_ref_templ8(inout template RoI pt_roi, inout template integer pt_elem) runs on CT_Empty
+{
+  pt_roi := { 10 };
+
+  if (log2str(pt_roi) == "{ 10 }") { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", pt_roi, ", expected: { 10 }"); }
+
+  if (log2str(pt_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", pt_elem, ", expected: <unbound>"); }
+
+  pt_elem := 20;
+
+  if (log2str(pt_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", pt_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+testcase tc_param_ref_templ8() runs on CT_Empty
+{
+  var template RoI vt_roi := { 0, 1, 2, 3, 4, 5 };
+  f_param_ref_templ8(vt_roi, vt_roi[5]);
+
+  if (log2str(vt_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", vt_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+// 17. Same as no. 9 (record of embedded in a record) but with the record of field being optional
+type record EmbRecOpt {
+  charstring text,
+  RoI numbers optional
+}
+
+function f_param_ref_emb_recof_opt(inout EmbRecOpt p_rec, inout integer p_elem) runs on CT_Empty
+{
+  p_rec := { "second", omit };
+
+  if (p_rec == { "second", omit }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_rec, ", expected: { text := \"second\", numbers := omit }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_rec) == "{ text := \"second\", numbers := { <unbound>, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_rec, ", expected: { text := \"second\", numbers := { <unbound>, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }"); }
+}
+
+testcase tc_param_ref_emb_recof_opt() runs on CT_Empty
+{
+  var EmbRecOpt v_rec := { "first", { 0, 1, 2, 3, 4, 5 } };
+  f_param_ref_emb_recof_opt(v_rec, v_rec.numbers[5]);
+  
+  if (log2str(v_rec) == "{ text := \"second\", numbers := { <unbound>, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_rec, ", expected: { text := \"second\", numbers := { <unbound>, <unbound>, <unbound>, <unbound>, <unbound>, 20 } }"); }
+}
+
+// 18. The function call is part of a lazy parameter expression
+function f_param_ref_emb_lazy(inout RoI p_roi, inout integer p_elem) runs on CT_Empty return charstring
+{
+  p_roi := { 10 };
+
+  if (p_roi == { 10 }) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", p_roi, ", expected: { 10 }"); }
+
+  if (log2str(p_elem) == "<unbound>") { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", p_elem, ", expected: <unbound>"); }
+
+  p_elem := 20;
+
+  if (log2str(p_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@3 got: ", p_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+
+  return int2str(p_elem);
+}
+
+function f_lazy(in integer p_val, in @lazy charstring p_str) runs on CT_Empty
+{
+  if (isbound(p_val)) {
+    log(p_str);
+    setverdict(pass);
+  }
+  else {
+    setverdict(fail, "lazy expression evaluated too soon");
+  }
+}
+
+testcase tc_param_ref_emb_lazy() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3, 4, 5 };
+  f_lazy(v_roi[1], f_param_ref_emb_lazy(v_roi, v_roi[5]));
+  
+  if (log2str(v_roi) == "{ 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }") { setverdict(pass); }
+  else { setverdict(fail, "@4 got: ", v_roi, ", expected: { 10, <unbound>, <unbound>, <unbound>, <unbound>, 20 }"); }
+}
+
+// 19. The function call is interrupted by a DTE, the reference to the element should be cleaned up (HT47424)
+function f_dte(in RoI p_roi, inout integer p_val) runs on CT_Empty
+{
+  var integer bad_index := -1;
+  if (p_val < p_roi[bad_index]) {
+    setverdict(fail, "expected DTE in if clause");
+  }
+}
+
+testcase tc_param_ref_dte() runs on CT_Empty
+{
+  var RoI v_roi := { 0, 1, 2, 3 };
+  @try {
+    f_dte(v_roi, v_roi[2]);
+    setverdict(fail, "expected DTE in function call");
+  }
+  @catch (dummy) {}
+  v_roi := { };
+  var RoI v_copy := v_roi;
+  var charstring log_exp := "{ }";
+  if (log2str(v_roi) == log_exp) { setverdict(pass); }
+  else { setverdict(fail, "@1 got: ", v_roi, ", expected: ", log_exp); }
+  if (log2str(v_copy) == log_exp) { setverdict(pass); }
+  else { setverdict(fail, "@2 got: ", v_copy, ", expected: ", log_exp); }
+}
+
+control {
+  execute(tc_param_ref_assign());
+  execute(tc_param_ref_concat());
+  execute(tc_param_ref_replace());
+
+  execute(tc_param_ref_json());
+  execute(tc_param_ref_xer());
+  execute(tc_param_ref_text());
+  execute(tc_param_ref_raw());
+  execute(tc_param_ref_ber());
+
+  execute(tc_param_ref_emb_recof());
+  execute(tc_param_ref_emb_elem());
+  execute(tc_param_ref_emb_func());
+
+  execute(tc_param_ref_out_par());
+  execute(tc_param_ref_copy());
+  execute(tc_param_ref_array());
+  execute(tc_param_ref_multi());
+
+  //execute(tc_param_ref_templ8()); Doesn't work for templates
+
+  execute(tc_param_ref_emb_recof_opt());
+  execute(tc_param_ref_emb_lazy());
+
+  execute(tc_param_ref_dte());
+}
+
+} // end of module

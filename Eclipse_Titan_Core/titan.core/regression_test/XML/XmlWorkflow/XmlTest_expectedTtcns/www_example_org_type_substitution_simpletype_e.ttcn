@@ -1,0 +1,196 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_type_substitution_simpletype.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Nov 18 11:56:35 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- type_substitution_simpletype.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/type/substitution/simpletype" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_type_substitution_simpletype {
+
+
+import from XSD all;
+
+
+type String_derivations Head
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type String_derivations Head_1
+with {
+  variant "name as 'head_'";
+  variant "element";
+};
+
+
+type Stringtype_derivations Head2
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.String Stringtype
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String Stringtype2 length(5)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type Integer_derivations Int
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.Integer ExtInt
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* Test if the elements are changed in a complextype */
+
+
+type Base64Binary_derivations Elem
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.Base64Binary CrypBinary;
+
+
+type Signature SignatureValue
+with {
+  variant "element";
+};
+
+
+type record Signature
+{
+	XSD.ID id optional,
+	XSD.Base64Binary base
+}
+with {
+  variant (id) "name as capitalized";
+  variant (id) "attribute";
+  variant (base) "untagged";
+};
+
+
+type DataType Data
+with {
+  variant "element";
+};
+
+
+type record DataType
+{
+	union {
+		Base64Binary_derivations sKI,
+		Base64Binary_derivations cert
+	} choice
+}
+with {
+  variant (choice) "untagged";
+  variant (choice.sKI) "name as capitalized";
+  variant (choice.cert) "name as capitalized";
+};
+
+
+type union String_derivations
+{
+	XSD.String string,
+	Stringtype stringtype,
+	Stringtype2 stringtype2
+}
+with {
+  variant "name as uncapitalized";
+  variant "useType";
+};
+
+
+type union Stringtype_derivations
+{
+	Stringtype stringtype,
+	Stringtype2 stringtype2
+}
+with {
+  variant "name as uncapitalized";
+  variant "useType";
+};
+
+
+type union Integer_derivations
+{
+	XSD.Integer integer_,
+	ExtInt extInt
+}
+with {
+  variant "name as uncapitalized";
+  variant "useType";
+  variant (integer_) "name as 'integer'";
+};
+
+
+type union Base64Binary_derivations
+{
+	XSD.Base64Binary base64Binary,
+	CrypBinary crypBinary
+}
+with {
+  variant "name as uncapitalized";
+  variant "useType";
+  variant (crypBinary) "name as capitalized";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/type/substitution/simpletype' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

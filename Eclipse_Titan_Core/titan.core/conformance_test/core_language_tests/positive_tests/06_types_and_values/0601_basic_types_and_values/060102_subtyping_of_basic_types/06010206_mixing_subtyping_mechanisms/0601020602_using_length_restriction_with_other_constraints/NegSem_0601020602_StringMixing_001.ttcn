@@ -1,0 +1,23 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:6.1.2.6.2, Assign invalid values to mixed restricted character strings.
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_0601020602_StringMixing_001 {
+    type charstring MyString (pattern "?bc*xyz") length (5 .. 8);
+    
+    type component GeneralComp {}
+    
+    testcase TC_NegSem_0601020602_StringMixing_001() runs on GeneralComp {
+        var MyString v_c := "abcyz"; // value missing x
+		setverdict(pass);
+    }
+    
+    control{
+        execute(TC_NegSem_0601020602_StringMixing_001());
+    }
+}

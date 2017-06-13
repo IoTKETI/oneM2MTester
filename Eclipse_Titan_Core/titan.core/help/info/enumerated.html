@@ -1,0 +1,103 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Szabados, Kristof
+  Zalanyi, Balazs Andor
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>enumerated</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="../info/enum2int.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="../info/error.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>enumerated</h1>
+<hr align="left" width="75%">
+<p>The keyword denotes a structured type which can take only a distinct named set of values. It cannot be parameterized.&nbsp;
+<ul>
+  <li>Enumerated types are never compatible with other basic or structured types.</li>
+  <li>For each enumeration without an assigned integer value, the system successively associates an integer number in the textual order of the enumerations, starting at the left-hand side,
+  beginning with zero, by step 1 and skipping any number occupied in any of the enumerations with a manually assigned value. These values are only used by the system to allow the use of relational
+  operators.</li>
+  <li>Operations on enumeration are restricted to assignment, equivalence and ordering operators</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="type.html"><font face="Courier New" color="#003258" size="4"><b>type</b></font></a> &nbsp;</li>
+  <li><a href="address.html"><font face="Courier New" color="#003258" size="4"><b>address</b></font></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>type enumerated</b></font> (<i>identifier&nbsp;</i> |<font face="Courier New" color="#003258" size="5"> <b>address</b></font>)<font
+      face="Courier New" color="#003258" size="5"><b>{</b></font><br>
+    &nbsp; <i>enumeration_identifier</i> [<font face="Courier New" color="#003258" size="5"><b>(</b></font><i>integer</i> <font face="Courier New" color="#003258" size="5"><b>)</b></font>]&nbsp;[<font
+      face="Courier New" color="#003258" size="5"><b>,</b></font> <i>enumeration_identifier</i>&nbsp;[<font face="Courier New" color="#003258" size="5"><b>(</b></font><i>integer</i> <font
+      face="Courier New" color="#003258" size="5"><b>)</b></font>]] <font face="Courier New" color="#003258" size="5"><b>};</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <a href="type.html"><font face="Courier New" color="#003258" size="4"><b>type</b></font></a> keyword introduces the type definition.</p>
+  </li>
+  <li>
+  <p><i>identifier</i> is the&nbsp;name used to refer to the enumeration. Must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+  <li>
+  <p><a href="address.html"><font face="Courier New" color="#003258" size="4"><b>address</b></font></a> is a user defined type to allow addressing specific entities inside the
+  System Under Test.</p>
+  </li>
+  <li>
+  <p><i>enumeration_identifier</i> identifies the elements of the enumeration. The identifiers must be unique within the same enumeration</p>
+  </li>
+  <li>
+  <p><i>integer</i> is the value optionally assigned to the enumeration element.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>Example 1:
+<p><font face="Courier New">type enumerated Example {tisdag, fredag, onsdag};</font>
+<p>The enumeration called Example consists of three elements. The number 0 is assigned to the first one (tisdag), the number 1 to &quot;fredag&quot; and number 2 to the last element (onsdag).</p>
+<p>Example 2:
+<p><font face="Courier New">type enumerated Examplf {tisdag (2), fredag (-5), onsdag};</font>
+<p>The enumeration called Examplf consists of three elements. Note, that the same element names may be used as in example 1 because they must be unique only within the same enumeration. The
+optional integer value determines the value assigned to the element name. Thus, &quot;tisdag&quot; has the value 2, &quot;fredag&quot; the value -5 and onsdag has been assigned the value zero. (The
+first free value from 0 upwards is assigned to elements without the optional integer value.)</p>
+<p>Example 3:
+<p><font face="Courier New">type enumerated address {first_entity, second_entity};</font>
+<p>There are two entities in the system under test (SUT). We can refer to the first one using the element name &quot;first_entity&quot; whereas the other entity is addressed by the element name
+&quot;second_entity&quot;.</p>
+<hr align="left" width="25%">
+<p><a HREF="../info/BNF.html#enumdef">BNF definition</a> of <font face="Courier New"> enumerated</font></p>
+</body>
+</html>

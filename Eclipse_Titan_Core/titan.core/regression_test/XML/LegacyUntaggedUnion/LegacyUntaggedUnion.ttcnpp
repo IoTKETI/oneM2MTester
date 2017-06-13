@@ -1,0 +1,79 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module LegacyUntaggedUnion {
+modulepar boolean Untagged_verbose := false;
+#define verbose Untagged_verbose
+#include "../macros.ttcnin"
+
+  type component EmptyCT {
+
+  }
+
+  type union MyUnion {
+    integer i,
+    charstring cs
+  } with {
+    variant "untagged";
+  }
+
+  DECLARE_XER_ENCODERS(MyUnion, myunion);
+  DECLARE_EXER_ENCODERS(MyUnion, myunion);
+
+  const MyUnion c_mu := { i := 5 };
+
+  const universal charstring c_b_mu := "<MyUnion>\n\t<i>5</i>\n</MyUnion>\n\n";
+  const universal charstring c_e_mu := "<MyUnion>\n\t<i>5</i>\n</MyUnion>\n\n";
+
+  testcase tc_legacy_union_untagged() runs on EmptyCT {
+    CHECK_METHOD(bxer_enc_myunion, c_mu, c_b_mu);
+    CHECK_METHOD(exer_enc_myunion, c_mu, c_e_mu);
+
+    CHECK_DECODE(bxer_dec_myunion, c_b_mu, MyUnion, c_mu);
+    CHECK_DECODE(exer_dec_myunion, c_e_mu, MyUnion, c_mu);
+  }
+
+
+
+  type union MyRecord {
+    MyUnion mu
+  } with {
+    variant (mu) "untagged";
+  }
+
+  DECLARE_XER_ENCODERS(MyRecord, myrec);
+  DECLARE_EXER_ENCODERS(MyRecord, myrec);
+
+  const MyRecord c_mr := { mu := { i := 5 } };
+
+  const universal charstring c_b_mr := "<MyRecord>\n\t<mu>\n\t\t<i>5</i>\n\t</mu>\n</MyRecord>\n\n";
+  const universal charstring c_e_mr := "<MyRecord>\n\t<i>5</i>\n</MyRecord>\n\n";
+
+
+  // This should be unaffected from the legacy switch
+  testcase tc_legacy_union_in_record_untagged() runs on EmptyCT {
+    CHECK_METHOD(bxer_enc_myrec, c_mr, c_b_mr);
+    CHECK_METHOD(exer_enc_myrec, c_mr, c_e_mr);
+
+    CHECK_DECODE(bxer_dec_myrec, c_b_mr, MyRecord, c_mr);
+    CHECK_DECODE(exer_dec_myrec, c_e_mr, MyRecord, c_mr);
+  }
+
+
+
+  control {
+    execute(tc_legacy_union_untagged());
+    execute(tc_legacy_union_in_record_untagged());
+  }
+
+} with {
+  encode "XML";
+}

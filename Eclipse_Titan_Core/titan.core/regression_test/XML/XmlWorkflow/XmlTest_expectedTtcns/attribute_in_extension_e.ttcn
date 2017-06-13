@@ -1,0 +1,78 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Baranyi, Botond
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          attribute_in_extension.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Fri May 29 12:56:49 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- attribute_in_extension.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "attribute_in_extension" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module attribute_in_extension {
+
+
+import from XSD all;
+
+
+type record BaseType
+{
+	XSD.Integer base_variable
+}
+with {
+  variant (base_variable) "name as 'Base-variable'";
+};
+
+
+type record Extending_type
+{
+	record {
+		XSD.Integer extension_ optional,
+		XSD.Integer base_variable
+	} ext
+}
+with {
+  variant "name as 'Extending-type'";
+  variant (ext.extension_) "name as 'extension'";
+  variant (ext.extension_) "attribute";
+  variant (ext.base_variable) "name as 'Base-variable'";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'attribute_in_extension' prefix 'ns45'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

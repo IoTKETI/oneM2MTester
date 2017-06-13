@@ -1,0 +1,108 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_generate_element_substitution.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Mon Oct 19 09:34:07 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- generate_element_substitution.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/generate/element/substitution" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_generate_element_substitution {
+
+
+import from XSD all;
+
+
+type record ComplexEnum
+{
+	XSD.Integer bar optional,
+	XSD.Float foo optional,
+	XSD.String base
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (bar) "attribute";
+  variant (foo) "attribute";
+  variant (base) "untagged";
+};
+
+
+type record Member2
+{
+	XSD.Integer bar optional,
+	XSD.Float foo optional,
+	XSD.String unitOfAge optional,
+	XSD.String base
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (bar) "attribute";
+  variant (foo) "attribute";
+  variant (unitOfAge) "attribute";
+  variant (base) "untagged";
+};
+
+
+type record Ize
+{
+	record of Head_group head_list
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (head_list) "untagged";
+  variant (head_list[-]) "name as 'head'";
+};
+
+
+type union Head_group
+{
+	XSD.String head,
+	Member2 member2
+}
+with {
+  variant "untagged";
+  variant (head) "form as qualified";
+  variant (member2) "block";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/generate/element/substitution' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

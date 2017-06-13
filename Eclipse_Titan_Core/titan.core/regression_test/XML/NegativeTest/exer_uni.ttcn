@@ -1,0 +1,316 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module exer_uni {
+import from ReadXml all;
+import from rec { type Neg; function check_match }
+
+type union UT
+{
+  integer i,
+  charstring s,
+  record {
+    boolean b,
+    float f
+  } r
+}
+with {
+  variant "useType"
+}
+
+external function encUT(in UT u) return octetstring
+with {
+  extension "prototype(convert) encode(XER:XER_EXTENDED)"
+}
+
+const UT c_ut_i := {
+  i := 42
+}
+
+template Nodes t_ut_i := {
+  { XML_READER_TYPE_ELEMENT    , 0, "UT", "", "" },
+  { XML_READER_TYPE_TEXT       , 1, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "UT", "", "" }
+}
+
+const UT c_ut_s := {
+  s := "Hello, world!"
+}
+
+template Nodes t_ut_s := {
+  // node_type             , depth, name, value, namespace
+  { XML_READER_TYPE_ELEMENT    , 0, "UT", "", "" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsi",      "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/2000/xmlns/" },
+  // this is the value     for "xmlns:xsi" ------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // this is the namespace for "xsi:type"  ------------vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xsi:type" , "s", "http://www.w3.org/2001/XMLSchema-instance" },
+  { XML_READER_TYPE_TEXT       , 1, "#text", "Hello, world!", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "UT", "", "" }
+}
+
+const UT c_ut_rf := {
+  r := { b := true, f := 3.141592 }
+}
+
+/*
+<UT xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='r'>
+		<b>true</b>
+		<f>3.141393</f>
+</UT>
+*/
+template Nodes t_ut_rf := {
+  // node_type             , depth, name, value, namespace
+  { XML_READER_TYPE_ELEMENT    , 0, "UT", "", "" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsi",      "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/2000/xmlns/" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xsi:type" , "r", "http://www.w3.org/2001/XMLSchema-instance" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "b", "", "" },
+  { XML_READER_TYPE_TEXT       , 2, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "b", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "f", "", "" },
+  { XML_READER_TYPE_TEXT       , 2, "#text", "3.141592", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "f", "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "UT", "", "" }
+}
+
+testcase ut_plain() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encUT(c_ut_i);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_i);
+
+  o := encUT(c_ut_s);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_s);
+
+  o := encUT(c_ut_rf);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_rf);
+}
+
+// \\ // \\
+
+const UT c_ut_i_replace := c_ut_i
+with {
+  erroneous (i) "value := ""fourty-two"" "
+}
+
+template Nodes t_ut_i_replace modifies t_ut_i := {
+  -,
+  { XML_READER_TYPE_TEXT       , 1, "#text", "fourty-two", "" },
+  -
+}
+
+const UT c_ut_s_replace := c_ut_s
+with {
+  erroneous (s) "value := 'DECAFBAD'O"
+} // '4548 4c4c 2c4f 5720 524f 444c'O
+
+template Nodes t_ut_s_replace modifies t_ut_s := {
+  -,-,-,
+  { XML_READER_TYPE_TEXT       , 1, "#text", "DECAFBAD", "" },
+  -
+}
+
+const UT c_ut_s_replace_raw := c_ut_s
+with {
+  erroneous (s) "value(raw) := '48454c4c4f2c20574f524c44'O"
+}
+
+template Nodes t_ut_s_replace_raw modifies t_ut_s := {
+  -,-,-,
+  { XML_READER_TYPE_TEXT       , 1, "#text", "HELLO, WORLD", "" },
+  -
+}
+
+const UT c_ut_rf_replace := c_ut_rf
+with {
+  erroneous (r) "value := UT.r : { b := true, f := 2.71828 }"
+}
+
+template Nodes t_ut_rf_replace modifies t_ut_rf := {
+  -,-,-,
+  -,-,-,
+  -,
+  { XML_READER_TYPE_TEXT       , 2, "#text", "2.718280", "" },
+  -,-
+}
+
+testcase ut_replace() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encUT(c_ut_i_replace);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_i_replace);
+
+  o := encUT(c_ut_s_replace);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_s_replace);
+
+  o := encUT(c_ut_s_replace_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_s_replace_raw);
+
+  o := encUT(c_ut_rf_replace);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_rf_replace);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- USE-TYPE
+
+type record R {
+  boolean available
+}
+with {
+  variant (available) "attribute"
+}
+
+type union UT2 {
+  integer i,
+  charstring s,
+  R r
+}
+with {
+  variant "element";
+  variant "useType";
+}
+
+external function encUT2(in UT2 u) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+const UT2 c_ut_r := {
+  r := { available := true }
+}
+
+template Nodes t_ut_r := {
+  // node_type             , depth, name, value, namespace
+  { XML_READER_TYPE_ELEMENT    , 0, "UT2", "", "" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsi",      "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/2000/xmlns/" },
+  // this is the value     for "xmlns:xsi" ------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  // this is the namespace for "xsi:type"  ------------vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xsi:type" , "r", "http://www.w3.org/2001/XMLSchema-instance" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "available", "true", "" },
+  //{ XML_READER_TYPE_TEXT       , 1, "#text", "\n", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "UT2", "", "" }
+
+}
+
+testcase ut_nested_plain() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encUT2(c_ut_r);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_r);
+}
+
+const UT2 c_ut_r_replace := c_ut_r
+with {
+  erroneous (r) "value := R : { available := false } ";
+}
+
+template Nodes t_ut_r_replace modifies t_ut_r := {
+  -,-,-, // start element, xmlns:xsi, xsi:type
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "available", "false", "" },
+  -
+}
+
+testcase ut_nested_replace() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encUT2(c_ut_r_replace);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_ut_r_replace);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- USE-UNION
+
+type union UU
+{
+  integer i,
+  charstring s
+}
+with {
+  variant "useUnion";
+  variant (i) "XSD:integer";
+  variant (s) "XSD:string";
+}
+
+external function encUU(in UU u) return octetstring
+with {
+  extension "prototype(convert) encode(XER:XER_EXTENDED)"
+}
+
+const UU c_uu_i := {
+  i := 42
+}
+
+template Nodes t_uu_i := {
+  { XML_READER_TYPE_ELEMENT    , 0, "UU", "", "" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsi",      "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/2000/xmlns/" },
+  // this is the value     for "xmlns:xsi" ------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsd",      "http://www.w3.org/2001/XMLSchema",          "http://www.w3.org/2000/xmlns/" },
+  // this is the namespace for "xsi:type"  ------------vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xsi:type" , "xsd:integer", "http://www.w3.org/2001/XMLSchema-instance" },
+  { XML_READER_TYPE_TEXT       , 1, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "UU", "", "" }
+}
+
+const UU c_uu_s := {
+  s := "Hello, world!"
+}
+
+template Nodes t_uu_s := {
+  // node_type             , depth, name, value, namespace
+  { XML_READER_TYPE_ELEMENT    , 0, "UU", "", "" },
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsi",      "http://www.w3.org/2001/XMLSchema-instance", "http://www.w3.org/2000/xmlns/" },
+  // this is the value     for "xmlns:xsi" ------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xmlns:xsd",      "http://www.w3.org/2001/XMLSchema",          "http://www.w3.org/2000/xmlns/" },
+  // this is the namespace for "xsi:type"  ------------vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+  { XML_READER_TYPE_ATTRIBUTE  , 1, "xsi:type" , "xsd:string", "http://www.w3.org/2001/XMLSchema-instance" },
+  { XML_READER_TYPE_TEXT       , 1, "#text", "Hello, world!", "" },
+  { XML_READER_TYPE_END_ELEMENT, 0, "UU", "", "" }
+}
+
+
+testcase uu_plain() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encUU(c_uu_i);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_uu_i);
+
+  o := encUU(c_uu_s);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_uu_s);
+}
+
+}
+with {
+  encode "XML";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'"
+}

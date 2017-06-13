@@ -1,0 +1,53 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// Test for bug fix artf724695 : Incorrect code generated for template default value
+// The default values of templates and functions declared in this module are used in module A.
+// Code for this module is generated after code for module A.
+module B
+{
+
+function f
+(
+    template charstring pl_stringA := omit,
+    template charstring pl_stringB := omit // code for this default value was previously generated in A.cc
+)
+return charstring
+{
+    var charstring vl_return := "";
+    if(isvalue(pl_stringA))
+    {
+        vl_return := vl_return & valueof(pl_stringA)
+    }
+    if(isvalue(pl_stringB))
+    {
+        vl_return := vl_return & valueof(pl_stringB)
+    }
+    return vl_return
+}
+
+type record wrapped_string
+{
+    charstring string
+}
+
+template wrapped_string t_wrapped_string
+(
+    template charstring pl_string := f(pl_stringA := "EMMA")
+):=
+{
+    string := pl_string
+}
+
+
+}
+

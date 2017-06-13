@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema targetNamespace="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+           xmlns="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+           xmlns:IsTypes="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:confd="http://tail-f.com/ns/confd/1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xml:lang="en">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema" schemaLocation="XMLSchema.xsd"/>
+  <xs:import namespace="http://tail-f.com/ns/confd/1.0" schemaLocation="confd.xsd"/>
+  <xs:simpleType name="DummyEmptyType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MacAddress">
+    <xs:annotation>
+      <xs:documentation>
+
+	A MAC address 
+	in the form v1:v2:v3:v4:v5:v6 where v1 ... v6 is a
+	hexadecimal number in the range 00 to FF.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[A-F0-9][A-F0-9]?:[A-F0-9][A-F0-9]?:[A-F0-9][A-F0-9]?:[A-F0-9][A-F0-9]?:[A-F0-9][A-F0-9]?:[A-F0-9][A-F0-9]?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="IpAddress">
+    <xs:annotation>
+      <xs:documentation>
+
+	An IPv4 address 
+	in the form v1.v2.v3.v4 where v1 ... v4 is a
+	decimal number in the range 0 to 255.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Unsigned32">
+    <xs:annotation>
+      <xs:documentation>
+
+      Datatype for an integer according to SNMPv2 definition of
+      unsigned32.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="4294967295"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

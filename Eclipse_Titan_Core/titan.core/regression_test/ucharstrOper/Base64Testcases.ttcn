@@ -1,0 +1,298 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+// This module tests the following functions:
+// encode_base64
+// decode_base64
+module Base64Testcases {
+
+import from Common all;
+
+type record of charstring RoCS;
+const RoCS base64table := {
+  "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P",
+  "Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f",
+  "g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v",
+  "w","x","y","z","0","1","2","3","4","5","6","7","8","9","+","/" 
+}
+
+function f_base64_encdec_positivetest(octetstring os, boolean use_linebreaks := false) {
+  var charstring cs :=encode_base64(os);
+  var octetstring os2:=''O;
+  if(use_linebreaks==false) {
+    if(cs == encode_base64(os,use_linebreaks)){
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+
+  }
+
+  log("Encoded:",cs)
+  var charstring expected := f_my_encode_base64(os);
+  if(cs == expected) {
+    setverdict(pass, "Encoding ok")
+  } else {
+    setverdict(fail,"Encoding nok")
+  }
+
+  os2 := decode_base64(cs);
+  log(os2);
+  if(os2 == os){
+    setverdict(pass, "Encoding->decoding gives back the original value")
+  } else {
+    setverdict(fail, "Encoding->decoding does not give back the original value")
+  }
+}
+
+function f_my_encode_base64(in octetstring os, in boolean linebreaks := false) return charstring {
+
+  var integer remainder := lengthof(os) mod 3;
+  var integer extraBytes;
+  var charstring cs_tail:=""; //this will be added to the charstring
+
+  select(remainder) {
+    case(0){ 
+      cs_tail:="";
+      extraBytes:=0;
+    }
+    case(1){
+      cs_tail := "==";
+      extraBytes:=2;
+      os := os & '0000'O;
+    }
+    case(2){
+      cs_tail := "=";
+      extraBytes := 1;
+      os := os & '00'O;
+    }
+  }
+
+  var bitstring bs := oct2bit(os);
+  var charstring cs :="";
+  var integer N := lengthof(bs)-extraBytes*6;
+  var charstring temp;
+  var integer tempi;
+
+  for( var integer i:=0; i<N; i:=i+6 ) {
+    cs := cs & base64table[bit2int(substr(bs,i,6))];
+  }
+  cs := cs & cs_tail;
+  
+
+  var charstring cs_modified :="";
+  if(linebreaks==true){
+    //insert line breaks:
+    var integer len := lengthof(cs);
+    for(var integer i:=0; i<len; i:=i+1) {
+      cs_modified := cs_modified & cs[i];
+      if( ((i+1) mod 76) == 0) {
+        cs_modified := cs_modified & "\r\n";
+      }
+    }
+    log("Result2:",cs_modified);
+    return cs_modified;
+  } else {
+    log("Result: ",cs);
+    return cs;
+  }
+
+}
+
+//checks if the error is the expected. 
+//If expectedError is the empty string, the error message is not checked
+function f_base64_decode_negative(
+	in charstring cs,
+	in charstring expectedError:=""
+) {
+  
+  @try {
+	var octetstring os := decode_base64(cs);
+	setverdict(fail,"Unexpected successful decoding, expected error")
+  }
+  @catch(err_str) {
+    var template charstring expectedErrorTempl := pattern "*{expectedError}";
+    if(expectedError==""){
+      setverdict(pass,"Error, as expected: ",err_str)
+    } else if(match(err_str, expectedErrorTempl)) {
+      setverdict(pass,"expected error, expected: ", expectedError, " got: ", err_str)
+    } else {
+      setverdict(fail, "not expected error, expected: ", expectedError, " got: ", err_str)
+    }
+  }
+}
+
+type record of octetstring RoOS;
+
+testcase tc_base64_encdec() runs on MTC {
+  var RoOS r := {'01'O, '0102'O, '010203'O, '0102030405'O}
+  var integer len:=lengthof(r);
+  for( var integer i:=0;i<len;i:=i+1) {
+    f_base64_encdec_positivetest(r[i],false);
+    f_base64_encdec_positivetest(r[i],true);
+  }
+
+}
+
+//This testcase is based on examples from the spec.
+testcase tc_base64_enc_examples() runs on MTC {
+  var RoCS inputcs:= {
+    "Man",
+    "any carnal pleasure.",
+    "any carnal pleasure",
+    "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure."
+  }
+  var RoOS r := {char2oct("any carnal pleasure.")}
+  var integer lencs:= lengthof(inputcs);
+  for(var integer i:=0;i<lencs;i:=i+1){
+    r[i]:=char2oct(inputcs[i]);
+  }
+
+  var RoCS expectedResults :={
+    "TWFu",
+    "YW55IGNhcm5hbCBwbGVhc3VyZS4=",
+    "YW55IGNhcm5hbCBwbGVhc3VyZQ==",
+    "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4="
+  }
+  //var RoOS r := {'01'O, '0102'O, '010203'O, '0102030405'O}
+  var integer len:=lengthof(r);
+  var charstring encoded;
+  for( var integer i:=0;i<len;i:=i+1) {
+    log(f_my_encode_base64(r[i]));
+    encoded := encode_base64(r[i]);
+    log(encoded);
+    log(expectedResults[i]);
+    if(encoded == expectedResults[i] ) {
+      setverdict(pass,"base64 encoding is the expected");
+    } else {
+      setverdict(fail, "base64 encoding is not the expected");
+    }
+
+    if(encoded == f_my_encode_base64(r[i],false)){
+      setverdict(pass,"base64 encoding is the expected");
+    } else {
+      setverdict(fail, "base64 encoding is not the expected");
+    }
+
+    //decoding:
+    //var octetstring os := decode_base64(encoded);
+    if( decode_base64(encoded) == r[i]) {
+      setverdict(pass,"base64 decoding i the expected");
+    } else {
+      setverdict(fail,"base64 decodong is not the expected");
+    }
+  }
+}
+
+testcase tc_base64_enc_examples_with_linebreaks() runs on MTC {
+  var RoCS inputcs:= {
+    "Man",
+    "any carnal pleasure.",
+    "any carnal pleasure",
+    "Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure."
+  }
+  var RoOS r := {char2oct("any carnal pleasure.")}
+  var integer lencs:= lengthof(inputcs);
+  for(var integer i:=0;i<lencs;i:=i+1){
+    r[i]:=char2oct(inputcs[i]);
+  }
+
+  var RoCS expectedResults :={
+    "TWFu",
+    "YW55IGNhcm5hbCBwbGVhc3VyZS4=",
+    "YW55IGNhcm5hbCBwbGVhc3VyZQ==",
+    "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz\r\nIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg\r\ndGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu\r\ndWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo\r\nZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4="
+  }
+  //var RoOS r := {'01'O, '0102'O, '010203'O, '0102030405'O}
+  var integer len:=lengthof(r);
+  var charstring encoded;
+  for( var integer i:=0;i<len;i:=i+1) {
+    encoded := encode_base64(r[i],true);
+    //log(encoded);
+    //log(expectedResults[i]);
+    if(encoded == expectedResults[i] ) {
+      setverdict(pass,"base64 encoding is the expected");
+    } else {
+      setverdict(fail, "base64 encoding is not the expected. Expected: ",expectedResults[i]," got: ",encoded );
+    }
+
+    if(encoded == f_my_encode_base64(r[i],true) ){
+      setverdict(pass,"base64 encoding is the expected by me");
+    } else {
+      setverdict(fail, "base64 encoding is not the expected by me");
+    }
+
+    //decoding:
+    if(decode_base64(encoded) == r[i]) {
+      setverdict(pass,"base64 decoding i the expected");
+    } else {
+      setverdict(fail,"base64 decodong is not the expected");
+    }
+  }
+}
+
+
+//This testcase is based on encoding-decoding of octetstrings.
+//The octetstring is a concatenation of the first N integers converted to one length octetstring
+testcase tc_base64_generated_strings_1() runs on MTC {
+  var octetstring os:=''O ;
+  var integer N:=256;
+  for( var integer i:=0; i<N; i:=i+1){
+    os := os & int2oct(i,1);
+    log("======================");
+    log("i: ",i," os: ",os);
+    f_base64_encdec_positivetest(os,false);
+  }
+
+}
+
+//This testcase is based on encoding-decoding of octetstrings.
+//The octetstring is a concatenation of the first N integers converted to two length octetstring
+testcase tc_base64_generated_strings_2() runs on MTC {
+  var octetstring os:=''O ;
+  var integer N:=256*256;
+  for( var integer i:=0; i<N; i:=i+254){
+    os := os & int2oct(i,2);
+    log("======================");
+    log("i: ",i," os: ",os);
+    f_base64_encdec_positivetest(os,false);
+  }
+
+}
+
+
+testcase tc_base64_decode_negative_with_checkingErrorMessage() runs on MTC {
+  var RoCS rofcs := { " ","!", "#","$","%","&","'","(",")","*",":", "<",">", "{", "}", "~" };
+  var integer len := lengthof(rofcs);
+  for(var integer i:=0;i<len;i:=i+1) {
+  	f_base64_decode_negative(rofcs[i],"Error: Invalid character in Base64 encoded data: 0x"& oct2str(char2oct(rofcs[i])));
+  }
+}
+
+testcase tc_base64_decode_negative_without_checkingErrorMessage() runs on MTC {
+  var RoCS rofcs := { " Baba","Baba!", "ba#ba","bla$%bla","bla ","&","'","(",")","*",":", "<",">", "{", "}", "~" };
+  var integer len := lengthof(rofcs);
+  for(var integer i:=0;i<len;i:=i+1) {
+  	f_base64_decode_negative(rofcs[i],"");
+  }
+}
+control {
+  execute(tc_base64_encdec());
+  execute(tc_base64_enc_examples());
+  execute(tc_base64_enc_examples_with_linebreaks());
+  execute(tc_base64_generated_strings_1());
+  execute(tc_base64_generated_strings_2());
+  execute(tc_base64_decode_negative_with_checkingErrorMessage());
+  execute(tc_base64_decode_negative_with_checkingErrorMessage());
+}
+
+}

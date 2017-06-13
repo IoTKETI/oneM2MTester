@@ -1,0 +1,175 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_elements.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Tue Dec 15 11:00:26 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- elements.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/elements" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_elements {
+
+
+import from XSD all;
+
+
+/* Global element declarations */
+
+
+/* Global element declarations */
+
+
+type XSD.Float FooGlobal
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.String BarGlobal
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.Integer DingGlobal
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type record RemarkNillable
+{
+	XSD.String content optional
+}
+with {
+  variant "name as uncapitalized";
+  variant "useNil";
+  variant "element";
+};
+
+
+type record SeqNillable
+{
+	record {
+		record {
+			XSD.String content optional
+		} forename,
+		record {
+			XSD.String content optional
+		} surname optional,
+		record of record {
+			XSD.String content optional
+		} bornPlace_list,
+		FooGlobal fooGlobal,
+		BarGlobal barGlobal,
+		DingGlobal dingGlobal,
+		RemarkNillable remarkNillable
+	} content optional
+}
+with {
+  variant "useNil";
+  variant "element";
+  variant (content.forename) "useNil";
+  variant (content.surname) "useNil";
+  variant (content.bornPlace_list) "untagged";
+  variant (content.bornPlace_list[-]) "name as 'bornPlace'";
+  variant (content.bornPlace_list[-]) "useNil";
+};
+
+
+type XSD.String ShipComment
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type XSD.String CustomerComment
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+/* Local element declarations */
+
+
+type record E25seq
+{
+	XSD.String title,
+	record {
+		XSD.String content optional
+	} forename,
+	XSD.String surname optional,
+	record of XSD.Integer bornDate_list,
+	record of record {
+		XSD.String content optional
+	} bornPlace_list,
+	FooGlobal fooGlobal,
+	BarGlobal barGlobal,
+	DingGlobal dingGlobal,
+	RemarkNillable remarkNillable
+}
+with {
+  variant "name as uncapitalized";
+  variant (forename) "useNil";
+  variant (bornDate_list) "untagged";
+  variant (bornDate_list[-]) "name as 'bornDate'";
+  variant (bornPlace_list) "untagged";
+  variant (bornPlace_list[-]) "name as 'bornPlace'";
+  variant (bornPlace_list[-]) "useNil";
+};
+
+
+type union Comment_group
+{
+	XSD.String comment,
+	CustomerComment customerComment,
+	ShipComment shipComment
+}
+with {
+  variant "untagged";
+  variant (comment) "form as qualified";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/elements' prefix 'ns'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

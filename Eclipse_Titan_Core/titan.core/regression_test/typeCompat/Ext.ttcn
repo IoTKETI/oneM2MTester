@@ -1,0 +1,97 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *
+ ******************************************************************************/
+// Same as in "Compat.ttcn", but in a different module of the project.  The
+// tests from the "function_test" were moved here as well.
+module Ext {
+
+type component Empty { }
+
+type integer I (0..2)
+type float F
+type anytype Atype
+
+//** RECORDS **//
+type record myrec1Ext {
+  integer f1 optional,
+  integer f2
+}
+
+type record myrec2Ext {
+  integer f1 optional,
+  integer f2
+}
+
+//** RECORDOFS **//
+type record of integer myintlist1Ext
+type record of integer myintlist2Ext
+type record of myrec1Ext myr1listExt
+type record of myrec2Ext myr2listExt
+
+type record rtype { integer i1, integer i2 }
+type record of integer r1type
+
+template r1type t1 := { 1, 2 }
+template rtype t modifies t1 := { 2, 1 }
+
+testcase tc_ExtMatch() runs on Empty {
+  // Normal templates.
+  if (match({ 1, 2 }, t1)) { setverdict(pass) } else { setverdict(fail) }
+  if (match({ 2, 1 }, t))  { setverdict(pass) } else { setverdict(fail) }
+  // Same with local templates.
+  template r1type t1l := { 11, 22 }
+  template rtype tl modifies t1l := { 22, 11 }
+  if (match({ 11, 22 }, t1l)) { setverdict(pass) } else { setverdict(fail) }
+  if (match({ 22, 11 }, tl))  { setverdict(pass) } else { setverdict(fail) }
+}
+
+type record of recR recofR
+type record recR { recofR rof optional }
+type record c1   { recR f1 }
+type record c11  { c1 f1 }
+type record c2   { recofR f1 }
+type record c22  { c2 f1 }
+
+// Recursive type definitions.
+testcase tc_Recursive() runs on Empty {
+  var recofR v_rof := { { omit } }
+  var recR v_r := { rof := omit }
+  var c11 cc1 := { f1 := { { omit } } }
+  var c22 cc2 := { f1 := { { { omit } } } }
+  //v_r := v_rof
+  if (v_r.rof == omit) { setverdict(pass) } else { setverdict(fail) }
+  //v_rof := v_r
+}
+
+testcase tc_ExtSimple() runs on Empty {
+  var myrec1Ext rec1 := { 1, 2 }
+  var myrec2Ext rec2 := { 1, 2 }
+  var myintlist1Ext il1 := { 1, 2 }
+  var myintlist2Ext il2 := { 9, 9 }
+  var myr1listExt r1l := { { 11, 22 }, { 33, 44 } }
+  var myr2listExt r2l := { { 0, 1 }, { 2, 3 } }
+  rec1 := rec2 ; rec2 := rec1
+  rec1 := il1 ; il1 := rec1
+  rec2 := il1 ; il1 := rec2
+  if (rec1 == rec2 and rec2 == rec1) { setverdict(pass) } else { setverdict(fail) }
+  if (rec1 != rec2 and rec2 != rec1) { setverdict(fail) } else { setverdict(pass) }
+  if (rec1 == il1 and il1 == rec1)   { setverdict(pass) } else { setverdict(fail) }
+  if (rec1 != il1 and il1 != rec1)   { setverdict(fail) } else { setverdict(pass) }
+  il1 := il2 ; il2 := il1
+  if (il1 == il2 and il2 == il1) { setverdict(pass) } else { setverdict(fail) }
+  if (il1 != il2 and il2 != il1) { setverdict(fail) } else { setverdict(pass) }
+  if (r1l == r2l or r2l == r1l) { setverdict(fail) } else { setverdict(pass) }
+  r1l := r2l
+  if (r1l == r2l or r2l == r1l) { setverdict(pass) } else { setverdict(fail) }
+}
+
+} with { extension "anytype I, F, integer, float" }

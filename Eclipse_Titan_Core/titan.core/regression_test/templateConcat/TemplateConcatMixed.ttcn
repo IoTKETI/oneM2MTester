@@ -1,0 +1,312 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating charstring and universal charstring templates
+module TemplateConcatMixed {
+
+import from Types all;
+
+template charstring t_char := "def";
+
+template universal charstring t_unichar := char(0, 0, 1, 2);
+
+// there is no other way to recreate these universal charstring templates, than concatenation,
+// so use constants and variable for the expected values
+template universal charstring t_mixed1 := "abc" & char(0, 1, 2, 3);
+const universal charstring c_mixed1_exp := "abc" & char(0, 1, 2, 3);
+
+template universal charstring t_mixed2 := char(0, 1, 2, 3) & "abc";
+const universal charstring c_mixed2_exp := char(0, 1, 2, 3) & "abc";
+
+template universal charstring t_mixed3 := t_char & char(0, 0, 1, 117);
+const universal charstring c_mixed3_exp := "def" & char(0, 0, 1, 117);
+
+template universal charstring t_mixed4 := char(0, 0, 1, 117) & t_char;
+const universal charstring c_mixed4_exp := char(0, 0, 1, 117) & "def";
+
+template universal charstring t_mixed5 := t_unichar & "xx";
+const universal charstring c_mixed5_exp := char(0, 0, 1, 2) & "xx";
+
+template universal charstring t_mixed6 := "xx" & t_unichar;
+const universal charstring c_mixed6_exp := "xx" & char(0, 0, 1, 2);
+
+template universal charstring t_mixed7 := t_char & t_unichar;
+const universal charstring c_mixed7_exp := "def" & char(0, 0, 1, 2);
+
+template universal charstring t_mixed8 := t_unichar & t_char;
+const universal charstring c_mixed8_exp := char(0, 0, 1, 2) & "def";
+
+
+testcase tc_mixed_t_values() runs on CT {
+  if (log2str(t_mixed1) != log2str(c_mixed1_exp)) {
+    setverdict(fail, "Expected: ", c_mixed1_exp, ", got: ", t_mixed1);
+  }
+  else if (log2str(t_mixed2) != log2str(c_mixed2_exp)) {
+    setverdict(fail, "Expected: ", c_mixed2_exp, ", got: ", t_mixed2);
+  }
+  else if (log2str(t_mixed3) != log2str(c_mixed3_exp)) {
+    setverdict(fail, "Expected: ", c_mixed3_exp, ", got: ", t_mixed3);
+  }
+  else if (log2str(t_mixed4) != log2str(c_mixed4_exp)) {
+    setverdict(fail, "Expected: ", c_mixed4_exp, ", got: ", t_mixed4);
+  }
+  else if (log2str(t_mixed5) != log2str(c_mixed5_exp)) {
+    setverdict(fail, "Expected: ", c_mixed5_exp, ", got: ", t_mixed5);
+  }
+  else if (log2str(t_mixed6) != log2str(c_mixed6_exp)) {
+    setverdict(fail, "Expected: ", c_mixed6_exp, ", got: ", t_mixed6);
+  }
+  else if (log2str(t_mixed7) != log2str(c_mixed7_exp)) {
+    setverdict(fail, "Expected: ", c_mixed7_exp, ", got: ", t_mixed7);
+  }
+  else if (log2str(t_mixed8) != log2str(c_mixed8_exp)) {
+    setverdict(fail, "Expected: ", c_mixed8_exp, ", got: ", t_mixed8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_mixed_vt_values() runs on CT {
+  var template universal charstring vt_mixed1 := "abc" & char(0, 1, 2, 3);
+  var universal charstring v_mixed1_exp := "abc" & char(0, 1, 2, 3);
+
+  var template universal charstring vt_mixed2 := char(0, 1, 2, 3) & "abc";
+  var universal charstring v_mixed2_exp := char(0, 1, 2, 3) & "abc";
+
+  var template universal charstring vt_mixed3 := t_char & char(0, 0, 1, 117);
+  var universal charstring v_mixed3_exp := "def" & char(0, 0, 1, 117);
+
+  var template universal charstring vt_mixed4 := char(0, 0, 1, 117) & t_char;
+  var universal charstring v_mixed4_exp := char(0, 0, 1, 117) & "def";
+
+  var template universal charstring vt_mixed5 := t_unichar & "xx";
+  var universal charstring v_mixed5_exp := char(0, 0, 1, 2) & "xx";
+
+  var template universal charstring vt_mixed6 := "xx" & t_unichar;
+  var universal charstring v_mixed6_exp := "xx" & char(0, 0, 1, 2);
+
+  var template universal charstring vt_mixed7 := t_char & t_unichar;
+  var universal charstring v_mixed7_exp := "def" & char(0, 0, 1, 2);
+
+  var template universal charstring vt_mixed8 := t_unichar & t_char;
+  var universal charstring v_mixed8_exp := char(0, 0, 1, 2) & "def";
+  
+  if (log2str(vt_mixed1) != log2str(v_mixed1_exp)) {
+    setverdict(fail, "Expected: ", v_mixed1_exp, ", got: ", vt_mixed1);
+  }
+  else if (log2str(vt_mixed2) != log2str(v_mixed2_exp)) {
+    setverdict(fail, "Expected: ", v_mixed2_exp, ", got: ", vt_mixed2);
+  }
+  else if (log2str(vt_mixed3) != log2str(v_mixed3_exp)) {
+    setverdict(fail, "Expected: ", v_mixed3_exp, ", got: ", vt_mixed3);
+  }
+  else if (log2str(vt_mixed4) != log2str(v_mixed4_exp)) {
+    setverdict(fail, "Expected: ", v_mixed4_exp, ", got: ", vt_mixed4);
+  }
+  else if (log2str(vt_mixed5) != log2str(v_mixed5_exp)) {
+    setverdict(fail, "Expected: ", v_mixed5_exp, ", got: ", vt_mixed5);
+  }
+  else if (log2str(vt_mixed6) != log2str(v_mixed6_exp)) {
+    setverdict(fail, "Expected: ", v_mixed6_exp, ", got: ", vt_mixed6);
+  }
+  else if (log2str(vt_mixed7) != log2str(v_mixed7_exp)) {
+    setverdict(fail, "Expected: ", v_mixed7_exp, ", got: ", vt_mixed7);
+  }
+  else if (log2str(vt_mixed8) != log2str(v_mixed8_exp)) {
+    setverdict(fail, "Expected: ", v_mixed8_exp, ", got: ", vt_mixed8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_mixed_vt_w_str_elem() runs on CT {
+  var charstring v_char := "abc";
+  var universal charstring v_unichar := "xyz";
+
+  var template universal charstring vt_mixed1 := "abc" & v_unichar[1];
+  var universal charstring v_mixed1_exp := "abcy";
+  
+  var template universal charstring vt_mixed2 := v_unichar[1] & "abc";
+  var universal charstring v_mixed2_exp := "yabc";
+  
+  var template universal charstring vt_mixed3 := char(0, 1, 2, 3) & v_char[0];
+  var universal charstring v_mixed3_exp := char(0, 1, 2, 3) & "a";
+  
+  var template universal charstring vt_mixed4 := v_char[0] & char(0, 1, 2, 3);
+  var universal charstring v_mixed4_exp := "a" & char(0, 1, 2, 3);
+  
+  var template universal charstring vt_mixed5 := t_char & v_unichar[1];
+  var universal charstring v_mixed5_exp := "defy";
+
+  var template universal charstring vt_mixed6 := v_unichar[1] & t_char;
+  var universal charstring v_mixed6_exp := "ydef";
+
+  var template universal charstring vt_mixed7 := t_unichar & v_char[0];
+  var universal charstring v_mixed7_exp := char(0, 0, 1, 2) & "a";
+
+  var template universal charstring vt_mixed8 := v_char[0] & t_unichar;
+  var universal charstring v_mixed8_exp := "a" & char(0, 0, 1, 2);
+  
+  if (log2str(vt_mixed1) != log2str(v_mixed1_exp)) {
+    setverdict(fail, "Expected: ", v_mixed1_exp, ", got: ", vt_mixed1);
+  }
+  else if (log2str(vt_mixed2) != log2str(v_mixed2_exp)) {
+    setverdict(fail, "Expected: ", v_mixed2_exp, ", got: ", vt_mixed2);
+  }
+  else if (log2str(vt_mixed3) != log2str(v_mixed3_exp)) {
+    setverdict(fail, "Expected: ", v_mixed3_exp, ", got: ", vt_mixed3);
+  }
+  else if (log2str(vt_mixed4) != log2str(v_mixed4_exp)) {
+    setverdict(fail, "Expected: ", v_mixed4_exp, ", got: ", vt_mixed4);
+  }
+  else if (log2str(vt_mixed5) != log2str(v_mixed5_exp)) {
+    setverdict(fail, "Expected: ", v_mixed5_exp, ", got: ", vt_mixed5);
+  }
+  else if (log2str(vt_mixed6) != log2str(v_mixed6_exp)) {
+    setverdict(fail, "Expected: ", v_mixed6_exp, ", got: ", vt_mixed6);
+  }
+  else if (log2str(vt_mixed7) != log2str(v_mixed7_exp)) {
+    setverdict(fail, "Expected: ", v_mixed7_exp, ", got: ", vt_mixed7);
+  }
+  else if (log2str(vt_mixed8) != log2str(v_mixed8_exp)) {
+    setverdict(fail, "Expected: ", v_mixed8_exp, ", got: ", vt_mixed8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_mixed_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, omit, "xx", "yy", omit, omit };
+
+  var template universal charstring vt_mixed1 := "abc" & v_rec.ucs;
+  var universal charstring v_mixed1_exp := "abcyy";
+  
+  var template universal charstring vt_mixed2 := v_rec.ucs & "abc";
+  var universal charstring v_mixed2_exp := "yyabc";
+  
+  var template universal charstring vt_mixed3 := char(0, 1, 2, 3) & v_rec.cs;
+  var universal charstring v_mixed3_exp := char(0, 1, 2, 3) & "xx";
+  
+  var template universal charstring vt_mixed4 := v_rec.cs & char(0, 1, 2, 3);
+  var universal charstring v_mixed4_exp := "xx" & char(0, 1, 2, 3);
+  
+  var template universal charstring vt_mixed5 := t_char & v_rec.ucs;
+  var universal charstring v_mixed5_exp := "defyy";
+
+  var template universal charstring vt_mixed6 := v_rec.ucs & t_char;
+  var universal charstring v_mixed6_exp := "yydef";
+
+  var template universal charstring vt_mixed7 := t_unichar & v_rec.cs;
+  var universal charstring v_mixed7_exp := char(0, 0, 1, 2) & "xx";
+
+  var template universal charstring vt_mixed8 := v_rec.cs & t_unichar;
+  var universal charstring v_mixed8_exp := "xx" & char(0, 0, 1, 2);
+  
+  if (log2str(vt_mixed1) != log2str(v_mixed1_exp)) {
+    setverdict(fail, "Expected: ", v_mixed1_exp, ", got: ", vt_mixed1);
+  }
+  else if (log2str(vt_mixed2) != log2str(v_mixed2_exp)) {
+    setverdict(fail, "Expected: ", v_mixed2_exp, ", got: ", vt_mixed2);
+  }
+  else if (log2str(vt_mixed3) != log2str(v_mixed3_exp)) {
+    setverdict(fail, "Expected: ", v_mixed3_exp, ", got: ", vt_mixed3);
+  }
+  else if (log2str(vt_mixed4) != log2str(v_mixed4_exp)) {
+    setverdict(fail, "Expected: ", v_mixed4_exp, ", got: ", vt_mixed4);
+  }
+  else if (log2str(vt_mixed5) != log2str(v_mixed5_exp)) {
+    setverdict(fail, "Expected: ", v_mixed5_exp, ", got: ", vt_mixed5);
+  }
+  else if (log2str(vt_mixed6) != log2str(v_mixed6_exp)) {
+    setverdict(fail, "Expected: ", v_mixed6_exp, ", got: ", vt_mixed6);
+  }
+  else if (log2str(vt_mixed7) != log2str(v_mixed7_exp)) {
+    setverdict(fail, "Expected: ", v_mixed7_exp, ", got: ", vt_mixed7);
+  }
+  else if (log2str(vt_mixed8) != log2str(v_mixed8_exp)) {
+    setverdict(fail, "Expected: ", v_mixed8_exp, ", got: ", vt_mixed8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_mixed_vt_extra() runs on CT {
+  var charstring v_char := "abc";
+  var universal charstring v_unichar := "xyz";
+  var Rec v_rec := { omit, omit, omit, "xx", "yy", omit, omit };
+  
+  var template universal charstring vt_mixed1 := v_char[0] & v_rec.ucs;
+  var universal charstring v_mixed1_exp := "ayy";
+  
+  var template universal charstring vt_mixed2 := v_rec.ucs & v_char[0];
+  var universal charstring v_mixed2_exp := "yya";
+
+  var template universal charstring vt_mixed3 := v_rec.cs & v_unichar[1];
+  var universal charstring v_mixed3_exp := "xxy";
+  
+  var template universal charstring vt_mixed4 := v_unichar[1] & v_rec.cs;
+  var universal charstring v_mixed4_exp := "yxx";
+  
+  var template universal charstring vt_mixed5 := v_char[0] & v_unichar[1];
+  var universal charstring v_mixed5_exp := "ay";
+
+  var template universal charstring vt_mixed6 := v_unichar[1] & v_char[0];
+  var universal charstring v_mixed6_exp := "ya";
+
+  var template universal charstring vt_mixed7 := v_rec.cs & v_rec.ucs;
+  var universal charstring v_mixed7_exp := "xxyy";
+
+  var template universal charstring vt_mixed8 := v_rec.ucs & v_rec.cs;
+  var universal charstring v_mixed8_exp := "yyxx";
+  
+  if (log2str(vt_mixed1) != log2str(v_mixed1_exp)) {
+    setverdict(fail, "Expected: ", v_mixed1_exp, ", got: ", vt_mixed1);
+  }
+  else if (log2str(vt_mixed2) != log2str(v_mixed2_exp)) {
+    setverdict(fail, "Expected: ", v_mixed2_exp, ", got: ", vt_mixed2);
+  }
+  else if (log2str(vt_mixed3) != log2str(v_mixed3_exp)) {
+    setverdict(fail, "Expected: ", v_mixed3_exp, ", got: ", vt_mixed3);
+  }
+  else if (log2str(vt_mixed4) != log2str(v_mixed4_exp)) {
+    setverdict(fail, "Expected: ", v_mixed4_exp, ", got: ", vt_mixed4);
+  }
+  else if (log2str(vt_mixed5) != log2str(v_mixed5_exp)) {
+    setverdict(fail, "Expected: ", v_mixed5_exp, ", got: ", vt_mixed5);
+  }
+  else if (log2str(vt_mixed6) != log2str(v_mixed6_exp)) {
+    setverdict(fail, "Expected: ", v_mixed6_exp, ", got: ", vt_mixed6);
+  }
+  else if (log2str(vt_mixed7) != log2str(v_mixed7_exp)) {
+    setverdict(fail, "Expected: ", v_mixed7_exp, ", got: ", vt_mixed7);
+  }
+  else if (log2str(vt_mixed8) != log2str(v_mixed8_exp)) {
+    setverdict(fail, "Expected: ", v_mixed8_exp, ", got: ", vt_mixed8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_mixed_t_values());
+  execute(tc_mixed_vt_values());
+  execute(tc_mixed_vt_w_str_elem());
+  execute(tc_mixed_vt_w_opt_fields());
+  execute(tc_mixed_vt_extra());
+}
+
+}

@@ -1,0 +1,46 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Czerman, Oliver
+ *
+ ******************************************************************************/
+module module4 {
+
+friend module module1;
+
+type component Lib4_CT {
+  var integer v_Lib4_1;
+  public var integer v_Lib4_2;
+  private var integer v_Lib4_3;
+}
+friend type component Lib4Friend_CT {
+  var integer v_Lib4Friend_1;
+  public var integer v_Lib4Friend_2;
+  private var integer v_Lib4Friend_3;
+}
+private type component Lib4Private_CT {
+  var integer v_Lib4Private_1;
+  public var integer v_Lib4Private_2;
+  private var integer v_Lib4Private_3;
+}
+
+function f_set_Lib4_1() runs on Lib4_CT { v_Lib4_1 := 0 } //OK
+function f_set_Lib4_2() runs on Lib4_CT { v_Lib4_2 := 0 } //OK
+function f_set_Lib4_3() runs on Lib4_CT { v_Lib4_3 := 0 } //OK
+function f_set_Lib4Friend_1() runs on Lib4Friend_CT { v_Lib4Friend_1 := 0 } //OK
+function f_set_Lib4Friend_2() runs on Lib4Friend_CT { v_Lib4Friend_2 := 0 } //OK
+function f_set_Lib4Friend_3() runs on Lib4Friend_CT { v_Lib4Friend_3 := 0 } //OK
+
+//These functions cannot be called or started outside module4, though they are public!
+//See module1
+function f_set_Lib4Private_1() runs on Lib4Private_CT { v_Lib4Private_1 := 0 } //OK
+function f_set_Lib4Private_2() runs on Lib4Private_CT { v_Lib4Private_2 := 0 } //OK
+function f_set_Lib4Private_3() runs on Lib4Private_CT { v_Lib4Private_3 := 0 } //OK
+
+}//end module4

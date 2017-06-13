@@ -1,0 +1,29 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:7.1.1, Ensure that arithmetic operators can not handle special float values
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module Sem_070101_ArithmeticOperators_051 {
+
+type component GeneralComp {	    	    
+}
+
+testcase TC_Sem_070101_ArithmeticOperators_051() runs on GeneralComp {
+	var float v_i := -infinity;
+	var float v_k :=2.0E0;
+	
+	var float v_result := v_i * v_k;	// arithmetic operator with -infinity is not allowed
+	
+	setverdict(pass);
+
+}	
+control{
+    execute(TC_Sem_070101_ArithmeticOperators_051());
+}
+
+}

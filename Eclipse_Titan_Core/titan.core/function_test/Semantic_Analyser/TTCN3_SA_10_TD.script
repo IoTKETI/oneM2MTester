@@ -1,0 +1,2111 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Baranyi, Botond
+.*   Bartha, Norbert
+.*   Delic, Adam
+.*   Kovacs, Ferenc
+.*   Pandi, Krisztian
+.*   Raduly, Csaba
+.*   Szabados, Kristof
+.*   Szabo, Janos Zoltan – initial implementation
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+
+.* EDML webpage:       http://cpi.ericsson.se/dwaxe/
+.* EDML2PDF converter: http://dwaxe.ericsson.se/x2pdf
+.* EDML user guide:    http://www.lmc.ericsson.se/~lmcmarg/isit/edml_ug.html
+
+.* Document header information
+:docname.Test Description
+:docno.22/152 91-CRL 113 200/5 Uen
+:rev.A
+:date.2015-04-27
+
+:prep.ETH/XZ Jeno Balasko
+:appr.ETH/XZ (Gyula Koos)
+:checked.ETHGRY
+
+:title.Test description of the TTCN-3 Semantic Analyzer: Implicit message encoding
+:contents level=2.
+.*---------------------------------------------------------------------*
+:h1.Introduction
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Revision history
+.*---------------------------------------------------------------------*
+:xmp tab=2.
+REV   DATE         PREPARED   CHANGE
+__________________________________________________
+PA1   2007-01-31   EDMDELI    New document for TITAN R7
+A     2007-03-06   EJNOSZA    Approved after review
+B     2007-06-01   ETHNBA     New TCs added for 'discard' mapping
+C     2009-06-11  EFERKOV    No more name clashes
+D     2010-07-02  EKRISZA    corrected version information
+A     2011-12-12   EKRISZA     Updated for release
+A     2012-06-27   EFERKOV   Updated for release
+A     2013-01-17   EKRIPND   Updated for release
+:exmp.
+.*---------------------------------------------------------------------*
+:h2.Purpose
+.*---------------------------------------------------------------------*
+The purpose of this Test Description is to define and describe the function
+test activity for the Semantic Analyser functionality of the TTCN-3 compiler:
+:nl.SA-10/x: Implicit message encoding.
+:p.The specification of the test cases can be found in this document.
+.*---------------------------------------------------------------------*
+:h1.Test environment
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Hardware
+.*---------------------------------------------------------------------*
+No specific hardware requirement.
+.*---------------------------------------------------------------------*
+:h2.Software
+.*---------------------------------------------------------------------*
+Tests shall be carried out on the following platforms:
+:list.
+:li D='1.'.Solaris 8 (Sun OS 5.8) (gcc 3.0.4)
+:li D='2.'.SUSE Linux Enterprise server 8 (2.4.19-4GB) (gcc 3.2)
+:li D='3.'.CYGWIN_NT-5.0 (Cygwin DLL: 1.5.12) on Windows 2000 (gcc 3.3.3)
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Configuration
+.*---------------------------------------------------------------------*
+The test environment had been setup in CVS. The tester program is stored in:
+:nl.TTCNv3/function_test/Tools/SAtester.pl
+:nl.Test cases are stored with extension .script in the directory:
+:nl.TTCNv3/function_test/Semantic_Analyser/
+.*---------------------------------------------------------------------*
+:h2.Installation
+.*---------------------------------------------------------------------*
+Install proper TITAN binaries on the used platforms and make sure that
+your environment settings are correct:
+:list.
+:li D='1.'.TTCN3_DIR is set
+:li D='2.'.$TTCN3_DIR/bin is added to the PATH variable
+:li D='3.'.$TTCN3_DIR/lib is added to the LD_LIBRARY_PATH variable
+:li D='4.'.Perl 5.6.0 or higher is available on the platform
+:li D='5.'.Create a symlink to your Perl binary into the directory where the
+test cases are stored:
+:nl.ln -s <your Perl> perl
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+A tester program had been written in Perl especially for the Semantic Analyser
+tests. For the list of command line parameters, type 'SAtester.pl -help', for the
+complete documentation, type 'SAtester.pl -doc'.
+:p.Test cases are specified in the Test Description documents in EDML format.
+The tester program parses these files and generates the TTCN-3/ASN.1 modules, then
+calls the compiler to compile them. The result printout is then matched against
+different patterns to be able to set the verdict. Test cases contain not only
+the source modules, but the patterns as well.
+:p.The tester program allows one-by-one execution of test cases and batched
+execution as well.
+:p.NOTE: the tester program requires Perl 5.6.0 or higher.
+.*---------------------------------------------------------------------*
+:h1.Test cases
+.*---------------------------------------------------------------------*
+Ref [1]: SA-10/x: Implicit message encoding
+
+
+.*---------------------------------------------------------------------*
+:h2.Encoder/Decoder functions: extension attribute tests
+.*---------------------------------------------------------------------*
+This test case group covers the requirement SA-10/1.
+
+The test cases below test the non-standard extension attribute used to
+define encoder/decoder functions. All 4 prototypes are tested (convert,
+fast, backtrack, sliding). Tests include negative and positive tests for
+both syntax and semantics.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder function, missing with attribute
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder function, missing with attribute>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+external function f_converter(in octetstring os) return MyPDU;
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder function, prototypes without encoding
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder function, prototypes without encoding>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+
+external function f_converter_decode(in octetstring os) return MyPDU
+  with { extension "prototype(convert)" }
+external function f_converter_encode(in MyPDU pdu) return octetstring
+  with { extension "prototype(convert)" }
+group G {
+external function f_fast_encode(in MyPDU pdu, out octetstring os);
+external function f_fast_decode(in octetstring os, out MyPDU pdu);
+} with { extension "prototype(fast)" }
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+external function f_convert_decode(in octetstring os) return MyPDU
+with { extension " prototype ( convert ) decode(RAW) " }
+external function f_convert_encode(in MyPDU p_pdu) return octetstring
+with { extension " prototype ( convert ) encode(RAW)  " }
+group G {
+external function f_fast_decode(in octetstring os, out MyPDU pdu)
+with { extension "decode(RAW)" }
+external function f_fast_encode(in MyPDU pdu, out octetstring os)
+with { extension "encode(RAW)" }
+} with { extension " prototype (fast) " }
+external function f_backtrack_decoder(in octetstring os, out MyPDU pdu) return integer
+with { extension " prototype ( backtrack ) decode(RAW)  " }
+external function f_sliding_decoder(inout octetstring os, out MyPDU pdu) return integer
+with { extension " prototype ( sliding ) decode(RAW) " }
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, invalid or missing prototype
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, invalid or missing prototype>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+external function f_converter1(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype( module ) encode(RAW)"
+}
+external function f_converter2(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype( prototype ) encode(RAW)"
+}
+external function f_converter3(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype() encode(RAW)"
+}
+external function f_converter4(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype encode(RAW)"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 4>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, invalid codec
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, invalid codec>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+external function f_converter1(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype( convert ) encode"
+}
+external function f_converter2(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype(convert) encode(CER)"
+}
+external function f_converter3(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype(convert) encode(BER: "
+}
+external function f_converter4(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype(convert) encode(RAW nonexistent)"
+}
+external function f_converter5(in MyPDU p_pdu) return octetstring
+with {
+  extension "prototype(convert) encode(nonexistent)"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 7>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, multiple prototypes, multiple encodes
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, multiple prototypes, multiple encodes>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+group G {
+  external function f_converter1(in MyPDU p_pdu) return octetstring
+  with { extension "prototype(convert) encode(RAW)" }
+  external function f_converter2(in MyPDU p_pdu) return octetstring
+  with { extension "encode(RAW)" }
+} with { extension "prototype(convert)" }
+group G1 {
+group G2 {
+  external function f_converter3(in MyPDU p_pdu) return octetstring
+} with { extension "encode(RAW)" }
+group G3 {
+  external function f_converter4(in MyPDU p_pdu) return octetstring
+}
+} with { extension "prototype(convert) encode(RAW) " }
+external function f_converter5(in MyPDU p_pdu) return octetstring
+  with { extension "prototype(fast) prototype(convert) encode(RAW)" }
+external function f_converter6(in MyPDU p_pdu) return octetstring
+  with { extension "prototype(convert) encode(TEXT) encode(RAW)" }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 4>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, valid codec options
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, valid codec options>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU { float f } with { encode "RAW"; variant "" }
+type record MyPDUtxt { integer i } with { encode "TEXT"; variant "TEXT_CODING()" }
+external function f_converter1(in MyPDU p_pdu) return octetstring
+with { extension "prototype(convert) encode(RAW:nonexistent)" }
+external function f_converter2(in MyPDUtxt p_pdu) return charstring
+with { extension "prototype(convert) encode(TEXT:nonexistent)" }
+external function f_converter3(in MyPDUtxt p_pdu) return charstring
+with { extension "prototype(convert) encode(TEXT:nonexi() hehe(haha()),what?!)" }
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, valid errorbehaviors
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, valid errorbehaviors>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+group G {
+external function f_converter1(in MyPDU p_pdu) return octetstring
+with { extension "errorbehavior(UNBOUND:DEFAULT)" }
+external function f_converter2(in MyPDU p_pdu) return octetstring
+with { extension "errorbehavior(UNBOUND:DEFAULT,REPR:ERROR)" }
+group Gf3 {
+external function f_converter3(in MyPDU p_pdu) return octetstring
+with { extension "errorbehavior(ENC_ENUM:WARNING,DEC_ENUM:WARNING) errorbehavior(REPR:ERROR)" }
+} with { extension "errorbehavior(UNBOUND:DEFAULT)" }
+external function f_converter4(in MyPDU p_pdu) return octetstring
+with { extension "errorbehavior(FOO:BAR)" }
+} with { extension "prototype(convert) encode(RAW)" }
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?im)\bwarning:.+is not a valid error
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, invalid errorbehaviors
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, invalid errorbehaviors>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+external function f_converter1(in MyPDU p_pdu) return octetstring
+with { extension "prototype(convert) encode(RAW) errorbehavior" }
+external function f_converter2(in MyPDU p_pdu) return octetstring
+with { extension "prototype(convert) errorbehavior( encode(RAW)" }
+external function f_converter3(in MyPDU p_pdu) return octetstring
+with { extension "prototype(convert) encode(RAW) errorbehavior(error)" }
+external function f_converter4(in MyPDU p_pdu) return octetstring
+with { extension "prototype(convert) encode(RAW) errorbehavior(FOO:BAR,error)" }
+} with { encode "RAW"; variant "" }
+<END_MODULE>
+<RESULT IF_PASS COUNT 4>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h2.Encoder/Decoder functions: function parameters and return type
+.*---------------------------------------------------------------------*
+This test case group covers the requirement SA-10/2.
+
+The test cases below test the function parameters and return type used in
+define encoder/decoder functions. All 4 prototypes are tested (convert,
+fast, backtrack, sliding). Tests include negative and positive tests for
+both syntax and semantics.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, valid funcs of all types
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, valid funcs of all types>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+group G_converter {
+  external function f_convert_decode(in octetstring os) return MyPDU
+  with { extension "decode(RAW)" }
+  external function f_convert_encode(in MyPDU pdu) return octetstring
+  with { extension "encode(RAW)" }
+} with { extension "prototype(convert)" }
+group G_fast {
+  external function f_fast_decode(in octetstring os, out MyPDU pdu)
+  with { extension "decode(RAW)" }
+  external function f_fast_encode(in MyPDU pdu, out octetstring os)
+  with { extension "encode(RAW)" }
+} with { extension "prototype(fast)" }
+group G_decode {
+  external function f_backtrack_decode(in octetstring os, out MyPDU pdu) return integer
+  with { extension "prototype(backtrack)" }
+  external function f_sliding_decode(inout octetstring os, out MyPDU pdu) return integer
+  with { extension "prototype(sliding)" }
+} with { extension "decode(RAW)" }
+} with { encode "RAW"; variant "" extension "errorbehavior(ALL:ERROR)" }
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, converter type, invalid parameter or return type
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, converter type, invalid parameter or return type>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+group G_decoders {
+  external function f_decode1(out octetstring os) return MyPDU;
+  external function f_decode2(inout octetstring os) return MyPDU;
+  external function f_decode3(in charstring os) return MyPDU;
+  external function f_decode4(in MyPDU os) return MyPDU;
+  external function f_decode5(in octetstring os, in integer i) return MyPDU;
+  external function f_decode6() return MyPDU;
+  external function f_decode7(in octetstring os);
+} with { extension "prototype(convert) decode(RAW)" }
+group G_encoders {
+  external function f_encode1(out MyPDU pdu) return octetstring;
+  external function f_encode2(inout MyPDU pdu) return octetstring;
+  external function f_encode3() return octetstring;
+  external function f_encode4(in MyPDU pdu);
+  external function f_encode5(in MyPDU pdu) return integer;
+  external function f_encode6(in MyPDU pdu) return MyPDU;
+} with { extension "prototype(convert) encode(RAW)" }
+} with { encode "RAW"; variant "" extension "errorbehavior(ALL:ERROR)" }
+<END_MODULE>
+<RESULT IF_PASS COUNT 13>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, fast type, invalid parameter or return type
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, fast type, invalid parameter or return type>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+}
+group G_decoders {
+  external function f_decode1(out octetstring os, out MyPDU pdu);
+  external function f_decode2(inout octetstring os, out MyPDU pdu);
+  external function f_decode3(in MyPDU os, out MyPDU pdu);
+  external function f_decode4(in charstring os, out MyPDU pdu);
+  external function f_decode5(in octetstring os);
+  external function f_decode6(in octetstring os, in MyPDU pdu);
+  external function f_decode7(in octetstring os, inout MyPDU pdu);
+  external function f_decode8(in octetstring os, in MyPDU pdu, integer i);
+  external function f_decode9(in octetstring os, out MyPDU pdu) return integer;
+} with { extension "prototype(fast) decode(RAW)" }
+group G_encoders {
+  external function f_encode1(out MyPDU pdu, out octetstring os);
+  external function f_encode2(inout MyPDU pdu, out octetstring os);
+  external function f_encode3(in MyPDU pdu, in octetstring os);
+  external function f_encode4(in MyPDU pdu, inout octetstring os);
+  external function f_encode5(in MyPDU pdu, out charstring os);
+  external function f_encode6(in MyPDU pdu, out MyPDU os);
+  external function f_encode7(in MyPDU pdu);
+  external function f_encode8();
+  external function f_encode9(in MyPDU pdu, out octetstring os) return integer;
+} with { extension "prototype(fast) encode(RAW)" }
+} with { encode "RAW"; variant "" extension "errorbehavior(ALL:ERROR)" }
+<END_MODULE>
+<RESULT IF_PASS COUNT 18>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Decoder functions, backtrack type, invalid parameter or return type
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoder functions, backtrack type, invalid parameter or return type>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+group G {
+  external function f_backtrack1(out octetstring os, out MyPDU pdu) return integer;
+  external function f_backtrack2(inout octetstring os, out MyPDU pdu) return integer;
+  external function f_backtrack3(in MyPDU os, out MyPDU pdu) return integer;
+  external function f_backtrack4(in charstring os, out MyPDU pdu) return integer;
+  external function f_backtrack5(in octetstring os, in MyPDU pdu) return integer;
+  external function f_backtrack6(in octetstring os, inout MyPDU pdu) return integer;
+  external function f_backtrack7(in octetstring os) return integer;
+  external function f_backtrack8(in octetstring os, out MyPDU pdu);
+  external function f_backtrack9(in octetstring os, out MyPDU pdu) return octetstring;
+} with { extension "prototype(backtrack) decode(RAW)" }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 9>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Decoder functions, sliding type, invalid parameter or return type
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Decoder functions, sliding type, invalid parameter or return type>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+group G {
+  external function f_sliding1(in octetstring os, out MyPDU pdu) return integer;
+  external function f_sliding2(out octetstring os, out MyPDU pdu) return integer;
+  external function f_sliding3(inout MyPDU os, out MyPDU pdu) return integer;
+  external function f_sliding4(inout charstring os, out MyPDU pdu) return integer;
+  external function f_sliding5(inout octetstring os, in MyPDU pdu) return integer;
+  external function f_sliding6(inout octetstring os, inout MyPDU pdu) return integer;
+  external function f_sliding7(inout octetstring os, out MyPDU pdu);
+  external function f_sliding8(inout octetstring os, out MyPDU pdu) return octetstring;
+  external function f_sliding9(inout octetstring os) return integer;
+} with { extension "prototype(sliding) decode(RAW)" }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 9>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Encoder/Decoder functions, invalid encoder for backtrack and sliding types
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Encoder/Decoder functions, invalid encoder for backtrack and sliding types>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU {
+  integer i,
+  float f
+} with { encode "RAW"; variant "" }
+external function f_backtrack_encoder(in MyPDU pdu, out octetstring os) return integer
+  with { extension "prototype(backtrack) encode(RAW)" }
+external function f_sliding_encoder(inout MyPDU pdu, out octetstring os) return integer
+  with { extension "prototype(sliding) encode(RAW)" }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?is)Attribute `encode' cannot be used with
+<END_RESULT>
+<RESULT IF_PASS COUNT 3>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+
+.*---------------------------------------------------------------------*
+:h2.Ports with dual interfaces
+.*---------------------------------------------------------------------*
+This test case group covers the requirement SA-10/3.
+
+The test cases below test the ports with dual interfaces.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, valid def. using simple and ext. func. mappings
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, valid def. using simple and ext. func. mappings>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> octetstring : function(f_encode_pdu2)
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2)
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, invalid provider/user
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, invalid provider/user>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type port PA message { inout octetstring }
+  with {
+    extension "provider"
+  }
+type port PB message { inout octetstring }
+  with {
+    extension "user PA
+      in(octetstring -> octetstring: simple)
+      out(octetstring -> octetstring: simple)"
+  }
+type port PC message { inout octetstring }
+  with {
+    extension "user PA
+      in(octetstring -> octetstring: simple)
+      out(octetstring -> octetstring: simple)"
+    extension "provider"
+  }
+type port PD message { inout octetstring }
+  with {
+    extension "user Pnonexi
+      in(octetstring -> octetstring: simple)
+      out(octetstring -> octetstring: simple)"
+  }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)Attributes .+ cannot be used at the same time
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)There is no local or imported definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, signature mapping
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, signature mapping>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+signature S(in octetstring os);
+type port PA mixed
+{
+  inout octetstring;
+  inout S;
+} with {
+    extension "provider"
+}
+type port PB mixed
+{
+  inout octetstring;
+  inout S;
+} with {
+    extension "user PA
+      in(octetstring -> octetstring: simple;
+         S -> S : simple)
+      out(octetstring -> octetstring: simple;
+         S -> S : simple)"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?im)\berror:.+\bmapping is not present on the list of incoming messages
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?im)\berror:.+\bmapping is not present on the list of outgoing messages
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing incoming signature from the list of external interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing incoming signature from the list of external interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+signature S(in octetstring os)
+
+type port ProviderPort mixed {
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort mixed {
+  in S;
+  inout octetstring
+} with { extension "user ProviderPort
+  out(
+	    octetstring -> octetstring : simple
+  )
+  in(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Incoming signature `@Temp.S' of user port type `@Temp.UserPort' is not present on the list of incoming signatures in provider port type `@Temp.ProviderPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing outgoing signature from the list of external interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing outgoing signature from the list of external interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+signature S(in octetstring os)
+
+type port ProviderPort mixed {
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort mixed {
+  out S;
+  inout octetstring
+} with { extension "user ProviderPort
+  out(
+	    octetstring -> octetstring : simple
+  )
+  in(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Outgoing signature `@Temp.S' of user port type `@Temp.UserPort' is not present on the list of outgoing signatures in provider port type `@Temp.ProviderPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing incoming signature from the list of internal interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing incoming signature from the list of internal interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+signature S(in octetstring os)
+
+type port ProviderPort mixed {
+  in S;
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort mixed {
+  inout octetstring
+} with { extension "user ProviderPort
+  out(
+	    octetstring -> octetstring : simple
+  )
+  in(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Incoming signature `@Temp.S' of provider port type `@Temp.ProviderPort' is not present on the list of incoming signatures in user port type `@Temp.UserPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing outgoing signature from the list of internal interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing outgoing signature from the list of internal interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+signature S(in octetstring os)
+
+type port ProviderPort mixed {
+  out S;
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort mixed {
+  inout octetstring
+} with { extension "user ProviderPort
+  out(
+	    octetstring -> octetstring : simple
+  )
+  in(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Outgoing signature `@Temp.S' of provider port type `@Temp.ProviderPort' is not present on the list of outgoing signatures in user port type `@Temp.UserPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, duplicate mapping
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, duplicate mapping>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+external function f_encode(in octetstring os, out octetstring oos)
+  with { extension "prototype(fast)" }
+
+type port PP message { in octetstring } with { extension "provider" }
+type port PA message { in octetstring } with {
+  extension "user PP
+    in( octetstring -> octetstring : simple;
+        octetstring -> octetstring : function(f_encode)) "
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Duplicate mapping
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, invalid mapping syntax
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, invalid mapping syntax>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type port PP message { in octetstring } with { extension "provider" }
+type port PA message { in octetstring } with {
+  extension "user PP in( octetstring -> octetstring : sample)" }
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)syntax error
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, invalid mappings
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, invalid mappings>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyInControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> octetstring : function(f_encode_pdu2)
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : simple,
+                   MyPDU2 : function(f_decode_pdu2)
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 4>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?is)\bThe source and target types must be the same:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, discard mapping
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, discard mapping>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> octetstring : function(f_encode_pdu2);
+    MyPDU2 -> - : discard
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   - : discard,
+                   MyPDU2 : function(f_decode_pdu2)
+
+
+
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Duplicate mapping for type `@Temp.MyPDU2'
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Mapping `discard' must be the last target of the source type
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, discard mapping for foreign PDU
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, discard mapping for foreign PDU>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+type record MyPDU3 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> - : discard;
+    MyPDU3 -> - : discard
+  )
+  in(
+    MyPDU3 -> - : discard;
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2),
+                   - : discard
+
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Source type `@Temp.MyPDU3' of the `in' mapping is not present on the list of incoming messages in provider port type `@Temp.ProviderPort'
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Source type `@Temp.MyPDU3' of the `out' mapping is not present on the list of outgoing messages in user port type `@Temp.UserPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing 'provider' attribute
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing 'provider' attribute>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+}
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2),
+                   - : discard
+
+  )
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> - : discard
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: The referenced port type `@Temp.ProviderPort' must have the `provider' attribute
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing 'address' attribute from provider port
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing 'address' attribute from provider port>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type integer address;
+
+type port ProviderPort message {
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort message {
+  inout octetstring
+} with { extension "user ProviderPort
+  in(
+     octetstring -> octetstring : simple
+  )
+  out(
+    octetstring -> octetstring : simple
+  ) address"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Attribute `address' cannot be used because the provider port type `@Temp.ProviderPort' does not have attribute `address'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing 'internal' attribute from user port
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing 'internal' attribute from user port>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+type port ProviderPort message {
+  inout octetstring;
+} with { extension "provider internal"}
+
+type port UserPort message {
+  inout octetstring
+} with { extension "user ProviderPort
+  in(
+     octetstring -> octetstring : simple
+  )
+  out(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Missing attribute `internal'. Provider port type `@Temp.ProviderPort' has attribute `internal', which must be also present here
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, invalid incoming mapping(s)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, invalid incoming mapping(s)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+type port ProviderPort message {
+  out octetstring;
+} with { extension "provider"}
+
+type port UserPort message {
+  inout octetstring
+} with { extension "user ProviderPort
+  in(
+     octetstring -> octetstring : simple
+  )
+  out(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Invalid incoming mappings. Provider port type `@Temp.ProviderPort' does not have incoming message types
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, completely missing 'in' mappings
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, completely missing 'in' mappings>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+type record MyPDU{ }
+
+type port ProviderPort message {
+  in MyPDU;
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort message {
+  inout octetstring
+} with { extension "user ProviderPort
+  out(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Missing `in' mappings to handle the incoming message types of provider port type `@Temp.ProviderPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, completely missing 'out' mappings
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, completely missing 'out' mappings>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+
+type record MyPDU{ }
+
+type port ProviderPort message {
+  out MyPDU;
+  inout octetstring;
+} with { extension "provider"}
+
+type port UserPort message {
+  inout octetstring
+} with { extension "user ProviderPort
+  in(
+    octetstring -> octetstring : simple
+  )"
+
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror: Missing `out' mappings to handle the outgoing message types of user port type `@Temp.UserPort'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, nonexistent message types
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, nonexistent message types>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type port PP message { inout octetstring } with { extension "provider" }
+type port PA message { inout octetstring } with {
+  extension "user PP
+    in(octetstring -> octetstring : simple;
+       Nonexi_PDU  -> Nonexi_PDU  : simple)
+    out(octetstring -> octetstring : simple;
+        Nonexi_PDU  -> Nonexi_PDU  : simple)"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 4>
+(?is)error: There is no local or imported definition with name `Nonexi_PDU'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, nonexistent message types 2
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, nonexistent message types 2>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU { } with { encode "RAW" variant "" }
+group G {
+  external function f_encode(in MyPDU pdu, out octetstring os)
+    with { extension "encode(RAW)" }
+  external function f_decode(in octetstring os, out MyPDU pdu)
+    with { extension "decode(RAW)" }
+} with { extension "prototype(fast)" }
+type port PP message { inout octetstring } with { extension "provider" }
+type port PA message { in charstring } with {
+  extension "user PP
+    in( octetstring -> MyPDU : function(f_decode))
+    out(MyPDU -> octetstring : function(f_encode))"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing mappings: outgoing types of the internal interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing mappings: outgoing types of the internal interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2, charstring;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1)
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2)
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?im)\berror: .+ not handled by the outgoing mappings
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, missing mappings: incoming types of the external interface
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, missing mappings: incoming types of the external interface>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+type record MyPDU3 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+  in charstring;
+  in MyPDU3
+} with { extension "provider" }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> octetstring : function(f_encode_pdu2)
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2)
+  )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?im)error: .+ not handled by the incoming mappings
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, external outgoing and internal incoming
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, external outgoing and internal incoming>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU1 { }
+type record MyPDU2 { }
+type record MyPDU3 { }
+type record MyPDU4 { }
+
+type port ExternalFacePort message {
+  out integer;
+  out MyPDU1;
+  out MyPDU2;
+  inout bitstring;
+} with { extension "provider" }
+
+type port InternalFacePort message {
+  in charstring;
+  in MyPDU3;
+  in MyPDU4;
+  inout bitstring;
+} with { extension "user ExternalFacePort
+  in(bitstring -> bitstring : simple)
+  out(bitstring -> bitstring : simple)"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, connecting and mapping
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, connecting and mapping>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyInControlPDU { }
+type record MyOutControlPDU { }
+type record MyPDU1 { }
+type record MyPDU2 { }
+
+external function f_encode_pdu1(in MyPDU1 pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function f_encode_pdu2(in MyPDU2 pdu, out octetstring os)
+  with { extension "prototype(fast)" }
+
+group G_backtrack {
+external function f_decode_pdu1(in octetstring os, out MyPDU1 pdu) return integer;
+external function f_decode_pdu2(in octetstring os, out MyPDU2 pdu) return integer;
+} with { extension "prototype(backtrack)" }
+
+type port ProviderPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout octetstring;
+} with { extension "internal provider"  }
+
+type port UserPort message {
+  in MyInControlPDU;
+  out MyOutControlPDU;
+  inout MyPDU1, MyPDU2;
+} with { extension "internal user ProviderPort
+  out(
+    MyOutControlPDU -> MyOutControlPDU : simple;
+    MyPDU1 -> octetstring : function(f_encode_pdu1);
+    MyPDU2 -> octetstring : function(f_encode_pdu2)
+  )
+  in(
+    MyInControlPDU -> MyInControlPDU : simple;
+    octetstring -> MyPDU1 : function(f_decode_pdu1),
+                   MyPDU2 : function(f_decode_pdu2)
+  )"
+}
+
+type port MyPort message {
+  out MyInControlPDU;
+  in MyOutControlPDU;
+  inout octetstring;
+}
+
+type component K1 {
+  port MyPort my_port;
+}
+
+type component K2 {
+  port UserPort user_port;
+}
+
+testcase TC1() runs on K1 {
+  var K1 k1;
+  var K2 k2;
+  connect(k1:my_port, k2:user_port);
+  map(k1:my_port, k2:user_port);
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\bwarning: Port type .+ was marked as `internal'
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, non standard attribute keywords as identifiers
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, non standard attribute keywords as identifiers>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record user { }
+type record internal { }
+type record simple { }
+
+external function fast(in internal pdu) return octetstring
+  with { extension "prototype(convert)" }
+external function convert(in octetstring os, out internal pdu)
+  with { extension "prototype(fast)" }
+
+type port provider message {
+  inout user;
+  inout simple;
+  inout octetstring;
+} with { extension "internal provider" }
+
+type port sliding message {
+  inout user;
+  inout simple;
+  inout internal;
+} with { extension "internal user provider
+  in(simple -> simple : simple;
+     user -> user : simple;
+     octetstring -> internal : function(convert))
+  out(simple -> simple : simple;
+      user -> user : simple;
+      internal -> octetstring : function(fast))"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS NEGATIVE>
+(?is)\bwarning:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, cardinality 1->N with non-backtrack decoder
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, cardinality 1->N with non-backtrack decoder>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU1 { integer i, float f } with { encode "RAW"; variant "" }
+type record MyPDU2 { charstring c, boolean b } with { encode "RAW"; variant "" }
+external function f_decode1(in octetstring os, out MyPDU1 pdu) return integer
+  with { extension "prototype(backtrack) decode(RAW) errorbehavior(ALL:WARNING)" }
+external function f_decode2(in octetstring os, out MyPDU2 pdu)
+  with { extension "prototype(fast) decode(RAW) errorbehavior(ALL:WARNING)" }
+type port ProvPort message { in octetstring }
+with { extension "internal provider" }
+type port UserPort message { in MyPDU1, MyPDU2 }
+with { extension "internal user ProvPort
+  in( octetstring -> MyPDU1 : function(f_decode1),
+                     MyPDU2 : function(f_decode2) )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, coding method
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, coding method>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU1 { integer i, float f } with { encode "RAW"; variant "" }
+type record MyPDU2 { charstring c, boolean b } with { encode "RAW"; variant "" }
+type port ProvPort message { in octetstring }
+with { extension "internal provider" }
+type port UserPort message { in MyPDU1, MyPDU2 }
+with { extension "internal user ProvPort
+  in( octetstring -> MyPDU1 : decode(RAW) errorbehavior(ALL:WARNING,DEC_ENUM:IGNORE),
+                     MyPDU2 : decode(RAW) )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS NEGATIVE>
+(?is)\bwarning:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, decoding with sliding function
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, decoding with sliding function>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type record MyPDU { integer i, float f } with { encode "RAW"; variant "" }
+external function f_decode(inout octetstring os, out MyPDU pdu) return integer
+  with { extension "prototype(sliding) decode(RAW) errorbehavior(ALL:WARNING)" }
+type port ProvPort message { in octetstring }
+with { extension "internal provider" }
+type port UserPort message { in MyPDU }
+with { extension "internal user ProvPort
+  in( octetstring -> MyPDU : function(f_decode) )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS NEGATIVE>
+(?is)\bwarning:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Ports with dual interfaces, internal function as catch-all in mappings
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Ports with dual interfaces, internal function as catch-all in mappings>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN Temp Temp.ttcn>
+module Temp {
+type integer MyPDU1 with { encode "RAW"; variant "" }
+type boolean MyPDU2 with { encode "RAW"; variant "" }
+function f_catchall_decode(in octetstring os, out MyPDU1 pdu) return integer {
+  pdu := 0;
+  return 0;
+} with { extension "prototype(backtrack)" }
+type port ProvPort message { in octetstring }
+with { extension "internal provider" }
+type port UserPort message { in MyPDU1, MyPDU2 }
+with { extension "internal user ProvPort
+  in( octetstring -> MyPDU1 : decode(RAW),
+                     MyPDU2 : decode(RAW),
+                     MyPDU1 : function(f_catchall_decode) )"
+}
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS NEGATIVE>
+(?is)\bwarning:
+<END_RESULT>
+<RESULT IF_PASS POSITIVE>
+(?im)Notify: File `Temp.hh' was generated.
+<END_RESULT>
+<END_TC>
+
+:exmp.

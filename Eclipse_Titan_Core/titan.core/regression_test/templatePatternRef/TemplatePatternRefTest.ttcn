@@ -1,0 +1,1160 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Bence Janos Szabo
+ *
+ ******************************************************************************/
+module TemplatePatternRefTest {
+
+type component EmptyCT {}
+
+modulepar charstring m_r := "r";
+
+
+type charstring MyCharRange ("a".."z");
+type charstring MyCharList ("a", "z");
+type MyCharList MyCharList2 ("a");
+type MyCharList2 MyCharList3;
+type MyCharRange MyCharRange2 ("b".."g");
+type MyCharRange2 MyCharRange3;
+type MyCharRange3 MyCharRange4;
+type charstring MyCharRangeNormal;
+type MyCharRangeNormal MyCharRangeNormal2;
+const charstring c_myCharR := "r";
+template charstring t_char_temp := "r";
+
+
+template charstring mw_myTempPatt1 := pattern "\N{c_myCharR}";
+template charstring mw_myTempPatt2 := pattern "\N{t_char_temp}";
+template charstring mw_myTempPatt4 := pattern "\N{m_r}";
+
+testcase tc_single_char() runs on EmptyCT {
+  if (not match("r", mw_myTempPatt1)) {
+    setverdict(fail);
+   }
+
+   if (match("s", mw_myTempPatt1)) {
+    setverdict(fail);
+   }
+
+   if (not match("r", mw_myTempPatt2)) {
+    setverdict(fail);
+   }
+
+   if (match("s", mw_myTempPatt2)) {
+    setverdict(fail);
+   }
+
+   if (not match("r", mw_myTempPatt4)) {
+    setverdict(fail);
+   }
+
+   if (match("s", mw_myTempPatt4)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+
+
+template charstring mw_myTempPatt5 := pattern "v\N{c_myCharR}v";
+template charstring mw_myTempPatt6 := pattern "v\N{t_char_temp}v";
+template charstring mw_myTempPatt8 := pattern "v\N{m_r}v";
+
+
+testcase tc_single_char_middle() runs on EmptyCT {
+   if (not match("vrv", mw_myTempPatt5)) {
+    setverdict(fail);
+   }
+
+   if (match("vsv", mw_myTempPatt5)) {
+    setverdict(fail);
+   }
+
+   if (not match("vrv", mw_myTempPatt6)) {
+    setverdict(fail);
+   }
+
+   if (match("vsv", mw_myTempPatt6)) {
+    setverdict(fail);
+   }
+
+   if (not match("vrv", mw_myTempPatt8)) {
+    setverdict(fail);
+   }
+
+   if (match("vsv", mw_myTempPatt8)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+
+template charstring mw_myTempPatt10 := pattern "\N{MyCharRange}";
+template charstring mw_myTempPatt11 := pattern "\N{MyCharRange2}";
+template charstring mw_myTempPatt12 := pattern "\N{MyCharRange3}";
+template charstring mw_myTempPatt13 := pattern "\N{MyCharRange4}";
+template charstring mw_myTempPatt14 := pattern "\N{MyCharRangeNormal}";
+template charstring mw_myTempPatt20 := pattern "\N{MyCharRangeNormal2}";
+
+testcase tc_type_range() runs on EmptyCT {
+  if (not match("a", mw_myTempPatt10)) {
+    setverdict(fail);
+  }
+
+  if (not match("r", mw_myTempPatt10)) {
+    setverdict(fail);
+  }
+
+  if (not match("z", mw_myTempPatt10)) {
+    setverdict(fail);
+  }
+
+   if (match("aa", mw_myTempPatt10)) {
+    setverdict(fail);
+   }
+
+   if (not match("c", mw_myTempPatt11)) {
+    setverdict(fail);
+   }
+
+   if (match("aa", mw_myTempPatt11)) {
+    setverdict(fail);
+   }
+
+   if (not match("c", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (match("y", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (match("a", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (not match("b", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (not match("g", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (match("h", mw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   if (not match("c", mw_myTempPatt13)) {
+    setverdict(fail);
+   }
+
+   if (match("y", mw_myTempPatt13)) {
+    setverdict(fail);
+   }
+
+   if (not match("g", mw_myTempPatt14)) { // any char
+    setverdict(fail);
+   }
+
+   if (match("gg", mw_myTempPatt14)) {
+    setverdict(fail);
+   }
+
+   if (not match("g", mw_myTempPatt20)) { // any char
+    setverdict(fail);
+   }
+
+   if (match("gg", mw_myTempPatt20)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+
+
+template charstring mw_myTempPatt15 := pattern "v\N{MyCharRange}v";
+template charstring mw_myTempPatt16 := pattern "v\N{MyCharRange2}v";
+template charstring mw_myTempPatt17 := pattern "v\N{MyCharRange3}v";
+template charstring mw_myTempPatt18 := pattern "v\N{MyCharRange4}v";
+template charstring mw_myTempPatt19 := pattern "v\N{MyCharRangeNormal}v";
+template charstring mw_myTempPatt21 := pattern "v\N{MyCharRangeNormal2}v";
+
+testcase tc_type_range_middle() runs on EmptyCT {
+  if (not match("vrv", mw_myTempPatt15)) {
+    setverdict(fail);
+   }
+
+   if (match("vaav", mw_myTempPatt15)) {
+    setverdict(fail);
+   }
+
+   if (not match("vcv", mw_myTempPatt16)) {
+    setverdict(fail);
+   }
+
+   if (match("vaav", mw_myTempPatt16)) {
+    setverdict(fail);
+   }
+
+   if (not match("vcv", mw_myTempPatt17)) {
+    setverdict(fail);
+   }
+
+   if (match("vyv", mw_myTempPatt17)) {
+    setverdict(fail);
+   }
+
+   if (not match("vcv", mw_myTempPatt18)) {
+    setverdict(fail);
+   }
+
+   if (match("vyv", mw_myTempPatt18)) {
+    setverdict(fail);
+   }
+
+   if (not match("vgv", mw_myTempPatt19)) { // any char
+    setverdict(fail);
+   }
+
+   if (match("vggv", mw_myTempPatt19)) {
+    setverdict(fail);
+   }
+
+      if (not match("vgv", mw_myTempPatt21)) { // any char
+    setverdict(fail);
+   }
+
+   if (match("vggv", mw_myTempPatt21)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+
+template charstring mw_myTempPatt22 := pattern "\N{MyCharList}";
+template charstring mw_myTempPatt23 := pattern "\N{MyCharList2}";
+template charstring mw_myTempPatt24 := pattern "\N{MyCharList3}";
+
+testcase tc_type_list() runs on EmptyCT {
+  if (not match("a", mw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  if (not match("z", mw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  if (match("g", mw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  if (not match("a", mw_myTempPatt23)) {
+    setverdict(fail);
+  }
+
+  if (match("z", mw_myTempPatt23)) {
+    setverdict(fail);
+  }
+
+  if (not match("a", mw_myTempPatt24)) {
+    setverdict(fail);
+  }
+
+  if (match("z", mw_myTempPatt24)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+
+
+template charstring mw_myTempPatt25 := pattern "v\N{MyCharList}v";
+template charstring mw_myTempPatt26 := pattern "v\N{MyCharList2}v";
+template charstring mw_myTempPatt27 := pattern "v\N{MyCharList3}v";
+
+
+testcase tc_type_list_middle() runs on EmptyCT {
+  if (not match("vav", mw_myTempPatt25)) {
+    setverdict(fail);
+  }
+
+  if (not match("vzv", mw_myTempPatt25)) {
+    setverdict(fail);
+  }
+
+  if (match("vgv", mw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  if (not match("vav", mw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  if (match("vzv", mw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  if (not match("vav", mw_myTempPatt27)) {
+    setverdict(fail);
+  }
+
+  if (match("vzv", mw_myTempPatt27)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+
+//===========================================================================//
+
+
+modulepar universal charstring m_Unir := "r";
+
+type universal charstring MyUniCharRange ("a".."z");
+type universal charstring MyUniCharList ("a", "z", char(1,2,3,4));
+type MyUniCharList MyUniCharList2 ("a");
+type MyUniCharList2 MyUniCharList3;
+type MyUniCharRange MyUniCharRange2 ("b".."g");
+type MyUniCharRange2 MyUniCharRange3;
+type MyUniCharRange3 MyUniCharRange4;
+type universal charstring MyUniCharRangeNormal;
+type MyUniCharRangeNormal MyUniCharRangeNormal2;
+const universal charstring c_myUniCharR := "r";
+template universal charstring t_unichar_temp := "r";
+
+
+template universal charstring unimw_myTempPatt1 := pattern "\N{c_myUniCharR}";
+template universal charstring unimw_myTempPatt2 := pattern "\N{t_unichar_temp}";
+template universal charstring unimw_myTempPatt4 := pattern "\N{m_Unir}";
+
+testcase tc_single_unichar() runs on EmptyCT {
+  var universal charstring str := "r";
+  if (not match(str, unimw_myTempPatt1)) {
+    setverdict(fail);
+   }
+
+   str := "s";
+   if (match(str, unimw_myTempPatt1)) {
+    setverdict(fail);
+   }
+
+   str := "r";
+   if (not match(str, unimw_myTempPatt2)) {
+    setverdict(fail);
+   }
+
+   str := "s";
+   if (match(str, unimw_myTempPatt2)) {
+    setverdict(fail);
+   }
+
+   str := "r";
+   if (not match(str, unimw_myTempPatt4)) {
+    setverdict(fail);
+   }
+
+   str := "s";
+   if (match(str, unimw_myTempPatt4)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+template universal charstring unimw_myTempPatt5 := pattern "v\N{c_myUniCharR}v";
+template universal charstring unimw_myTempPatt6 := pattern "v\N{t_unichar_temp}v";
+template universal charstring unimw_myTempPatt8 := pattern "v\N{m_Unir}v";
+
+testcase tc_single_unichar_middle() runs on EmptyCT {
+   var universal charstring str := "vrv";
+   if (not match(str, unimw_myTempPatt5)) {
+    setverdict(fail);
+   }
+
+   str := "vsv";
+   if (match(str, unimw_myTempPatt5)) {
+    setverdict(fail);
+   }
+
+   str := "vrv";
+   if (not match(str, unimw_myTempPatt6)) {
+    setverdict(fail);
+   }
+
+   str := "vsv";
+   if (match(str, unimw_myTempPatt6)) {
+    setverdict(fail);
+   }
+
+   str := "vrv";
+   if (not match(str, unimw_myTempPatt8)) {
+    setverdict(fail);
+   }
+
+   str := "vsv";
+   if (match(str, unimw_myTempPatt8)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+template universal charstring unimw_myTempPatt10 := pattern "\N{MyUniCharRange}";
+template universal charstring unimw_myTempPatt11 := pattern "\N{MyUniCharRange2}";
+template universal charstring unimw_myTempPatt12 := pattern "\N{MyUniCharRange3}";
+template universal charstring unimw_myTempPatt13 := pattern "\N{MyUniCharRange4}";
+template universal charstring unimw_myTempPatt14 := pattern "\N{MyUniCharRangeNormal}";
+template universal charstring unimw_myTempPatt20 := pattern "\N{MyUniCharRangeNormal2}";
+
+testcase tc_unitype_range() runs on EmptyCT {
+  var universal charstring str := "r";
+  if (not match(str, unimw_myTempPatt10)) {
+    setverdict(fail);
+   }
+
+   str := "aa";
+   if (match(str, unimw_myTempPatt10)) {
+    setverdict(fail);
+   }
+
+   str := "a";
+   if (not match(str, unimw_myTempPatt10)) {
+    setverdict(fail);
+   }
+
+   str := "z";
+   if (not match(str, unimw_myTempPatt10)) {
+    setverdict(fail);
+   }
+
+   str := "c";
+   if (not match(str, unimw_myTempPatt11)) {
+    setverdict(fail);
+   }
+
+   str := "aa";
+   if (match(str, unimw_myTempPatt11)) {
+    setverdict(fail);
+   }
+
+   str := "c";
+   if (not match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "y";
+   if (match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "a";
+   if (match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "b";
+   if (not match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "g";
+   if (not match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "h";
+   if (match(str, unimw_myTempPatt12)) {
+    setverdict(fail);
+   }
+
+   str := "c";
+   if (not match(str, unimw_myTempPatt13)) {
+    setverdict(fail);
+   }
+
+   str := "y";
+   if (match(str, unimw_myTempPatt13)) {
+    setverdict(fail);
+   }
+
+   str := "g";
+   if (not match(str, unimw_myTempPatt14)) { // any char
+    setverdict(fail);
+   }
+
+   str := "gg";
+   if (match(str, unimw_myTempPatt14)) {
+    setverdict(fail);
+   }
+
+   str := "g";
+   if (not match(str, unimw_myTempPatt20)) { // any char
+    setverdict(fail);
+   }
+
+   str := "gg";
+   if (match(str, unimw_myTempPatt20)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+template universal charstring unimw_myTempPatt15 := pattern "v\N{MyUniCharRange}v";
+template universal charstring unimw_myTempPatt16 := pattern "v\N{MyUniCharRange2}v";
+template universal charstring unimw_myTempPatt17 := pattern "v\N{MyUniCharRange3}v";
+template universal charstring unimw_myTempPatt18 := pattern "v\N{MyUniCharRange4}v";
+template universal charstring unimw_myTempPatt19 := pattern "v\N{MyUniCharRangeNormal}v";
+template universal charstring unimw_myTempPatt21 := pattern "v\N{MyUniCharRangeNormal2}v";
+
+testcase tc_unitype_range_middle() runs on EmptyCT {
+  var universal charstring str := "vrv";
+  if (not match(str, unimw_myTempPatt15)) {
+    setverdict(fail);
+   }
+
+   str := "vaav";
+   if (match(str, unimw_myTempPatt15)) {
+    setverdict(fail);
+   }
+
+   str := "vcv";
+   if (not match(str, unimw_myTempPatt16)) {
+    setverdict(fail);
+   }
+
+   str := "vaav";
+   if (match(str, unimw_myTempPatt16)) {
+    setverdict(fail);
+   }
+
+   str := "vcv";
+   if (not match(str, unimw_myTempPatt17)) {
+    setverdict(fail);
+   }
+
+   str := "vyv";
+   if (match(str, unimw_myTempPatt17)) {
+    setverdict(fail);
+   }
+
+   str := "vcv";
+   if (not match(str, unimw_myTempPatt18)) {
+    setverdict(fail);
+   }
+
+   str := "vyv";
+   if (match(str, unimw_myTempPatt18)) {
+    setverdict(fail);
+   }
+
+   str := "vgv";
+   if (not match(str, unimw_myTempPatt19)) { // any char
+    setverdict(fail);
+   }
+
+   str := "vggv";
+   if (match(str, unimw_myTempPatt19)) {
+    setverdict(fail);
+   }
+ 
+   str := "vgv";
+   if (not match(str, unimw_myTempPatt21)) { // any char
+    setverdict(fail);
+   }
+
+   str := "vggv";
+   if (match(str, unimw_myTempPatt21)) {
+    setverdict(fail);
+   }
+
+   setverdict(pass);
+}
+
+
+template universal charstring unimw_myTempPatt22 := pattern "\N{MyUniCharList}";
+template universal charstring unimw_myTempPatt23 := pattern "\N{MyUniCharList2}";
+template universal charstring unimw_myTempPatt24 := pattern "\N{MyUniCharList3}";
+
+testcase tc_unitype_list() runs on EmptyCT {
+  var universal charstring str := "a";
+  if (not match(str, unimw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  str := "z";
+  if (not match(str, unimw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  str := char(1,2,3,4);
+  if (not match(str, unimw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  str := "g";
+  if (match(str, unimw_myTempPatt22)) {
+    setverdict(fail);
+  }
+
+  str := "a";
+  if (not match(str, unimw_myTempPatt23)) {
+    setverdict(fail);
+  }
+
+  str := "z";
+  if (match(str, unimw_myTempPatt23)) {
+    setverdict(fail);
+  }
+
+  str := "a";
+  if (not match(str, unimw_myTempPatt24)) {
+    setverdict(fail);
+  }
+
+  str := "z";
+  if (match(str, unimw_myTempPatt24)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+template universal charstring unimw_myTempPatt25 := pattern "v\N{MyUniCharList}v";
+template universal charstring unimw_myTempPatt26 := pattern "v\N{MyUniCharList2}v";
+template universal charstring unimw_myTempPatt27 := pattern "v\N{MyUniCharList3}v";
+
+testcase tc_unitype_list_middle() runs on EmptyCT {
+  var universal charstring str := "vav";
+  if (not match(str, unimw_myTempPatt25)) {
+    setverdict(fail);
+  }
+
+  str := "vzv";
+  if (not match(str, unimw_myTempPatt25)) {
+    setverdict(fail);
+  }
+
+  str := "vgv";
+  if (match(str, unimw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  str := "vav";
+  if (not match(str, unimw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  str := "vzv";
+  if (match(str, unimw_myTempPatt26)) {
+    setverdict(fail);
+  }
+
+  str := "vav";
+  if (not match(str, unimw_myTempPatt27)) {
+    setverdict(fail);
+  }
+
+  str := "vzv";
+  if (match(str, unimw_myTempPatt27)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+//===========================================================================//
+
+template charstring t_char := pattern "\N{charstring}";
+template universal charstring t_unichar := pattern "\N{universal charstring}";
+
+testcase tc_special() runs on EmptyCT {
+  if (not match("s", t_char)) {
+    setverdict(fail);
+  }
+
+  if (match("ss", t_char)) {
+    setverdict(fail);
+  }
+
+  var universal charstring str := "s";
+  if (not match(str, t_unichar)) {
+    setverdict(fail);
+  }
+
+  str := "ss";
+  if (match(str, t_unichar)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+}
+
+
+//===========================================================================//
+
+modulepar charstring m_charstring;
+modulepar universal charstring m_unicharstring;
+modulepar template charstring m_charstring_template;
+modulepar template universal charstring m_unicharstring_template;
+
+testcase tc_modulepar() runs on EmptyCT {
+  var template charstring t_chartemp := pattern "\N{m_charstring}";
+
+  if (not match("r", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  if (match("s", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  t_chartemp := pattern "\N{m_charstring_template}";
+  if (not match("r", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  if (match("s", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  var template universal charstring t_unichartemp := pattern "\N{m_unicharstring}";
+  var universal charstring str := "r";
+  if (not match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+  
+  str := "s";
+  if (match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  t_unichartemp := pattern "\N{m_unicharstring_template}";
+  str := "r";
+  if (not match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+  
+  str := "s";
+  if (match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+}
+
+
+// Values not known at compile time
+testcase tc_variable() runs on EmptyCT {
+  var charstring loc_char := "r";
+  var universal charstring loc_unichar := "r";
+  var template charstring loc_chartemp := "r";
+  var template universal charstring loc_unichartemp := "r";
+
+  var template charstring t_chartemp := pattern "\N{loc_char}";
+  if (not match("r", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  if (match("s", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  var universal charstring str := "r";
+  var template universal charstring t_unichartemp := pattern "\N{loc_unichar}";
+  if (not match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  str := "s";
+  if (match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  t_chartemp := pattern "\N{loc_chartemp}";
+  if (not match("r", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  if (match("s", t_chartemp)) {
+    setverdict(fail);
+  }
+
+  str := "r";
+  t_unichartemp := pattern "\N{loc_unichartemp}";
+  if (not match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  str := "s";
+  if (match(str, t_unichartemp)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+}
+
+//===========================================================================//
+
+
+const charstring c_a := "a";
+template charstring t_b := "b";
+type charstring CtoD ("c" .. "d");
+type charstring EorF ("e", "f");
+
+// param1 is "i", param2 is "j"
+testcase tc_complex(charstring param1, template charstring param2) runs on EmptyCT {
+
+  var charstring loc_g := "g";
+  var template charstring t_h := "h";
+
+  var template charstring loc_pattern := pattern "A\N{c_a}\N{c_a}B\N{t_b}\N{t_b}\N{CtoD}\N{CtoD}\N{EorF}\N{EorF}\N{charstring}\N{loc_g}\N{t_h}\N{param1}\N{param1}\N{param2}\N{param2}";
+
+  var charstring str := "AaaBbbcdefYghiijj";
+  if (not match(str, loc_pattern)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+const universal charstring c_1 := char(1,2,3,4);
+template universal charstring t_2 := char(1,2,3,5);
+type universal charstring FromTo (char(1,1,1,1) .. char(2,2,2,2));
+type universal charstring Either (char(3,3,3,3), char(4,4,4,4));
+
+// param1 is char(7,7,7,7), param2 is char(8,8,8,8)
+testcase tc_complex_unichar(universal charstring param1, template universal charstring param2) runs on EmptyCT {
+  var universal charstring loc_3 := char(5,5,5,5);
+  var template universal charstring loc_4 := char(6,6,6,6);
+
+  var template universal charstring loc_pattern := pattern "A\N{c_1}\N{c_1}B\N{t_2}\N{t_2}\N{FromTo}\N{FromTo}\N{Either}\N{Either}\N{universal charstring}\N{loc_3}\N{loc_4}\N{param1}\N{param1}\N{param2}\N{param2}";
+  
+  var universal charstring str := "A"& char(1,2,3,4) & char(1,2,3,4) & "B" & char(1,2,3,5) & char(1,2,3,5) & char (1,1,1,1) & char(2,2,2,2) & char (3,3,3,3) & char(4,4,4,4) & char(9,9,9,9) & char(5,5,5,5) & char(6,6,6,6) & char(7,7,7,7) & char(7,7,7,7) & char(8,8,8,8) & char(8,8,8,8);
+  if (not match(str, loc_pattern)) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+
+}
+
+
+
+//===========================================================================//
+
+
+modulepar charstring m_charstring_bad;
+modulepar charstring m_charstring_bad2;
+modulepar template charstring m_charstring_templ_bad;
+modulepar template charstring m_charstring_templ_bad2;
+modulepar universal charstring m_unicharstring_bad;
+modulepar universal charstring m_unicharstring_bad2;
+modulepar template universal charstring m_unicharstring_templ_bad;
+modulepar template universal charstring m_unicharstring_templ_bad2;
+
+testcase tc_pattern_DTE() runs on EmptyCT {
+
+  // DTE tests with variables 
+
+  var charstring charstr := "aa";
+  var charstring dte_message := "Dynamic test case error: The length of the charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template charstring templ := pattern "\N{charstr}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  charstr := "";
+  @try {
+    var template charstring templ := pattern "\N{charstr}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  dte_message := "Dynamic test case error: The length of the universal charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  var universal charstring unicharstr := "aa";
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstr}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  unicharstr := "";
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstr}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  unicharstr := char(1,2,3,4) & char(1,2,3,3);
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstr}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  // DTE tests with templates
+
+  var template charstring charstrtempl := "aa";
+  dte_message := "Dynamic test case error: The length of the charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template charstring templ := pattern "\N{charstrtempl}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  charstrtempl := "";
+  @try {
+    var template charstring templ := pattern "\N{charstrtempl}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  dte_message := "Dynamic test case error: The length of the universal charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  var template universal charstring unicharstrtempl := "aa";
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstrtempl}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  unicharstrtempl := "";
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstrtempl}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  unicharstrtempl := char(1,2,3,4) & char(1,2,3,3);
+  @try {
+    var template universal charstring templ := pattern "\N{unicharstrtempl}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  // DTE tests with modulepar variables
+
+  dte_message := "Dynamic test case error: The length of the charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template charstring templ := pattern "\N{m_charstring_bad}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template charstring templ := pattern "\N{m_charstring_bad2}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  dte_message := "Dynamic test case error: The length of the universal charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template universal charstring templ := pattern "\N{m_unicharstring_bad}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template universal charstring templ := pattern "\N{m_unicharstring_bad2}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+
+  // DTE tests with modulepar templates
+
+  dte_message := "Dynamic test case error: The length of the charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template charstring templ := pattern "\N{m_charstring_templ_bad}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template charstring templ := pattern "\N{m_charstring_templ_bad2}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  dte_message := "Dynamic test case error: The length of the universal charstring must be of length one, when it is being referenced in a pattern with \\N{ref}";
+  @try {
+    var template universal charstring templ := pattern "\N{m_unicharstring_templ_bad}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template universal charstring templ := pattern "\N{m_unicharstring_templ_bad2}";
+    setverdict(fail, "Expected dynamic test case error when referencing a long string in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+
+  // DTE when non value template used
+
+  dte_message := "Dynamic test case error: Only specific value template allowed in pattern reference with \\N{ref}";
+  @try {
+    var template universal charstring s := pattern "sdf";
+    var template universal charstring templ := pattern "\N{s}";
+    setverdict(fail, "Expected dynamic test case error when referencing a non value template in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template universal charstring s := ("a", "b");
+    var template universal charstring templ := pattern "\N{s}";
+    setverdict(fail, "Expected dynamic test case error when referencing a non value template in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template universal charstring s := *;
+    var template universal charstring templ := pattern "\N{s}";
+    setverdict(fail, "Expected dynamic test case error when referencing a non value template in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  @try {
+    var template universal charstring s := ?;
+    var template universal charstring templ := pattern "\N{s}";
+    setverdict(fail, "Expected dynamic test case error when referencing a non value template in pattern with \\N{ref} ");
+  }
+  @catch (msg) {
+    if (not match(msg, dte_message)) {
+      setverdict(fail, "Expected error: ", dte_message, ", got: ", msg);
+    }
+  }
+
+  setverdict(pass);
+}
+
+control {
+ 
+ execute(tc_single_char());
+ execute(tc_single_char_middle());
+ execute(tc_type_range());
+ execute(tc_type_range_middle());
+ execute(tc_type_list());
+ execute(tc_type_list_middle());
+
+ execute(tc_single_unichar());
+ execute(tc_single_unichar_middle());
+ execute(tc_unitype_range());
+ execute(tc_unitype_range_middle());
+ execute(tc_unitype_list());
+ execute(tc_unitype_list_middle());
+
+
+ execute(tc_special());
+ execute(tc_modulepar());
+ execute(tc_variable());
+ execute(tc_complex("i", "j"));
+ execute(tc_complex_unichar(char(7,7,7,7), char(8,8,8,8)));
+ execute(tc_pattern_DTE());
+
+}
+
+}

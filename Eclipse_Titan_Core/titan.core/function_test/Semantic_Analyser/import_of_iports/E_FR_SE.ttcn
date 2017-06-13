@@ -1,0 +1,133 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+//^In TTCN\-3 module `E_FR_SE'\:$//
+module E_FR_SE{
+
+public import from D_FR_SE { import all };
+public import from D_FR_SE all;
+
+ type component MTC {};
+
+//==CONST===
+const integer c_E_i := 0;
+public const integer c_E_i_pu := 0;
+friend const integer c_E_i_fr := 0;
+private const integer c_E_i_pr := 0;
+
+//==TEMPLATES===
+template integer t_E_i := 0;
+public template integer t_E_i_pu := 0;
+friend template integer t_E_i_fr := 0;
+private template integer t_E_i_pr := 0;
+
+//===TYPES===
+type integer E_MyInt;
+public type integer E_MyInt_pu;
+private type integer E_MyInt_pr;
+friend type integer E_MyInt_fr;
+
+//==functions
+/* public */ function f_E() { log("This is f_E") } 
+public function f_E_pu() { log("This is f_E_pu") } 
+friend function f_E_fr() { log("This is f_E_fr") } 
+private function f_E_pr() { log("This is f_E_pr") }
+
+//=============Testcases=========================================
+// "friend import from A_SE all;" of B_CEFR_SE has been lost in D_FR_SE
+testcase tc_A() runs on MTC { //^In testcase definition `tc_A'://
+  var integer i:=c_A_i; //^In variable definition \`i\'\:$//  //^error: There is no local or imported definition with name `c_A_i'//
+  i:=valueof(t_A_i);     //^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_A_i'//
+  i:=valueof(t_A_i_pu);  //^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_A_i_pu'//
+  var A_MyInt myInt;     //^In variable definition `myInt'// //^error: There is no local or imported definition with name `A_MyInt'//
+  var A_MyInt_pu myInt_pu; //^In variable definition `myInt_pu'// //^error: There is no local or imported definition with name `A_MyInt_pu'//
+  f_A(); //^In function or altstep instance:// //^error: There is no local or imported definition with name `f_A'//
+  f_A_pu();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_A_pu'//
+
+  i:=c_A_i_fr;//^In variable assignment:// //^error: There is no local or imported definition with name `c_A_i_fr'//
+  i:=valueof(t_A_i_fr);//^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_A_i_fr'//
+  var A_MyInt_fr myInt_fr; //^In variable definition `myInt_fr'// //^error: There is no local or imported definition with name `A_MyInt_fr'//
+  f_A_fr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_A_fr'//
+
+  i:=c_A_i_pr;//^In variable assignment:// //^error: There is no local or imported definition with name `c_A_i_pr'//
+  i:=valueof(t_A_i_pr);//^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_A_i_pr'//
+  var A_MyInt_pr a_myInt_pr;//^In variable definition `a_myInt_pr'// //^error: There is no local or imported definition with name `A_MyInt_pr'//
+  f_A_pr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_A_pr'//
+  setverdict(pass);  
+}
+
+testcase tc_B() runs on MTC {//^In testcase definition `tc_B'://
+  var integer i:=c_B_i; 
+  i:=c_B_i_pu;
+  i:=valueof(t_B_i_pu); 
+  i:=valueof(t_B_i); 
+  var B_MyInt myInt; 
+  var B_MyInt_pu myInt_pu; 
+  f_B(); 
+  f_B_pu();
+
+
+  i:=c_B_i_fr;//^In variable assignment:// //^error: There is no local or imported definition with name `c_B_i_fr'//
+  i:=valueof(t_B_i_fr);//^In variable assignment:// //^In the operand of operation `valueof\(\)'\:// //^error: There is no local or imported definition with name `t_B_i_fr'//
+  var B_MyInt_fr myInt_fr;//^In variable definition `myInt_fr':// //^error: There is no local or imported definition with name `B_MyInt_fr'//
+  f_B_fr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_B_fr'//
+
+  i:=c_B_i_pr;//^In variable assignment\:$// //^error: There is no local or imported definition with name `c_B_i_pr'//
+  i:=valueof(t_B_i_pr);//^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_B_i_pr'//
+  var B_MyInt_pr b_myInt_pr; //^In variable definition `b_myInt_pr'////^error: There is no local or imported definition with name `B_MyInt_pr'//
+  f_B_pr(); //^In function or altstep instance:// //^error: There is no local or imported definition with name `f_B_pr'//
+  setverdict(pass);  
+}
+
+
+testcase tc_C() runs on MTC { //^In testcase definition `tc_C'://
+  var integer i:=c_C_i;  
+  i:=valueof(t_C_i_pu);  
+  var C_MyInt myInt;  
+  var C_MyInt_pu myInt_pu; 
+  f_C_pu();
+   
+  i:=c_C_i_fr; //^In variable assignment\:$// //^error: There is no local or imported definition with name `c_C_i_fr'//
+  i:=valueof(t_C_i_fr); //^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_C_i_fr'//
+  var C_MyInt_fr myInt_fr;//^In variable definition \`myInt_fr\'\:$// //^error: There is no local or imported definition with name `C_MyInt_fr'//
+  f_C_fr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_C_fr'//
+
+  i:=c_C_i_pr;//^In variable assignment\:$// //^error: There is no local or imported definition with name `c_C_i_pr'//
+  i:=valueof(t_C_i_pr);//^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_C_i_pr'//
+  var C_MyInt_pr c_myInt_pr; //^In variable definition `c_myInt_pr'////^error: There is no local or imported definition with name `C_MyInt_pr'//
+  f_C_pr(); //^In function or altstep instance:// //^error: There is no local or imported definition with name `f_C_pr'//
+ 
+  setverdict(pass);  
+}
+
+testcase tc_D() runs on MTC { //^In testcase definition `tc_D'://
+  var integer i:=c_D_i;  
+  i:=valueof(t_D_i_pu);  
+  var D_MyInt myInt;  
+  var D_MyInt_pu myInt_pu; 
+  f_D_pu(); 
+
+  i:=c_D_i_fr; //^In variable assignment\:$// //^error: There is no local or imported definition with name `c_D_i_fr'//
+  i:=valueof(t_D_i_fr); //^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_D_i_fr'//
+  var D_MyInt_fr myInt_fr;//^In variable definition \`myInt_fr\'\:$// //^error: There is no local or imported definition with name `D_MyInt_fr'//
+  f_D_fr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_D_fr'//
+
+  i:=c_D_i_pr;//^In variable assignment\:$// //^error: There is no local or imported definition with name `c_D_i_pr'//
+  i:=valueof(t_D_i_pr);//^In variable assignment:// //In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_D_i_pr'//
+  var D_MyInt_pr d_myInt_pr; //^In variable definition `d_myInt_pr'////^error: There is no local or imported definition with name `D_MyInt_pr'//
+  f_D_pr(); //^In function or altstep instance:// //^error: There is no local or imported definition with name `f_D_pr'//
+
+  setverdict(pass);  
+}
+
+}

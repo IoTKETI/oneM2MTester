@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+#echo "*****************************************************"
+#echo "Ez egy negyedik tok primitiv automatizalt teszter V0.0"
+#echo "ami leellenorzi hogy az ASN1 kotojelek kettos alahuzasra
+# fordulnak.  Egyelore sima greppel , de kesobb majd osszehasonlitunk
+# egy TTCN3-bol generalt filevel
+#echo "*****************************************************"
+
+if  
+  $GREP -q "a = 0" ./Test23.hh
+      then
+        if 
+           $GREP -q "b = 1" ./Test23.hh
+                then
+                    if
+		         $GREP -q "c = 2" ./Test23.hh
+		              then 
+			          if
+				   $GREP -q "d = 7" ./Test23.hh
+				      then
+				         if 
+				           $GREP -q "e = 8" ./Test23.hh
+				                then
+				                  if 
+						     $GREP -q "f = 0" ./Test23.hh
+						      then Verdict="pass"
+						  
+						      else Verdict="fail 6"
+				                  fi
+				            else Verdict="fail 5"  
+				         fi
+		                   
+		                   else Verdict="fail 4"
+		                  fi
+		         else  Verdict="fail 3"
+		    fi
+		else  Verdict="fail 2"
+        fi
+     else Verdict="fail 1"
+fi
+
+echo "ASN1:TEST23 = Verdict: $Verdict"
+

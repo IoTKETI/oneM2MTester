@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/substitutiongroup/name/as"
+ targetNamespace="www.example.org/substitutiongroup/name/as">
+
+<!-- THE HEAD ELEMENT -->
+<xsd:element name="Head" type="xsd:string" />
+
+<!-- SUBSTITUTION ELEMENT OF THE SAME TYPE AS THE HEAD -->
+<xsd:element name="Member1" type="xsd:string" substitutionGroup="this:Head"/>
+
+<!-- SUBSTITUTION ELEMENT OF A TYPE RESTRICTING THE TYPE OF THE HEAD -->
+<xsd:simpleType name="StringEnum">
+	<xsd:restriction base="xsd:string">
+		<xsd:enumeration value="something"/>
+		<xsd:enumeration value="else"/> 
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:element name="Member2" type="this:StringEnum" substitutionGroup="this:Head"/>
+
+<!-- SUBSTITUTION ELEMENT OF A TYPE EXTENDING THE TYPE OF THE HEAD -->
+<xsd:complexType name="ComplexEnum">
+	<xsd:simpleContent>
+		<xsd:extension base="xsd:string">
+			<xsd:attribute name="foo" type="xsd:float"/>
+			<xsd:attribute name="bar" type="xsd:integer"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:element name="Member3" type="this:ComplexEnum" substitutionGroup="this:Head"/>
+
+<!-- TOP LEVEL ELEMENT TO DEMONSTRATE SUBSTITUTION -->
+<xsd:element name="Ize">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref="this:Head" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

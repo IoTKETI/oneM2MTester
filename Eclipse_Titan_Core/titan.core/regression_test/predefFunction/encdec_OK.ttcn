@@ -1,0 +1,197 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Ormandi, Matyas
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module encdec_OK {
+
+type component PDTestComponent {};
+
+/*--- ENCVALUE_DECVALUE -----------------------------------------*/
+
+type float 		ed_MyFloat 		with { encode "BER:2002" variant "length accept short" };
+type integer 	ed_MyInt 		with { encode "TEXT" };
+type bitstring 	ed_MyBitstring 	with { encode "RAW" };
+
+group beer {
+
+type record 	ed_MyRecord {
+	ed_MyInt   i,
+	ed_MyFloat f optional,
+	ed_MyFloat f2 optional,
+	ed_MyBitstring  bstr,
+	set {
+	  ed_MyInt i,
+	  ed_MyFloat f optional
+	} tr
+}
+
+type enumerated quark { up, down, top, bottom, strange, charm }
+template quark t_q := charm;
+
+type record of ed_MyFloat ed_Floaters;
+
+type union 	ed_MyChoice {
+	ed_MyInt   i,
+	ed_MyFloat f,
+	ed_MyFloat f2,
+	ed_MyBitstring  bstr,
+	set {
+	  ed_MyInt i,
+	  ed_MyFloat f optional
+	} tr
+}
+
+} with { encode "XML" }; // TTCN types don't usually have BER, so use XML
+
+template ed_MyRecord t_MyRecord := {
+  i := 17,
+  f := omit,
+  f2 := omit,
+  bstr := ''B,
+  tr := { i := 13, f := 3.1415926535 }
+}
+
+template ed_Floaters t_f := { 0.0, 1.1, 2.2, 3.3 }
+
+template ed_MyChoice t_MyChoice := {
+  tr := { i := 13, f := 3.1415926535 }
+}
+
+const charstring expected :=
+"<ed_MyRecord>\n" &
+"\t<i>17</i>\n" &
+"\t<bstr/>\n" &
+"\t<tr>\n" &
+"\t\t<i>13</i>\n" &
+"\t\t<f>3.141593</f>\n" &
+"\t</tr>\n" &
+"</ed_MyRecord>\n\n";
+
+function dec(in bitstring bs) return boolean
+{
+  var ed_MyBitstring edres;
+  var integer i;
+  var bitstring b := '11110000'B;
+  bs := b;
+  log(b);
+	i := decvalue(bs, edres);
+	log(bs);
+	return (bs != b); // bs here needs to be changed locally, within the function (shadow copy)
+}
+
+testcase dec_within_func() runs on PDTestComponent
+{
+  var bitstring bs := '01010101'B;
+  if (dec(bs)) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (bs == '01010101'B) // shouldn't be changed because of the in parameter passing
+    {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+const ed_MyRecord edconst4 := { i := 1, f := 1.0, f2 := 0.0, bstr := '00000001'B, tr := { i := 1, f := 1.0 } };
+
+testcase enc_dec_value() runs on PDTestComponent {
+	var ed_MyFloat edvar1 := 23E-25;
+	var ed_MyInt   edvar2 := 2345;
+	var ed_MyBitstring edvar3 := '01010101'B;
+	log(edvar3);
+	var ed_MyRecord edvar4 := { i := 1, f := 1.0, f2 := 0.0, bstr := '00000001'B, tr := { i := 1, f := 1.0 } };
+
+	var bitstring edvar_bs1 := encvalue(edvar1);
+	var bitstring edvar_bs2 := encvalue(edvar2);
+	var bitstring edvar_bs3 := encvalue(edvar3);
+	log(edvar_bs3);
+	var bitstring edvar_bs4_1 := encvalue(edvar4.i);
+	var bitstring edvar_bs4_2 := encvalue(edvar4.f);
+	var bitstring edvar_bs4_3 := encvalue(edvar4.f2);
+	var bitstring edvar_bs4_4 := encvalue(edvar4.bstr);
+	var bitstring edvar_bs4_5 := encvalue(edvar4.tr.i);
+	var bitstring edvar_bs4_6 := encvalue(edvar4.tr.f);
+
+	// encvalue of a const should be the same as encvalue of a variable
+	// Tests for HN69319 (encvalue of an optional field of a const record)
+	if (edvar_bs4_1 == encvalue(edconst4.i)){setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar_bs4_2 == encvalue(edconst4.f)){setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar_bs4_3 == encvalue(edconst4.f2)){setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar_bs4_4 == encvalue(edconst4.bstr)){setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar_bs4_5 == encvalue(edconst4.tr.i)){setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar_bs4_6 == encvalue(edconst4.tr.f)){setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer i := 1;
+
+	var ed_MyFloat 		edres1;
+	var ed_MyInt   		edres2; 
+	var ed_MyBitstring 	edres3;
+	var ed_MyRecord 	edres4;
+
+	i := decvalue(edvar_bs1, edres1);
+	i := decvalue(edvar_bs2, edres2);
+	i := decvalue(edvar_bs3, edres3);
+	log(edres3);
+	i := decvalue(edvar_bs4_1, edres4.i);
+	i := decvalue(edvar_bs4_2, edres4.f);
+	i := decvalue(edvar_bs4_3, edres4.f2);
+	i := decvalue(edvar_bs4_4, edres4.bstr);
+	i := decvalue(edvar_bs4_5, edres4.tr.i);
+	i := decvalue(edvar_bs4_6, edres4.tr.f);
+
+	if (edvar1 == edres1)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar2 == edres2)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar3 == edres3)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (edvar4 == edres4)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	var bitstring edtmpl_1 := encvalue(t_MyRecord);
+	if (bit2oct(edtmpl_1) == char2oct(expected))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	var bitstring edtmpl_2 := encvalue(ed_MyRecord : {
+		i := 17,
+		f := omit,
+		f2 := omit,
+		bstr := ''B,
+		tr := { i := 13, f := 3.1415926535 }
+		});
+	if (bit2oct(edtmpl_2) == char2oct(expected))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	// enum not really affected
+	var bitstring edtmpl_3 := encvalue( quark: strange );
+	edtmpl_3 := encvalue( t_q );
+	log(bit2oct(edtmpl_3));
+	// record-of
+	var bitstring edtmpl_4 := encvalue(t_f);
+	log(bit2oct(edtmpl_4));
+	// choice
+	var bitstring edtmpl_5 := encvalue(t_MyChoice);
+	log(bit2oct(edtmpl_5));
+}
+
+control {
+	execute (enc_dec_value());
+	execute (dec_within_func());
+}
+
+}

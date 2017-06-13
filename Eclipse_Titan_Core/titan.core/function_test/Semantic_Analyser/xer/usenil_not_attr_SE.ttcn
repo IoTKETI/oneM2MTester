@@ -1,0 +1,57 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module usenil_not_attr_SE {	//^In TTCN-3 module `usenil_not_attr_SE'://
+
+/*
+33.2.1 The USE-NIL ... All the other components of the sequence type, if any,
+shall have a final ATTRIBUTE or ANY-ATTRIBUTES encoding instruction, or shall be the sequence-of components
+supporting a USE-ORDER or an EMBED-VALUES encoding instruction that are also final encoding instructions on the
+sequence type.
+*/
+
+type record UN { //^In type definition//
+  integer i,     //^error: Component 'i' of USE-NIL not ATTRIBUTE//
+  boolean b,	 /* only the first such error is reported */
+  charstring last optional
+}
+with {
+  variant "useNil";
+}
+
+type record UN2 { //^In type definition//
+  integer i,
+  boolean b,     //^error: Component 'b' of USE-NIL not ATTRIBUTE//
+  charstring last optional
+}
+with {
+  variant "useNil";
+  variant (i) "attribute"
+}
+
+type record UN3 { //^In type definition//
+  record of universal charstring aa, /* A-A is as good as ATTRIBUTE */
+  boolean b,     //^error: Component 'b' of USE-NIL not ATTRIBUTE//
+  charstring last optional
+}
+with {
+  variant "useNil";
+  variant (aa) "anyAttributes"
+}
+
+
+
+}
+with {
+  encode "XML";
+  variant "controlNamespace 'urn:a' prefix 'u'"
+}

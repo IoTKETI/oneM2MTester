@@ -1,0 +1,58 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module importer { //^In TTCN-3 module `importer':$//
+
+import from R2D_SE all;
+import from R2D2_SE all;
+import from CRL_111_222_R2D_SE all;
+import from CRL_111_222_3_R2D_SE all;
+import from unreleased_SE all;
+import from noversion_SE all;
+
+}
+with {
+  extension "requires R2D_SE R2D"; // exact match 2.3.99==2.3.99
+  extension "requires R2D_SE R2D99"; // exact match 2.3.99==2.3.99
+  extension "requires R2D_SE R2D1"; // 2.3.1 < 2.3.99
+  extension "requires R2D_SE R2C"; // 2.2.99 < 2.3.99
+  extension "requires R2D_SE R1Z"; 
+
+  extension "requires R2D2_SE R3A0"; //^error: Module 'importer' requires version R3A00 of module 'R2D2_SE', but only R2D02 is available$//
+  extension "requires R2D2_SE R3A" ; //^error: Module 'importer' requires version R3A of module 'R2D2_SE', but only R2D02 is available$//
+  extension "requires R2D2_SE R2Z" ; //^error: Module 'importer' requires version R2Z of module 'R2D2_SE', but only R2D02 is available$//
+  extension "requires R2D2_SE R2D5"; //^error: Module 'importer' requires version R2D05 of module 'R2D2_SE', but only R2D02 is available$//
+
+  extension "requires R2D_SE R3A0"; //^error: Module 'importer' requires version R3A00 of module 'R2D_SE', but only R2D is available$//
+  extension "requires R2D_SE R3A" ; //^error: Module 'importer' requires version R3A of module 'R2D_SE', but only R2D is available$//
+  extension "requires R2D_SE R2Z" ; //^error: Module 'importer' requires version R2Z of module 'R2D_SE', but only R2D is available$//
+  extension "requires R2D_SE R2D5"; // not an error, R2D5 is lower than R2D
+
+  extension "requires CRL_111_222_R2D_SE R2D"; //^warning: Module 'importer' requires module 'CRL_111_222_R2D_SE' of any product, while it specifies 'CRL 111 222'$//
+  extension "requires CRL_111_222_R2D_SE CRL 111 222 R2D";
+  extension "requires CRL_111_222_R2D_SE CRL 111 222/1 R2D"; //^error: Module 'importer' requires version CRL 111 222/1 R2D of module 'CRL_111_222_R2D_SE', but only CRL 111 222 R2D is available$//
+  extension "requires CRL_111_222_R2D_SE CRL 333 222 R2D"; //^error: Module 'importer' requires version CRL 333 222 R2D of module 'CRL_111_222_R2D_SE', but only CRL 111 222 R2D is available$//
+  extension "requires CRL_111_222_3_R2D_SE R2D"; //^error: Module 'importer' requires version R2D of module 'CRL_111_222_3_R2D_SE', but only CRL 111 222/3 R2D is available$// \
+                                               //^warning: Module 'importer' requires module 'CRL_111_222_3_R2D_SE' of any product, while it specifies 'CRL 111 222'$//
+  
+  extension "requires CRL_111_222_3_R2D_SE CRL 111 222 R2D"; //^error: Module 'importer' requires version CRL 111 222 R2D of module 'CRL_111_222_3_R2D_SE', but only CRL 111 222/3 R2D is available$//
+  extension "requires CRL_111_222_3_R2D_SE CRL 111 222/1 R2D"; //^error: Module 'importer' requires version CRL 111 222/1 R2D of module 'CRL_111_222_3_R2D_SE', but only CRL 111 222/3 R2D is available$//
+  extension "requires CRL_111_222_3_R2D_SE CRL 111 222/3 R2D";
+  extension "requires CRL_111_222_3_R2D_SE CRL 333 222 R2D"; //^error: Module 'importer' requires version CRL 333 222 R2D of module 'CRL_111_222_3_R2D_SE', but only CRL 111 222\/3 R2D is available$//
+
+  extension "requires unreleased_SE R9Z"; // highest possible version
+
+  extension "requires noversion_SE R9Z"; // highest possible version
+  extension "requires noversion_SE CNL 111 222 R9Z"; //^error: Module 'importer' requires module 'noversion_SE' of product CNL 111 222, but it is not specified//
+  extension "requires noversion_SE CNL 111 222/2 R9Z"; //^error: Module 'importer' requires module 'noversion_SE' of product CNL 111 222, but it is not specified//
+}

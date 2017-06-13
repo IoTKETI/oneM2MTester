@@ -1,0 +1,69 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+
+module Hostid
+{
+    type port MyPort message    
+    {
+    inout charstring
+    } with { extension "internal" }
+
+    type component MyMTCType
+    {
+        port MyPort MyPCO1;
+    }
+
+    type component MTCType
+    {
+        port MyPort MyPCO2;
+    }
+
+    testcase tc_hostid() runs on MyMTCType system MTCType
+    {
+        // ip should be "127.0.0.1" aka localhost, I think...
+        var charstring ip := hostid("Ipv4orIpv6");
+        log(ip);
+        if(ip != "") {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        // The same as hostid("Ipv4orIpv6")
+        ip := hostid();
+        log(ip);
+        if(ip != "") {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        ip := hostid("Ipv4");
+        if(ip != "") {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+
+        ip := hostid("Ipv6");
+        if(ip == "") {
+            setverdict(pass);
+        }else {
+            setverdict(fail);
+        }
+    }
+   
+    control
+    {
+        execute(tc_hostid());
+    }
+}

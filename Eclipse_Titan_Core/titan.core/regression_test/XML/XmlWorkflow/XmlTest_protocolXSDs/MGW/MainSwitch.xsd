@@ -1,0 +1,1754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema targetNamespace="http://www.ericsson.com/is/isco/MainSwitch/R4L06/R4AB_1.02"
+           xmlns="http://www.ericsson.com/is/isco/MainSwitch/R4L06/R4AB_1.02"
+           xmlns:MainSwitch="http://www.ericsson.com/is/isco/MainSwitch/R4L06/R4AB_1.02"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:confd="http://tail-f.com/ns/confd/1.0"
+           xmlns:IsTypes="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xml:lang="en">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema" schemaLocation="XMLSchema.xsd"/>
+  <xs:import namespace="http://tail-f.com/ns/confd/1.0" schemaLocation="confd.xsd"/>
+  <xs:import namespace="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02" schemaLocation="IntegratedSite.xsd"/>
+  <xs:simpleType name="vlanIdsType-26">
+    <xs:list itemType="MainSwitch:VlanId"/>
+  </xs:simpleType>
+  <xs:simpleType name="vlanIdsType-27">
+    <xs:list itemType="MainSwitch:VlanId"/>
+  </xs:simpleType>
+  <xs:simpleType name="bandwidthUsageSamplingPeriodType-2">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="1440"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PercentUsage">
+    <xs:annotation>
+      <xs:documentation>
+
+			Defines the usage of a specific object, expressed as a percentage.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="100"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="distributingType-17">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Yes|No"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="defaultedType-18">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Yes|No"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="expiredType-19">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Yes|No"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="schedulingType-21">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="notUsed|wrr|strictpriority"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="cpuUsageSamplingPeriodType-1">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="60"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="pmMemoryStatusType-4">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="on|off"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SubrackNum">
+    <xs:annotation>
+      <xs:documentation>
+IS logical subrack number.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="31"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StatisticCounter">
+    <xs:annotation>
+      <xs:documentation>
+
+			The number of packets or octets sent or received over a
+			specific link.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="processorStatusType-3">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="on|off"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MxbSlot">
+    <xs:annotation>
+      <xs:documentation>
+
+			The MXB position in a subrack. Left: position 0; Right: position 25.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="left|right"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ThresholdPercent">
+    <xs:annotation>
+      <xs:documentation>
+
+			A threshold value defining the threshold where an alarm is
+			raised or ceased.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="100"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="queueValueType-25">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="7"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PhysicalPort">
+    <xs:annotation>
+      <xs:documentation>
+
+			The physical port, that is an MXB's physical port, which 
+			either is a backplane slot link (port number 1 to 24) or an MXB's front port (port number 49 and 50). 
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="50"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="lacpActivityType-12">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Passive|Active"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="lacpTimeoutType-13">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Long|Short"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="syncronizationType-15">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="In Sync|Out of Sync"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="linkSelectionPolicyType-11">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Src MAC|Dst MAC|Src and Dst MAC|Src IP|Dst IP|Src and Dst IP"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="bladeSlotLinkType-23">
+    <xs:restriction base="xs:integer">
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DummyEmptyType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="collectingType-16">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Yes|No"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="modeType-9">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="LACP|Manual|Disable"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BladeSlotLink">
+    <xs:annotation>
+      <xs:documentation>
+
+			The backplane slot link, that is a blade's physical position in
+			the subrack.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="24"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="weightType-22">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="notUsed|high|medium|low"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="vlanTypeType-7">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="static|dynamic|-"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="macSelectionPolicyType-10">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Dynamic|Force"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="aggregationType-14">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="Individual|Aggregatable"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="statusType-6">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="on|off"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="isolationStatusType-8">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="protected|isolatable|-"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="pbitKeyType-24">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="7"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="pmBandwidthStatusType-5">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="on|off"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="queueType-20">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="7"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VlanId">
+    <xs:annotation>
+      <xs:documentation>
+
+                       A value defining the identity of a VLAN.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="4094"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="MainSwitch">
+    <xs:annotation>
+      <xs:documentation>
+        
+    All data types, classes and relationships in the MainSwitch model are described in detail.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Cos">
+          <xs:annotation>
+            <xs:documentation>
+              
+			This class describes the Class of Service function. Class of
+			Service (CoS) refers to the traffic service differentiation
+			capabilities offered by the Ethernet standards. It offers
+			means to differentiate the forwarding characteristics
+			(latency, drop probability, etc.) for different traffic
+			flows through the Main Switch. The CoS mechanisms are
+			useful, primarily at times when the traffic load in the LAN
+			is excessive. The traffic classes can be used to preserve
+			the more loss-sensitive and (or) delay sensitive flows, at
+			the expense of less sensitive ones.
+      
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CosQueueConfigurationData" minOccurs="8" maxOccurs="8">
+                <xs:annotation>
+                  <xs:appinfo confd:config="false"/>
+                  <xs:documentation>
+                    
+			This class describes Class Of Service (COS) configuration data.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="queue" type="MainSwitch:queueType-20"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Definition of a specific switch output queue.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="buffer" type="MainSwitch:PercentUsage" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Indicates allocated queue memory buffer in percentage.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="scheduling" type="MainSwitch:schedulingType-21" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Indicates if Sceduling is Weighted Round Robin (WRR) or
+				Strict Priority.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="weight" type="MainSwitch:weightType-22" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Indicates if Weight in case of WRR is High, Medium or
+				Low.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Operational" minOccurs="0" maxOccurs="64">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			This class describes the Class of Service function
+			operational data.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                    <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                    <xs:element name="CosQueueConfigurationData" minOccurs="8" maxOccurs="8">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+			This class describes Class Of Service (COS) configuration data.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="queue" type="MainSwitch:queueType-20"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                
+				Definition of a specific switch output queue.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="buffer" type="MainSwitch:PercentUsage" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                
+				Indicates allocated queue memory buffer in percentage.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="scheduling" type="MainSwitch:schedulingType-21" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                
+				Indicates if Sceduling is Weighted Round Robin (WRR) or
+				Strict Priority.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="weight" type="MainSwitch:weightType-22" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                
+				Indicates if Weight in case of WRR is High, Medium or
+				Low.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="PbitToQueueMapping">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          This class describes Pbit to queue mapping.
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="bladeSlotLink" type="MainSwitch:bladeSlotLinkType-23"/>
+                          <xs:element name="interface" type="xs:integer" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                Interface number.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="PbitQueue" minOccurs="8" maxOccurs="8">
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="pbitKey" type="MainSwitch:pbitKeyType-24"/>
+                                <xs:element name="queueValue" type="MainSwitch:queueValueType-25" minOccurs="0"/>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:key name="key_MainSwitch_Cos_Operational_PbitToQueueMapping_PbitQueue">
+                        <xs:selector xpath="MainSwitch:PbitQueue"/>
+                        <xs:field xpath="MainSwitch:pbitKey"/>
+                      </xs:key>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_MainSwitch_Cos_Operational_CosQueueConfigurationData">
+                  <xs:selector xpath="MainSwitch:CosQueueConfigurationData"/>
+                  <xs:field xpath="MainSwitch:queue"/>
+                </xs:key>
+              </xs:element>
+              <xs:element name="PbitToQueueMapping">
+                <xs:annotation>
+                  <xs:appinfo confd:config="false"/>
+                  <xs:documentation>
+                    This class describes Pbit to queue mapping.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="bladeSlotLink" type="MainSwitch:bladeSlotLinkType-23"/>
+                    <xs:element name="interface" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          Interface number.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="PbitQueue" minOccurs="8" maxOccurs="8">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="pbitKey" type="MainSwitch:pbitKeyType-24"/>
+                          <xs:element name="queueValue" type="MainSwitch:queueValueType-25" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_MainSwitch_Cos_PbitToQueueMapping_PbitQueue">
+                  <xs:selector xpath="MainSwitch:PbitQueue"/>
+                  <xs:field xpath="MainSwitch:pbitKey"/>
+                </xs:key>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:key name="key_MainSwitch_Cos_CosQueueConfigurationData">
+            <xs:selector xpath="MainSwitch:CosQueueConfigurationData"/>
+            <xs:field xpath="MainSwitch:queue"/>
+          </xs:key>
+          <xs:key name="key_MainSwitch_Cos_Operational">
+            <xs:selector xpath="MainSwitch:Operational"/>
+            <xs:field xpath="MainSwitch:subrackNum"/>
+            <xs:field xpath="MainSwitch:mxbSlot"/>
+          </xs:key>
+        </xs:element>
+        <xs:element name="Pm">
+          <xs:annotation>
+            <xs:documentation>
+              
+			This class describes the Performance Monitoring function.
+			The Performance Monitoring (PMON) function monitors the
+			usage of resources on the switch blades and issues an alarm
+			if certain thresholds are exceeded.
+      
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="PmBladeMeasure" minOccurs="0" maxOccurs="64">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			Enabling monitoring of CPU and memory usage and reading the
+			corresponding values of utilisation in percent.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                    <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                    <xs:element name="processorStatus" type="MainSwitch:processorStatusType-3"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				The status of processor load performance measurement.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pmProcessorLoad" type="MainSwitch:PercentUsage" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				The value of the processor load in percent when
+				performing the measurement.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pmMemoryStatus" type="MainSwitch:pmMemoryStatusType-4"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				The status of memory usage performance management
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pmMemoryFree" type="MainSwitch:PercentUsage" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				The value of the amount of free memory in
+				percent when performing a memory usage measurement.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pmMemoryFreeBytes" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				The value of free Memory in bytes when
+				performing a memory usage measurement.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pmBandwidthStatus" type="MainSwitch:pmBandwidthStatusType-5"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				The status of bandwidth usage performance management
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PmConfiguration" minOccurs="0" maxOccurs="31">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			Performance Monitoring configuration related data.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                    <xs:element name="cpuUpperThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Configuration of CPU upper threshold, that is when the CPU
+				load is rising and crosses this threshold then the PMON
+				function will raise an xxbCpuExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="cpuLowerThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				CPU lower threshold, that is when the CPU load is falling
+				and crosses this threshold then the PM function 
+				will cease the xxbCpuExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="cpuUsageSamplingPeriod" type="MainSwitch:cpuUsageSamplingPeriodType-1" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				The sampling period, in seconds, during which CPU usage is measured.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="memoryUpperThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Memory upper threshold, that is when the Memory usage is
+				rising and crosses this threshold, the PM function
+				will raise an xxbMemExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="memoryLowerThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Memory lower threshold, that is when the Memory usage is
+				falling and crosses this threshold, the PM function
+				will cease the xxbMemExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bandwidthUpperThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Bandwidth upper threshold, that is when the Bandwidth usage
+				is rising and crosses this threshold, the PM
+				function will raise an xxbBwExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bandwidthLowerThreshold" type="MainSwitch:ThresholdPercent" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				Bandwidth lower threshold, that is when the Bandwidth usage
+				is falling and crosses this threshold, the PM
+				function in ISS will cease the xxbBwExcessiveAlarm.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bandwidthUsageSamplingPeriod" type="MainSwitch:bandwidthUsageSamplingPeriodType-2" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+				The sampling period, in minutes, during which bandwidth usage is measured.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PmLink">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			Performance Management Link related data. For each Physical Port, 
+			statistics can be displayed and the bandwidth
+			usage monitored.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PmBwMeasure" minOccurs="0" maxOccurs="1536">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class enables monitoring Bandwidth usage and reading the
+			corresponding values of utilisation in percent.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="physicalPort" type="MainSwitch:PhysicalPort"/>
+                          <xs:element name="status" type="MainSwitch:statusType-6"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                
+				Start or stop measuring of bandwidth utilisation.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bandwidthUsage" type="MainSwitch:PercentUsage" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				This is the value of the average Bandwidth usage in
+				percent during the configured sampling period.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="PmStatistics" minOccurs="0" maxOccurs="1536">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class describes the Performance Monitoring Statistics;
+			that is counters for each physical port on the MXB, the actual
+			speed used on the port and if the port operates in full or
+			half duplex mode.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="physicalPort" type="MainSwitch:PhysicalPort"/>
+                          <xs:element name="inOctets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for received octets.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inUnicastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for received Unicast
+				Packets
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inMulticastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for received Multicast
+				Packets
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inBroadcastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for received Broadcast
+				Packets
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inOctetsDiscarded" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for the number of received
+				discarded octets.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inOctetsFaulty" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for the number of received
+				faulty octets.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="inUnknownProtocol" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for the number of received
+				Unknown Protocol packets.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="outOctets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for octets in the send
+				buffer.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="outUnicastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for Unicast Packets in
+				the send buffer.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="outMulticastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for Multicast Packets in
+				the send buffer.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="outBroadcastPackets" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for Broadcast Packets in
+				the send buffer.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="framesOpcodePause" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for Frames with Op code
+				Pause
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="framesExceedingMaxFramesize" type="MainSwitch:StatisticCounter" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Performance Monitoring counter for Frames exceeding
+				maximum frame size.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_MainSwitch_Pm_PmLink_PmBwMeasure">
+                  <xs:selector xpath="MainSwitch:PmBwMeasure"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                  <xs:field xpath="MainSwitch:physicalPort"/>
+                </xs:key>
+                <xs:key name="key_MainSwitch_Pm_PmLink_PmStatistics">
+                  <xs:selector xpath="MainSwitch:PmStatistics"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                  <xs:field xpath="MainSwitch:physicalPort"/>
+                </xs:key>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:key name="key_MainSwitch_Pm_PmBladeMeasure">
+            <xs:selector xpath="MainSwitch:PmBladeMeasure"/>
+            <xs:field xpath="MainSwitch:subrackNum"/>
+            <xs:field xpath="MainSwitch:mxbSlot"/>
+          </xs:key>
+          <xs:key name="key_MainSwitch_Pm_PmConfiguration">
+            <xs:selector xpath="MainSwitch:PmConfiguration"/>
+            <xs:field xpath="MainSwitch:subrackNum"/>
+          </xs:key>
+        </xs:element>
+        <xs:element name="State">
+          <xs:annotation>
+            <xs:documentation>
+              
+			This class describes data for each MXB and all Blade Slot
+			Links in the Integrated Site.
+      
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="StateBlade">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			This class describes data related to a specific MXB.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="MXB4" minOccurs="0" maxOccurs="64">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class describes data related to a specific MXB4 (ROJ 208 365/10).
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="description" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The MXB hardware type.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ipAddress" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Effective IP address of the switch to be used for
+				contacting via the SNMP interface.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="upTime" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The time since the MXB was last re-initialized.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="isolationStatus" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Whether the MXB is sending marker PDUs on the backplane slot links at full intensity or not.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="remoteMxbHost" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Status for the other MXB in the same subrack, the status is decided by the MXB-pair intersubrack protocol.
+				Possible values are Present and Not present.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="executingSoftwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The software version executing on MXB.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="flashLoadedSoftwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The software version in MXB's flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="fallbackSoftwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The fallback software version on MXB.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ipmiFirmwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the firmware, supervising the control bus
+				in the backplane.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bootLoaderVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the Universal Boot-loader stored in the
+				MXB flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="hwVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The MXB hardware version.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="MXB5LE" minOccurs="0" maxOccurs="64">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class describes data related to a specific MXB5LE (ROJ 208 368/10).
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="description" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The MXB hardware type.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ipAddress" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Effective IP address of the switch to be used for
+				contacting via the SNMP interface.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="upTime" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The time since the MXB was last re-initialized.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="isolationStatus" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Whether the MXB is sending marker PDUs on the backplane slot links at full intensity or not.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="remoteMxbHost" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				Status for the other MXB in the same subrack, the status is decided by the MXB-pair intersubrack protocol.
+				Possible values are Present and Not present. 
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="excutingKernelSWVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the kernel loadmodule executing in RAM.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="flashLoadedKernelSWVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the kernel loadmodule stored in flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="discLoadedKernelSWVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the kernel loadmodule stored on disc, that is, on the SIS node.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="activeRootFileSystemVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the root file system loadmodule stored in flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="passiveRootFileSystemVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the passive root file system loadmodule stored in flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="discLoadedRootFileSystemVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the root file system loadmodule stored on disc, that is,
+  				on the SIS node.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="fallbackSoftwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The fallback software version on the MXB.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="executingIpmiFirmwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The executing version of the firmware, that supervises the control bus in the backplane.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ipmiFirmwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the firmware, that supervises the control bus in the backplane.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ipmiFallbackFirmwareVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The fallback version of the firmware, that supervises the control bus in the backplane.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bootLoaderVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+				The version of the Universal Boot-loader stored in the
+				MXB flash memory.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="hwVersion" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The MXB hardware version.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_MainSwitch_State_StateBlade_MXB4">
+                  <xs:selector xpath="MainSwitch:MXB4"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                </xs:key>
+                <xs:key name="key_MainSwitch_State_StateBlade_MXB5LE">
+                  <xs:selector xpath="MainSwitch:MXB5LE"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                </xs:key>
+              </xs:element>
+              <xs:element name="StateLink">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			This class describes actual state data for a specific link
+			related to the MXB.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="StateLa" minOccurs="0" maxOccurs="1536">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class describes the state of the Blade Slot Links with
+			regard to Link Aggregation info. Link aggregation is the
+			grouping together of two or more links (data channels) into
+			a single channel, which appears as a single, logical link.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="physicalPort" type="MainSwitch:PhysicalPort"/>
+                          <xs:element name="LinkAggregationData">
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+			This class describes Link Aggregation info for the current subrack, MXB
+			and Blade Slot Link.
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="ifIndex" type="xs:integer"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A unique value, greater than zero, for each interface or
+				interface sub-layer in the managed system.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="mode" type="MainSwitch:modeType-9" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The port-channel mode shows the current Operating Channel Mode of the
+				port.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="configuredPorts" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The number of configured ports for this interface.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="activePorts" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The number of ports that are attached to the
+				port-channel and actively carrying data traffic on the
+				line.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="macSelectionPolicy" type="MainSwitch:macSelectionPolicyType-10" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				Sets the MAC address selection method for the
+				port-channel.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="linkSelectionPolicy" type="MainSwitch:linkSelectionPolicyType-11" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				Link selection policy to be used by the port-channel.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="aggregatorMac" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 6-octet read-only value containing the individual MAC
+				address assigned to the Aggregator.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="actorId" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 6-octet read-write MAC address value used as a unique
+				identifier for the system that contains this Aggregator.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="actorPrio" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 2-octet read-write value indicating the priority value
+				associated with the Actors System ID.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="actorAdminKey" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The current administrative value of the Key for the
+				Aggregator.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="actorOperKey" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The current operational value of the Key for the
+				Aggregator.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="partnerId" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 6-octet read-only MAC address value consisting of the
+				unique identifier for the current protocol Partner of
+				this Aggregator.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="partnerPrio" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 2-octet read-only value that indicates the priority
+				value associated with the Partners System ID.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="partnerOperKey" type="xs:integer" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The current operational value of the Key for the
+				Aggregator's current protocol Partner.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="LinkAggregationPortData">
+                                  <xs:annotation>
+                                    <xs:appinfo confd:config="false"/>
+                                    <xs:documentation>
+                                      
+			This class describes Link Aggregation Port Data
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="aggrPortActorPort" type="xs:integer"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+                                            
+				The port number locally assigned to the Aggregation
+				Port.
+                
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="LinkAggregationOperStateData">
+                                        <xs:annotation>
+                                          <xs:appinfo confd:config="false"/>
+                                          <xs:documentation>
+                                            
+			This class describes Link Aggregation Operating State Data. A
+			string of 8 bits, corresponding to the current operational
+			values of Actor_State as transmitted by the Actor in LACPDU.
+                
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="index" type="xs:integer"/>
+                                            <xs:element name="lacpActivity" type="MainSwitch:lacpActivityType-12" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates if the Activity control value with regard to this link is active or
+				passive.
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="lacpTimeout" type="MainSwitch:lacpTimeoutType-13" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates if the Timeout control value with regard to this link is long or short.
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="aggregation" type="MainSwitch:aggregationType-14" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates that the system considers the link to be Aggregatable; that is, a potential candidate for aggregation,
+				or that the link is considered to be Individual; that is, the link can be operated only as an individual link.
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="syncronization" type="MainSwitch:syncronizationType-15" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates if the system considers the link to be in_sync; that is it has been allocated to the correct Link Aggregation Group, the group has
+				been associated with a compatible Aggregator, and the identity of the Link Aggregation Group
+				is consistent with the System ID and operational Key information transmitted.
+				If the link is out_of_sync then it is not in the right Aggregation group.
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="collecting" type="MainSwitch:collectingType-16" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates if collection of incoming frames on this link is  
+				enabled(yes) or disabled(no).
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="distributing" type="MainSwitch:distributingType-17" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates if distribution of outgoing frames on this link is
+				enabled(yes) or disabled(no).
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="defaulted" type="MainSwitch:defaultedType-18" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+			Indicates if the actor's receive machine is using default operational partner information, administratively configured for the partner (Yes), 
+			or if the operational partner information in use has been received in a LACPDU (No).
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="expired" type="MainSwitch:expiredType-19" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+                                                  
+				Indicates whether the actor's receive machine is in an expired state (Yes) or not (No).
+                  
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="StateVlan" minOccurs="0" maxOccurs="768">
+                      <xs:annotation>
+                        <xs:documentation>
+                          
+			This class describes the state of the Physical Ports with
+			regard to VLAN info.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                          <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                          <xs:element name="physicalPort" type="MainSwitch:PhysicalPort"/>
+                          <xs:element name="VlanData" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                
+			This class describes VLANs for actual subrack and Blade Slot Link
+            
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="vlanId" type="MainSwitch:VlanId"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				A 12-bit VLAN ID used by the VLAN Tag header.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="vlanType" type="MainSwitch:vlanTypeType-7" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				Indicates if the VLAN ID has been created by management (static),
+				by GVRP (dynamic) or other (-).
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="isolationStatus" type="MainSwitch:isolationStatusType-8" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      
+				The isolation protection value for this VLAN ID.
+              
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:key name="key_MainSwitch_State_StateLink_StateVlan_VlanData">
+                        <xs:selector xpath="MainSwitch:VlanData"/>
+                        <xs:field xpath="MainSwitch:vlanId"/>
+                      </xs:key>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_MainSwitch_State_StateLink_StateLa">
+                  <xs:selector xpath="MainSwitch:StateLa"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                  <xs:field xpath="MainSwitch:physicalPort"/>
+                </xs:key>
+                <xs:key name="key_MainSwitch_State_StateLink_StateVlan">
+                  <xs:selector xpath="MainSwitch:StateVlan"/>
+                  <xs:field xpath="MainSwitch:subrackNum"/>
+                  <xs:field xpath="MainSwitch:mxbSlot"/>
+                  <xs:field xpath="MainSwitch:physicalPort"/>
+                </xs:key>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Vlan">
+          <xs:annotation>
+            <xs:documentation>
+              
+			The VLAN service displays information about configured and
+			active VLANs in the Main Switch.
+      
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="VlanAdmin" minOccurs="0" maxOccurs="31">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			VLAN Administrative class: shows the administrative
+			configured VLANs
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                    <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                    <xs:element name="numberOfDefinedVlans" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				The number of administrative configured VLANs.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="vlanIds" type="MainSwitch:vlanIdsType-27" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				Information about defined VLAN IDs
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="VlanOper" minOccurs="0" maxOccurs="31">
+                <xs:annotation>
+                  <xs:documentation>
+                    
+			VLAN operational class: An instant view of the VLAN state on
+			the MXB boards.
+        
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrackNum" type="MainSwitch:SubrackNum"/>
+                    <xs:element name="mxbSlot" type="MainSwitch:MxbSlot"/>
+                    <xs:element name="numberOfActiveVlans" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				The number of active VLANs in an MXB. That is, VLANs either defined as static or enabled by GVRP.
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="vlanIds" type="MainSwitch:vlanIdsType-26" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          
+				Information about operative VLAN IDs
+          
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:key name="key_MainSwitch_Vlan_VlanAdmin">
+            <xs:selector xpath="MainSwitch:VlanAdmin"/>
+            <xs:field xpath="MainSwitch:subrackNum"/>
+            <xs:field xpath="MainSwitch:mxbSlot"/>
+          </xs:key>
+          <xs:key name="key_MainSwitch_Vlan_VlanOper">
+            <xs:selector xpath="MainSwitch:VlanOper"/>
+            <xs:field xpath="MainSwitch:subrackNum"/>
+            <xs:field xpath="MainSwitch:mxbSlot"/>
+          </xs:key>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:6.2.2, The element identifiers are local to the set and shall be unique within the record (but do not have to be globally unique).
+ ** @verdict  pass accept, noexecution
+ ***************************************************/
+module Syn_060202_SetTypeValues_001 {
+    const integer field2 := 4; // do not edit the name
+    
+    type set MySetType {
+		integer field1,
+		MyOtherSetType field2 optional,
+		charstring field3
+	}
+    type set MyOtherSetType {
+    	bitstring field1,
+    	boolean field2
+    }
+
+	type component GeneralComp {	    	    
+	}
+
+	testcase TC_Syn_060202_SetTypeValues_001() runs on GeneralComp {
+		setverdict(pass);	
+	}
+
+	control {
+     	execute(TC_Syn_060202_SetTypeValues_001());
+	}
+}

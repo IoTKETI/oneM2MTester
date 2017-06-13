@@ -1,0 +1,298 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module hex_to_SW {	//^In TTCN-3 module `hex_to_SW'://
+
+type component PDTestComponent {};
+
+/*--- HEX2BIT --------------------------------------------------*/
+
+const bitstring h2bcon := hex2bit(''H)
+const bitstring h2bcon1 := hex2bit('000000'H & ''H & '111111'H)
+const bitstring h2bcon2 := hex2bit(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+const bitstring h2bcon3 := hex2bit(('000000'H <@ lengthof(h2bcon2)/2) & ''H & ('111111'H @> lengthof(h2bcon2)/2))
+const bitstring h2bcon4 := hex2bit((not4b 'FFFFFF'H) & '111111'H)
+const bitstring h2bcon5 := hex2bit('000000111111'H and4b '000000111111'H)
+const bitstring h2bcon6 := hex2bit('000000000000'H or4b  '000000111111'H)
+const bitstring h2bcon7 := hex2bit('000000000000'H xor4b '000000111111'H)
+
+const bitstring h2bconb := '000000000000000000000000000100010001000100010001'B
+
+testcase hex_to_bit() runs on PDTestComponent{ //In testcase definition//
+
+	if ((h2bcon == hex2bit(''H))
+	and (h2bcon == ''B))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon1 == hex2bit('000000'H & ''H & '111111'H))
+	and (h2bcon1 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon2 == hex2bit(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2bcon2 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon3 == hex2bit(('000000'H <@ lengthof(h2bcon2)/2) & ''H & ('111111'H @> lengthof(h2bcon2)/2)))
+	and (h2bcon3 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon4 == hex2bit((not4b 'FFFFFF'H) & '111111'H))
+	and (h2bcon4 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon5 == hex2bit('000000111111'H and4b '000000111111'H))
+	and (h2bcon5 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon6 == hex2bit('000000000000'H or4b  '000000111111'H))
+	and (h2bcon6 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2bcon7 == hex2bit('000000000000'H xor4b '000000111111'H))
+	and (h2bcon7 == h2bconb))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+}
+/*--- HEX2INT --------------------------------------------------*/
+
+const integer h2icon := hex2int(''H)
+const integer h2icon1 := hex2int('FFF'H & 'FFFF'H)
+const integer h2icon2 := hex2int((not4b 'FFF'H) & 'FFFF'H)
+const integer h2icon3 := hex2int(('FFF'H and4b '000'H) & 'FFFF'H)
+const integer h2icon4 := hex2int(('000'H or4b '000'H) & 'FFFF'H)
+const integer h2icon5 := hex2int(('0FF'H xor4b '0FF'H) & 'FFFF'H)
+const integer i1 := 12345678910111213141516
+const hexstring hs1 := '000000000000029D42B65689328BBE0C'H
+
+testcase hex_to_int() runs on PDTestComponent{ //In testcase definition//
+
+	if ((h2icon == hex2int(''H))
+	and (h2icon == 0))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2icon1 == hex2int('FFF'H & 'FFFF'H))
+	and (h2icon1 == 268435455))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2icon2 == hex2int((not4b 'FFF'H) & 'FFFF'H))
+	and (h2icon2 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2icon3 == hex2int(('FFF'H and4b '000'H) & 'FFFF'H))
+	and (h2icon3 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2icon4 == hex2int(('000'H or4b '000'H) & 'FFFF'H))
+	and (h2icon4 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2icon5 == hex2int(('0FF'H xor4b '0FF'H) & 'FFFF'H))
+	and (h2icon5 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if (hex2int(hs1) == i1)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (hex2int('000000000000029D42B65689328BBE0C'H) == 12345678910111213141516)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (hex2int(hs1) == 12345678910111213141516)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (hex2int('029D42B65689328BBE0C'H) == 12345678910111213141516)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                            //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+
+/*--- HEX2OCT --------------------------------------------------*/
+
+const octetstring h2ocon := hex2oct(''H)
+const octetstring h2ocon1 := hex2oct('000000'H & ''H & '111111'H)
+const octetstring h2ocon2 := hex2oct(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+const octetstring h2ocon3 := hex2oct(('000000'H <@ 3) & ''H & ('111111'H @> 3))
+const octetstring h2ocon4 := hex2oct((not4b 'FFFFFF'H) & '111111'H)
+const octetstring h2ocon5 := hex2oct('000000111111'H and4b '000000111111'H)
+const octetstring h2ocon6 := hex2oct('000000000000'H or4b  '000000111111'H)
+const octetstring h2ocon7 := hex2oct('000000000000'H xor4b '000000111111'H)
+const octetstring h2ocon8 := hex2oct('00011'H)
+const octetstring h2ocon9 := hex2oct('1'H)
+
+const octetstring h2ocono := '000000111111'O
+
+testcase hex_to_oct() runs on PDTestComponent{ //In testcase definition//
+
+	if ((h2ocon == hex2oct(''H))
+	and (h2ocon == ''O))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon1 == hex2oct('000000'H & ''H & '111111'H))
+	and (h2ocon1 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon2 == hex2oct(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2ocon2 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon3 == hex2oct(('000000'H <@ 3) & ''H & ('111111'H @> 3)))
+	and (h2ocon3 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon4 == hex2oct((not4b 'FFFFFF'H) & '111111'H))
+	and (h2ocon4 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon5 == hex2oct('000000111111'H and4b '000000111111'H))
+	and (h2ocon5 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon6 == hex2oct('000000000000'H or4b  '000000111111'H))
+	and (h2ocon6 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon7 == hex2oct('000000000000'H xor4b '000000111111'H))
+	and (h2ocon7 == h2ocono))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon8 == hex2oct('00011'H))
+	and (h2ocon8 == '000011'O))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2ocon9 == hex2oct('1'H))
+	and (h2ocon9 == '01'O))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- HEX2STR --------------------------------------------------*/
+
+const charstring h2scon := hex2str(''H)
+const charstring h2scon1 := hex2str('000000'H & ''H & '111111'H)
+const charstring h2scon2 := hex2str(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+const charstring h2scon3 := hex2str(('000000'H <@ 3) & ''H & ('111111'H @> 3))
+const charstring h2scon4 := hex2str((not4b 'FFFFFF'H) & '111111'H)
+const charstring h2scon5 := hex2str('000000111111'H and4b '000000111111'H)
+const charstring h2scon6 := hex2str('000000000000'H or4b  '000000111111'H)
+const charstring h2scon7 := hex2str('000000000000'H xor4b '000000111111'H)
+
+const charstring h2scons := "000000111111"
+
+testcase hex_to_str() runs on PDTestComponent{ //In testcase definition//
+
+	if ((h2scon == hex2str(''H))
+	and (h2scon == ""))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon1 == hex2str('000000'H & ''H & '111111'H))
+	and (h2scon1 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon2 == hex2str(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2scon2 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon3 == hex2str(('000000'H <@ 3) & ''H & ('111111'H @> 3)))
+	and (h2scon3 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon4 == hex2str((not4b 'FFFFFF'H) & '111111'H))
+	and (h2scon4 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon5 == hex2str('000000111111'H and4b '000000111111'H))
+	and (h2scon5 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon6 == hex2str('000000000000'H or4b  '000000111111'H))
+	and (h2scon6 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+
+	if ((h2scon7 == hex2str('000000000000'H xor4b '000000111111'H))
+	and (h2scon7 == h2scons))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+control {
+	execute (hex_to_bit());
+	execute (hex_to_int());
+	execute (hex_to_oct());
+	execute (hex_to_str());
+}
+
+}

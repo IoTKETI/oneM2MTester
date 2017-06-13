@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module jellystone {
+import from ttcn_ericsson_se_xsd2ttcn_HN65402 all;
+
+type component Jelly {}
+
+testcase tc1() runs on Jelly
+{
+  var RangerSmith r := {
+    // Compile-time test.
+    // xsd2ttcn would generate a RangerSmith record without the "food" member.
+    food := "sandwiches",
+    gun := omit
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc1());
+}
+
+}

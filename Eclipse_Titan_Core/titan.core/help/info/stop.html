@@ -1,0 +1,272 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Gecse, Roland
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>stop</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="start.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="str2bit.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>stop</h1>
+<blockquote>
+<p>0. <a href="#Terminating execution">Terminating execution</a></p>
+<p>1. <a href="#Terminating a test component">Stopping components</a></p>
+<p>2. <a href="#Starting a port">Stopping ports</a></p>
+<p>3. <a href="#timer">Stopping timers</a></p>
+<p>4. <a href="profiler.html#1">Stopping the profiler</a></p>
+</blockquote>
+<hr align="left" width="75%">
+<h3>0. <a name="Terminating execution">Terminating execution</a></h3>
+<p>The stop statement is used to terminate test execution. Whenever a stop statement is reached, the execution of the underlying testcase is immediately terminatef. The result of execution will be
+error.
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>stop;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<hr align="left" width="50%">
+<p><a href="#Example1b">Examples:</a></p>
+<hr align="left" width="75%">
+
+
+<h3>1. <a name="Terminating a test component">Stopping components</a></h3>
+<ul>
+  <li>When used in a test case, altstep or function that are executed on a test component, the keyword terminates the relevant test component;</li>
+  <li>when used in the control part of a module or in a function used by the control part of a module, it terminates the execution of the module control part.</li>
+  <li>When prefixed with a component reference, other than the own component will be stopped;</li>
+  <li>when prefixed with the <a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a> <a href="component.html"> <b><font
+    face="Courier New" color="#003258" size="4">component</font></b> </a> keyword pair, all components except the main test component will be stopped.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a></li>
+  <li><a href="component.html"> <b><font face="Courier New" color="#003258" size="4">component</font></b> </a></li>
+  <li><a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a></li>
+  <li><a href="profiler.html"><b><font face="Courier New" color="#003258" size="4">@profiler</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center">[ <i>component_reference</i><font face="Courier New" color="#003258" size="5"><b>.</b></font>] <font face="Courier New" color="#003258" size="5"><b>stop;</b></font> &nbsp;
+    </h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The optional <i>component_reference</i> (used when other than the own component should be stopped) is one of the following:</p>
+  <ul>
+    <li>a reference returned by the <a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a> operation to refer to a given component,</li>
+    <li>the keyword pair <a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a> <a href="component.html"> <b><font
+      face="Courier New" color="#003258" size="4">component</font></b> </a> when referring to all parallel test components (the command must be issued in the main test component),</li>
+    <li>the keyword <a href="self.html"><b><font face="Courier New" color="#003258" size="4">self</font></b></a> when referring to the own component,</li>
+    <li>the keyword <a href="mtc.html"><b><font face="Courier New" color="#003258" size="4">mtc</font></b></a> when referring to the main test component.<br>
+    &nbsp;</li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">stop</font> </b> keyword denotes that (a) component(s) should be stopped.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>See <a href="#Example 4:">Examples</a></p>
+<hr align="left" width="75%">
+
+
+<h3>2. <a name="Stopping a port">Stopping a port</a></h3>
+<hr align="left" width="50%">
+<p>The keyword may be used to stop a <a href="#Example 2a">port</a>.</p>
+<ul>
+  <li>The operation causes listening at the named ports to cease and disallows the sending operations.</li>
+  <li>The port may be restarted by a subsequent start operation.</li>
+  <li>It is possible to stop all defined ports.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a></li>
+  <li><a href="port.html"><b><font face="Courier New" color="#003258" size="4">port</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><i>port_reference</i><font face="Courier New" color="#003258" size="5"><b>.stop;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i> port_reference</i> points out the port to be stopped.</p>
+  <ul>
+    <li>
+    <p>the keywords <b><font face="Courier New" color="#003258" size="4">all port</font> </b> may be used to indicate that all defined ports must be stopped (see the <a href="#Example 2b">example
+    2b</a>).</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">stop</font> </b> keyword introduces port stopping.</p>
+  </li>
+</ul>
+<hr align="left" width="75%">
+<h3>3. <a name="timer">Stopping&nbsp; timers</a></h3>
+<hr align="left" width="50%">
+<p>The keyword may be used to indicate that a <a href="#timer_start">timer should stop running</a>.</p>
+<ul>
+  <li><a name="stop_all">The</a> keyword <a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a> may be used to <a href="#default"> stop all timers</a> that are
+  visible in the scope unit in which the operation has been called.</li>
+  <li>Stopping an inactive timer is a valid operation, although it does not have any effect.</li>
+  <li>Stopping an expired timer causes the entry for this timer in the timeout-list to be removed.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a></li>
+  <li><a href="read.html"><b><font face="Courier New" color="#003258" size="4">read</font></b></a></li>
+  <li><a href="running.html"><b><font face="Courier New" color="#003258" size="4">running</font></b></a></li>
+  <li><a href="timer.html"><b><font face="Courier New" color="#003258" size="4">timer</font></b></a></li>
+  <li><a href="start.html"><b><font face="Courier New" color="#003258" size="4">start</font></b></a></li>
+  <li><a href="timeout.html"><b><font face="Courier New" color="#003258" size="4">timeout</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center">( <i>timer_identifier</i> | <font face="Courier New" color="#003258" size="5"><b>all timer</b></font> )<font face="Courier New" color="#003258" size="5"><b>.stop</b></font>
+    <font face="Courier New" color="#003258" size="5"><b>;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i>timer_identifier</i> is the&nbsp;name used to refer to the timer. It must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>It is possible to stop a member of an <a href="#array">timer array</a>.</p>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b></b></font> &nbsp; <i>timer_identifier</i><font face="Courier New" color="#003258" size="5"><b>[</b></font><i>array_index</i><font
+      face="Courier New" color="#003258" size="5"><b>].stop; </b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<div align="center"></div>
+<ul>
+  <li>
+  <p><i>timer_identifier</i> is the&nbsp;name used to refer to the timer. It must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+  <li>
+  <p><i>array_index</i> points out the timer to be stopped.</p>
+  </li>
+</ul>
+<p><a href="#timer_start">Examples</a></p>
+<hr align="left" width="50%">
+<p><a name="Example 4:">Example 1a:</a>
+<p><font face="Courier New">self.stop; </font>
+<p>The own test component is terminated. (The command was issued in a test case, altstep or function that are executed on a test component).</p>
+<hr align="left" width="50%">
+<p><a name="Example1b">Example 1b</a>:
+<p><font face="Courier New">stop; </font>
+<p>The test case execution is interrupted.
+<hr align="left" width="50%">
+<p><a name="Example 1c">Example 1c</a>:
+<p><font face="Courier New">vc_Hivatkozaas.stop; </font>
+<p>The component with the reference vc_Hivatkozaas is stopped.</p>
+<hr align="left" width="50%">
+<p>Example 1d:
+<p><font face="Courier New">all component.stop; </font>
+<p>All test components except the main test controller are stopped.</p>
+<hr align="left" width="50%">
+<p>Example 1e:
+<p><font face="Courier New">self.stop; </font>
+<p>The own test component is stopped. It has the same effect as in <a href="#Example 4:">example 1a</a></p>
+<hr align="left" width="50%">
+<p>Example 1f:
+<p><font face="Courier New">mtc.stop; </font>
+<p>The main test component is stopped.</p>
+<hr align="left" width="50%">
+<p><a name="Example 2a">Example 2a</a>:
+<p><font face="Courier New">Kapu_PCO.stop;</font>
+<p>The port Kapu_PCO will be stopped.</p>
+<hr align="left" width="50%">
+<p><a name="Example 2b">Example 2b</a>:
+<p><font face="Courier New">all port.stop;</font>
+<p>All ports will be stopped.</p>
+<hr align="left" width="50%">
+<p><a name="timer_start">Example 3a</a>:
+<p><font face="Courier New">T_soek.stop;<br>
+</font>
+<p>The global timer T_soek is stopped provided that it was running, otherwise the command has no effect.</p>
+<hr align="left" width="50%">
+<p><a name="default">Example 3b:</a>
+<p><font face="Courier New">all timer.stop;&nbsp;<br>
+</font>
+<p>The local timer Tl_foerlorad is declared (1st line) and stoped with a duration of 20 ms (2nd line).</p>
+<hr align="left" width="50%">
+<p><a name="array">Example 3c:</a>
+<p><font face="Courier New">timer Tl_Denfert[2] := {-, 1E-1, -};<br>
+Tl_Denfert[1].stop(20E-3); </font>
+<p>The array of&nbsp; local timers declared is called Tl_denfert and consists of three timers . The second timer has the default value of 100 ms, the others have no default value(1st
+line).&nbsp;The second timer in the array is stoped for 20 ms, overwriting the default value of 100 ms (2nd line).</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#stoptcstatement">BNF definition</a> of <font face="Courier New">component stop</font></p>
+<p><a HREF="BNF.html#stoptimerstatement">BNF definition</a> of <font face="Courier New">timer stop</font></p>
+</body>
+</html>

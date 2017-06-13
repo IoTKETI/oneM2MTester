@@ -1,0 +1,964 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Beres, Szabolcs
+ *   Cserveni, Akos
+ *   Forstner, Matyas
+ *   Godar, Marton
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *   Pandi, Krisztian
+ *
+ ******************************************************************************/
+module TarrayOper {
+// ********** Type definitions  *********************
+type component arrayOper_mycomp {};
+type enumerated arrayOper_myenum {xx1,xx2,xx3};
+type record arrayOper_trecord {
+	integer x1 optional,
+	float x2 };
+type record of octetstring arrayOper_trecof;
+type set arrayOper_tset {
+	integer x1,
+	float x2 optional };
+type set of charstring arrayOper_tsetof;
+type set of integer arrayOper_tsetof2;
+type union arrayOper_tunion {
+	integer x1,
+	float x2 };
+type arrayOper_tsetof2 arrayOper_triplet[3];
+type arrayOper_triplet arrayOper_triplettriplet[3];
+type record arrayOper_trecord2{
+	integer x1[3]
+};
+// *************** Constanst ***********************
+const arrayOper_trecord arrayOper_temp1:={ x1:=omit, x2:=3.4 };
+const arrayOper_trecof arrayOper_temp2:={ 'AF12'O };
+const arrayOper_tset arrayOper_temp3:={ x1:=234, x2:=1.9};
+const arrayOper_tsetof arrayOper_temp4:={"f","8"};
+const arrayOper_tunion arrayOper_temp5:={ x2:=1.3 };
+const integer arrayOper_const1[2]:={ 1,2 }	//array of basic types
+const arrayOper_myenum arrayOper_const2[2]:={ xx2, xx1 }
+const arrayOper_trecord arrayOper_const4[2]:={   //array of record
+  { x1:=1, x2:=1.2 },arrayOper_temp1 };
+const arrayOper_trecof arrayOper_const6[2]:={   //array of record of
+ { '12AB'O, 'CD12'O },  arrayOper_temp2 };
+const arrayOper_tset arrayOper_const8[2]:={   //array of set
+ { x1:=2, x2:=1.3}, arrayOper_temp3 };
+const arrayOper_tsetof arrayOper_const10[2]:={   //array of set of
+ {"a","b"}, arrayOper_temp4 }; //{"f","8"},
+const arrayOper_tunion arrayOper_const12[2]:={   //array of union
+ { x1 :=3 }, arrayOper_temp5  }; //{ x2:=1.3 }
+const arrayOper_tsetof2 arrayOper_const13[3][3]:={
+{{1,2},{2,3},{3,4}},{{1,2},{4,5},{6,7}},{{2,1},{3,2},{4,3}}}
+
+testcase arrayAssign() runs on arrayOper_mycomp{
+var integer x1[2]:={ 12,34} 	//array of basic types
+var integer x2[2];
+var integer x3[2 .. 4];		//index ranges
+x2:={ 32, 12 };
+x3:={32,12,3};
+if (x1[0]==12) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[1]==34) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0]==32) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[1]==12) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2]==32) {setverdict(pass);}	//index ranges
+     else {setverdict(fail);}
+if (x3[3]==12) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[4]==3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignEnum() runs on arrayOper_mycomp{
+var arrayOper_myenum x1[2]:={ xx2, - }	//array of enum
+var arrayOper_myenum x2[2];
+x2:={xx2,xx1};
+//at declaration
+if (x1[0]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+//later
+if (x2[0]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1]==xx1) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignRec() runs on arrayOper_mycomp{
+var arrayOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var arrayOper_trecord x1[2]:={   //array of record
+ { x1:=1, x2:=1.2 }, temp1 };
+var arrayOper_trecord x2[2];
+x2:={ { x1:=1, x2:=1.2 }, temp1 };
+if (x1[0].x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignRecof() runs on arrayOper_mycomp{
+var arrayOper_trecof temp2:={'AF12'O};
+var arrayOper_trecof x1[2]:={   //array of record of
+ { '12AB'O, 'CD12'O }, temp2 };
+var arrayOper_trecof x2[2];
+x2:={ { '12AB'O, 'CD12'O }, temp2 };
+if (x1[0][0]=='12AB'O) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=='12AB'O) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=='AF12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignSet() runs on arrayOper_mycomp{
+var arrayOper_tset temp1:={ x1:=2, x2:=omit };
+var arrayOper_tset x1[2]:={   //array of set
+ { x1:=1, x2:=1.2 }, temp1 };
+var arrayOper_tset x2[2];
+x2:={ { x1:=1, x2:=1.2 }, temp1 };
+if (x1[0].x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignSetof() runs on arrayOper_mycomp{
+var arrayOper_tsetof temp2:={"a","7"};
+var arrayOper_tsetof x1[2]:={   //array of set of
+ { "1", "a" }, temp2 };
+var arrayOper_tsetof x2[2];
+x2:={ { "1", "a" }, temp2 };
+if (x1[0][0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignUnion() runs on arrayOper_mycomp{
+var arrayOper_tunion temp5 := {x2:=1.3}
+var arrayOper_tunion x1[2]:={   	//array of union
+ { x1 :=3 }, temp5  }; //{ x2:=1.3
+var arrayOper_tunion x2[2];
+x2:={ { x1 :=3 }, temp5 }; //{ x2:=1.3 }
+if (x1[0].x1==3) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp5) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==3) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignArray() runs on arrayOper_mycomp{
+var charstring x1[2][2]:={   //array of array
+ { "1", "a" }, {"a","7"} };
+var arrayOper_tsetof x2[2];
+x2:={ { "1", "a" }, {"a","7"} };
+if (x1[0][0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignSubArray() runs on arrayOper_mycomp{
+  var integer x1[4][2] := {{1,2},{3,4},{5,6},{7,8}}; //array of basic types
+  var integer x2[2][2] := {x1[0],x1[3]};
+  var integer x3[1][2] := {{x1[0][0],x1[1][0]}};
+  if(x2[0][0]==1){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[0][1]==2){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[1][0]==7){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[1][1]==8){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x3[0][0]==1){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x3[0][1]==3){setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase arrayAssignRangedArray() runs on arrayOper_mycomp{
+  var integer x1[1..2][2..3]:={{1,2},{2,3}};
+  var integer x2[0..1][2..3]:={{11,22},x1[1]};
+  if(x1[1][2]==1){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[1][3]==2){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[2][2]==2){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[2][3]==3){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[0][2]==11){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[0][3]==22){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[1][2]==1){setverdict(pass);}
+  else{setverdict(fail);}
+}
+
+testcase arrayAssignElem() runs on arrayOper_mycomp{
+var integer x1[2], x2[2], x3[2], x4[5] ;	//array of basic types
+x1:={ 3, 2 };
+x2:={ 1, 2 };
+x3:=x2;
+x2[0]:=3;			//change element to value
+x3[0]:=x2[0];			//change element to element
+x4[2]:=2;			// out of order
+if (x1[1]==2) {setverdict(pass);}	//accessing individual element
+     else {setverdict(fail);}
+if (x2[0]==3) {setverdict(pass);}	// change element to value
+     else {setverdict(fail);}
+if (x2[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[0]==3) {setverdict(pass);}	// change element to element
+     else {setverdict(fail);}
+if (x3[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x4[2]==2) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignElemEnum() runs on arrayOper_mycomp{
+var arrayOper_myenum x1[2],x2[3]; //array of enumerated
+x1:={ xx1, xx2 };
+x1[0]:=xx3;			//change element
+x2[2]:=xx3;			// out of order
+if (x1[0]==xx3) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[1]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2]==xx3) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignElemRec() runs on arrayOper_mycomp{
+var arrayOper_trecord x1[2],x2[2]; 	//array of record
+x1:={   { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x1[0].x1:=2;
+x1[1].x1:=3;
+x2[1]:= {x1:=2, x2:=1.3};		//out of order
+if (x1[0].x1==2) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x1==3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x1==2) {setverdict(pass);}	   // out of order
+     else {setverdict(fail);}
+if (x2[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignElemRecof() runs on arrayOper_mycomp{
+var arrayOper_trecof x1[2],x2[3];		 //record of record of
+x1:={  { '12AB'O, 'CD12'O }, { 'ABCD'O } };
+x1[0][1]:='34AB'O;		//change element
+x2[2]:={'12CD'O};		//out of order
+if (x1[0][0]=='12AB'O) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[0][1]=='34AB'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][0]=='ABCD'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2][0]=='12CD'O) {setverdict(pass);}	//out of order
+     else {setverdict(fail);}}
+
+testcase arrayAssignElemSet() runs on arrayOper_mycomp{
+var arrayOper_tset x1[2],x2[3];    	//array of set
+x1:={ { x1:=1, x2:=1.2 }, { x1:=2, x2:=omit }};
+x1[0].x2:=3.4;				//change element
+x2[2]:={  x1:=2, x2:=1.3 };		// out of order
+if (x1[0].x1==1) {setverdict(pass);}	//change element
+     else {setverdict(fail);}
+if (x1[0].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x1[1].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x1==2) {setverdict(pass);}	//out of order
+     else {setverdict(fail);}
+if (x2[2].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignElemSetof() runs on arrayOper_mycomp{
+var arrayOper_tsetof x1[2],x2[3];   	//array of set of
+x1:={ { "1" }, {"a","7"}};
+x1[0][0]:="h";			// change element
+x2[2]:={"2"};			//out of order
+if (x1[0][0]=="h") {setverdict(pass);}	  //change element
+     else {setverdict(fail);}
+if (x1[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2][0]=="2") {setverdict(pass);}		// out of order
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignElemUnion() runs on arrayOper_mycomp{
+//var arrayOper_tunion temp5 := {x2:=1.3}
+var arrayOper_tunion x1[2],x2[3];   //array of union
+x1:={ {x1 :=3 }, {x2:=1.3} };
+x1[0].x2:=3.4;			//change element
+x2[2]:={ x2:=1.4}; 		// out of order
+if (x1[0].x2==3.4) {setverdict(pass);}		//changed element
+     else {setverdict(fail);}
+if (ischosen(x1[0].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[0].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x2==1.4) {setverdict(pass);}		//out of order
+     else {setverdict(fail);}
+if (ischosen(x2[2].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[2].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayAssignSubArrayElem() runs on arrayOper_mycomp{
+  var integer x1[4][2]; //array of basic types
+  var integer x2[2][2];
+  var integer x3[1][2];
+  x1:={{1,2},{3,4},{5,6},{7,8}};
+  x2:={x1[0],x1[3]};
+  x3[0]:={x1[0][0],3};
+  if(x2[0][0]==1){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[0][1]==2){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[1][0]==7){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x2[1][1]==8){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x3[0][0]==1){setverdict(pass);}
+  else {setverdict(fail);}
+  if(x3[0][1]==3){setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase arrayAssignRangedArrayElem() runs on arrayOper_mycomp{
+  var integer x1[1..2][2..3];
+  var integer x2[0..1][2..3];
+  x1:={{1,2},{2,3}};
+  x2:={{11,22},x1[1]};
+  if(x1[1][2]==1){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[1][3]==2){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[2][2]==2){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x1[2][3]==3){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[0][2]==11){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[0][3]==22){setverdict(pass);}
+  else{setverdict(fail);}
+  if(x2[1][2]==1){setverdict(pass);}
+  else{setverdict(fail);}
+}
+
+testcase arrayConst() runs on arrayOper_mycomp{
+const integer const1[3]:={1,2,3} //array of basic types
+if (arrayOper_const1[0]==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const1[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[0]==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const1[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[2]==3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstEnum() runs on arrayOper_mycomp{
+const arrayOper_myenum const1[3]:={xx1,xx2,xx3} //array of enumerated
+if (arrayOper_const2[0]==xx2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const2[1]==xx1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[0]==xx1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const1[1]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[2]==xx3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstRec() runs on arrayOper_mycomp{
+const arrayOper_trecord const4[2]:={   //array of record
+ { x1:=1, x2:=1.2 }, arrayOper_temp1 };
+if (arrayOper_const4[0].x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const4[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (arrayOper_const4[1]==arrayOper_temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4[0].x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const4[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4[1]==arrayOper_temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstRecof() runs on arrayOper_mycomp{
+const arrayOper_trecof const6[2]:={   //array of record of
+ { '12AB'O, 'CD12'O }, arrayOper_temp2 };
+if (arrayOper_const6[0][0]=='12AB'O) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const6[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (arrayOper_const6[1]==arrayOper_temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6[0][0]=='12AB'O) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const6[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6[1]==arrayOper_temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstSet() runs on arrayOper_mycomp{
+const arrayOper_tset const8[2]:={   			//array of set
+ { x1:=2, x2:=1.3}, arrayOper_temp3 };
+if (arrayOper_const8[0].x1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const8[0].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (arrayOper_const8[1]==arrayOper_temp3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const8[0].x1==2) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const8[0].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const8[1]==arrayOper_temp3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstSetof() runs on arrayOper_mycomp{
+const arrayOper_tsetof const10[2]:={  		 //array of set of
+ {"a","b"}, {"f","8"} };
+if (arrayOper_const10[0][0]=="a") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (arrayOper_const10[0][1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (arrayOper_const10[1]==arrayOper_temp4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[0][0]=="a") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const10[0][1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[1][0]=="f") {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[1][1]=="8") {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayConstUnion() runs on arrayOper_mycomp{
+const arrayOper_tunion const12[2]:={   //array of union
+ { x1 :=3 }, { x2:=1.3 } };
+if (arrayOper_const12[0].x1==3) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(arrayOper_const12[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(arrayOper_const12[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (arrayOper_const12[1]==arrayOper_temp5) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const12[0].x1==3) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const12[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const12[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const12[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayComp() runs on arrayOper_mycomp{
+var integer x1[3],x2[0..2],x3[3],x4[3],x5[4]; //array of basic type
+x1:={ 1,2,3 };
+x2:={ 1,2,3 };
+x3:={ 1,2,4 };
+x4:={3,2,1};
+x5:={1,2,3,-};
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x4)) {setverdict(pass);}	//out of order
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x4) {setverdict(pass);}		//out of order
+     else {setverdict(fail);}
+}
+
+testcase arrayCompConst() runs on arrayOper_mycomp{	//In testcase definition//
+  const integer c_array1[4] := { 1,2,3,4};
+  const integer c_array2[4] := { 1,2,3,4};
+  const integer c_array3[4] := { 4,3,2,1};
+  const integer c_array4_ind[4] := { [0] := 1, [1] := 2, [2] := 3, [3] := 4};
+  const integer c_array5_ind[4] := { [3] := 4, [1] := 2, [2] := 3, [0] := 1};
+  
+  
+  var integer vl_array5[4] := { 1,2,3,4};
+
+  
+  if(c_array1 == c_array1) {setverdict(pass);}
+  else {setverdict(fail);}	//^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+  if({1,2,3,4} == c_array1) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+  if(c_array1 == c_array2) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+
+  if(c_array1 == c_array4_ind) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+  if(c_array4_ind == c_array4_ind) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+  if({ [0] := 1, [1] := 2, [2] := 3, [3] := 4} == c_array4_ind) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+  if(c_array4_ind == c_array5_ind) {setverdict(pass);}
+  else {setverdict(fail);} //^In else statement\:$//	//^warning: Control never reaches this code because of previous effective condition\(s\)$//
+  
+
+  if(vl_array5 == c_array1) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase arrayCompEnum() runs on arrayOper_mycomp{
+var arrayOper_myenum x1[3],x2[3],x3[3];  // array of enum
+x1:={ xx1,xx2,xx3 };
+x2:={ xx1,xx2,xx3 };
+x3:={ xx1,xx2,xx2 };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayCompRec() runs on arrayOper_mycomp{
+var arrayOper_trecord x1[2],x2[2],x3[2];	// array of record
+x1 :={ { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x2 :={ { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x3 :={ { x1:=2, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase arrayCompRecof() runs on arrayOper_mycomp{
+//var arrayOper_trecof temp2:={'AF12'O};
+var arrayOper_trecof x1[2],x2[2],x3[2]; //array of record of
+x1:={ { '12AB'O, 'CD12'O }, {'AF12'O} };
+x2:={ { '12AB'O, 'CD12'O }, {'AF12'O} };
+x3:={ { '12AB'O  }, {'AF12'O} };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase arrayCompSet() runs on arrayOper_mycomp{
+//var arrayOper_tset temp1:={ x1:=2, x2:=omit };
+var arrayOper_tset x1[2],x2[2],x3[2]; 		//array of set
+x1:={ { x1:=1, x2:=1.2 }, { x1:=2, x2:=omit } };
+x2:={ { x2:=1.2, x1:=1 }, { x1:=2, x2:=omit }};
+x3:={ { x1:=1, x2:=1.2 }, { x1:=1, x2:=1.2 }  };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x2==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayCompSetof() runs on arrayOper_mycomp{
+var arrayOper_tsetof temp2:={"a","7"};
+var arrayOper_tsetof x1[2],x2[2],x3[2];   	//array of set of
+x1:={ { "1", "a" },  temp2 };
+x2:={ { "1", "a" }, {"a","7"} };
+x3:={ { "1", "a" }, {"l", "k"} };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x2==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayCompUnion() runs on arrayOper_mycomp{
+var arrayOper_tunion temp5 := {x2:=1.3}
+var arrayOper_tunion x1[2],x2[2],x3[2]; 	//array of union
+x1:={ { x1 :=3 }, { x2:=1.3 } };
+x2:={ { x1 :=3 }, temp5 }; //{ x2:=1.3 }
+x3:={ { x2 :=3.9 },temp5 }; //{ x2:=1.3 }
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase arrayMatching() runs on arrayOper_mycomp{
+  template arrayOper_triplet template1:={{1,2},{2,3},{3,4}};
+  template arrayOper_triplet template2:=
+    {subset(1,2,3),subset(3,4,5),subset(5,6,7,8)};
+  template arrayOper_triplet template3:={superset(1),superset(2),superset(4)};
+  template arrayOper_trecord2 template4:={{1,?,3}};
+  var arrayOper_trecord2 x1:={{1,2,3}};
+  if(match(arrayOper_const13[0],template1)){setverdict(pass);}
+  else {setverdict(fail);}
+  if(not(match(arrayOper_const13[0],template2))){setverdict(pass);}
+  else {setverdict(fail);}
+  if(match(arrayOper_const13[1],template2)){setverdict(pass);}
+  else {setverdict(fail);}
+  if(not(match(arrayOper_const13[1],template3))){setverdict(pass);}
+  else {setverdict(fail);}
+  if(match(arrayOper_const13[2],template3)){setverdict(pass);}
+  else {setverdict(fail);}
+  if(match(x1,template4)){setverdict(pass);}
+  else{setverdict(fail);}
+}
+
+testcase arraySummation() runs on arrayOper_mycomp{
+  var integer x1[2][3]:={{1,2,3},{4,5,6}};
+  var integer i1,i2,sum;
+  x1[1][1]:=3;
+  sum:=0;
+  for(i1:=0;i1<sizeof(x1);i1:=i1+1)
+  {
+    for(i2:=0;i2<sizeof(x1[i1]);i2:=i2+1)
+    {
+      sum:=sum+x1[i1][i2];
+    }
+  }
+  if(sum==19){setverdict(pass);}
+  else{setverdict(fail);}
+}
+
+testcase arrayRotateOperators() runs on arrayOper_mycomp{
+  var integer x1[5]:={1,2,3,4,5}
+  var integer x2[5],x3[5],x4[5],x5[5],x6[5],x7[5];
+  x2 := x1 <@ 1;
+  x3 := x1 <@ 10;
+  x4 := x1 <@ 3 <@ 2;
+  x5 := x1 @> 1;
+  x6 := x1 @> 10;
+  x7 := x1 @> 3 @> 2;
+  if (x2 == {2,3,4,5,1}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x3 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x4 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x5 == {5,1,2,3,4}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x6 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x7 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase arrayLengthof() runs on arrayOper_mycomp{
+// lengthof returns the sequential number of the last initialized element of the array
+  var integer x1[2]:={1,2}					// last init element is the second
+  var integer x2[2],x3[3],x4[2],x5[5];		// array of basic types
+  x2:={ 1, 2 };								// last init element is the second
+  x3:={1,2, -};								// last init element is the second
+											// x4: last init element is the zero
+  x5[2]:=1;									// last init element is the third
+  if (lengthof(x1)==2) {setverdict(pass);}	//assignment at declaration
+  else {setverdict(fail);}
+  if (lengthof(x2)==2) {setverdict(pass);}	//assignment later
+  else {setverdict(fail);}
+  if (lengthof(x3)==2) {setverdict(pass);}	//partly filled, TITAN specific
+  else {setverdict(fail);}
+  if (lengthof(x4)==0) {setverdict(pass);}	//empty
+  else {setverdict(fail);}
+  if (lengthof(x5)==3) {setverdict(pass);}	//out of order
+  else {setverdict(fail);}
+}
+
+testcase arraySizeof() runs on arrayOper_mycomp{
+  var integer x1[2]:={1,2}
+  var integer x2[2],x3[3],x4[2],x5[5];	//array of basic types
+  x2:={ 1, 2 };
+  x3:={1,2, -};	// partly filled array
+  x5[2]:=1;	//out of order
+  if (sizeof(x1)==2) {setverdict(pass);}	//assignment at declaration
+  else {setverdict(fail);}
+  if (sizeof(x2)==2) {setverdict(pass);}	//assignment later
+  else {setverdict(fail);}
+  if (sizeof(x3)==3) {setverdict(pass);}	//partly filled, TITAN specific
+  else {setverdict(fail);}
+  if (sizeof(x4)==2) {setverdict(pass);}	//empty
+  else {setverdict(fail);}
+  if (sizeof(x5)==5) {setverdict(pass);}	//out of order
+  else {setverdict(fail);}
+}
+
+testcase arraySizeof2() runs on arrayOper_mycomp{
+  var integer x1[1..3][1]:={{1},{2},{3}};
+  var integer x2[11..12],x3[3..5],x4[-8..-7],x5[-4..0];	//array of basic types
+  x2:={ 1, 2 };
+  x3:={1,2, -};	// partly filled array
+  x5[-3]:=1;	//out of order
+  if (sizeof(x1)==3) {setverdict(pass);}	//assignment at declaration
+  else {setverdict(fail);}
+  if (sizeof(x1[1])==1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (sizeof(x2)==2) {setverdict(pass);}	//assignment later
+  else {setverdict(fail);}
+  if (sizeof(x3)==3) {setverdict(pass);}	//partly filled, TITAN specific
+  else {setverdict(fail);}
+  if (sizeof(x4)==2) {setverdict(pass);}	//empty
+  else {setverdict(fail);}
+  if (sizeof(x5)==5) {setverdict(pass);}	//out of order
+  else {setverdict(fail);}
+}
+
+testcase arrayIsvalue() runs on arrayOper_mycomp{
+  var integer x0[2];
+  var integer x1[2] := { 12,34 }
+  var integer x2[2];
+  x2:={ 32, 12 };
+  var integer x3[2 .. 4];
+  var integer x4[2 .. 4] := {32,12,3};
+  var template integer x5[3] :=  omit;
+  var template integer x6[3] :=  { 1, 2, 3 } ifpresent;
+
+  if ( isvalue(x0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(x0[0]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(x1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(x2) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(x3) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(x4) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(x5) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(x6) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase emptyTemplateArrayOneDimensional() runs on arrayOper_mycomp{
+  var template charstring csa[10]
+  var template charstring cs
+  //cs := csa[0]
+  if ( isbound(csa[0]) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase emptyTemplateArrayTwoDimensional() runs on arrayOper_mycomp{
+  var template charstring csa[10][10]
+  var template charstring cs
+  //cs := csa[0][1]
+  if ( isbound(csa[0][1]) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+type enumerated DefaultCallHandling { 
+  releaseCall, continueCall 
+}; 
+type record DP_AnalysedInfoCriterium {};
+type record of DP_AnalysedInfoCriterium DP_AnalysedInfoCriteriumList; 
+template DP_AnalysedInfoCriterium t_MAP_DP_AnalysedInfoCriterium(octetstring ox, 
+  integer ix, charstring cx, DefaultCallHandling dx) := {} 
+function f_Converter_Charstring_To_Map(in charstring c) return octetstring { 
+  return char2oct(c); 
+} 
+template DP_AnalysedInfoCriterium t_MAP_D_CSI(template DP_AnalysedInfoCriteriumList tdpl, integer num) := { }
+
+testcase TemplateArray() runs on arrayOper_mycomp{
+
+  var template DP_AnalysedInfoCriterium v_DP_AnalysedInfoCriterium[8]; 
+  var charstring v_gsmSCF := "howdy"; 
+  var template DP_AnalysedInfoCriterium v_D_CSI_1 ; 
+  v_DP_AnalysedInfoCriterium[0] := t_MAP_DP_AnalysedInfoCriterium( '91'O& f_Converter_Charstring_To_Map(                                                                 "491799000000003"), // ISDN-AddressString, 
+                                                                   50000, // ServiceKey, 
+                                                                   v_gsmSCF,// ISDN-AddressString, 
+                                                                   releaseCall); // DefaultCallHandling, 
+  v_DP_AnalysedInfoCriterium[1] := t_MAP_DP_AnalysedInfoCriterium( '91'O& f_Converter_Charstring_To_Map(                                                                 "491799000000002"), // ISDN-AddressString, 
+                                                                   32768, // ServiceKey, 
+                                                                   v_gsmSCF,// ISDN-AddressString, 
+                                                                   releaseCall); // DefaultCallHandling,       
+  
+  v_DP_AnalysedInfoCriterium[2] := t_MAP_DP_AnalysedInfoCriterium( 'A1'O&f_Converter_Charstring_To_Map(                                                                 "491799000000001"), // ISDN-AddressString, 
+                                                                   128, // ServiceKey, 
+                                                                   v_gsmSCF,// ISDN-AddressString, 
+                                                                    continueCall); // DefaultCallHandling, 
+  
+  v_D_CSI_1 := t_MAP_D_CSI ({v_DP_AnalysedInfoCriterium[0], v_DP_AnalysedInfoCriterium[1], v_DP_AnalysedInfoCriterium[2                             ]},//DP-AnalysedInfoCriteriaList 
+                               3); //CamelCapabilityHandling 
+  
+  if ( isbound(t_MAP_D_CSI({v_DP_AnalysedInfoCriterium[0], v_DP_AnalysedInfoCriterium[1], v_DP_AnalysedInfoCriterium[2                             ]},3)) ) 
+  { setverdict(pass); } else { setverdict(fail); };
+}
+
+control
+{
+ const arrayOper_tsetof2 cl_1[3][3]:={   // constant in control part
+  {{1,2},{2,3},{3,4}},{{1,2},{4,5},{6,7}},{{2,1},{3,2},{4,3}}};
+ var arrayOper_tsetof2 vl_1[3][3]; //variable in control part
+
+ execute(arrayAssign());
+ execute(arrayAssignEnum());
+ execute(arrayAssignRec());
+ execute(arrayAssignRecof());
+ execute(arrayAssignSet());
+ execute(arrayAssignSetof());
+ execute(arrayAssignUnion());
+ execute(arrayAssignArray());
+ execute(arrayAssignSubArray());
+ execute(arrayAssignRangedArray());
+ execute(arrayAssignElem());
+ execute(arrayAssignElemEnum());
+ execute(arrayAssignElemRec());
+ execute(arrayAssignElemRecof());
+ execute(arrayAssignElemSet());
+ execute(arrayAssignElemSetof());
+ execute(arrayAssignElemUnion());
+ execute(arrayAssignSubArrayElem());
+ execute(arrayAssignRangedArrayElem());
+ execute(arrayConst());
+ execute(arrayConstEnum());
+ execute(arrayConstRec());
+ execute(arrayConstRecof());
+ execute(arrayConstSet());
+ execute(arrayConstSetof());
+ execute(arrayConstUnion());
+ execute(arrayComp());
+ execute(arrayCompConst());
+ execute(arrayCompEnum());
+ execute(arrayCompRec());
+ execute(arrayCompRecof());
+ execute(arrayCompSet());
+ execute(arrayCompSetof());
+ execute(arrayCompUnion());
+ execute(arrayMatching());
+ execute(arraySummation());
+
+ execute(arrayRotateOperators());
+ execute(arrayLengthof());
+ execute(arraySizeof());
+ execute(arraySizeof2());
+ execute(arrayIsvalue());
+ 
+ execute(emptyTemplateArrayOneDimensional());
+ execute(emptyTemplateArrayTwoDimensional());
+ execute(TemplateArray());
+}
+
+}

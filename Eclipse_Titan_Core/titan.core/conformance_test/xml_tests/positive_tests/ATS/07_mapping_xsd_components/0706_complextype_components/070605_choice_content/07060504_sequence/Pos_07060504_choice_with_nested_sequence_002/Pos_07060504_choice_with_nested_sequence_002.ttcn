@@ -1,0 +1,91 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:7.6.5.4, Verify that choice content with multiple nested sequences is correctly transformed
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// An XSD sequence nested to a choice shall be mapped to a TTCN-3 record field
+// of the enframing TTCN-3 union or record of union field (see clause 7.6.5), 
+// according to clause 7.6.6.
+
+module Pos_07060504_choice_with_nested_sequence_002 {
+
+   import from schema_Pos_07060504_choice_with_nested_sequence_002 language "XSD" all;
+
+   template MyType m_msg := { 
+      choice := {
+         sequence := {
+	        foo := "abc",
+	        bar := "cde",
+	        ding := "fgh",
+	        foo_1 := "ijk",
+	        bar_1 := "lmn"
+         }
+      }
+   };
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Pos_07060504_choice_with_nested_sequence_002() runs on C system C {
+        var Raw v_rcv;
+
+        var Raw  v_Raw:= "<ns189:MyType xmlns:ns189='schema:Pos_07060504_choice_with_nested_sequence_002'>\n\t<foo>abc</foo>\n\t<bar>cde</bar>\n\t<ding>fgh</ding>\n\t<foo>ijk</foo>\n\t<bar>lmn</bar>\n</ns189:MyType>\n\n";
+
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_07060504_choice_with_nested_sequence_002(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

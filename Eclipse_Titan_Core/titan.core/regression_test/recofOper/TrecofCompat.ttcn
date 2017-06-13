@@ -1,0 +1,267 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module tests the compatibility between record-ofs and set-ofs of base
+// element types
+module TrecofCompat {
+
+type component CT_Empty {}
+
+// record of
+type record of integer RoI1;
+type record of integer RoI2;
+
+type record of boolean RoB1;
+type record of boolean RoB2;
+
+type record of float RoF1;
+type record of float RoF2;
+
+type record of bitstring RoBS1;
+type record of bitstring RoBS2;
+
+type record of hexstring RoHS1;
+type record of hexstring RoHS2;
+
+type record of octetstring RoOS1;
+type record of octetstring RoOS2;
+
+type record of charstring RoCS1;
+type record of charstring RoCS2;
+
+type record of universal charstring RoUS1;
+type record of universal charstring RoUS2;
+
+type record of integer RoI1_opt with { extension "optimize:memalloc" };
+type record of integer RoI2_opt with { extension "optimize:memalloc" };
+
+testcase tc_record_of_compat() runs on CT_Empty
+{
+  var RoI1 v_roi1 := { 1, 2 };
+  var RoI2 v_roi2 := v_roi1;
+  if (not match( { 1, 2 }, v_roi2) or v_roi1 != v_roi2) { setverdict(fail, "record of integer incompatibility"); }
+
+  var RoB1 v_rob1 := { true, false };
+  var RoB2 v_rob2 := v_rob1;
+  if (not match( { true, false }, v_rob2) or v_rob1 != v_rob2) { setverdict(fail, "record of boolean incompatibility"); }
+
+  var RoF1 v_rof1 := { 0.4, 9.6 };
+  var RoF2 v_rof2 := v_rof1;
+  if (not match( { 0.4, 9.6 }, v_rof2) or v_rof1 != v_rof2) { setverdict(fail, "record of float incompatibility"); }
+
+  var RoBS1 v_robs1 := { '1101'B, '10101'B };
+  var RoBS2 v_robs2 := v_robs1;
+  if (not match( { '1101'B, '10101'B }, v_robs2) or v_robs1 != v_robs2) { setverdict(fail, "record of bitstring incompatibility"); }
+
+  var RoHS1 v_rohs1 := { '1AF74'H, 'D000D'H };
+  var RoHS2 v_rohs2 := v_rohs1;
+  if (not match( { '1AF74'H, 'D000D'H }, v_rohs2) or v_rohs1 != v_rohs2) { setverdict(fail, "record of hexstring incompatibility"); }
+
+  var RoOS1 v_roos1 := { 'DEAD'O, '1BC5'O };
+  var RoOS2 v_roos2 := v_roos1;
+  if (not match( { 'DEAD'O, '1BC5'O }, v_roos2) or v_roos1 != v_roos2) { setverdict(fail, "record of octetstring incompatibility"); }
+
+  var RoCS1 v_rocs1 := { "red", "blue" };
+  var RoCS2 v_rocs2 := v_rocs1;
+  if (not match( { "red", "blue" }, v_rocs2) or v_rocs1 != v_rocs2) { setverdict(fail, "record of charstring incompatibility"); }
+
+  var RoUS1 v_rous1 := { "yellow", "green" };
+  var RoUS2 v_rous2 := v_rous1;
+  if (not match( { "yellow", "green" }, v_rous2) or v_rous1 != v_rous2) { setverdict(fail, "record of universal charstring incompatibility"); }
+
+  var RoI1_opt v_roi1_opt := { 1, 2 };
+  var RoI2_opt v_roi2_opt := v_roi1_opt;
+  if (not match( { 1, 2 }, v_roi2_opt) or v_roi1_opt != v_roi2_opt) { setverdict(fail, "record of integer (optimized) incompatibility"); }
+
+  setverdict(pass);
+}
+
+// record of template
+testcase tc_record_of_template_compat() runs on CT_Empty
+{
+  var template RoI1 vt_roi1 := { 1, 2 };
+  var template RoI2 vt_roi2 := vt_roi1;
+  if (not match( { 1, 2 }, vt_roi2) or not match(valueof(vt_roi1), vt_roi2)) 
+    { setverdict(fail, "record of integer template incompatibility"); }
+
+  var template RoB1 vt_rob1 := { true, false };
+  var template RoB2 vt_rob2 := vt_rob1;
+  if (not match( { true, false }, vt_rob2) or not match(valueof(vt_rob1), vt_rob2)) 
+    { setverdict(fail, "record of boolean template incompatibility"); }
+
+  var template RoF1 vt_rof1 := { 0.4, 9.6 };
+  var template RoF2 vt_rof2 := vt_rof1;
+  if (not match( { 0.4, 9.6 }, vt_rof2) or not match(valueof(vt_rof1), vt_rof2)) 
+    { setverdict(fail, "record of float template incompatibility"); }
+
+  var template RoBS1 vt_robs1 := { '1101'B, '10101'B };
+  var template RoBS2 vt_robs2 := vt_robs1;
+  if (not match( { '1101'B, '10101'B }, vt_robs2) or not match(valueof(vt_robs1), vt_robs2)) 
+    { setverdict(fail, "record of bitstring template incompatibility"); }
+
+  var template RoHS1 vt_rohs1 := { '1AF74'H, 'D000D'H };
+  var template RoHS2 vt_rohs2 := vt_rohs1;
+  if (not match( { '1AF74'H, 'D000D'H }, vt_rohs2) or not match(valueof(vt_rohs1), vt_rohs2)) 
+    { setverdict(fail, "record of hexstring template incompatibility"); }
+
+  var template RoOS1 vt_roos1 := { 'DEAD'O, '1BC5'O };
+  var template RoOS2 vt_roos2 := vt_roos1;
+  if (not match( { 'DEAD'O, '1BC5'O }, vt_roos2) or not match(valueof(vt_roos1), vt_roos2)) 
+    { setverdict(fail, "record of octetstring template incompatibility"); }
+
+  var template RoCS1 vt_rocs1 := { "red", "blue" };
+  var template RoCS2 vt_rocs2 := vt_rocs1;
+  if (not match( { "red", "blue" }, vt_rocs2) or not match(valueof(vt_rocs1), vt_rocs2)) 
+    { setverdict(fail, "record of charstring template incompatibility"); }
+
+  var template RoUS1 vt_rous1 := { "yellow", "green" };
+  var template RoUS2 vt_rous2 := vt_rous1;
+  if (not match( { "yellow", "green" }, vt_rous2) or not match(valueof(vt_rous1), vt_rous2)) 
+    { setverdict(fail, "record of universal charstring template incompatibility"); }
+
+  var template RoI1_opt vt_roi1_opt := { 1, 2 };
+  var template RoI2_opt vt_roi2_opt := vt_roi1_opt;
+  if (not match( { 1, 2 }, vt_roi2_opt) or not match(valueof(vt_roi1_opt), vt_roi2_opt)) 
+    { setverdict(fail, "record of integer template (optimized) incompatibility"); }
+
+  setverdict(pass);
+}
+
+// set of
+type set of integer SoI1;
+type set of integer SoI2;
+
+type set of boolean SoB1;
+type set of boolean SoB2;
+
+type set of float SoF1;
+type set of float SoF2;
+
+type set of bitstring SoBS1;
+type set of bitstring SoBS2;
+
+type set of hexstring SoHS1;
+type set of hexstring SoHS2;
+
+type set of octetstring SoOS1;
+type set of octetstring SoOS2;
+
+type set of charstring SoCS1;
+type set of charstring SoCS2;
+
+type set of universal charstring SoUS1;
+type set of universal charstring SoUS2;
+
+type set of integer SoI1_opt with { extension "optimize:memalloc" };
+type set of integer SoI2_opt with { extension "optimize:memalloc" };
+
+testcase tc_set_of_compat() runs on CT_Empty
+{
+  var SoI1 v_soi1 := { 1, 2 };
+  var SoI2 v_soi2 := v_soi1;
+  if (not match( { 1, 2 }, v_soi2) or v_soi1 != v_soi2) { setverdict(fail, "set of integer incompatibility"); }
+
+  var SoB1 v_sob1 := { true, false };
+  var SoB2 v_sob2 := v_sob1;
+  if (not match( { true, false }, v_sob2) or v_sob1 != v_sob2) { setverdict(fail, "set of boolean incompatibility"); }
+
+  var SoF1 v_sof1 := { 0.4, 9.6 };
+  var SoF2 v_sof2 := v_sof1;
+  if (not match( { 0.4, 9.6 }, v_sof2) or v_sof1 != v_sof2) { setverdict(fail, "set of float incompatibility"); }
+
+  var SoBS1 v_sobs1 := { '1101'B, '10101'B };
+  var SoBS2 v_sobs2 := v_sobs1;
+  if (not match( { '1101'B, '10101'B }, v_sobs2) or v_sobs1 != v_sobs2) { setverdict(fail, "set of bitstring incompatibility"); }
+
+  var SoHS1 v_sohs1 := { '1AF74'H, 'D000D'H };
+  var SoHS2 v_sohs2 := v_sohs1;
+  if (not match( { '1AF74'H, 'D000D'H }, v_sohs2) or v_sohs1 != v_sohs2) { setverdict(fail, "set of hexstring incompatibility"); }
+
+  var SoOS1 v_soos1 := { 'DEAD'O, '1BC5'O };
+  var SoOS2 v_soos2 := v_soos1;
+  if (not match( { 'DEAD'O, '1BC5'O }, v_soos2) or v_soos1 != v_soos2) { setverdict(fail, "set of octetstring incompatibility"); }
+
+  var SoCS1 v_socs1 := { "red", "blue" };
+  var SoCS2 v_socs2 := v_socs1;
+  if (not match( { "red", "blue" }, v_socs2) or v_socs1 != v_socs2) { setverdict(fail, "set of charstring incompatibility"); }
+
+  var SoUS1 v_sous1 := { "yellow", "green" };
+  var SoUS2 v_sous2 := v_sous1;
+  if (not match( { "yellow", "green" }, v_sous2) or v_sous1 != v_sous2) { setverdict(fail, "set of universal charstring incompatibility"); }
+
+  var SoI1_opt v_soi1_opt := { 1, 2 };
+  var SoI2_opt v_soi2_opt := v_soi1_opt;
+  if (not match( { 1, 2 }, v_soi2_opt) or v_soi1_opt != v_soi2_opt) { setverdict(fail, "set of integer (optimized) incompatibility"); }
+
+  setverdict(pass);
+}
+
+// set of template
+testcase tc_set_of_template_compat() runs on CT_Empty
+{
+  var template SoI1 vt_soi1 := { 1, 2 };
+  var template SoI2 vt_soi2 := vt_soi1;
+  if (not match( { 1, 2 }, vt_soi2) or not match(valueof(vt_soi1), vt_soi2)) 
+    { setverdict(fail, "set of integer template incompatibility"); }
+
+  var template SoB1 vt_sob1 := { true, false };
+  var template SoB2 vt_sob2 := vt_sob1;
+  if (not match( { true, false }, vt_sob2) or not match(valueof(vt_sob1), vt_sob2)) 
+    { setverdict(fail, "set of boolean template incompatibility"); }
+
+  var template SoF1 vt_sof1 := { 0.4, 9.6 };
+  var template SoF2 vt_sof2 := vt_sof1;
+  if (not match( { 0.4, 9.6 }, vt_sof2) or not match(valueof(vt_sof1), vt_sof2)) 
+    { setverdict(fail, "set of float template incompatibility"); }
+
+  var template SoBS1 vt_sobs1 := { '1101'B, '10101'B };
+  var template SoBS2 vt_sobs2 := vt_sobs1;
+  if (not match( { '1101'B, '10101'B }, vt_sobs2) or not match(valueof(vt_sobs1), vt_sobs2)) 
+    { setverdict(fail, "set of bitstring template incompatibility"); }
+
+  var template SoHS1 vt_sohs1 := { '1AF74'H, 'D000D'H };
+  var template SoHS2 vt_sohs2 := vt_sohs1;
+  if (not match( { '1AF74'H, 'D000D'H }, vt_sohs2) or not match(valueof(vt_sohs1), vt_sohs2)) 
+    { setverdict(fail, "set of hexstring template incompatibility"); }
+
+  var template SoOS1 vt_soos1 := { 'DEAD'O, '1BC5'O };
+  var template SoOS2 vt_soos2 := vt_soos1;
+  if (not match( { 'DEAD'O, '1BC5'O }, vt_soos2) or not match(valueof(vt_soos1), vt_soos2)) 
+    { setverdict(fail, "set of octetstring template incompatibility"); }
+
+  var template SoCS1 vt_socs1 := { "red", "blue" };
+  var template SoCS2 vt_socs2 := vt_socs1;
+  if (not match( { "red", "blue" }, vt_socs2) or not match(valueof(vt_socs1), vt_socs2)) 
+    { setverdict(fail, "set of charstring template incompatibility"); }
+
+  var template SoUS1 vt_sous1 := { "yellow", "green" };
+  var template SoUS2 vt_sous2 := vt_sous1;
+  if (not match( { "yellow", "green" }, vt_sous2) or not match(valueof(vt_sous1), vt_sous2)) 
+    { setverdict(fail, "set of universal charstring template incompatibility"); }
+
+  var template SoI1_opt vt_soi1_opt := { 1, 2 };
+  var template SoI2_opt vt_soi2_opt := vt_soi1_opt;
+  if (not match( { 1, 2 }, vt_soi2_opt) or not match(valueof(vt_soi1_opt), vt_soi2_opt)) 
+    { setverdict(fail, "set of integer template (optimized) incompatibility"); }
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_record_of_template_compat());
+  execute(tc_record_of_compat());
+  execute(tc_set_of_template_compat());
+  execute(tc_set_of_compat());
+}
+
+}

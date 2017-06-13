@@ -1,0 +1,234 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           //
+// Copyright Test Competence Center (TCC) ETH 2013                           //
+//                                                                           //
+// The copyright to the computer  program(s) herein  is the property of TCC. //
+// The program(s) may be used and/or copied only with the written permission //
+// of TCC or in accordance with  the terms and conditions  stipulated in the //
+// agreement/contract under which the program(s) has been supplied.          //
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:               IPL4asp_PortType.ttcn
+//  Rev:                R25A
+//  Prodnr:             CNL 113 531
+//  Updated:            2013-08-27
+//  Contact:            http://ttcn.ericsson.se
+//  Reference:
+
+module IPL4asp_PortType {
+
+  import from IPL4asp_Types all;
+
+  /* Listening on a local address, local port, protocol triplet
+     If the triplet is to be reused, then the ReuseAddr option has to be
+     specified in each usage in listen or connect.
+     In case of UDP the returned connection ID can also be used to send messages
+     to arbitrary destinations or it can be connected to a specific destination.
+     In case of TCP the incoming connection requests are automatically accepted,
+     and a connOpened event is sent with a new connection ID. */
+  external function f_IPL4_listen(
+    inout IPL4asp_PT portRef, 
+    in HostName locName,
+    in PortNumber locPort,
+    in ProtoTuple proto,
+    in OptionList options := {}
+  ) return Result;
+
+  /* A connection to a specific destination is created.
+     In case of UDP its purpose is to enable the use of the simpler send ASP.
+     connId returned by listen may be specified in case of UDP, otherwise it is
+     ignored. If connId is used, then the same ID is returned, otherwise a new
+     one is created.
+     If the local address, local port, protocol triplet is to be reused, then
+     the ReuseAddr option has to be specified in each usage in listen or
+     connect.
+  */
+  external function f_IPL4_connect(
+    inout IPL4asp_PT portRef,
+    in HostName remName,
+    in PortNumber remPort,
+    in HostName locName,
+    in PortNumber locPort,
+    in ConnectionId connId := -1,
+    in ProtoTuple proto,
+    in OptionList options := {}
+  ) return Result;
+
+  /* A list of options can be specified on global level or for a connection.
+     On global level an option can be given for one or for all protocols.
+     connId, proto or both may be omitted to indicate the desired level.
+     There are restrictions on which option may be specified on which level
+     and on which platform.
+  */
+  external function f_IPL4_setOpt(
+    inout IPL4asp_PT portRef,
+    in OptionList options,
+    in ConnectionId connId := -1,
+    in ProtoTuple proto := { unspecified := {} }
+  ) return Result;
+
+  external function f_IPL4_close(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in ProtoTuple proto := { unspecified := {} }
+  ) return Result;
+
+  external function f_IPL4_setUserData(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in UserData userData
+  ) return Result;
+
+  external function f_IPL4_getUserData(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    out UserData userData
+  ) return Result;
+
+  external function f_IPL4_getConnectionDetails(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in IPL4_Param IPL4param,
+    out IPL4_ParamResult IPL4paramResult  
+  ) return Result;
+
+  external function f_IPL4_send(
+    inout IPL4asp_PT portRef,
+    in ASP_Send asp,
+    out integer sent_octets
+  ) return Result;
+
+  external function f_IPL4_sendto(
+    inout IPL4asp_PT portRef,
+    in ASP_SendTo asp,
+    out integer sent_octets
+  ) return Result;
+
+  external function f_IPL4_StartTLS(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in boolean server_side:=false
+  ) return Result;
+
+  // stops the TLS layer of the connId. TCP/UDP layer will stay available
+  external function f_IPL4_StopTLS(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId
+  ) return Result;
+
+  /*// sets the SRTP protection profile to be negotiated during the handshake
+  // must be called before the handshake is performed
+  external function f_IPL4_setDtlsSrtpProfile(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in charstring dtlsSrtpProfiles
+  ) return Result;*/
+
+  // exports pl_keyLen bytes of TLS encrypted data using the pl_label and pl_context
+  // can be called after the SSL/TLS handshake is done (the shared secret is available)
+  external function f_IPL4_exportTlsKey(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in charstring pl_label,
+    in octetstring pl_context,
+    in integer pl_keyLen
+  ) return octetstring;
+
+  // see RFC 5705 / section 4.
+  external function f_IPL4_exportSrtpKeysAndSalts(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId
+  ) return IPL4_SrtpKeysAndSalts;
+
+  // see RFC 5705 / section 4.
+  external function f_IPL4_exportSctpKey(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId
+  ) return octetstring;
+
+  // returns the fingerprint of the locally configured certificate
+  // ssl_certificate_chain_file testport parameter
+  external function f_IPL4_getLocalCertificateFingerprint(
+    inout IPL4asp_PT portRef,
+    in IPL4_DigestMethods method,
+    in ConnectionId connId := -1,
+    in charstring certificate_file := ""
+  ) return charstring;
+
+  // returns the fingerprint of the peer certificate
+  external function f_IPL4_getPeerCertificateFingerprint(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId,
+    in IPL4_DigestMethods method
+  ) return charstring;
+
+  // returns the selected SRTP profile
+  external function f_IPL4_getSelectedSrtpProfile(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId
+  ) return charstring;
+
+  /* This function sets the user defined function to determine the message
+     length (boundary) in a TCP data stream.
+     The function can be set at global or connection level.
+     For global level the connId should be omitted or set set to -1.
+     The user function should return -1 for incomplete message when the size of
+     the whole message cannot be determined. A positive value: the message
+     length should be returned if it can be determined (even if not all bytes of
+     the message is received). In this case the message length is stored and the
+     user function is not called again for the given message.
+     If function is not set, then the length of the whole momentarily received
+     data is considered as the message length.
+  */
+  external function f_IPL4_setGetMsgLen(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId := -1,
+    inout f_getMsgLen f,
+    in ro_integer msgLenArgs
+  );
+
+  /* This function is only called when the kernel reports that the connection is
+     closed by the remote peer, before removing the databasa items from the testport
+     and reporting the connClosed to the TTCN layer.
+     The user function should return -1 for if the remaining received data on the
+     connection shall not be passed to the TTCN layer. A positive value: the
+     remaining data shall be passed to the TTCN layer.
+  */
+  external function f_IPL4_setGetMsgLen_forConnClosedEvent(
+    inout IPL4asp_PT portRef,
+    in ConnectionId connId := -1,
+    inout f_getMsgLen f,
+    in ro_integer msgLenArgs
+  );
+
+
+  /* This function provides a simple message length calculation functionality.
+     It handles a fixe sized length field in a fixed position.
+     The args shlould be a list of 5 integer values
+       args[0]:  The offset of the length field from the begining of the message in octets
+       args[1]:  The size of the length field in octets
+       args[2]:  The offset of the value of the length fields
+       args[3]:  The multiplier of the length field value. The actual length is the multipliation of the multiplier and the length field value in octets
+       args[4]:  The endianess of length field. 1-Little endian, 0-Big endian
+  */
+
+  external function f_IPL4_fixedMsgLen(in octetstring stream, inout ro_integer args) return integer;
+
+  /* Tne general purpose transport layer TestPort can be used to send and
+     receive messages with the communication ASP.
+     The send ASP can be used to send 
+     Asyncronous event notification occures via the event ASP. E.g. if any
+     of the connections is closed, a connection closed event is sent to
+     inform the user that the user-connection mapping may have to be updated
+     accordingly.
+  */
+  type port IPL4asp_PT message {
+    out ASP_SendTo
+    out ASP_Send
+    in ASP_RecvFrom
+    in ASP_Event
+  } with {extension "provider"}
+
+} // IPL4asp_PortType
+

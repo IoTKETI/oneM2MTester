@@ -1,0 +1,155 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txerstring {
+
+modulepar boolean Txerstring_verbose := false;
+#define verbose Txerstring_verbose
+
+#include "../macros.ttcnin"
+
+import from AsnValues all;
+external function flatten(inout universal charstring par) ;
+
+DECLARE_XER_ENCODERS( charstring,string);
+DECLARE_EXER_ENCODERS(charstring,string)
+DECLARE_XER_ENCODERS(   rstring, rstring);
+DECLARE_EXER_ENCODERS(  rstring, rstring);
+DECLARE_XER_ENCODERS(   ustring, ustring);
+DECLARE_EXER_ENCODERS(  ustring, ustring);
+
+type component Tstring{}
+
+type record rstring {
+  charstring s optional
+}
+
+type union ustring {
+  charstring s
+}
+
+function test_escape(in charstring source, in charstring escaped)
+{
+  var universal charstring expected := "<CHARSTRING>" & escaped & "</CHARSTRING>\n";
+  CHECK_METHOD(cxer_enc_string, source, expected);
+  CHECK_METHOD(bxer_enc_string, source, expected & lf);
+  CHECK_METHOD(exer_enc_string, source, expected & lf);
+}
+
+testcase encode_string_plain() runs on Tstring
+{
+  var charstring plain := "Foo";
+  var universal charstring expected := "<CHARSTRING>Foo</CHARSTRING>\n";
+  CHECK_METHOD(cxer_enc_string, plain, expected);
+  CHECK_METHOD(bxer_enc_string, plain, expected & lf);
+  CHECK_METHOD(exer_enc_string, plain, expected & lf);
+
+  plain := "Vaettir"; // this was meant to use &aelig;
+  expected := "<CHARSTRING>Vaettir</CHARSTRING>\n";
+  CHECK_METHOD(cxer_enc_string, plain, expected);
+  CHECK_METHOD(bxer_enc_string, plain, expected & lf);
+  CHECK_METHOD(exer_enc_string, plain, expected & lf);
+}
+
+testcase encode_string_escapes() runs on Tstring
+{
+  var charstring left := "<";
+  var charstring html_escaped := "&lt;";
+  test_escape(left, html_escaped);
+
+  left := "<html";
+  html_escaped := "&lt;html";
+  test_escape(left, html_escaped);
+
+  left := left & ">";
+  html_escaped := "&lt;html&gt;";
+  test_escape(left, html_escaped);
+
+  left := html_escaped; // "double-escaping"
+  html_escaped := "&amp;lt;html&amp;gt;";
+  test_escape(left, html_escaped);
+}
+
+testcase encode_string_empty() runs on Tstring
+{
+  var charstring empty := "";
+  var universal charstring expected := "<CHARSTRING/>\n";
+  CHECK_METHOD(cxer_enc_string, empty, expected);
+  CHECK_METHOD(bxer_enc_string, empty, expected & lf);
+  CHECK_METHOD(exer_enc_string, empty, expected & lf);
+
+  var rstring rec;
+  rec.s := omit;
+
+  expected := "<rstring/>\n\n";
+  var octetstring bytes;
+  bytes := bxer_enc_rstring(rec);
+  var  universal charstring result;
+  var integer rv := o2u("UTF-8", bytes, result);
+  COMPARE(result, expected);
+
+  bytes := cxer_enc_rstring(rec);
+  rv := o2u("UTF-8", bytes, result);
+  flatten(expected);
+  COMPARE(result, expected & lf);
+
+  rec.s := "Foo";
+  expected := "<rstring>\n\t<s>Foo</s>\n</rstring>\n\n";
+
+  bytes := bxer_enc_rstring(rec);
+  var universal charstring foo;
+  rv := o2u("UTF-8", bytes, foo);
+  COMPARE(foo, expected);
+  flatten(expected);
+  bytes := cxer_enc_rstring(rec);
+  rv := o2u("UTF-8", bytes, foo);
+  COMPARE(foo, expected & lf);
+}
+
+//testcase encode_string_plain() runs on Tstring
+//{}
+
+const charstring us0 := "<ustring>\n\t<s/>\n</ustring>\n\n";
+
+testcase encode_string_choice() runs on Tstring
+{
+    var ustring rec := { s := "" }
+    var universal charstring expected;
+
+    expected := us0;
+    CHECK_METHOD(bxer_enc_ustring, rec, expected);
+    CHECK_METHOD(exer_enc_ustring, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_ustring, rec, expected & lf);
+
+    rec.s := "Hello!"; // not omit anymore
+    expected := "<ustring>\n\t<s>Hello!</s>\n</ustring>\n\n";
+    CHECK_METHOD(bxer_enc_ustring, rec, expected);
+    CHECK_METHOD(exer_enc_ustring, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_ustring, rec, expected & lf);
+}
+
+
+
+control {
+  execute( encode_string_plain() );
+  execute( encode_string_escapes() );
+  execute( encode_string_empty() );
+  execute( encode_string_choice() );
+}
+
+}
+with {
+  encode "XML"
+  extension "version R8Z"
+}

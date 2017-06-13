@@ -1,0 +1,1168 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module TunionOper {
+// ********** Type definitions  *********************
+type component unionOper_mycomp {};
+type enumerated unionOper_myenum {xx1,xx2,xx3};
+type record unionOper_trecord {
+	integer x1 optional,
+	float x2 };
+type record of octetstring unionOper_trecof;
+type set unionOper_tset {
+	integer x1,
+	float x2 optional };
+type set of charstring unionOper_tsetof;
+type union unionOper_tunion {
+	integer x1,
+	float x2 };
+type union unionOper_myunion1 {integer x1, float x2}; 	// union of basic types
+type union unionOper_myunion2 {  // union of enum
+	unionOper_myenum x1,
+	integer x2};
+type union unionOper_myunion3 {  // union of record
+	unionOper_trecord x1,
+	integer x2};
+type union unionOper_myunion4 { // union of record of
+	unionOper_trecof x1,
+	integer x2};
+type union unionOper_myunion5 {  // union of set
+	unionOper_tset x1,
+	integer x2};
+type union unionOper_myunion6 { // union of set of
+	unionOper_tsetof x1,
+	integer x2};
+type union unionOper_myunion7 { // union of union
+	unionOper_tunion x1,
+	integer x2};
+type union unionOper_myunion8 { // union of same types
+	integer x1,
+	integer x2};
+	type union typedefunionComp_myunion {
+	unionOper_trecord x1,
+	unionOper_trecof x2,
+	unionOper_tset x3,
+	unionOper_tsetof x4,
+	unionOper_tunion x5,
+	integer x6[3]
+	};
+// *************** Constanst ***********************
+//const unionOper_trecord unionOper_temp1:={ x1:=omit, x2:=3.4 };
+//const unionOper_trecof unionOper_temp2:={ 'AF12'O };
+//const unionOper_tset unionOper_temp3:={ x1:=234, x2:=1.9};
+//const unionOper_tsetof unionOper_temp4:={"f","8"};
+//const unionOper_tunion unionOper_temp5:={ x2:=1.3 };
+const unionOper_myunion1 unionOper_const1:={	//union with basic types
+	x1:=1 };
+const unionOper_myunion2 unionOper_const2:={	//union with enum
+  x1:=xx1 };
+const unionOper_myunion3 unionOper_const4:={   //union from record
+  x1:={ x1:=1, x2:=1.2 } };
+const unionOper_myunion4 unionOper_const6:={   //union from record of
+ x1:={ '12AB'O, 'CD12'O } };
+const unionOper_myunion5 unionOper_const8:={   //union from set
+ x1:={ x1:=2, x2:=1.3} };
+const unionOper_myunion6 unionOper_const10:={   //union from set of
+ x1:={"a","b"} };
+const unionOper_myunion7 unionOper_const12:={   //union from union
+ x1:={ x1 :=3 } };
+const typedefunionComp_myunion unionOper_const13:= { x1:={ x1:=1, x2:=1.2 }};
+const typedefunionComp_myunion unionOper_const14:= { x2:={ '12AB'O, 'CD12'O }};
+const typedefunionComp_myunion unionOper_const15:= { x3:={ x1:=2, x2:=1.3 }};
+const typedefunionComp_myunion unionOper_const16:= { x4:={ "a", "b", "c" }};
+const typedefunionComp_myunion unionOper_const17:= { x5:={ x1 :=3 }};
+const typedefunionComp_myunion unionOper_const18:= { x6:={ 1,2,3}};
+
+testcase unionAssign() runs on unionOper_mycomp{
+var unionOper_myunion1 x1:={	//union with basic types
+  x1:=1};
+var unionOper_myunion1 x2,x3;
+x2:={ x2:=1.2 };
+if (x1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==1.2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignEnum() runs on unionOper_mycomp{
+var unionOper_myunion2 x1:={	//union with enum
+  x1:=xx1};
+var unionOper_myunion2 x2;
+x2:={ x1:=xx2 };
+if (x1.x1==xx1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1==xx2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignRec() runs on unionOper_mycomp{
+//var unionOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var unionOper_myunion3 x1:={   //union from record
+ x1:={ x1:=1, x2:=1.2 } };
+var unionOper_myunion3 x2;
+x2:={ x1:={ x1:=1, x2:=1.2 } };
+if (x1.x1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignRecof() runs on unionOper_mycomp{
+//var unionOper_trecof temp2:={'AF12'O};
+var unionOper_myunion4 x1:={   //union from record of
+ x1:={ '12AB'O, 'CD12'O } };
+var unionOper_myunion4 x2;
+x2:={  x1:={ '12AB'O, 'CD12'O } };
+if (x1.x1[0]=='12AB'O) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=='12AB'O) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase unionAssignSet() runs on unionOper_mycomp{
+//var unionOper_tset temp1:={ x1:=2, x2:=omit };
+var unionOper_myunion5 x1:={   //union from record
+ x1:={ x1:=1, x2:=1.2 } };
+var unionOper_myunion5 x2;
+x2:={   x1:={ x1:=1, x2:=1.2 } };
+if (x1.x1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignSetof() runs on unionOper_mycomp{
+//var unionOper_tsetof temp2:={"a","7"};
+var unionOper_myunion6 x1:={   //union from set of
+ x1:={ "1", "a" } };
+var unionOper_myunion6 x2;
+x2:={  x1:={ "1", "a" } };
+if (x1.x1[0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignUnion() runs on unionOper_mycomp{
+var unionOper_tunion temp5 := {x2:=1.3}
+var unionOper_myunion7 x1:={   //union from union
+ x1:={ x1 :=3 } };
+var unionOper_myunion7 x2;
+x2:={ x1:={ x1 :=3 } };
+if (x1.x1.x1==3) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==3) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElem() runs on unionOper_mycomp{
+var unionOper_myunion1 x1, x2;	//union with basic types
+x1:={ x1:=1 };
+x2:= {x1:=2}
+x1.x1:=3;		// change value
+x2.x2:=3.2;		//choose other
+if (x1.x1==3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3.2) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElemEnum() runs on unionOper_mycomp{
+var unionOper_myunion2 x1, x2;	//union with enum
+x1:={ x1:=xx1 };
+x2:= {x1:=xx2}
+x1.x1:=xx3;		// change value
+x2.x2:=3;		//choose other
+if (x1.x1==xx3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElemRec() runs on unionOper_mycomp{
+//var unionOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var unionOper_myunion3 x1,x2;	//union from record
+x1:={   x1:={ x1:=1, x2:=1.2 } };
+x2:={   x1:={ x1:=1, x2:=1.2 } };
+x1.x1.x1:=2;		//change value
+x2.x2:=2;		//change selection
+if (x1.x1.x1==2) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElemRecof() runs on unionOper_mycomp{
+//var unionOper_trecof temp2:={'AF12'O};
+var unionOper_myunion4 x1,x2;    //union from record of
+x1:={ x1:={ '12AB'O, 'CD12'O } };
+x2:={ x1:={ '12AB'O, 'CD12'O } };
+x1.x1[1]:='34AB'O;	//change value
+x2.x2:=2;		//change selection
+if (x1.x1[0]=='12AB'O) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1[1]=='34AB'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase unionAssignElemSet() runs on unionOper_mycomp{
+//var unionOper_tset temp1:={ x1:=2, x2:=omit };
+var unionOper_myunion5 x1,x2;   //union from record
+x1:= { x1:={ x1:=1, x2:=1.2 } };
+x2:= { x1:={ x1:=1, x2:=1.2 } };
+x1.x1.x2:=3.4;			//change value
+x2.x2:=3;			//change selection
+if (x1.x1.x1==1) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1.x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElemSetof() runs on unionOper_mycomp{
+//var unionOper_tsetof temp2:={"a","7"};
+var unionOper_myunion6 x1,x2;   //union from record of
+x1:={ x1:={ "1", "a" } };
+x2:={ x2:=1 };
+x1.x1[0]:="h";		//change value
+x2.x1:={ "1", "a" };		//change selection
+if (x1.x1[0]=="h") {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=="1") {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (x2.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionAssignElemUnion() runs on unionOper_mycomp{
+//var unionOper_tunion temp5 := {x2:=1.3}
+var unionOper_myunion7 x1,x2;   //union from union
+x1:={ x1:={ x1 :=3 } };
+x2:={ x2:=2 };
+x1.x1.x2:=3.4;			//change value
+x2.x1:={ x2 :=3.4 };		//change selection
+if (x1.x1.x2==3.4) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x1.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x2==3.4) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x1.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase unionConst() runs on unionOper_mycomp{
+const unionOper_myunion1 const1:={	//union with basic types
+ x1:=1 };
+if (unionOper_const1.x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(unionOper_const1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1.x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionConstEnum() runs on unionOper_mycomp{
+const unionOper_myunion2 const2:={	//union with enum
+ x1:=xx1 };
+if (unionOper_const2.x1==xx1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(unionOper_const2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const2.x1==xx1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionConstRec() runs on unionOper_mycomp{
+const unionOper_myunion3 const4:={   //union from record
+ x1:={ x1:=1, x2:=1.2 } };
+if (unionOper_const4.x1.x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (unionOper_const4.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(unionOper_const4.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const4.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4.x1.x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const4.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const4.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const4.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionConstRecof() runs on unionOper_mycomp{
+const unionOper_myunion4 const6:={   //union from record of
+ x1:={ '12AB'O, 'CD12'O } };
+if (unionOper_const6.x1[0]=='12AB'O) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (unionOper_const6.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(unionOper_const6.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const6.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6.x1[0]=='12AB'O) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const6.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const6.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const6.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase unionConstSet() runs on unionOper_mycomp{
+const unionOper_myunion5 const8:={   //union from set
+ x1:={ x1:=2, x2:=1.3} };
+if (unionOper_const8.x1.x1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (unionOper_const8.x1.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(unionOper_const8.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const8.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const8.x1.x1==2) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const8.x1.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const8.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const8.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionConstSetof() runs on unionOper_mycomp{
+const unionOper_myunion6 const10:={   //union from set of
+ x1:={"a","b"} };
+if (unionOper_const10.x1[0]=="a") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (unionOper_const10.x1[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(unionOper_const10.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const10.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10.x1[0]=="a") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const10.x1[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const10.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const10.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionConstUnion() runs on unionOper_mycomp{
+const unionOper_myunion7 const12:={   //union from union
+ x1:={ x1 :=3 } };
+if (unionOper_const12.x1.x1==3) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(unionOper_const12.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const12.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(unionOper_const12.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(unionOper_const12.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const12.x1.x1==3) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const12.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const12.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionComp() runs on unionOper_mycomp{
+var unionOper_myunion1 x1,x2,x3,x4;
+x1:={ x1:=1  };
+x2:={ x1:=1 };
+x3:={ x1:=2 };		// different value
+x4:={ x2:=1.2 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase unionCompSame() runs on unionOper_mycomp{
+var unionOper_myunion8 x1,x2;
+x1:={ x1:=1  };			// same value, different selection
+x2:={ x2:=1 };
+if (x1!=x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase unionCompEnum() runs on unionOper_mycomp{
+var unionOper_myunion2 x1,x2,x3,x4;
+x1:={ x1:=xx1  };
+x2:={ x1:=xx1 };
+x3:={ x1:=xx2 };		// different value
+x4:={ x2:=1 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase unionCompRec() runs on unionOper_mycomp{
+//var unionOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var unionOper_myunion3 x1,x2,x3,x4;
+x1 :={  x1:={ x1:=1, x2:=1.2 } };
+x2 :={  x1:={ x1:=1, x2:=1.2 } };
+x3 :={  x1:={ x1:=2, x2:=1.2 } }; // different value
+x4 :={  x2:=1 }; // different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase unionCompRecof() runs on unionOper_mycomp{
+//var unionOper_trecof temp2:={'AF12'O};
+var unionOper_myunion4 x1,x2,x3,x4;	//union from record of
+x1:={  x1:={ '12AB'O, 'CD12'O } };
+x2:={  x1:={ '12AB'O, 'CD12'O } };
+x3:={  x1:={ '12AB'O } };		//different value
+x4:={  x2:=12 };		//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase unionCompSet() runs on unionOper_mycomp{
+//var unionOper_tset temp1:={ x1:=2, x2:=omit };
+var unionOper_myunion5 x1,x2,x3,x4; // union from set
+x1:={ x1:={ x1:=1, x2:=1.2 } };
+x2:={ x1:={ x1:=1, x2:=1.2 } };
+x3:={ x1:={ x1:=4, x2:=1.2 } }; // different value
+x4:={ x2:=4 }; 			// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase unionCompSetof() runs on unionOper_mycomp{
+//var unionOper_tsetof temp2:={"a","7"};
+var unionOper_myunion6 x1,x2,x3,x4;	//union from record of
+x1:={ x1:={ "1", "a" } };
+x2:={ x1:={ "1", "a" } };
+x3:={ x1:={ "1", "a", "k" } };	//different value
+x4:={ x2:=2 };			//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase unionCompUnion() runs on unionOper_mycomp{
+var unionOper_tunion temp5 := {x2:=1.3}
+var unionOper_myunion7 x1,x2,x3,x4;	// union form union
+x1:={  x1:={ x1 :=3 } };
+x2:={  x1:={ x1 :=3 } };
+x3:={  x1:={ x2 :=3.9 } };		//different value
+x4:={  x2:=3 };				//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+type union myu1 {
+  integer f1 (0..255),
+  charstring f2 length(0..255)
+}
+type myu1 myu2
+type myu1 myu3 ({ f1 := 0 }, { f1 := 1 }, { f2 := "" })
+type myu1 myu4 (myu3)
+
+function f_u1() return myu3 {
+  var myu1 v_myu1 := { f1 := 0 }
+  var myu2 v_myu2 := { f2 := "" }
+  if (v_myu1 == v_myu2) { return v_myu1 }
+  else { return v_myu2 }
+}
+
+testcase unionSubtypes() runs on unionOper_mycomp {
+  var template myu1 vt_myu1 := { f1 := 0 }  // Restricted fields.
+  var template myu4 vt_myu2 := { f2 := "" }  // Type list.
+  var myu1 v_myu1 := { f2 := "0" }
+  var myu4 v_myu2 := { f2 := "" }
+
+  if (valueof(vt_myu1.f1) == str2int(v_myu1.f2) and v_myu2 == valueof(vt_myu2)) { setverdict(pass) }
+  else { setverdict(fail) }
+  if (f_u1() != f_u1()) { setverdict(fail) }
+  else { setverdict(pass) }
+}
+
+testcase unionIsvalue() runs on unionOper_mycomp{
+  var unionOper_tunion u0;
+  var unionOper_tunion u1 := { x1 := 1 };
+  var unionOper_tunion u2;
+  u2.x2 := 1.0;
+  var unionOper_tunion u3 := { x2 := 1.0 };
+  if ( isvalue(u0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(u1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(u2) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(u3) ) { setverdict(pass); } else { setverdict(fail); };
+
+  template unionOper_tunion t_union1 := { x1:= 1 }
+  template unionOper_tunion t_union2 := * ;
+  template unionOper_tunion t_union3 := { x1 := (1,2,3) }
+  template unionOper_tunion t_union4 := { x1 := ? }
+
+  if ( isvalue(t_union1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(t_union1.x1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(t_union2) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(t_union3) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(t_union3.x1) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(t_union4) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(t_union4.x1) ) { setverdict(fail); } else { setverdict(pass); };
+
+  if ( isvalue(modifies t_union1 := { x2 := 33.0 }) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(modifies t_union1 := { x2 := ? }) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase unionIsbound() runs on unionOper_mycomp{
+  var unionOper_tunion u0;
+  var unionOper_tunion u1 := { x1 := 1 };
+  var unionOper_tunion u2;
+  u2.x2 := 1.0;
+  var unionOper_tunion u3 := { x2 := 1.0 };
+  if ( isbound(u0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u0.x1) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u0.x2) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(u1.x1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(u1.x2) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u2) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(u2.x1) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u2.x2) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(u3) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(u3.x1) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(u3.x2) ) { setverdict(pass); } else { setverdict(fail); };
+
+  template unionOper_tunion t_union1 := { x1:= 1 }
+  template unionOper_tunion t_union2 := * ;
+  template unionOper_tunion t_union3 := { x1 := (1,2,3) }
+  template unionOper_tunion t_union4 := { x1 := ? }
+
+  if ( isbound(t_union1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union1.x1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union2) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union3) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union3.x1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union4) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(t_union4.x1) ) { setverdict(pass); } else { setverdict(fail); };
+
+  if ( isbound(modifies t_union1 := { x2 := 33.0 }) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(modifies t_union1 := { x2 := ? }) ) { setverdict(pass); } else { setverdict(fail); };
+}
+
+type record of charstring ROC;
+type record of integer  ROI;
+type record MyRecord1 {
+  integer       i optional,
+  float         x optional,
+  charstring    c
+}
+
+type union MyUnion1 {
+  ROC roc,
+  integer i,
+  ROI roi,
+  MyRecord1 r
+}
+
+const MyUnion1 c_myunion1:= { roc:= { "1aa", "2bb", "3cc"}}
+const MyUnion1 c_myunion2:= { i:= 5}
+
+testcase tc_unionOfRecordOfs1() runs on unionOper_mycomp {
+  var MyUnion1 vl_u:= c_myunion1;
+  if(isbound(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc)){setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc[0])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[1])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[2])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[3])){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.roc[99])){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.i)){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.roi)){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.roi[0])){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+  log(vl_u.roc);
+}
+
+testcase tc_unionOfRecordOfs2() runs on unionOper_mycomp {
+  var MyUnion1 vl_u:= c_myunion2;
+  if(isbound(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roc[0])){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roc[1])){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roc[2])){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roc[3])){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roc[99])){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.r)){setverdict(fail)} else {setverdict(pass)};
+  if(isbound(vl_u.r.i)){setverdict(fail)} else {setverdict(pass)};
+  if(isbound(vl_u.r.x)){setverdict(fail)} else {setverdict(pass)};
+  if(isbound(vl_u.r.c)){setverdict(fail)} else {setverdict(pass)};
+  //checks if the selected item remained the same
+  if(isbound(vl_u.i)){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roi)){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roi[0])){setverdict(fail)}else {setverdict(pass)}
+  if(isbound(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+}
+
+
+// testcase tc_compilationerror1() runs on unionOper_mycomp {
+//   var MyUnion1 vl_u:= c_myunion2;
+//   if(isbound(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+//   if(isbound(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+//   if(isbound(vl_u.roc[0])){setverdict(fail)}else {setverdict(pass)} 
+//   if(isbound(vl_u.r.x)){setverdict(fail)}else {setverdict(pass)} 
+//   if(isbound(vl_u.roc[99])){setverdict(fail)} else {setverdict(pass)} 
+// }
+
+
+  
+testcase tc_union_modify() runs on unionOper_mycomp {
+  var MyUnion1 vl_u:= c_myunion2;
+  if(isbound(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+  if(isbound(vl_u.roi)){setverdict(fail)} else {setverdict(pass)}  
+
+  vl_u:=c_myunion1;
+  if(isbound(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc)){setverdict(pass)} else {setverdict(fail)}
+  if(isbound(vl_u.roc[0])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[1])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[2])){setverdict(pass)}else {setverdict(fail)}
+  if(isbound(vl_u.roc[3])){setverdict(fail)}
+  if(isbound(vl_u.roc[99])){setverdict(fail)}
+  if(isbound(vl_u.i)){setverdict(fail)}
+  if(isbound(vl_u.roi)){setverdict(fail)}
+  if(isbound(vl_u.roi[0])){setverdict(fail)}
+  if(isbound(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+  log(vl_u.roc);
+}
+//expected:error
+testcase tc_sideeffect1() runs on unionOper_mycomp {
+  var MyUnion1 vl_u:= c_myunion1;    // { roc:= { "1aa", "2bb", "3cc"}}
+  if(isbound(vl_u.roc[3])){setverdict(fail)}else {setverdict(pass)}
+  if(ispresent(vl_u.roc[3])){setverdict(fail)}else {setverdict(pass)}
+}
+
+//expected:error
+testcase tc_sideeffect2() runs on unionOper_mycomp {
+  var MyUnion1 vl_u:= c_myunion1;  // { roc:= { "1aa", "2bb", "3cc"}}
+  var integer vl_oldsize:=0, vl_newsize:=0;
+  vl_oldsize:=sizeof(vl_u.roc);
+
+  if(isbound(vl_u.i)){setverdict(fail)}else {setverdict(pass)}  
+
+  if(isbound(vl_u.roc)) {setverdict(pass)}else {setverdict(fail)}
+
+  //checks if  size is unchenged  
+  if(isbound(vl_u.roc[4])) {setverdict(fail)}else {setverdict(pass)}
+  vl_newsize:=sizeof(vl_u.roc);
+  if(vl_newsize == vl_oldsize) {setverdict(pass)}else {setverdict(fail)}
+  //log(vl_u.i);
+}
+
+  testcase tc_unionOfRecordOfs1_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion1;
+    if(ispresent(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  }
+  
+  testcase tc_unionOfRecordOfs2_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion1;
+    if(ispresent(vl_u.roc)){setverdict(pass)} else {setverdict(fail)}
+    if(ispresent(vl_u.roc[0])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[1])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[2])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[3])){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.roc[99])){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.i)){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.roi)){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.roi[0])){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+    log(vl_u.roc);
+  }
+
+  testcase tc_unionOfRecordOfs3_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion2;
+    if(ispresent(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+    if(ispresent(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roc[0])){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roc[1])){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roc[2])){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roc[3])){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roc[99])){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.r)){setverdict(fail)} else {setverdict(pass)};
+    if(ispresent(vl_u.r.i)){setverdict(fail)} else {setverdict(pass)};
+    if(ispresent(vl_u.r.x)){setverdict(fail)} else {setverdict(pass)};
+    if(ispresent(vl_u.r.c)){setverdict(fail)} else {setverdict(pass)};
+    //checks if the selected item remained the same
+    if(ispresent(vl_u.i)){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roi)){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roi[0])){setverdict(fail)}else {setverdict(pass)}
+    if(ispresent(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+  }
+
+
+  // testcase tc_compilationerror1() runs on unionOper_mycomp {
+  //   var MyUnion1 vl_u:= c_myunion2;
+  //   if(ispresent(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+  //   if(ispresent(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+  //   if(ispresent(vl_u.roc[0])){setverdict(fail)}else {setverdict(pass)} 
+  //   if(ispresent(vl_u.r.x)){setverdict(fail)}else {setverdict(pass)} 
+  //   if(ispresent(vl_u.roc[99])){setverdict(fail)} else {setverdict(pass)} 
+  // }
+
+
+
+  testcase tc_union_modify_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion2;
+    if(ispresent(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+    if(ispresent(vl_u.roc)){setverdict(fail)} else {setverdict(pass)}
+    if(ispresent(vl_u.roi)){setverdict(fail)} else {setverdict(pass)}  
+
+    vl_u:=c_myunion1;
+    if(ispresent(vl_u)) {setverdict(pass)} else {setverdict(fail)}
+    if(ispresent(vl_u.roc)){setverdict(pass)} else {setverdict(fail)}
+    if(ispresent(vl_u.roc[0])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[1])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[2])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[3])){setverdict(fail)}
+    if(ispresent(vl_u.roc[99])){setverdict(fail)}
+    if(ispresent(vl_u.i)){setverdict(fail)}
+    if(ispresent(vl_u.roi)){setverdict(fail)}
+    if(ispresent(vl_u.roi[0])){setverdict(fail)}
+    if(ispresent(vl_u.roi[1])){setverdict(fail)} else {setverdict(pass)}
+    log(vl_u.roc);
+  }
+  //expected:error
+  testcase tc_sideeffect1_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion1;    // { roc:= { "1aa", "2bb", "3cc"}}
+    if(ispresent(vl_u.roc[2])){setverdict(pass)}else {setverdict(fail)}
+    if(ispresent(vl_u.roc[3])){setverdict(fail)}else {setverdict(pass)}
+  }
+
+  //expected:error
+  testcase tc_sideeffect2_ispresent() runs on unionOper_mycomp {
+    var MyUnion1 vl_u:= c_myunion1;  // { roc:= { "1aa", "2bb", "3cc"}}
+    var integer vl_oldsize:=0, vl_newsize:=0;
+    vl_oldsize:=sizeof(vl_u.roc);
+
+    if(ispresent(vl_u.i)){setverdict(fail)}else {setverdict(pass)}  
+
+    if(ispresent(vl_u.roc)) {setverdict(pass)}else {setverdict(fail)}
+
+    //checks if  size is unchenged  
+    if(ispresent(vl_u.roc[4])) {setverdict(fail)}else {setverdict(pass)}
+    vl_newsize:=sizeof(vl_u.roc);
+    if(vl_newsize == vl_oldsize) {setverdict(pass)}else {setverdict(fail)}
+    //log(vl_u.i);
+  }
+  
+type set InnerSet {
+  integer num,
+  charstring str
+}
+
+type record InnerRec {
+  integer num,
+  charstring str
+}
+
+type union InnerUni {
+  InnerSet s,
+  InnerRec r
+}
+
+type record Outer {
+  InnerUni uni1 optional,
+  InnerUni uni2,
+  record of InnerUni unis
+}
+
+modulepar Outer mp;
+
+// Test case for artf703093 : A union with an unbound alternative should itself be unbound
+// All unions in the module parameter and the variable declared in the test case should
+// be unbound (instead of being bound with an unbound alternative).
+// Copying the record containing the unions should be possible, too, without errors.
+testcase tc_union_with_unbound_alternative() runs on unionOper_mycomp {
+  if (isbound(mp.uni1)) {
+    setverdict(fail, "mp.uni1 is bound: ", mp.uni1);
+  }
+  if (isbound(mp.uni2)) {
+    setverdict(fail, "mp.uni2 is bound: ", mp.uni2);
+  }
+  if (isbound(mp.unis[0])) {
+    setverdict(fail, "mp.unis[0] is bound: ", mp.unis[0]);
+  }
+  if (isbound(mp.unis[1])) {
+    setverdict(fail, "mp.unis[1] is bound: ", mp.unis[1]);
+  }
+
+  var Outer x := {
+    uni1 := { r := { num := -, str := - } },
+    uni2 := { s := { num := -, str := - } },
+    unis := {
+      { r := { num := -, str := - } },
+      { s := { num := -, str := - } }
+    }
+  };
+  if (isbound(x.uni1)) {
+    setverdict(fail, "x.uni1 is bound: ", x.uni1);
+  }
+  if (isbound(x.uni2)) {
+    setverdict(fail, "x.uni2 is bound: ", x.uni2);
+  }
+  if (isbound(x.unis[0])) {
+    setverdict(fail, "x.unis[0] is bound: ", x.unis[0]);
+  }
+  if (isbound(x.unis[1])) {
+    setverdict(fail, "x.unis[1] is bound: ", x.unis[1]);
+  }
+
+  var Outer copy := x;
+  if (isbound(copy.uni1)) {
+    setverdict(fail, "copied x.uni1 is bound: ", copy.uni1);
+  }
+  if (isbound(copy.uni2)) {
+    setverdict(fail, "copied x.uni2 is bound: ", copy.uni2);
+  }
+  if (isbound(copy.unis[0])) {
+    setverdict(fail, "copied x.unis[0] is bound: ", copy.unis[0]);
+  }
+  if (isbound(copy.unis[1])) {
+    setverdict(fail, "copied x.unis[1] is bound: ", copy.unis[1]);
+  }
+
+  copy := mp;
+  if (isbound(copy.uni1)) {
+    setverdict(fail, "copied mp.uni1 is bound: ", copy.uni1);
+  }
+  if (isbound(copy.uni2)) {
+    setverdict(fail, "copied mp.uni2 is bound: ", copy.uni2);
+  }
+  if (isbound(copy.unis[0])) {
+    setverdict(fail, "copied mp.unis[0] is bound: ", copy.unis[0]);
+  }
+  if (isbound(copy.unis[1])) {
+    setverdict(fail, "copied mp.unis[1] is bound: ", copy.unis[1]);
+  }
+  setverdict(pass);
+}
+
+control {
+ const typedefunionComp_myunion cl_1:= { x1:={ x1:=1, x2:=1.2 }}; // constant in control part
+ const typedefunionComp_myunion cl_2:= { x2:={ '12AB'O, 'CD12'O }};
+ const typedefunionComp_myunion cl_3:= { x3:={ x1:=2, x2:=1.3 }};
+ const typedefunionComp_myunion cl_4:= { x4:={ "a", "b", "c" }};
+ const typedefunionComp_myunion cl_5:= { x5:={ x1 :=3 }};
+ const typedefunionComp_myunion cl_6:= { x6:={ 1,2,3}};
+ var typedefunionComp_myunion vl_1; // variable in control part
+ var typedefunionComp_myunion vl_2;
+ var typedefunionComp_myunion vl_3;
+ var typedefunionComp_myunion vl_4;
+ var typedefunionComp_myunion vl_5;
+ var typedefunionComp_myunion vl_6;
+
+ execute(unionAssign());
+ execute(unionAssignEnum());
+ execute(unionAssignRec());
+ execute(unionAssignRecof());
+ execute(unionAssignSet());
+ execute(unionAssignSetof());
+ execute(unionAssignUnion());
+ execute(unionAssignElem());
+ execute(unionAssignElemEnum());
+ execute(unionAssignElemRec());
+ execute(unionAssignElemRecof());
+ execute(unionAssignElemSet());
+ execute(unionAssignElemSetof());
+ execute(unionAssignElemUnion());
+ execute(unionConst());
+ execute(unionConstEnum());
+ execute(unionConstRec());
+ execute(unionConstRecof());
+ execute(unionConstSet());
+ execute(unionConstSetof());
+ execute(unionConstUnion())
+ execute(unionComp());
+ execute(unionCompSame());
+ execute(unionCompEnum());
+ execute(unionCompRec());
+ execute(unionCompRecof());
+ execute(unionCompSet());
+ execute(unionCompSetof());
+ execute(unionCompUnion());
+ execute(unionSubtypes());
+ execute(unionIsvalue());
+ execute(unionIsbound());
+ 
+ execute(tc_unionOfRecordOfs1());
+ execute(tc_unionOfRecordOfs2());
+ execute(tc_union_modify());
+ execute(tc_sideeffect1());
+ execute(tc_sideeffect2());
+ execute(tc_unionOfRecordOfs1_ispresent());
+ execute(tc_unionOfRecordOfs2_ispresent());
+ execute(tc_unionOfRecordOfs3_ispresent());
+ execute(tc_union_modify_ispresent());
+ execute(tc_sideeffect1_ispresent());
+ execute(tc_sideeffect2_ispresent());
+ execute(tc_union_with_unbound_alternative());
+}
+}

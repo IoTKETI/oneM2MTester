@@ -1,0 +1,317 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module everything
+{
+type record of integer RoI;
+type set    of integer SoI;
+
+type set of integer MySetOfType (0 .. 10);
+
+type component A {}
+
+/****************************************************************/
+
+// B 1.2.1 Template List
+
+template RoI t_RoI1 := {1, 2, (6..9)};
+template RoI t_RoI2 := {1, *, 3};
+
+template integer t_i1 := (all from t_RoI1, 100);
+// equivalent to         (1, 2, (6..9)   , 100);
+
+testcase tc1() runs on A
+{
+  var integer v_i;
+  action("t_i1=", t_i1);
+
+  v_i := 1;
+  if (match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1); }
+
+  v_i := 2;
+  if (match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1); }
+
+  v_i := 3;
+  if (not match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1); }
+
+  v_i := 4;
+  if (not match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1); }
+
+  v_i := 5;
+  if (not match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1); }
+
+  v_i := 6;
+  if (match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1); }
+
+  v_i := 10;
+  if (not match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1); }
+
+  v_i := 100;
+  if (match(v_i, t_i1)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1); }
+}
+
+// now correctly reported by Titan
+//template integer t_i2 := (0, all from t_RoI2); // causes an error because t_RoI2 contains AnyElementsOrNone
+
+//testcase tc2() runs on A
+//{
+//  action ("t_i2=", t_i2)
+//}
+
+/* TODO: different errors are reported
+template RoI t_RoI3 := (all from t_RoI1); // causes an error because member type of
+                                          // t_RoI1 (integer) is not compatible with the list template type (RoI)
+
+template RoI t_RoI4 := ?;
+
+template RoI t_RoI5 := (all from t_RoI4); // causes an error because t_RoI4 resolves into a matching mechanism
+*/
+
+//template RoI t_RoI1 := {1, 2, (6..9)};
+//template RoI t_RoI2 := {1, *, 3};
+
+// B 1.2.2 Complemented Template List
+/*
+template RoI t_RoI1c := {1, 2, (6..9)};
+template RoI t_RoI2c := {1, *, 3};
+*/
+template integer t_i1c := complement(all from t_RoI1, 100); // results in (1, 2, (6..9), 100)
+
+// This is exactly the opposite of the testcase in all_from
+testcase tc_compl() runs on A
+{
+  var integer v_i;
+  action("t_i1c=", t_i1c);
+
+  v_i := 1;
+  if (not match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1c); }
+
+  v_i := 2;
+  if (not match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1c); }
+
+  v_i := 3;
+  if (match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1c); }
+
+  v_i := 4;
+  if (match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1c); }
+
+  v_i := 5;
+  if (match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1c); }
+
+  v_i := 6;
+  if (not match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1c); }
+
+  v_i := 10;
+  if (match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should match ", t_i1c); }
+
+  v_i := 100;
+  if (not match(v_i, t_i1c)) { setverdict(pass); }
+  else { setverdict(fail, v_i, " should NOT match ", t_i1c); }
+}
+
+// correctly diagnosed by Titan
+//template integer t_i2c := complement(0, all from t_RoI2);   // causes an error because t_RoI2 contains AnyElementsOrNone
+
+//template RoI   t_RoI3c := complement(all from t_RoI1);      // causes an error because member type of t_RoI1 (integer) is not compatible
+//                                                            // with the complemented list template type (RoI)
+//
+// The errors for the above are the same as the errors for the one below :)
+//
+//template RoI t_RoI3c_direct := complement(1, 2, (6..9))
+
+/*
+template RoI t_RoI4c   := ?;
+template RoI t_RoI5c   := complement (all from t_RoI4c); 
+    // causes an error because t_RoI4 resolves into a matching mechanism
+    // now correctly signalled by titan
+*/
+//template RoI t_RoI1 := {1, 2, (6..9)};
+//template RoI t_RoI2 := {1, *, 3};
+
+// B 1.2.6 Superset
+
+//EXAMPLE 1:
+
+    template MySetOfType MyTemplate1 := superset (1, 2, 3);
+    // matches any sequence of integers which contains at least one occurrences of the numbers
+    // 1, 2 and 3 in any order and position
+
+    template MySetOfType MyTemplate2_AnyValue := superset (1, 2, ?);
+    // matches any sequence of integers which contains at least one occurrences of the numbers
+    // 1, 2 and at least one more valid integer value (i.e. between 0 and 10, inclusively), in any
+    // order and position
+
+    template MySetOfType MyTemplate3 := superset (1, 2, (3, 4));
+    // matches any sequence of integers which contains at least one occurrences of the numbers
+    // 1, 2 and a number with the value 3 or 4, in any order and position
+
+    template MySetOfType MyTemplate4 := superset (1, 2, complement(3, 4));
+    // any sequence of integers matches which contains at least one occurrences of the numbers
+    // 1, 2 and a valid integer value which is not 3 or 4, in any order and position
+
+    template MySetOfType MyTemplate6 := superset (1, 2, 3) length (7);
+    // matches any sequence of 7 integers which contains at least one occurrences of the numbers
+    // 1, 2 and 3 in any order and position
+
+    template MySetOfType MyTemplate7 := superset (1, 2, ?) length (7 .. infinity);
+    // matches any sequence of at least 7 integers which contains at least one occurrences of the
+    // numbers 1, 2 and 3 in any order and position
+
+    template MySetOfType MyTemplate8 := superset (1, 2, 3) length (2 .. 7);
+    // causes an error, the lower bound of the length attribute contradicts to the minimum number
+    // of elements imposed by the superset argument
+
+//EXAMPLE 2:
+    template RoI t_RoI1s := {1, 2, ?};
+    template SoI t_SoI1s := superset(all from t_RoI1s); 
+        // results in superset(1, 2, ?)
+
+testcase tc_superset() runs on A
+{
+  action("superset: ", t_SoI1s);
+}
+
+//template RoI t_RoI1 := {1, 2, (6..9)};
+//template RoI t_RoI2 := {1, *, 3};
+
+// B.1.2.7    SubSet
+//EXAMPLE 1:
+    template MySetOfType MyTemplate1_ := subset (1, 2, 3);
+    // matches any sequence of integers which contains zero or one occurrences of the numbers
+    // 1, 2 and 3 in any order and position
+
+    template MySetOfType MyTemplate2_ := subset (1, 2, ?);
+    // matches any sequence of integers which contains zero or one occurrences of the numbers
+    // 1, 2 and a valid integer value (i.e. between 0 and 10, inclusive) in any order and position
+
+    template MySetOfType MyTemplate3_ := subset (1, 2, (3, 4));
+    // matches any sequence of integers which contains zero or one occurrences of the numbers
+    // 1, 2 and one of the numbers 3 or 4, in any order and position
+
+    template MySetOfType MyTemplate4_ := subset (1, 2, complement (3, 4));
+    // matches any sequence of integers which contains zero or one occurrences of the numbers
+    // 1, 2 and a valid integer number which is not 3 or 4, in any order and position
+
+    template MySetOfType MyTemplate5_ := subset (1, 2, 3) length (2);
+    // matches any sequence of two integers which contains zero or one occurrences of
+    // the numbers 1, 2 and 3, in any order and position
+
+    template MySetOfType MyTemplate6_ := subset (1, 2, ?) length (0 .. 2);
+    // matches any sequence of zero, one or two integers which contains zero or one occurrences of
+    // the numbers 1, 2 and of a valid integer value, in any order and position
+
+    template MySetOfType MyTemplate7_ := subset (1, 2, 3) length (0 .. 4);
+    // causes an error, the upper bound of length attribute contradicts to the maximum number of
+    // elements imposed by the subset argument
+
+//EXAMPLE 2:
+    template RoI t_RoI1_ := {1, 2, ?};
+    template SoI t_SoI1_ := subset(all from t_RoI1_); 
+    // results in subset(1, 2, ?)
+
+testcase tc_subset() runs on A
+{
+  action("subset: ", t_SoI1_);
+}
+
+//template RoI t_RoI1 := {1, 2, (6..9)};
+//template RoI t_RoI2 := {1, *, 3};
+
+// B.1.3.3    Permutation
+//EXAMPLE 1:
+    type RoI MySequenceOfType;
+
+    template MySequenceOfType MyTemplate1p := { permutation ( 1, 2, 3 ), 5 };
+    // matches any of the following sequences of 4 integers: 1,2,3,5; 1,3,2,5; 2,1,3,5;
+    // 2,3,1,5; 3,1,2,5; or 3,2,1,5
+
+    template MySequenceOfType MyTemplate2p := { permutation ( 1, 2, ? ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 1 and 2 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate3p := { permutation ( 1, 2, 3 ), * };
+    // matches any sequence of integers starting with 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1
+
+    template MySequenceOfType MyTemplate4p := { *, permutation ( 1, 2, 3 )};
+    // matches any sequence of integers ending with 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1
+
+    template MySequenceOfType MyTemplate5p := { *, permutation ( 1, 2, 3 ),* };
+    // matches any sequence of integers containing any of the following substrings at any position:
+    // 1,2,3; 1,3,2; 2,1,3; 2,3,1; 3,1,2 or 3,2,1 
+
+    template MySequenceOfType MyTemplate6p := { permutation ( 1, 2, * ), 5 };
+    // matches any sequence of integers that ends with 5 and containing 1 and 2 at least once in
+    // other positions
+
+//error by Titan: Length restriction cannot be used in a template of type `integer'
+//    template MySequenceOfType MyTemplate7p := { permutation ( 1, 2, 3 ), * length (0..5) };
+    // matches any sequence of three to eight integers starting with 1,2,3; 1,3,2; 2,1,3; 2,3,1;
+    // 3,1,2 or 3,2,1
+
+    template integer MyInt1 := (1,2,3);
+    template integer MyInt2 := (1,2,?);
+    template integer MyInt3 := ?;
+    template integer MyInt4 := *;
+
+    template MySequenceOfType MyTemplate10 := { permutation (MyInt1, 2, 3 ), 5 };
+    // matches any of the sequences of 4 integers:
+    //        1,3,2,5; 2,1,3,5; 2,3,1,5; 3,1,2,5; or 3,2,1,5;
+    //        2,3,2,5; 2,2,3,5; 2,3,2,5; 3,2,2,5; or 3,2,2,5;
+    //        3,3,2,5; 2,3,3,5; 2,3,3,5; 3,3,2,5; or 3,2,3,5;
+
+    template MySequenceOfType MyTemplate11 := { permutation (MyInt2, 2, 3 ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate12 := { permutation (MyInt3, 2, 3 ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate13 := { permutation (MyInt4, 2, 3 ), 5 };
+    // matches any sequence of integers that ends with 5 and containing 2 and 3 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate14 := { permutation (MyInt3, 2, ? ), 5 };
+    // matches any sequence of 4 integers that ends with 5 and contains 2 at least once in
+    // other positions
+
+    template MySequenceOfType MyTemplate15 := { permutation (MyInt4, 2, * ), 5 };
+    // matches any sequence of integers that ends with 5 and contains 2 at least once in
+    // other positions
+
+//EXAMPLE 2:
+    template RoI t_RoI1p := {1, 2, *};
+    template RoI t_RoI2p := {permutation(0, all from t_RoI1p), 4, 5}; 
+    // results in {permutation(0, 1, 2, *), 4, 5}
+
+testcase tc_permut() runs on A
+{
+  action("permut: ", t_RoI2p);
+}
+
+
+}  // end of module

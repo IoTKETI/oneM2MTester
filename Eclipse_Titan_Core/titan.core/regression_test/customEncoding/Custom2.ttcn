@@ -1,0 +1,43 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module Custom2 {
+
+import from Custom1 all;
+import from Custom3 all;
+
+// Coding function declarations for test 1
+external function f_enc_rec(in Rec x) return bitstring
+  with { extension "prototype(convert) encode(localCustom)" }
+  
+external function f_dec_rec(inout bitstring b, out Rec x) return integer
+  with { extension "prototype(sliding) decode(localCustom)" }
+  
+// Coding function declarations for test 3
+external function f_enc_uni(in Uni x) return bitstring
+  with { extension "prototype(convert) encode(globalCustom)" }
+  
+external function f_dec_uni(inout bitstring b, out Uni x) return integer
+  with { extension "prototype(sliding) decode(globalCustom)" }
+
+// Type for test 4
+type bitstring BitString with { encode "nothing" };
+
+// Coding function declarations for test 4
+external function f_enc_bs(in BitString x) return bitstring
+  with { extension "prototype(convert) encode(nothing)" }
+  
+external function f_dec_bs(inout bitstring b, out BitString x) return integer
+  with { extension "prototype(sliding) decode(nothing)" }
+
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<txd:Titan_Execution_Descriptor xmlns:txd="http://schemas.ericsson.com/TXD" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.ericsson.com/TXD TXD.xsd ">
+  
+  <txd:Build>
+    <txd:Projects>
+      <txd:Project path="foobar.tpd">
+        <txd:Configurations>
+          <txd:Configuration name="foo"/>
+          <txd:Configuration name="bar"/>
+        </txd:Configurations>
+      </txd:Project>
+      
+      <txd:Project path="meow.tpd">
+        <txd:Configurations>
+          <txd:Configuration name="m1"/>
+        </txd:Configurations>
+      </txd:Project>
+    </txd:Projects>
+
+    <txd:MasterConfiguration>
+    </txd:MasterConfiguration>
+  </txd:Build>
+  
+  <txd:Run>
+    <txd:SingleModeRun>
+      <txd:WorkingDirectory>right here!</txd:WorkingDirectory>
+      <txd:ConfigurationFile></txd:ConfigurationFile>
+    </txd:SingleModeRun>
+
+    <txd:ParallelRun>
+      <txd:WorkingDirectory>right here!</txd:WorkingDirectory>
+      <txd:ConfigurationFile></txd:ConfigurationFile>
+      <txd:HostControllers>
+        <txd:HostController>
+          <txd:Name>tcclab4</txd:Name>
+          <txd:Command>echo Hello world!</txd:Command>
+        </txd:HostController>
+        <txd:HostController>
+          <txd:Name>tcclab5</txd:Name>
+          <txd:HostId>tcclab5</txd:HostId>
+          <txd:WorkingDirectory>/tmp</txd:WorkingDirectory>
+          <txd:Executable>/home/away/SOAPTest</txd:Executable>
+          <txd:Command>ssh %Host cd %WorkingDirectory; %Executable %MCHost %MCPort</txd:Command>
+        </txd:HostController>
+      </txd:HostControllers>
+    </txd:ParallelRun>
+
+    <txd:SingleModeRun>
+      <txd:WorkingDirectory>right here!</txd:WorkingDirectory>
+      <txd:ConfigurationFile></txd:ConfigurationFile>
+    </txd:SingleModeRun>
+    
+    <txd:CustomRun>
+      Use whatever you want
+    </txd:CustomRun>
+  </txd:Run>
+</txd:Titan_Execution_Descriptor>

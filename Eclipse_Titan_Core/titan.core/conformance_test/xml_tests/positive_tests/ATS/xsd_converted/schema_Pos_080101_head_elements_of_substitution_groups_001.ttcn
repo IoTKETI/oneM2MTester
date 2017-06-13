@@ -1,0 +1,133 @@
+/*******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator version: CRL 113 200/5 R5A                       
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+//
+//  File:          schema_Pos_080101_head_elements_of_substitution_groups_001.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Mon Jul 11 16:32:40 2016
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- Pos_080101_head_elements_of_substitution_groups_001.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "schema:Pos_080101_head_elements_of_substitution_groups_001" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module schema_Pos_080101_head_elements_of_substitution_groups_001 {
+
+
+import from XSD all;
+
+
+/* THE HEAD ELEMENT */
+
+
+/* SUBSTITUTION ELEMENT OF THE SAME TYPE AS THE HEAD */
+
+
+type XSD.String Member1
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+/* SUBSTITUTION ELEMENT OF A TYPE RESTRICTING THE TYPE OF THE HEAD */
+
+
+type enumerated StringEnum
+{
+	else_,
+	something
+}
+with {
+  variant "text 'else_' as 'else'";
+  variant "name as uncapitalized";
+};
+
+
+type StringEnum Member2
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+/* SUBSTITUTION ELEMENT OF A TYPE EXTENDING THE TYPE OF THE HEAD */
+
+
+type record ComplexEnum
+{
+	XSD.Integer bar optional,
+	XSD.Float foo optional,
+	XSD.String base
+}
+with {
+  variant "name as uncapitalized";
+  variant (bar) "attribute";
+  variant (foo) "attribute";
+  variant (base) "untagged";
+};
+
+
+type ComplexEnum Member3
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+/* TOP LEVEL ELEMENT TO DEMONSTRATE SUBSTITUTION */
+
+
+type record Ize
+{
+	record of Head_group head_list
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (head_list) "untagged";
+  variant (head_list[-]) "name as 'head'";
+};
+
+
+type union Head_group
+{
+	XSD.String head,
+	Member1 member1,
+	Member2 member2,
+	Member3 member3
+}
+with {
+  variant "untagged";
+  variant (head) "form as qualified";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'schema:Pos_080101_head_elements_of_substitution_groups_001' prefix 'ns227'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

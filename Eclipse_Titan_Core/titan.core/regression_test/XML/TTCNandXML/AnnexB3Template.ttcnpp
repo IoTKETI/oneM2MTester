@@ -1,0 +1,117 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnnexB3Template {
+//import from XSD language "XML" all;
+import from AnnexB3 all;
+
+modulepar boolean AnnexB3Template_verbose := false;
+#define verbose AnnexB3Template_verbose
+#include "../macros.ttcnin"
+
+type component ice3 {}
+
+template C1 t_C1:= {
+  a1 :=1,       // attribute
+  a2 :=2,       // -""- 
+  base := "All your base are belong to us!" // untagged
+}
+
+template C2 t_C2:= {
+  a1 :=1,
+  a2 :=-2,
+  base :=24
+}
+
+template C3 t_C3:= {
+  a1 :=1,
+  a2 :=-1000,
+  base :=25
+}
+
+
+DECLARE_EXER_ENCODERS(C1, c1);
+DECLARE_XER_ENCODERS(C1, c1);
+
+DECLARE_EXER_ENCODERS(C2, c2);
+DECLARE_XER_ENCODERS(C2, c2);
+
+DECLARE_EXER_ENCODERS(C3, c3);
+DECLARE_XER_ENCODERS(C3, c3);
+
+const universal charstring c1_str_e := "<C1 A1='1' A2='2'>All your base are belong to us!</C1>\n\n"
+// Note no namespace because it's a type, not a top-level element
+const universal charstring c1_str_b := 
+"<C1>\n" &
+"\t<a1>1</a1>\n" &
+"\t<a2>2</a2>\n" &
+"\t<base>All your base are belong to us!</base>\n" &
+"</C1>\n\n";
+
+const universal charstring c2_str_e := "<C2 A1='1' A2='-2'>24</C2>\n\n";
+// Note no namespace because it's a type, not a top-level element
+const universal charstring c2_str_b := 
+"<C2>\n" &
+"\t<a1>1</a1>\n" &
+"\t<a2>-2</a2>\n" &
+"\t<base>24</base>\n" &
+"</C2>\n\n";
+
+const universal charstring c3_str_e := "<C3 A1='1' A2='-1000'>25</C3>\n\n";
+// Note no namespace because it's a type, not a top-level element
+const universal charstring c3_str_b := 
+"<C3>\n" &
+"\t<a1>1</a1>\n" &
+"\t<a2>-1000</a2>\n" &
+"\t<base>25</base>\n" &
+"</C3>\n\n";
+
+
+testcase enc_untagged() runs on ice3
+{
+  CHECK_METHOD(bxer_enc_c1, valueof(t_C1), c1_str_b);
+  CHECK_METHOD(exer_enc_c1, valueof(t_C1), c1_str_e);
+
+  CHECK_METHOD(bxer_enc_c2, valueof(t_C2), c2_str_b);
+  CHECK_METHOD(exer_enc_c2, valueof(t_C2), c2_str_e);
+
+  CHECK_METHOD(bxer_enc_c3, valueof(t_C3), c3_str_b);
+  CHECK_METHOD(exer_enc_c3, valueof(t_C3), c3_str_e);
+}
+
+testcase dec_untagged() runs on ice3
+{
+  CHECK_DECODE(bxer_dec_c1, c1_str_b, C1, t_C1);
+  CHECK_DECODE(exer_dec_c1, c1_str_e, C1, t_C1);
+
+  CHECK_DECODE(bxer_dec_c2, c2_str_b, C2, t_C2);
+  CHECK_DECODE(exer_dec_c2, c2_str_e, C2, t_C2);
+
+  CHECK_DECODE(bxer_dec_c3, c3_str_b, C3, t_C3);
+  CHECK_DECODE(exer_dec_c3, c3_str_e, C3, t_C3);
+}
+
+control {
+  execute(enc_untagged());
+  execute(dec_untagged());
+}
+
+}
+
+/*
+<?xml version="1.0" encoding="UTF-8"?>
+<C1 xmlns="nsA" A1=1 A2=2>-1000</C1>
+<?xml version="1.0" encoding="UTF-8"?>
+<C2 xmlns="nsA" A1=1 A2=-2>24</C2>
+<?xml version="1.0" encoding="UTF-8"?>
+<C3 xmlns="nsA" A1=1 A2=-1000>25</C3>
+*/

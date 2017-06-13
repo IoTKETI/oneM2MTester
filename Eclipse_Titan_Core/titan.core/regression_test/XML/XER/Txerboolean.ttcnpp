@@ -1,0 +1,235 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txerboolean {
+
+modulepar boolean Txerboolean_verbose := false;
+#define verbose Txerboolean_verbose
+
+#include "../macros.ttcnin"
+
+import from AsnValues all;
+type component Tboolean {}
+
+external function flatten(inout universal charstring par) ;
+
+DECLARE_XER_ENCODERS(boolean , boolean);
+DECLARE_EXER_ENCODERS(boolean,boolean)
+DECLARE_XER_ENCODERS(rboolean, rboolean);
+DECLARE_EXER_ENCODERS(rboolean,rboolean)
+DECLARE_XER_ENCODERS(uboolean, uboolean);
+DECLARE_EXER_ENCODERS(uboolean,uboolean)
+DECLARE_XER_ENCODERS(rofboolean, rofboolean);
+DECLARE_EXER_ENCODERS(rofboolean,rofboolean)
+
+type record rboolean {
+  boolean b optional
+}
+
+type union uboolean {
+  boolean b
+}
+
+type record of boolean rofboolean; // NOT roflboolean !
+
+testcase encode_bool() runs on Tboolean
+{
+    var boolean plain := false;
+    var universal charstring expected := "<BOOLEAN><false/></BOOLEAN>";
+    CHECK_METHOD(cxer_enc_boolean, plain, expected);
+    CHECK_METHOD(bxer_enc_boolean, plain, expected & lf);
+    expected := "<BOOLEAN>false</BOOLEAN>";
+    CHECK_METHOD(exer_enc_boolean, plain, expected & lf);
+
+    plain := true;
+    expected := "<BOOLEAN><true/></BOOLEAN>"
+    CHECK_METHOD(cxer_enc_boolean, plain, expected);
+    CHECK_METHOD(bxer_enc_boolean, plain, expected & lf);
+    expected := "<BOOLEAN>true</BOOLEAN>";
+    CHECK_METHOD(exer_enc_boolean, plain, expected & lf);
+}
+
+testcase decode_bool() runs on Tboolean
+{
+    var universal charstring input := "<BOOLEAN><false/></BOOLEAN>";
+    var boolean expected := false;
+    CHECK_DECODE(cxer_dec_boolean, input, boolean, expected);
+
+    input := "<BOOLEAN><true/></BOOLEAN>";
+    expected := true;
+    CHECK_DECODE(cxer_dec_boolean, input, boolean, expected);
+}
+
+testcase decode_textbool() runs on Tboolean
+{
+    var universal charstring input := "<BOOLEAN>0</BOOLEAN>";
+    var boolean expected := false;
+    CHECK_DECODE(cxer_dec_boolean, input, boolean, expected);
+
+    input := "<BOOLEAN>1</BOOLEAN>";
+    expected := true;
+    CHECK_DECODE(cxer_dec_boolean, input, boolean, expected);
+}
+
+testcase encode_bool_omit() runs on Tboolean
+{
+    var rboolean rec := { omit }
+    var universal charstring expected, unexpected;
+
+    expected := "<rboolean/>\n";
+    CHECK_METHOD(cxer_enc_rboolean, rec, expected);
+    CHECK_METHOD(bxer_enc_rboolean, rec, expected & lf);
+    CHECK_METHOD(exer_enc_rboolean, rec, expected & lf);
+
+    rec.b := true; // not omit anymore
+    expected := "<rboolean><b><true/></b></rboolean>\n";
+    CHECK_METHOD(cxer_enc_rboolean, rec, expected);
+    expected := "<rboolean>\n\t<b><true/></b>\n</rboolean>\n\n"
+    CHECK_METHOD(bxer_enc_rboolean, rec, expected);
+    expected := "<rboolean>\n\t<b>true</b>\n</rboolean>\n\n"
+    CHECK_METHOD(exer_enc_rboolean, rec, expected);
+}
+
+testcase decode_bool_omit() runs on Tboolean
+{
+    var rboolean expected := { omit };
+    const charstring rbool_empty := "<rboolean/>\n";
+    CHECK_DECODE(cxer_dec_rboolean, rbool_empty, rboolean, expected);
+    CHECK_DECODE(bxer_dec_rboolean, rbool_empty, rboolean, expected);
+
+    const charstring rbool_t := "<rboolean><b><true/></b></rboolean>\n";
+    expected := { true };
+    CHECK_DECODE(cxer_dec_rboolean, rbool_t, rboolean, expected);
+    CHECK_DECODE(bxer_dec_rboolean, rbool_t, rboolean, expected);
+
+    const charstring rbool_f := "<rboolean><b><false/></b></rboolean>\n";
+    expected := { false };
+    CHECK_DECODE(cxer_dec_rboolean, rbool_f, rboolean, expected);
+    CHECK_DECODE(bxer_dec_rboolean, rbool_f, rboolean, expected);
+}
+
+testcase encode_bool_choice() runs on Tboolean
+{
+    var uboolean rec := { b := false }
+    var universal charstring expected;
+
+    expected := "<uboolean>\n\t<b><false/></b>\n</uboolean>\n\n";
+    CHECK_METHOD(bxer_enc_uboolean, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_uboolean, rec, expected & lf);
+    expected := "<uboolean>\n\t<b>false</b>\n</uboolean>\n\n";
+    CHECK_METHOD(exer_enc_uboolean, rec, expected);
+
+    rec.b := true; // not omit anymore
+    expected := "<uboolean>\n\t<b><true/></b>\n</uboolean>\n\n";
+    CHECK_METHOD(bxer_enc_uboolean, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_uboolean, rec, expected & lf);
+    expected := "<uboolean>\n\t<b>true</b>\n</uboolean>\n\n";
+    CHECK_METHOD(exer_enc_uboolean, rec, expected);
+}
+
+testcase decode_bool_choice() runs on Tboolean
+{
+	const charstring x0 := "<uboolean>\n\t<b><false/></b>\n</uboolean>\n\n";
+	var uboolean expected := { b := false }
+	CHECK_DECODE(bxer_dec_uboolean, x0, uboolean, expected);
+	CHECK_DECODE(cxer_dec_uboolean, x0, uboolean, expected);
+
+	const charstring x1 := "<uboolean>\n\t<b><true/></b>\n</uboolean>\n\n";
+	expected := { b := true }
+	CHECK_DECODE(bxer_dec_uboolean, x1, uboolean, expected);
+	CHECK_DECODE(cxer_dec_uboolean, x1, uboolean, expected);
+}
+
+const rofboolean a0 := {};
+const charstring abstr_empty := "<rofboolean/>\n\n";
+
+const rofboolean a1 := { false }
+const charstring abstr1 :=
+  "<rofboolean>\n" &
+  "\t<false/>\n" &
+  "</rofboolean>\n\n";
+const charstring abstr1_exer :=
+  "<rofboolean>\n" &
+  "\t<BOOLEAN>false</BOOLEAN>\n" &
+  "</rofboolean>\n\n";
+
+const rofboolean a3 := { true, false, true }
+const charstring abstr3 :=
+  "<rofboolean>\n" &
+  "\t<true/><false/><true/>\n" &
+  "</rofboolean>\n\n";
+const charstring abstr3_exer :=
+  "<rofboolean>\n" &
+  "\t<BOOLEAN>true</BOOLEAN>\n" &
+  "\t<BOOLEAN>false</BOOLEAN>\n" &
+  "\t<BOOLEAN>true</BOOLEAN>\n" &
+  "</rofboolean>\n\n";
+
+
+testcase encode_bool_array() runs on Tboolean
+{
+	var universal charstring expected := abstr_empty;
+	CHECK_METHOD(bxer_enc_rofboolean, a0, expected);
+	CHECK_METHOD(exer_enc_rofboolean, a0, expected);
+	flatten(expected);
+	CHECK_METHOD(cxer_enc_rofboolean, a0, expected & lf);
+	
+	expected := abstr1;
+	CHECK_METHOD(bxer_enc_rofboolean, a1, expected);
+	flatten(expected);
+	CHECK_METHOD(cxer_enc_rofboolean, a1, expected & lf);
+	expected := abstr1_exer;
+	CHECK_METHOD(exer_enc_rofboolean, a1, expected);
+	
+	expected := abstr3;
+	CHECK_METHOD(bxer_enc_rofboolean, a3, expected);
+	flatten(expected);
+	CHECK_METHOD(cxer_enc_rofboolean, a3, expected & lf);
+	expected := abstr3_exer;
+	CHECK_METHOD(exer_enc_rofboolean, a3, expected);
+}
+
+testcase decode_bool_array() runs on Tboolean
+{
+	var rofboolean expected := a0;
+	CHECK_DECODE2        (rofboolean, abstr_empty, rofboolean, expected);
+	CHECK_DECODE(exer_dec_rofboolean, abstr_empty, rofboolean, expected);
+	
+	expected := a1;
+	CHECK_DECODE2(        rofboolean, abstr1     , rofboolean, expected);
+	CHECK_DECODE(exer_dec_rofboolean, abstr1_exer, rofboolean, expected);
+	
+	expected := a3;
+	CHECK_DECODE2        (rofboolean, abstr3     , rofboolean, expected);
+	CHECK_DECODE(exer_dec_rofboolean, abstr3_exer, rofboolean, expected);
+}
+
+control {
+
+    execute(encode_bool());
+    execute(decode_bool());
+    execute(decode_textbool());
+    execute(encode_bool_omit());
+    execute(decode_bool_omit());
+    execute(encode_bool_choice());
+    execute(decode_bool_choice());
+    execute(encode_bool_array());
+    execute(decode_bool_array());
+}
+
+}
+with {
+  encode "XML";
+  extension "version R8B";
+}

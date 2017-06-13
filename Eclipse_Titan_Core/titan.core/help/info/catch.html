@@ -1,0 +1,172 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>catch</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="case.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="char.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>catch</h1>
+<hr align="left" width="75%">
+<p>The operation belongs to the family of procedure-based communication operations. It is used to handle exceptions from a previously called procedure.
+<ul>
+  <li>The operation can be used on connected procedure-based (or mixed) ports.</li>
+  <li>In case of multiple connections the operation may be restricted to one communication partner.</li>
+  <li><a href="timeout.html">Timeout</a> constitutes a special case of exception.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="address.html"><b><font face="Courier New" color="#003258" size="4">address</font></b></a></li>
+  <li><a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a></li>
+  <li><a href="from.html"><b><font face="Courier New" color="#003258" size="4">from</font></b></a></li>
+  <li><a href="modifies.html"><b><font face="Courier New" color="#003258" size="4">modifies</font></b></a></li>
+  <li><a href="sender.html"><b><font face="Courier New" color="#003258" size="4">sender</font></b></a> &nbsp;</li>
+  <li><a href="signature.html"><b><font face="Courier New" color="#003258" size="4">signature</font></b></a></li>
+  <li><a href="system.html"><b><font face="Courier New" color="#003258" size="4">system</font></b></a></li>
+  <li><a href="value.html"><b><font face="Courier New" color="#003258" size="4">value</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><i>port_reference</i><font face="Courier New" color="#003258" size="5"><b>.catch </b></font> [ <font face="Courier New" color="#003258" size="5"><b> (</b></font><i>signature_reference</i><font
+      face="Courier New" color="#003258" size="5"><b>,</b></font><i> template_instance&nbsp; </i><font face="Courier New" color="#003258" size="5"><b>)</b></font> ] [ <font face="Courier New"
+      color="#003258" size="5"><b>from </b></font><i>address_reference</i> ] [ <font face="Courier New" color="#003258" size="5"><b>-&gt; </b></font><i>assignment_part</i> ]<font face="Courier New"
+      color="#003258" size="5"><b>;</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i> port_reference</i> points out the port where the exception is raised.</p>
+  <ul>
+    <li>
+    <p>the keywords <b><font face="Courier New" color="#003258" size="4">any port</font> </b> may be used to indicate that exceptions will be accepted at any port (see the <a href="#Example 4:">example
+    4</a>).</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">catch</font> </b>keyword introduces the exception capture.</p>
+  </li>
+  <li>
+  <p><i>signature_reference</i> points out the signature where the exception is defined</p>
+  </li>
+  <li>
+  <p><i>template_instance</i> may be one of the following&nbsp; (<a href="#Example 5">when omitted</a>, any valid exception will be caught):</p>
+  <ul>
+    <li>in-line signature template (see the <a href="#Example 1">example1</a>);</li>
+    <li>a receiving template (see the <a href="#Example 2">example 2</a>);</li>
+    <li>a modified template (see the <a href="#Example 3">example 3</a>);<br>
+    &nbsp;</li>
+  </ul>
+  </li>
+  <table border="0" width="100%" bgcolor="#C9C2BB" cellpadding="4">
+    <tr>
+      <td width="100%">
+      <p><u>TITAN specific restriction compared to the standard:</u></p>
+      <ul>
+        <li>
+        <p>&nbsp;modified template is not implemented. When encountered in the TTCN-3 program, an error message will be generated.</p>
+        </li>
+      </ul>
+      </td>
+    </tr>
+  </table>
+  <li>
+  <p>The optional <b><font face="Courier New" color="#003258" size="4">from</font> </b> keyword&nbsp; is used when a port is connected to several entities and restriction to one communication
+  partner is required.</p>
+  </li>
+  <li>
+  <p><i>address_reference</i> is one of the following:</p>
+  <ul>
+    <li>a component reference (cf. <a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a>)&nbsp; or the keyword <a href="system.html"
+      target="_blank"><b><font face="Courier New" color="#003258" size="4">system</font></b></a>, in case of one-to-many connections.</li>
+    <li>
+    <p>an address reference (cf. <a href="address.html"><b><font face="Courier New" color="#003258" size="4">address</font></b></a>) , when there are several entities within the
+    system under test.</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p><i>assignment_part</i> is one or both of the following:</p>
+  <ul>
+    <li>the <a href="sender.html"><b><font face="Courier New" color="#003258" size="4">sender</font></b></a> keyword followed by a variable of <a href="address.html"
+      target="_blank"><b><font face="Courier New" color="#003258" size="4">address</font></b></a> or&nbsp; <a href="component.html"><b><font face="Courier New" color="#003258"
+      size="4">component</font></b></a> type to store the address of the sender (see the <a href="#Example 2">example 2</a>).</li>
+    <li>the <a href="value.html"><b><font face="Courier New" color="#003258" size="4">value</font></b></a> keyword followed by a variable of the appropriate type to store the
+    exception value (see the <a href="#Example 3">example 3</a>).</li>
+  </ul>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p><a name="Example 1">Example 1</a>: in-line signature template&nbsp;
+<p><font face="Courier New">signature S_MyProcedure (inout integer pl_MyPar91) exception (integer, float);<br>
+<br>
+MujPort_PCO.catch(S_MyProcedure, integer:14 .. 143) from system;</font>
+<p>The signature S_MyProcedure is defined in the first line. It has one parameter (pl_MyPar91, pl_MyPar2 and pl_MyPar3). In the second line, an exception is caught at&nbsp; the port MujPort_PCO.
+The port is connected to several components, but communication is restricted to one component, here to the test system interface. Exceptions with the integer code between 14 and 143 are caught.</p>
+<hr align="left" width="50%">
+<p><a name="Example 2">Example 2</a>: signature template and address redirect</p>
+<p><font face="Courier New">template IntegerFloatRecord tr_ExTemplate&nbsp; := {<br>
+&nbsp;&nbsp;&nbsp;field1 := 1 .. 6,<br>
+&nbsp;&nbsp;&nbsp;field2 := 0.0 .. infinity<br>
+}</font>
+<p><font face="Courier New">MujPort_PCO.catch (S_MyProcedure, tr_ExTemplate) -&gt; sender v_address;</font></p>
+<p>The parameterized template (tr_ExTemplate) catches exceptions where the integer parameter lies between one and six, and the floating point value parameter greater than zero. The address of the
+component raising the exception is stored in the variable v_address.</p>
+<hr align="left" width="50%">
+<p><a name="Example 3">Example 3</a>: modified signature template and value redirect</p>
+<p><font face="Courier New">MujPort_PCO.catch (modifies tr_ExTemplate := {field1 := 6}) -&gt; value v_Exc;</font></p>
+<p>The template defined in example 2 is modified. The response is now accepted when the integer parameter equals six. The returned exception value is stored in the variable v_Exc.</p>
+<hr align="left" width="50%">
+<p><a name="Example 4:">Example 4:</a> receive on any port</p>
+<p><font face="Courier New">any port.catch (tr_ExTemplate);</font></p>
+<p>The exception matching the template tr_ExTemplate will be accepted on any port.</p>
+<hr align="left" width="50%">
+<p><a name="Example 5">Example 5</a>: Accepting any exception</p>
+<p><font face="Courier New">MujPort_PCO.catch;</font></p>
+<p>Removes the top exception from MujPort_PCO.</p>
+<hr align="left" width="50%">
+<p><a name="Example 6">Example 6</a>: Catching a timeout</p>
+<p><font face="Courier New">MujPort_PCO.catch(timeout);</font></p>
+<p>The exception caused by the timeout at the port MujPort_PCO is caught.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#catchstatement">BNF definition</a> of <font face="Courier New"> catch</font></p>
+</body>
+</html>

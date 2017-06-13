@@ -1,0 +1,42 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module Main
+{
+
+import from PDU_Definitions all;
+
+type record HasPardType {
+  ProtocolElem_Field1 pard,
+  boolean buul,
+  Price price
+}
+
+external function f_enc_hpt(in HasPardType x) return octetstring
+  with { extension "prototype(convert) encode(JSON) printing(pretty)" }
+
+external function f_dec_hpt(in octetstring x) return HasPardType
+  with { extension "prototype(convert) decode(JSON)" }
+
+external function f_enc_pard(in ProtocolElem_Field1 x) return octetstring
+  with { extension "prototype(convert) encode(JSON) printing(pretty)" }
+
+external function f_enc_obj(in Object x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+
+external function f_dec_obj(in octetstring x) return Object
+  with { extension "prototype(convert) decode(JSON)" }
+
+} with {
+  encode "JSON"
+}

@@ -1,0 +1,1595 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Hanko, Matyas
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *   Szalai, Gabor
+ *
+ ******************************************************************************/
+module  DTAP_typedefs.objid {
+                itu_t(0) identified_organization (4) etsi(0) reserved(127)
+                etsi_identified_organization(0) ericsson(5) testing (0)
+                umts(5) cn(0) dtap(7) uCN3(5) type_definitions(2) patchNo(5)
+                }
+{
+
+// This module contains Mobile Radio Interface Layer 3 messages (DTAP)
+// based on 24.008 v4.3.0 and 44.018 v4.4.0
+// Protocol discriminators and other general parts are defined in 24.007 v4.2.0
+
+import from general_typedefs all;
+
+// This type is a container for all necessary MS related parameters
+type record MS_parameters
+  {
+    integer       imsi_length,  //in
+    BIT4          imsi_firstdigit,
+    octetstring   imsi,
+    octetstring   number,
+    integer       SCCP_connId, //connection Id of currently used SCCP connection
+    integer       L3_NSD,  // actual value of L3 NSD
+    BIT1          tiFlag   // '0'B for call originator, '1' for call destination
+    // this is an example how to set the value
+    // tsp_imsi_1_firstdigit := '0010'B
+    // tsp_imsi_1 :=  '26200103000015'O;   // '262021030000051'O;
+    // tsp_calledPartyBCD_Number_digits := '7112300020'O  ;   // '1721030002'O
+  }
+
+///////////////////////////////////////
+//   IE Type definitions
+///////////////////////////////////////
+
+type record DTAP_NotifySS_Arg {
+        OCT1  sequenceTag,
+        OCT1  sequenceLength,
+        OCT1  ssCodeTag,
+        OCT1  ssCodeLength,
+        OCT1  ssCodeValue,
+        OCT1  ssIndicatorTag,
+        OCT1  ssIndicatorLength,
+        OCT1  ssIndicatorValue
+} with { variant "" };
+
+// The following type was added to support BC octet group extensions
+type record BC_octet7 {
+        BIT5  userInformationLayer2Protocol, //octet 7:
+                                            // '00110'B  rec. X.25, level link
+                                            // '01000'B  ISO 6429
+                                            // '01001'B  X.75 (teletex)
+                                            // '01010'B  profile  Videotext
+                                            // '01011'B  FAX group 3
+                                            // '01100'COPnoF1Ct  B
+                                            // '01101'B  X.75 (CAPI)
+        BIT2  layer2Id, // '10'B  identifier  octet
+        BIT1  extension_octet_7  // '1'B
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record BC_octet6 {
+
+        // OCTET 6:
+        BIT1  synchronous_asynchronous, //              '0'synchronous  B
+                   //              '1'B asynchronous
+        BIT4  userInformationLayer1Protocol, // '0000'B default layer protocol 1
+        BIT2  layer1Id, //       '01'B identifier  octet
+        BIT1  extension_octet_6, // '0'B (octet 6a following) or '1'B
+
+        // OCTET 6a:
+        BIT4  userRate optional, //     '0001'B  0.kbps  3  (X.1 and V.110)
+                                 //      '0010'B  1.kbps  2  (X.1 and V.110)
+                                 //      '0011'B  2.kbps  4  (X.1 and V.110)
+                                 //      '0100'B  4.kbps  8  (X.1 and V.110)
+                                 //      '0101'B  9.kbps  6  (X.1 and V.110)
+                                 //      '0110'B  12.0 transparent  kbps
+                                 //      '0111'B  1.2 kbps/75bps asymmetric
+        BIT1  numberDataBits optional, //    '0'B bits  7  (data)
+                                       //    '1'B bits  8  (data)
+        BIT1  negotiation optional, // '0'B inband negotiation possible not
+        BIT1  numberStopBits optional, // '0'B bit 1
+                                       //   '1'B 2 bits
+        BIT1  extension_octet_6a optional, //   '0'B or '1'B
+
+        // OCTET 6b:
+        BIT3  parity optional, //      '000'odd  B  (number)
+                               //       '010'even  B
+                               //       '011'B  none
+                               //       '100'B  forced 0  to
+                               //       '101'B  forced to 1
+        BIT1  nicOnRX optional,   //     '0'B  no data accepted clock  with
+                                  //     '1'B       data accepted with clock
+        BIT1  nicOnTX optional,   //     '0'B  no data required clock  with
+                                  //     '1'B       data required with clock
+        BIT2  intermediateRate optional, //  '00'reserved  B
+                                         //  '01'B  reserved
+                                         //  '10'B  kbps  8
+                                         //  '11'B 16 kbps
+        BIT1  extension_octet_6b optional, // '0'B or '1'B
+
+        // OCTET 6c:
+        BIT5  modemType optional, //      '00000'none  B
+           //      '00001'B  V.21
+           //      '00010'B  V.22
+           //      '00011'B  V.22bis
+           //      '00100'B  V.23
+           //      '00101'B  V.26ter
+           //      '00110'B  V.32
+           //      '00111'B  modem for interfaces  undefined
+           //      '01000'B  autobauding type 1
+           //      '11111'B  V.42
+        BIT2  connectionElement optional, //   '00'transparent  B  (T)
+                                          //   '01'non_transparent  B  (NT)
+                                          //   '10'B  both,  preferred  T
+                                          //   '11'B  both, NT preferred
+        BIT1  extension_octet_6c optional,//'0'B or '1'B no octet following 6d
+
+        // OCTET 6d:
+        BIT5  fixedNetworkUserRate  optional, //  '00000'B  FNUR applicable not
+                            //     '00001'B   9.kbps  6  (X.1 and V.110)
+                            //     '00010'B  14.kbps  4  (X.1 and V.110)
+                            //     '00011'B  19.kbps  2  (X.1 and V.110)
+                            //     '00100'B  28.kbps  8  (X.1 and V.110)
+                            //     '00101'B  38.kbps  4  (X.1 and V.110)
+                            //     '00110'B  48.kbps  0  (X.1 and V.110)
+                            //     '00111'B  56.kbps  0  (X.1 and V.110)
+                            //     '01000'B  64.0 transparent  kbps
+        BIT2  otherModemType  optional, //'00'B  no other modem specified  type
+                                        // '11'B  V.34
+        BIT1  extension_octet_6d optional,//'0'B or '1'B no octet following 6e
+
+        // OCTET 6e:
+        BIT3  maxNumberOfTrafficChannels  optional, //         '000'B  TCH  1
+                                       //         '001'B  2 TCH
+                                       //         '010'B  TCH  3
+                                       //         '011'B  4 TCH
+                                       //         '100'B  TCH  5
+                                       //         '110'B  6 TCH
+                                       //         '101'B  TCH  7
+                                       //         '111'B  8 TCH
+        BIT4  acceptableChannelCodings  optional,//'0'B TCH/F4.8 not acceptable
+                                           // '1'B  TCH/F4.8      acceptable
+                                           // '0'B  TCH/F9.6  not acceptable
+                                           // '1'B  TCH/F9.6      acceptable
+                                           // '0'spare  B
+                                           // '0'B  TCH/F14.4 not acceptable
+                                           // '1'B  TCH/F14.acceptable  4
+        BIT1 extension_octet_6e optional,//'0'B or '1'B _ no octet following 6d
+
+        // OCTET 6f:
+        BIT4 wantedAirInterfaceUserRate optional,
+                                       //octet 6f (MS to MSC/VLR only):
+                                       // '0000'B  WAIUR applicable  not
+                                       // '0001'B   9.6 kbps
+                                       // '0010'B  14.kbps  4
+                                       // '0011'B  19.2 kbps
+                                       // '0100'B  19.kbps  2
+                                       // '0101'B  28.8 kbps
+                                       // '0110'B  38.kbps  4
+                                       // '0111'B  43.2 kbps
+                                       // '1000'B  57.kbps  6
+                                       // '1001'B  38.4 kbps
+                                       // '1010'B  38.kbps  4
+                                       // '1011'B  38.4 kbps
+                                       // '1101'B  38.kbps  4
+        BIT3  uimi optional,        //  '000'B  user initiated mod. allowed  not
+                           //       '001'B  UIMI allowed upto 1 TCH/F
+                           //       '010'B  UIMI allowed upto 2 TCH/F
+                           //       '011'B  UIMI allowed upto 3 TCH/F
+                           //       '100'B  UIMI allowed upto 4 TCH/F
+        BIT1  extension_octet_6f optional// '0'B or '1'B _ no octet following 6f
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record BC_octet5 {
+        BIT3  signallingAccessProtocol, //        '001'B I.440/450
+              //        '010'B X.21
+              //        '011'B X.28 dedicated PID, ind. NUI
+              //        '100'B X.28 dedicated PID, uni. NUI
+              //        '101'B X.28 PID  non_dedicated
+              //        '110'B X.32
+        BIT2  rateAdaptation, //     '00'B no adaptation  rate  (RA)
+              //     '01'B V.110/X.30 adaptation  rate
+              //     '10'B CCITT X.31 flag stuffing
+              //     '11'B RA  other  (see octet 5a)
+        BIT2  accessId, //  '00'B identifier  octet
+        BIT1  extension_octet_5, // '0'B or '1'B (if no octet 5A following)
+
+        BIT3  spare2_3  optional, // B'...._000
+        BIT2  otherRateAdaptation  optional, // B'.._00.._ V.interworking  120
+        BIT2  otherInformationTransferCapability optional,
+                                    // B'_00...._ interworking RDI
+        BIT1  extension_octet_5a  optional, // B'x......_
+
+        BIT1  spare3_1  optional, // B'......_0
+        BIT1  inbandNegotiation  optional,
+        BIT1  assignor_assignee  optional,
+        BIT1  lli  optional,
+        BIT1  mode  optional,
+        BIT1  multiframe  optional,
+        BIT1  hdrNohdr  optional,
+        BIT1  extension_octet_5b  optional // B'x......_
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record BC_octet4 {
+        BIT1  establishment, //            '0'demand  B
+        BIT1  nirr, //          '0'B no associated  meaning
+               //         '1'B data 4.8, FR, NT, 6.0
+        BIT1  configuration, //        '0'B point point  to
+        BIT1  duplexMode, //      '0'B duplex  half
+                //     '1'B full duplex
+        BIT2  structure, //   '00'B service data integrity  unit
+               //   '11'B unstructured
+        BIT1  compresion, //  '0'B no DC possible/allowed
+               //  '1'B    DC possible/allowed
+        BIT1  extension_octet_4 // '0'B or '1'B
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record Speech_AuxiliarySpeech {
+         BIT4  speechVersionIndication, //octet 3a (speech MS to MSC/VLR):
+              // B'....0000 speech full rate 1  version
+              // B'....0010 speech full rate version 2
+              // B'....0100 speech full rate 3  version
+              // B'....0001 speech half rate version 1
+              // B'....0011 speech half rate 2  version
+              // B'....0101 speech half rate version 3
+        BIT2  spare1_2, // B'..00....
+        BIT1  coding, // B'_0...... extension octet  ITC
+             // B'_1...... other extension octet
+        BIT1  extension_octet_3a   // B'x......_
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record BC_octet3 {
+        BIT3  informationTransferCapability,  //     '000'speech  B
+                                              //     '001'B UDI
+                                              //     '010'B 3.audio  1kHz
+                                              //     '101'oITC B (see octet 5a)
+                                              //     '110'B speech  auxiliary
+                                              //     '111'B reserved
+        BIT1  transferMode, //    '0'B mode  circuit
+                            //    '1'B packet  mode
+        BIT1  codingStandard, //   '0'B GSM/PCS coding  standardized
+                              //   '1'B  reserved
+        BIT2  radioChannelRequirement, // '01'B MSC/VLR to MS;
+              // '00'B MS (supports) towards MSC/VLR rate dual (half preferred)
+              // '01'B MS (supports) towards MSC/VLR full only  rate
+                                 // '10'B rate  dual  (half preferred)
+                                 // '11'B rate  dual  (full preferred)
+        BIT1 extension_octet_3,
+           //'0'B or '1'B (THe RAW encoder will overwrite this bit)
+        Speech_AuxiliarySpeech  speech_aux     optional,
+        octetstring more_extension optional //extension of octet 3
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record BearerCapability {
+        OCT1  elementIdentifier, // '04'O
+        LIN1  lengthIndicator,   // 1..12
+        // the following octet fields representing an octet group
+        BC_octet3 octet3,  // 1-
+        BC_octet4 octet4 optional,  // 1 octet
+        BC_octet5 octet5 optional,  // 1-3 octets
+        BC_octet6 octet6 optional,  // 1-8 octets
+        BC_octet7 octet7 optional   // 1 octet
+} with { variant (lengthIndicator) "LENGTHTO (octet3, octet4, octet5, octet6,
+                 octet7)"};
+
+type record CallControlCapabilities {
+        OCT1  elementIdentifier, // '
+        LIN1  lengthIndicator, //
+        BIT1  dTMF,
+        BIT1  pCP,
+        BIT2  spare1, //'00'B
+        BIT4  maxNumberOfSupportedBearers,
+        BIT4  maxNumberOfSpeechBearers,
+        BIT4  spare2   // '0000'B
+} with { variant (lengthIndicator) "LENGTHTO (dTMF,pCP,spare1,
+                                        maxNumberOfSupportedBearers,
+                                        maxNumberOfSpeechBearers,spare2)"};
+
+type record CalledPartyBCD_Number {
+        OCT1  elementIdentifier, // '5E'O
+        LIN1  lengthIndicator, // 1..15
+        BIT4  numberingPlanIdentification, //       '0000'unknown  B
+                    //       '0001'B ISDN/telephony
+                    //       '0011'data  B
+                    //       '0100'B telex
+                    //       '1000'national  B
+                    //       '1001'B private
+                    //       '1111'B reserved extension  for
+        BIT3  typeOfNumber, //  '000'unknown  B
+                    //  '001'B international number
+                    //  '010'B        number  national
+                    //  '011'B network specific number
+                    //  '100'B dedicated access code  short
+                    //  '101'B reserved
+                    //  '110'reserved  B
+                    //  '111'B reserved for extension
+        BIT1  ext1,  // '0'B or '1'B
+        octetstring  digits  length(1..14) optional
+} with { variant (lengthIndicator) "LENGTHTO (numberingPlanIdentification,
+                                        typeOfNumber, ext1, digits)"};
+
+type record CalledPartySubAddress {
+        OCT1  elementIdentifier, // H'6D
+        LIN1  lengthIndicator, // 0..21
+        BIT3  spare1_3  optional, // B'...._000
+        BIT1  odd_evenIndicator  optional,
+                              // B'....0.._ even number of digits  address
+                              // B'....1.._ odd  number of address digits
+        BIT3  typeOfSubAddress  optional, // B'_000.... NSAP
+                                          // B'_010.... specified  user
+        BIT1  ext1  optional, // B'1......_
+        OCTN  subAddressInformation  optional
+} with { variant (lengthIndicator) "LENGTHTO (spare1_3, odd_evenIndicator,
+                        typeOfSubAddress, ext1, subAddressInformation)"};
+
+// This type is added to handle extension bit in Calling Party BCD number IE
+type record CallingOrCalled_Number_oct3 {
+        BIT4  numberingPlanIdentification, // Applies for type number  of
+                                     // = 000, 001, 010 and 100
+                                     // B'....Unknown  0000
+                                     // B'....0001 ISDN/telephony number plan
+                                     // B'....0011 data numbering plan
+                                     // B'....0100 telex numbering plan
+                                     // B'....1000 national numbering plan
+                                     // B'....1001 private numbering plan
+                                     // B'....1111 reserved for extension
+        BIT3  typeOfNumber, // B'_000.... Unknown
+                                     // B'_001.... international number
+                                     // B'_010.... national number
+                                     // B'_011.... network specific number
+                                     // B'_100.... dedicated access, short code
+                                     // B'_101.... reserved
+                                     // B'_110.... reserved
+                                     // B'_111.... reserved for extension
+        BIT1  ext1, // B'1......_
+        BIT2  screeningIndicator  optional,
+            // B'......00 User_provided, not screened
+            // B'......01 User_provided, verified and passed
+            // B'......10 User_provided, verified and failed
+            // B'......11 Network provided
+        BIT3  spare1_3  optional, // B'.._000..
+        BIT2  presentationIndicator  optional,
+            // B'_00 Presentation allowed
+            // B'_01 Presentation restricted
+            // B'_10 Number not available due to interworking
+            // B'_11 Reserved
+        BIT1  ext2  optional // B'1......_
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record CallingPartyBCD_Number {
+        OCT1  elementIdentifier, // '5C'O
+        LIN1  lengthIndicator, // 1..12
+        CallingOrCalled_Number_oct3   oct3,
+        OCTN  digits  optional
+} with { variant (lengthIndicator) "LENGTHTO (oct3,digits)"};
+
+type record CallingPartySubAddress {
+        OCT1  elementIdentifier, // H'5D
+        LIN1  lengthIndicator, // 0..21
+        BIT3  spare1_3  optional, // B'...._000
+        BIT1  odd_evenIndicator  optional,
+           // B'....0.._ even number of digits  address
+           // B'....1.._ odd  number of address digits
+        BIT3  typeOfSubAddress  optional, // B'_000.... NSAP
+                          // B'_010.... specified  user
+        BIT1  ext1  optional, // B'1......_
+        OCTN  subAddressInformation  optional
+} with { variant (lengthIndicator) "LENGTHTO (spare1_3, odd_evenIndicator,
+                typeOfSubAddress, ext1, subAddressInformation)"};
+
+type record CipheringKeySequenceNumber {
+        BIT3  keySequence,
+          // B'_000 .. B'_110 Possible values for the ciphering sequence key
+          // B'_111 No key is available(MS to MSC/VLR)
+          //        Reserved (MSC/VLR to MS)
+        BIT1  spare1_1     // B'0.._
+} with { variant "" };
+
+type record ClassmarkInformationType2_forUMTS {
+        OCT1  elementIdentifier,
+          //'33'O instead of '12'O (normal Classmark2)
+        LIN1  lengthIndicator,
+          //always '03'O (unlike normal ClassMark2, which can be 2 or 3)
+        BIT3  rf_PowerCapability,   //  '000'B class1 (for GSM+DCS+PCS)
+          //      '001'B class2 (for GSM+DCS+PCS)
+          //      '010'B class3 (for GSM+DCS+PCS)
+          //      '011'class4  B  (only for GSM)
+          //      '100'class5  B  (only for GSM)
+        BIT1  a5_1, //  '0'B encryption algorithm A5/1 available not (0)
+          //  '1'B encryption algorithm A5/available  1  (1)
+        BIT1  esind,
+          //'0'B controlled early classmark sending option implemented not (0)
+          //  '1'B controlled early classmark sending implemented  option  (1)
+        BIT2  revisionLevel, //  '00'B reserved for phase1 (GSM+DCS)
+          //  '00'reserved  B  (PCS)
+          //  '01'B used by phase2 MSs  (GSM+DCS)
+          //  '01'B used by PCS1900 MSs  phase1  (PCS)
+        BIT1  spare1_1, // '0'B
+        BIT1  fc, //         '0'B  no MS' support of E/R_GSM
+          //   '1'B       MS' support of E/R_GSM
+        BIT2  spare1_2, //      '00'B
+        BIT1  sm_Capability, //     '0'B SM capbility present  not
+          // '1'B SM capability     present
+        BIT2  ss_ScreenIndicator, //  '00'B default value of phase1 (GSM+DCS)
+          //  '00'reserved  B  (PCS)
+          //  '01'B capability of notation  ellipsis
+          //  '10'B for future use
+          //  '11'B for use  future
+        BIT1  ps_Capability, // '0'B or '1'B ignored, received  if
+        BIT1  spare2_1,  // '0'B,
+        BIT1  a5_2, // '0'B encryption algorithm A5/2 available  not  (0)
+          // '1'B encryption algorithm A5/available  2  (1)
+        BIT1  a5_3, // '0'B encryption algorithm A5/3 available  not  (0)
+          // '1'B encryption algorithm A5/available  3  (1)
+        BIT5  spare3_5, // '00000'B
+        BIT1  cm3   // '0'B no additional capability info
+          // '1'B   additional info  capability
+} with { variant (lengthIndicator) "LENGTHTO (rf_PowerCapability, a5_1, esind,
+                                        revisionLevel, spare1_1, fc, spare1_2,
+                                        sm_Capability, ss_ScreenIndicator,
+                                        ps_Capability, spare2_1, a5_2, a5_3,
+                                        spare3_5, cm3)"};
+
+type record ConnectedNumber {
+        OCT1  elementIdentifier, // H'4C
+        LIN1  lengthIndicator, // 2..12
+        CallingOrCalled_Number_oct3   oct3,
+        OCTN  digits  optional
+} with { variant (lengthIndicator) "LENGTHTO (oct3,digits)"};
+
+type record ConnectedSubAddress {
+        OCT1  elementIdentifier, // H'4D
+        LIN1  lengthIndicator, // 0..21
+        BIT3  spare1_3  optional, // B'...._000
+        BIT1  odd_evenIndicator  optional,
+          // B'....0.._ even number of digits address
+          // B'....1.._ odd  number of address digits
+        BIT3  typeOfSubAddress  optional, // B'_000.... NSAP
+                            // B'_010.... specified  user
+        BIT1  ext1  optional, // B'1......_
+        OCTN  subAddressInformation  optional
+} with { variant (lengthIndicator) "LENGTHTO (spare1_3, odd_evenIndicator,
+                        typeOfSubAddress, ext1, subAddressInformation)"};
+
+type record Diagnostics {
+       BIT7  diagnostic,
+       BIT1  ext
+  } with { variant "" };
+
+// This type is added for handling extension bit in octet 3 of Cause IE
+type record DTAP_Cause_oct3 {
+        BIT4  location,   //      '0000'user  B
+            //      '0001'B private network, local user
+            //      '0010'B public  network, user  local
+            //      '0011'B transit network
+            //      '0100'B public  network, user  remote
+            //      '0101'B private network, remote user
+            //      '0111'B network  international
+            //      '1010'B Network beyond interworking pt.
+        BIT1  spare1_1, //     '0'B
+        BIT2  codingStandard, // '00'B coding according Q.931
+            // '01'B reserved for standards  other
+            // '10'B National standard
+            // '11'B standard  other  (e.g. one defined for GSM PLMNs)
+        BIT1  ext1, // '0'B or '1'B
+        BIT7  recommendation  optional,
+        BIT1  ext2  optional // B'1......
+} with { variant "EXTENSION_BIT (yes)"};
+
+type record DTAP_Cause_LV {
+        LIN1  lengthIndicator, // 2..30
+        DTAP_Cause_oct3 oct3,
+        BIT7  causeValue, // see 12/FS
+        BIT1  ext3, // B'1......
+        Diagnostics  diagnostics  optional  // size: 1..27
+} with { variant (lengthIndicator) "LENGTHTO (oct3, causeValue, ext3, diagnostics) "};
+
+type record DTAP_Cause_TLV {
+        OCT1   elementIdentifier,
+        DTAP_Cause_LV dtap_Cause_LV
+} with { variant ""};
+
+type record Facility {
+        OCT1  elementIdentifier, // H'1C
+        LIN1  lengthIndicator, // 0..?
+        OCTN  facilityInformation  optional
+} with { variant (lengthIndicator) "LENGTHTO (facilityInformation)"};
+
+type record HighLayerCompatibility {
+        OCT1  elementIdentifier, // H'7D
+        LIN1  lengthIndicator, // 0..3
+        octetstring  highLayerCompatibilityContents  length(1..3) optional
+} with { variant (lengthIndicator) "LENGTHTO (highLayerCompatibilityContents)"};
+
+type record IMSI_IMEI {
+          BIT4  firstdigit,
+          octetstring  digits  length(2..7)
+} with { variant "" };
+
+type record LocationAreaIdentification {
+        OCT3  mcc_mnc,
+        OCT2  lac
+        // MCC_Digits  mcc_Digits,
+        // mnc_Digits                     MNC_Digits,
+        // OCT1  lacHigh,
+        // OCT1  lacLow
+} with { variant "" };
+
+type record LocationUpdatingType {
+         BIT2  lut, // LU  Normal  (00)
+                            // LU  Periodic  (01)
+                            // Attach  IMSI  (10)
+                            // reserved    (11)
+        BIT1  spare1_1, // 0
+        BIT1  fop   // Follow Pending  on  (1)
+                            // Follow on Pending not (0)
+} with { variant "" };
+
+type record LowLayerCompatibility {
+        OCT1  elementIdentifier, // H'7C
+        LIN1  lengthIndicator, // 0..13
+        octetstring  lowLayerCompatibilityContents  length(2..16) optional
+
+//commented out to simplify the type
+/*        BIT5  informationTransferCapability  optional,
+        BIT2  codingStandard  optional,
+        BIT1  ext1  optional, // B'x........
+        BIT6  spare1_6  optional, // B'..0000000
+        BIT1  negotiationIndicator  optional,
+        BIT1  ext2  optional, // B'x........
+        BIT5  informationTransferRate  optional,
+        BIT2  transferMode  optional,
+        BIT1  ext3  optional, // B'x........
+        BIT2  establishment  optional,
+        BIT2  configuration  optional,
+        BIT3  structure  optional,
+        BIT1  ext4  optional, // B'x........
+        BIT5  informationTransferRateDestOrig  optional,
+        BIT2  symetry  optional,
+        BIT1  ext5  optional, // B'x........
+        BIT5  userInformationLayer1Protocol  optional,
+        BIT2  layer1Identity  optional,
+        BIT1  ext6  optional, // B'x........
+        BIT5  userRate  optional,
+        BIT1  negotiation  optional,
+        BIT1  synchronous_asynchronous  optional,
+        BIT1  ext7  optional, // B'x........
+        BIT1  spare2_1  optional, // B'........0
+        BIT1  flowControlOnRX  optional,
+        BIT1  flowControlOnTX  optional,
+        BIT1  nicOnRX  optional,
+        BIT1  nicOnTX  optional,
+        BIT2  intermediateRate  optional,
+        BIT1  ext8  optional, // B'x........
+        BIT1  spare3_1  optional, // B'........0
+        BIT1  inband_outbandNegotiation  optional,
+        BIT1  assignor_assignee  optional,
+        BIT1  lliNegotiation  optional,
+        BIT1  mode  optional,
+        BIT1  multiFrameSupport  optional,
+        BIT1  hdrNohdr  optional,
+        BIT1  ext9  optional, // B'x........
+        BIT3  parity  optional,
+        BIT2  numberDataBits  optional,
+        BIT2  numberStopBits  optional,
+        BIT1  ext10  optional, // B'x........
+        BIT6  modemType  optional,
+        BIT1  duplexMode  optional,
+        BIT1  ext11  optional, // B'x........
+        BIT5  userInformationLayer2Protocol  optional,
+        BIT2  layer2Id  optional,
+        BIT1  ext12  optional, // B'x........
+        BIT5  userInformationLayer3Protocol  optional,
+        BIT2  layer3Id  optional,
+        BIT1  ext13  optional, // B'x........
+        BIT7  optionalLayer3ProtocolInformation  optional,
+        BIT1  ext14  optional  // B'x........
+*/
+} with { variant (lengthIndicator) "LENGTHTO (lowLayerCompatibilityContents)"};
+
+type union Identity {
+        IMSI_IMEI  imsi_imei,
+        DTAP_TMSI  tmsi
+ } with { variant "" };
+
+type record MobileIdentity_LV {
+        LIN1  lengthIndicator, // '03'O..'0D'O
+        BIT3  typeOfIdentity,   //        '001'IMSI  B
+            //        '010'B  IMEI
+            //        '100'DTAP_TMSI  B
+            //        '000'B  No Identity
+        BIT1  oddEvenIndicator,   //      '1'Odd  B
+            //      '0'B Even
+        Identity  identity
+  } with { variant (lengthIndicator) "LENGTHTO ( typeOfIdentity,
+                                                 oddEvenIndicator, identity)";
+         variant (identity) "CROSSTAG( imsi_imei, {typeOfIdentity='010'B,
+                                                   typeOfIdentity='001'B};
+                                       tmsi,       typeOfIdentity='100'B)"
+                                               };
+
+type record MobileIdentity_TLV {
+        OCT1  elementIdentifier, // H'17
+        LIN1  lengthIndicator, // 3..13
+        BIT3  typeOfIdentity,   // B'....IMSI  _001
+        // B'...._010 IMEI
+        // B'....DTAP_TMSI  _100
+        // B'...._000 No Identity
+        BIT1  oddEvenIndicator,  // B'....0.._ Even number of digits  idendity
+        // B'....1.._ Odd  number of identity digits
+        Identity  identity
+  } with { variant (lengthIndicator) "LENGTHTO (typeOfIdentity, oddEvenIndicator,
+                                                 identity)";
+         variant (identity) "CROSSTAG( imsi_imei, {typeOfIdentity='010'B,
+                                                   typeOfIdentity='001'B};
+                                       tmsi,      typeOfIdentity='100'B)"};
+
+type record MobileStationClassmark1 {
+         BIT3  rf_PowerCapability,
+           // class1 (000) (for GSM+DCS+PCS)
+           // class2 (001) (for GSM+DCS+PCS)
+           // class3 (010) (for GSM+DCS+PCS)
+           // class4 (011) (only for GSM)
+           // class5 (100) (only for GSM)
+        BIT1  a5_1,
+           // encryption algor. A5/available  1  (1)
+           // encryption algor. A5/1 available  not  (0)
+        BIT1  esind,
+        BIT2  revisionLevel,
+        BIT1  spare1_1
+} with { variant "" };
+
+type record MobileStationClassmark2_oct4 {
+        BIT1  fc, // '0'B no MS support of E/R_GSM
+          // '1'B      MS support of E/R_GSM
+        BIT2  spare1_2, //        '00'B
+        BIT1  sm_Capability, // '0'B SM capbility present  not
+          // '1'B SM capbility        present
+        BIT2 ss_ScreenIndicator,
+          //'00'B default value of phase1 (GSM+DCS) reserved or (PCS)
+          // '01'B capability of notation  ellipsis
+          // '10'B for future use
+          // '11'B for use  future
+        BIT1  ps_Capability, // 'x'B  ignored, received  if
+        BIT1  spare2_1   // '0'B
+} with { variant "" };
+
+type record MobileStationClassmark2_oct5 {
+        BIT1  a5_2,     // '0'B encryption algorithm A5/2 available not(0)
+            // '1'B encryption algorithm A5/available  2  (1)
+        BIT1  a5_3,     // '0'B encryption algorithm A5/3 available not(0)
+            // '1'B encryption algorithm A5/available  3  (1)
+        BIT5  spare3_5, //   '00000'B
+        BIT1  cm3       // '0'B  no additional capability info
+            // '1'B additional info  capability
+} with { variant "" };
+
+type record MobileStationClassmark2 {
+        LIN1  lengthIndicator, // '01'O..'03'O
+        BIT3  rf_PowerCapability, //        '000'B class1 (for GSM+DCS+PCS)
+           //        '001'B class2 (for GSM+DCS+PCS)
+           //        '010'B class3 (for GSM+DCS+PCS)
+           //        '011'class4  B  (only for GSM)
+           //        '100'class5  B  (only for GSM)
+        BIT1  a5_1, //       '0'B encryption algorithm A5/1 available  not  (0)
+           //       '1'B encryption algorithm A5/available  1  (1)
+        BIT1  esind,
+           //'0'B controlled early classmark sending option implemented not (0)
+           //  '1'B controlled early classmark sending implemented option (1)
+        BIT2  revisionLevel, //   '00'B reserved for phase1 (GSM+DCS)
+           //   '00'reserved  B  (PCS)
+           //   '01'B used by phase2 MSs  (GSM+DCS)
+           //   '01'B used by PCS1900 MSs  phase1  (PCS)
+           //   '10'B used by  MSs  R99  supporting
+        BIT1  spare1_1, // '0'B
+        MobileStationClassmark2_oct4  mobileStationClassmark2_oct4    optional,
+        MobileStationClassmark2_oct5  mobileStationClassmark2_oct5    optional
+} with { variant (lengthIndicator) "LENGTHTO (rf_PowerCapability, a5_1, esind,
+                                             revisionLevel, spare1_1,
+                                             mobileStationClassmark2_oct4,
+                                             mobileStationClassmark2_oct5)"};
+
+// used in: PDU_DTAP_Setup_MSC_MS, PDU_DTAP_CallProceeding,
+//          PDU_DTAP_CMServiceRequest
+
+type record PriorityLevel_DTAP {
+         BIT3  callPriority, // B'...._000 no applied  priority
+                                      // B'...._001 call priority level 4
+                                      // B'...._010 call priority 3  level
+                                      // B'...._011 call priority level 2
+                                      // B'...._100 call priority 1  level
+                                      // B'...._101 call priority level 0
+                                      // B'...._110 call priority B  level
+                                      // B'...._111 call priority level A
+        BIT1  spare1_1, // B'....0.._
+        OCT1  elementIdentifier   // B'1000.... type 1 IEI Priority level
+} with { variant "" };
+//ending "_DTAP" added, because ambiguities of (RANAP is also using this name)
+
+type record ProgressIndicator_LV {
+//        OCT1  elementIdentifier    optional, // '1E'O
+        LIN1  lengthIndicator, // '02'O
+        BIT4  location,          // '0000'user  B
+                    // '0001'B private network, local user
+                    // '0010'B public  network, user  local
+                    // '0100'B public  network, remote user
+                    // '0101'B private network, user  remote
+                    // '1010'B Network beyond interworking pt.
+        BIT1  spare1_1, //      '0'B
+        BIT2  codingStandard, //  '00'B coding according Q.931
+            //  '01'B reserved for standards  other
+            //  '10'B National standard
+            //  '11'B standard  other
+        BIT1  ext1, // '1'B
+        BIT7  progressDescription, //'0000001'B call is not end_to_end PLMN/ISDN
+           //  '0000010'B destination address is not PLMN/ISDN
+           //  '0000011'B origination address is not PLMN/ISDN
+           //  '0000100'B call has returned to the PLMN/ISDN
+           //  '0001000'B inband info available PLMN/ISDN
+           //  '0100000'B call is end_to_end PLMN/ISDN
+        BIT1  ext2  // '1'B
+} with { variant (lengthIndicator) "LENGTHTO (location, spare1_1,
+                                              codingStandard, ext1,
+                                              progressDescription, ext2)"};
+
+type record  ProgressIndicator_TLV {
+        OCT1  elementIdentifier,
+        ProgressIndicator_LV  progressIndicator_LV
+}  with { variant ""};
+
+type record SS_VersionIndicator {
+        OCT1  elementIdentifier, // H'7F
+        LIN1  lengthIndicator, // 0..?
+        OCTN  ss_VersionIndicatorContents  optional
+} with { variant (lengthIndicator) "LENGTHTO (ss_VersionIndicatorContents)"};
+
+type record DTAP_Signal {
+       OCT1  elementIdentifier, // H'34
+       OCT1  signalValue   // B'00000000  0. Dial tone on
+                           // B'00000001  1. Ring back on  tone
+                           // B'00000010  2. Intercept tone on
+                           // B'00000011  3. Network congestion on  tone
+                           // B'00000100  4. Busy tone on
+                           // B'00000101  5. Confirm on  tone
+                           // B'00000110  6. Answer tone on
+                           // B'00000111  7. Call waiting on  tone
+                           // B'00001001  9. Off_hook warning tone on
+                           // B'00111111 63. off  Tones
+                           // B'01001111 79. Alerting off
+                           //
+} with { variant "" };
+
+type record StreamIdentifier {
+        OCT1  elementIdentifier, // '2D'O
+        OCT1  lengthf, // '01'O
+        OCT1  streamIdentifierValue  // value 0..255
+} with { variant "" };
+
+type record SupportedCodecList {
+        OCT1  elementIdentifier,
+        LIN1  lengthIndicator, //  5 _ m+3
+        OCT1  systemIdentification1,
+        OCT1  lengthOfBitmap1,
+        OCT1  codecBitmap1_bits1to8,
+        OCT1  codecBitmap1_bits9to16
+} with { variant (lengthIndicator) "LENGTHTO (systemIdentification1,
+                                                 lengthOfBitmap1,
+                                                 codecBitmap1_bits1to8,
+                                                 codecBitmap1_bits9to16)"};
+
+type record DTAP_TMSI {
+        BIT4  fillerDigit, // B'1111
+        OCT4  octets
+} with { variant "" };
+
+type record AuthenticationParAUTN {
+        OCT1  elementIdentifier,
+        LIN1  lengthIndicator, //
+        OCT16 octets
+} with { variant "" };
+
+type record User_user {
+        OCT1  elementIdentifier,
+        LIN1  lengthIndicator,
+        OCT1  user_userProtocolDiscriminator,
+        octetstring user_userInformation length(0..128)
+} with { variant (lengthIndicator) "LENGTHTO(user_userInformation)" };
+
+type record User_userShort {
+        OCT1  elementIdentifier,
+        LIN1  lengthIndicator,
+        OCT1  user_userProtocolDiscriminator,
+        octetstring user_userInformation length(0..32)
+} with { variant (lengthIndicator) "LENGTHTO(user_userInformation)" };
+
+type record AuthenticationParSRESext {
+        OCT1  elementIdentifier,
+        LIN1  lengthIndicator,
+        octetstring rES length(1..12)
+} with { variant (lengthIndicator) "LENGTHTO(rES)" };
+
+type record RepeatIndicator {
+        BIT4  elementIdentifier,
+        BIT4  RepeatIndication
+} with { variant "" };
+
+type record CLIR {
+        OCT1  elementIdentifier
+} with { variant "" };
+
+/////////////////////////////////////////////
+// IEs defined in 44.018
+/////////////////////////////////////////////
+// All references listed here refers clause number of 44.018
+
+// 10.5.2.2
+type record CellDescription
+{
+
+BIT3  bcc,                  // '001'B
+BIT3  ncc,                  // '010'B
+BIT2  BCCHArfcn_HighPart,   // '11'B
+OCT1  BCCHArfcn_LowPart    // '04'O
+} with {variant ""}
+
+// 10.5.2.5a
+type record ChannelDescription2
+{
+ BIT3   timeslotNumber,            // '110'B
+ BIT5   channelTypeandTDMAOffset,  // '00001'B send  or '00111'B rcv
+ OCT1   octet3,                    //  '00'O
+ OCT1   octet4                     // '09'O
+} with {variant ""}
+
+// 10.5.2.28a
+type record PowerCommandAndAccesstype
+{
+ BIT5   powerlevel,   // 00000
+ BIT1   fPC_EP,       // 0
+ BIT1   ePC_Mode,     // 0
+ BIT1   aTC           // 0
+} with {variant ""}
+
+// 10.5.2.15
+type record HandoverReference
+{
+OCT1   handoverReferenceValue   //'00'O
+} with {variant ""}
+
+//****************************************************************************
+//****************************************************************************
+/////////////////////////////////////////////
+// PDU Type definitions
+/////////////////////////////////////////////
+
+    // 9.3.1.1
+type record PDU_DTAP_Alerting_MSC_MS {
+      BIT6  messageType, //     '000001'Alerting  B
+      BIT2  nsd, // sent by the MSC: '00'B
+      Facility  facility                        optional,
+      ProgressIndicator_TLV  progressIndicator  optional,
+      User_user user_user                       optional
+} with { variant "TAG (
+                facility,           elementIdentifier = '1C'O;
+                progressIndicator,  elementIdentifier = '1E'O;
+                user_user,          elementIdentifier = '7E'O ) "}
+
+    // 9.3.1.2
+type record PDU_DTAP_Alerting_MS_MSC {
+      BIT6  messageType, // B'..000001 (Alerting)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      Facility  facility                            optional,
+      User_user user_user                           optional,
+      SS_VersionIndicator  ss_VersionIndicator      optional
+} with { variant "TAG (
+                facility,            elementIdentifier = '1C'O;
+                user_user,           elementIdentifier = '7E'O;
+                ss_VersionIndicator, elementIdentifier = '7F'O ) "};
+
+    // 9.2.2
+type record PDU_DTAP_AuthenticationRequest {
+     BIT6  messageType, // B'_010010  (AuthenticationRequest)
+     BIT2  nsd, // sent by the MSC: '00'B
+     CipheringKeySequenceNumber  cipheringKeySequenceNumber,
+     BIT4  spare2_4, // B'0000
+     OCT16  authenticationParRAND,
+     AuthenticationParAUTN  authenticationParAUTN    optional
+         // added by ethcky acc to 10/155 17_1/APT 210 26/1 Uen Rev A
+} with { variant "TAG (
+                authenticationParAUTN, elementIdentifier = '20'O ) "};
+
+// 9.2.3
+type record PDU_DTAP_AuthenticationResponse {
+     BIT6  messageType, // B'_010100  (AuthenticationResponse)
+     BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+     OCT4  authenticationParSRES,
+     AuthenticationParSRESext  authenticationParSRESext  optional
+} with { variant "TAG (authenticationParSRESext, elementIdentifier = '21'O ) " };
+
+// 9.2.7
+type record PDU_DTAP_CMServiceAbort {
+      BIT6  messageType, //   '100011'B
+      BIT2  nsd  // sent by the MSC: '00'B
+} with { variant "" };
+
+// 9.2.5
+type record PDU_DTAP_CMServiceAccept {
+      BIT6  messageType, //    '100001'B
+      BIT2  nsd  // sent by the MSC: '00'B
+} with { variant "" };
+
+// 9.2.6
+type record PDU_DTAP_CMServiceReject {
+      BIT6  messageType, //    '100010'B
+      BIT2  nsd, // sent by the MSC: '00'B
+      OCT1  rejectCause
+} with { variant "" };
+
+// 9.2.9
+type record PDU_DTAP_CMServiceRequest {
+      BIT6  messageType,//    '100100'B
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      BIT4  cm_ServiceType,  // '0001'B establishment  MOC
+                             // '0010'B Emergency Call
+                             // '0100'SMS  B
+                             // '1000'B SS activation
+      CipheringKeySequenceNumber  cipheringKeySequenceNumber,
+      MobileStationClassmark2     mobileStationClassmark2,
+      MobileIdentity_LV           mobileIdentity_LV,
+      PriorityLevel_DTAP        priorityLevel   optional
+} with { variant "TAG (
+                priorityLevel, elementIdentifier = '08'O ) "};
+
+    // 9.3.2
+type record PDU_DTAP_CallConfirmed {
+      BIT6  messageType, //    '001000'CallConfirmed  B
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      RepeatIndicator  repeatIndicator  optional, // successive selection:
+                                                  //only present also  if
+                                                  //BC1&BC2 are present
+                                                  // H'circular  D1
+                                                  // H'D3 sequential
+      BearerCapability  bearerCapability1     optional,
+      BearerCapability  bearerCapability2     optional,
+      DTAP_Cause_TLV  cause                 optional,
+      CallControlCapabilities cC_Capabilities optional,
+         //ethekr 02may 2 or 3 octets?
+      StreamIdentifier  streamIdentifier      optional,  // 2002may  ethekr
+      SupportedCodecList  supportedCodecs     optional  // ethekr 2002may UCN30
+} with { variant "TAG (
+                repeatIndicator,   elementIdentifier = '1101'B;
+                bearerCapability1, elementIdentifier = '04'O;
+                bearerCapability2, elementIdentifier = '04'O;
+                cause,             elementIdentifier = '08'O;
+                cC_Capabilities,   elementIdentifier = '15'O;
+                streamIdentifier,  elementIdentifier = '2D'O;
+                supportedCodecs,   elementIdentifier = '40'O ) "};
+
+// 9.3.3
+type record PDU_DTAP_CallProceeding {
+      BIT6  messageType, //   '000010'CallProceeding  B
+      BIT2  nsd, // sent by the MSC: '00'B
+      RepeatIndicator  repeatIndicator  optional, //successive selection:
+                                                  //only present also  if
+                                                  //BC1&BC2 are present
+                                                  // H'circular  D1
+                                                  // H'D3 sequential
+      BearerCapability  bearerCapability1         optional,
+      BearerCapability  bearerCapability2         optional,
+      Facility          facility                  optional,
+      ProgressIndicator_TLV  progressIndicator    optional,
+      PriorityLevel_DTAP   priorityGranted      optional
+} with { variant "TAG (
+                repeatIndicator,   elementIdentifier = '1101'B;
+                bearerCapability1, elementIdentifier = '04'O;
+                bearerCapability2, elementIdentifier = '04'O;
+                facility,          elementIdentifier = '1C'O;
+                progressIndicator, elementIdentifier = '1E'O;
+                priorityGranted,   elementIdentifier = '08'O ) "};
+
+type record PDU_DTAP_ConnectAck {
+      BIT6  messageType, // '001111'B (ConnectAck)
+      BIT2  nsd //in R8.0:'0x'B in R9.0:'xy'B or '0x'B if sent by MSC:'00'B
+} with { variant "" };
+
+// 9.3.5.1
+type record PDU_DTAP_Connect_MSC_MS {
+      BIT6  messageType, // '000111'B (Connect)
+      BIT2  nsd, // sent by the MSC: '00'B
+      Facility  facility                          optional,
+      ProgressIndicator_TLV  progressIndicator    optional,
+      ConnectedNumber        connectedNumber      optional,
+      ConnectedSubAddress    connectedSubAddress  optional,
+      User_user              user_user            optional
+} with { variant "TAG (
+                facility,            elementIdentifier = '1C'O;
+                progressIndicator,   elementIdentifier = '1E'O;
+                connectedNumber,     elementIdentifier = '4C'O;
+                connectedSubAddress, elementIdentifier = '4D'O;
+                user_user,           elementIdentifier = '7E'O ) "};
+
+// 9.3.5.2
+type record PDU_DTAP_Connect_MS_MSC {
+      BIT6  messageType, // '000111'B (Connect)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      Facility             facility             optional,
+      ConnectedSubAddress  connectedSubAddress  optional,
+      User_user            user_user            optional,
+      SS_VersionIndicator  ss_VersionIndicator  optional,
+      StreamIdentifier     streamIdentifier     optional
+} with { variant "TAG (
+                facility,              elementIdentifier = '1C'O;
+                connectedSubAddress,   elementIdentifier = '4D'O;
+                user_user,             elementIdentifier = '7E'O;
+                ss_VersionIndicator,   elementIdentifier = '7F'O;
+                streamIdentifier,      elementIdentifier = '2D'O ) "};
+
+// 9.3.7.1
+type record PDU_DTAP_Disconnect_MSC_MS {
+      BIT6  messageType, //   '100101'B  (Disconnect)
+      BIT2  nsd, // sent by the MSC: '00'B
+      DTAP_Cause_LV         cause,
+      Facility                facility            optional,
+      ProgressIndicator_TLV   progressIndicator   optional,
+      User_user               user_user           optional
+} with { variant "TAG (
+                facility,           elementIdentifier = '1C'O;
+                progressIndicator,  elementIdentifier = '1E'O;
+                user_user,          elementIdentifier = '7E'O ) "};
+
+// 9.3.7.2
+type record PDU_DTAP_Disconnect_MS_MSC {
+      BIT6  messageType,  //    '100101'B (Disconnect)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      DTAP_Cause_LV  cause,
+      Facility            facility              optional,
+      User_user           user_user             optional,
+      SS_VersionIndicator ss_VersionIndicator   optional
+} with { variant "TAG (
+                facility,             elementIdentifier = '1C'O;
+                user_user,            elementIdentifier = '7E'O;
+                ss_VersionIndicator,  elementIdentifier = '7F'O ) "};
+
+type record PDU_DTAP_Facility {
+      BIT6  messageType,
+      BIT2  nsd,
+     // facilityIEI                 OCT1,
+      OCT1  facilityIE_length,
+
+       OCT1  componentTypeTag,
+       OCT1  componentLength,
+      // sequenceTag                OCT1,
+      // OCT1  sequenceLength,
+      OCT1  invokeIdTag,
+      OCT1  invokeIdLength,
+      OCT1  invokeIdValue,
+      OCT1  operationCodeTag,
+
+      OCT1  operationCodeLength,
+      OCT1  operationCodeValue,
+     DTAP_NotifySS_Arg  argument
+} with { variant "" };
+
+type record PDU_DTAP_Hold {
+      BIT6  messageType,    //    '011000'Hold  B
+      BIT2  nsd  // sent by the MSC: '00'B
+} with { variant "" };
+
+type record PDU_DTAP_Hold_Acknowledge {
+      BIT6  messageType,    //   '011001'B   Acknowledge  Hold
+      BIT2  nsd  // sent by the MSC: '00'B
+} with { variant "" };
+
+type record PDU_DTAP_Hold_Retrieve {
+      BIT6  messageType,
+      BIT2  nsd  // sent by the MSC: '00'B
+} with { variant "" };
+
+type record PDU_DTAP_IdentityRequest {
+      BIT6  messageType, //   '011000'B ( IdentityRequest )
+      BIT2  nsd, //   '00'B  sent by MSC  the
+      BIT3  identityType,  // IMSI: '001'B IMEI: '010'B (TMSI not allowed)
+      BIT5  spare1_5     // '00000'B
+} with { variant "" };
+
+type record PDU_DTAP_IdentityResponse {
+      BIT6  messageType,  //    '011001'B (IdentityResponse)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      MobileIdentity_LV  mobileIdentity_LV
+         //only IMSI or accepted  IMEI  (not TMSI)
+} with { variant "" };
+
+type record PDU_DTAP_LocationUpdateAccept {
+      BIT6  messageType, // B'_001000  (LocationUpdateRequest)
+      BIT2  nsd, // sent by the MSC: '00'B
+      LocationAreaIdentification  locationAreaIdentification,
+      MobileIdentity_TLV          mobileIdentity_TLV
+} with { variant "" };
+
+type record PDU_DTAP_LocationUpdateReject {
+      BIT6  messageType, // B'_000100  (LocationUpdateReject)
+      BIT2  nsd, // sent by the MSC: '00'B
+      OCT1  rejectCause   // H'xx (Reject Cause)
+} with { variant "" };
+
+type record PDU_DTAP_LocationUpdateRequest {
+      BIT6  messageType, // B'_001000  (LocationUpdateRequest)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      LocationUpdatingType              locationUpdatingType,
+      CipheringKeySequenceNumber        cipheringKeySequenceNumber,
+      LocationAreaIdentification        locationAreaIdentification,
+      MobileStationClassmark1           mobileStationClassmark1,
+      MobileIdentity_LV                 mobileIdentity_LV,
+      ClassmarkInformationType2_forUMTS classmarkInformationType2_forUMTS optional
+} with { variant "" };
+
+// 9.3.17
+type record PDU_DTAP_Progress {
+      BIT6  messageType,    //  '000011'Progress  B
+      BIT2  nsd, // sent by the MSC: '00'B
+      ProgressIndicator_LV  progressIndicator
+} with { variant "" };
+
+// 9.3.19.1
+type record PDU_DTAP_ReleaseComplete_MSC_MS {
+      BIT6  messageType, //    '101010'ReleaseComplete  B
+      BIT2  nsd, // sent by the MSC: '00'B
+      DTAP_Cause_TLV  cause      optional,
+      Facility          facility   optional,
+      User_user         user_user  optional
+} with { variant "TAG (
+                cause,      elementIdentifier = '08'O;
+                facility,   elementIdentifier = '1C'O ;
+                user_user,  elementIdentifier = '7E'O ) "};
+
+// 9.3.19.2
+type record PDU_DTAP_ReleaseComplete_MS_MSC {
+      BIT6  messageType, //   '101010'B  (ReleaseComplete)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      DTAP_Cause_TLV      cause                 optional,
+      Facility              facility              optional,
+      User_user             user_user             optional,
+      SS_VersionIndicator   ss_VersionIndicator   optional
+} with { variant "TAG (
+                cause,                elementIdentifier = '08'O;
+                facility,             elementIdentifier = '1C'O;
+                user_user,            elementIdentifier = '7E'O;
+                ss_VersionIndicator,  elementIdentifier = '7F'O ) "};
+
+// 9.3.18.1
+type record PDU_DTAP_Release_MSC_MS {
+      BIT6  messageType, //    '101101'Release  B
+      BIT2  nsd, // sent by the MSC: '00'B
+      DTAP_Cause_TLV  cause         optional,
+      DTAP_Cause_TLV  secondCause   optional,
+      Facility          facility      optional,
+      User_user         user_user     optional
+} with { variant "TAG (
+                cause,        elementIdentifier = '08'O;
+                secondCause,  elementIdentifier = '08'O;
+                facility,     elementIdentifier = '1C'O;
+                user_user,    elementIdentifier = '7E'O ) "};
+
+// 9.3.18.2
+type record PDU_DTAP_Release_MS_MSC {
+      BIT6  messageType, //    '101101'Release  B
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      DTAP_Cause_TLV      cause                 optional,
+      DTAP_Cause_TLV      secondCause           optional,
+      Facility              facility              optional,
+      User_user             user_user             optional,
+      SS_VersionIndicator   ss_VersionIndicator   optional
+} with { variant "TAG (
+                cause,                elementIdentifier = '08'O;
+                secondCause,          elementIdentifier = '08'O;
+                facility,             elementIdentifier = '1C'O;
+                user_user,            elementIdentifier = '7E'O;
+                ss_VersionIndicator,  elementIdentifier = '7F'O ) "};
+
+// 9.3.23.1
+type record PDU_DTAP_Setup_MSC_MS {
+      BIT6  messageType,   // '000101'B  (Setup)
+      BIT2  nsd, // sent by the MSC: '00'B
+      RepeatIndicator  bcRepeatIndicator   optional, // successive selection:
+                                                     // only present also  if
+                                                     // BC1&BC2 are present
+                                                     // H'circular  D1
+                                                     // H'D3 sequential
+      BearerCapability  bearerCapability1      optional,
+      BearerCapability  bearerCapability2      optional,
+      Facility  facility                       optional,
+      ProgressIndicator_TLV  progressIndicator optional,
+      DTAP_Signal  signal                           optional,
+      CallingPartyBCD_Number  callingPartyBCD_Number   optional,
+      CallingPartySubAddress  callingPartySubAddress   optional,
+      CalledPartyBCD_Number  calledPartyBCD_Number     optional,
+      CalledPartySubAddress  calledPartySubAddress     optional,
+      RepeatIndicator  llc_RepeatIndicator     optional, // H'circular  D1
+                      // H'D3 sequential
+      LowLayerCompatibility  lowLayerCompatibility1    optional,
+      LowLayerCompatibility  lowLayerCompatibility2    optional,
+      RepeatIndicator  hlc_RepeatIndicator    optional, // H'circular  D1
+                      // H'D3 sequential
+      HighLayerCompatibility  highLayerCompatibility1   optional,
+      HighLayerCompatibility  highLayerCompatibility2   optional,
+      User_userShort  user_user      optional,
+      PriorityLevel_DTAP  priority        optional
+} with { variant "TAG (
+                bcRepeatIndicator,        elementIdentifier = '1101'B;
+                bearerCapability1,        elementIdentifier = '04'O;
+                bearerCapability2,        elementIdentifier = '04'O;
+                facility,                 elementIdentifier = '1C'O;
+                progressIndicator,        elementIdentifier = '1E'O;
+                signal,                   elementIdentifier = '34'O;
+                callingPartyBCD_Number,   elementIdentifier = '5C'O;
+                callingPartySubAddress,   elementIdentifier = '5D'O;
+                calledPartyBCD_Number,    elementIdentifier = '5E'O;
+                calledPartySubAddress,    elementIdentifier = '6D'O;
+                llc_RepeatIndicator,      elementIdentifier = '1101'B;
+                lowLayerCompatibility1,   elementIdentifier = '7C'O;
+                lowLayerCompatibility2,   elementIdentifier = '7C'O;
+                hlc_RepeatIndicator,      elementIdentifier = '1101'B;
+                highLayerCompatibility1,  elementIdentifier = '7D'O;
+                highLayerCompatibility2,  elementIdentifier = '7D'O;
+                user_user,                elementIdentifier = '7E'O;
+                priority,                 elementIdentifier = '08'O ) "};
+
+// 9.3.23.2
+type record PDU_DTAP_Setup_MS_MSC {
+      BIT6  messageType,   //     '000101'B  (Setup)
+      BIT2  nsd, // in R8.0: '0x'B    in R9.0: 'xy'B or '0x'B
+      RepeatIndicator  bcRepeatIndicator   optional, // successive selection:
+                                                     // only present also  if
+                                                     // BC1&BC2 are present
+                                                     // H'circular  D1
+                                                     // H'D3 sequential
+      BearerCapability  bearerCapability1,
+      BearerCapability  bearerCapability2         optional,
+//    MobileIdentity_TLV  mobileIdentity_TLV    optional,
+      Facility  facility                        optional,
+      CallingPartySubAddress  callingPartySubAddress   optional,
+      CalledPartyBCD_Number  calledPartyBCD_Number,
+      CalledPartySubAddress  calledPartySubAddress    optional,
+      RepeatIndicator  llc_RepeatIndicator    optional, // H'circular  D1
+                            // H'D3 sequential
+      LowLayerCompatibility  lowLayerCompatibility1    optional,
+      LowLayerCompatibility  lowLayerCompatibility2    optional,
+      RepeatIndicator  hlc_RepeatIndicator    optional, // H'circular  D1
+                              // H'D3 sequential
+      HighLayerCompatibility  highLayerCompatibility1   optional,
+      HighLayerCompatibility  highLayerCompatibility2   optional,
+      User_userShort user_user      optional,
+      SS_VersionIndicator  ss_VersionIndicator   optional,
+      CLIR  clir_Suppression                     optional, // H'A1
+      CLIR  clir_Invocation                      optional, // H'A2
+      StreamIdentifier  streamIdentifier         optional,
+      SupportedCodecList supportedCodecs  optional  // ethekr 2002may UCN30
+} with { variant "TAG (
+                bcRepeatIndicator,        elementIdentifier = '1101'B;
+                bearerCapability1,        elementIdentifier = '04'O;
+                bearerCapability2,        elementIdentifier = '04'O;
+                facility,                 elementIdentifier = '1C'O;
+                callingPartySubAddress,   elementIdentifier = '5D'O;
+                calledPartyBCD_Number,    elementIdentifier = '5E'O;
+                calledPartySubAddress,    elementIdentifier = '6D'O;
+                llc_RepeatIndicator,      elementIdentifier = '1101'B;
+                lowLayerCompatibility1,   elementIdentifier = '7C'O;
+                lowLayerCompatibility2,   elementIdentifier = '7C'O;
+                hlc_RepeatIndicator,      elementIdentifier = '1101'B;
+                highLayerCompatibility1,  elementIdentifier = '7D'O;
+                highLayerCompatibility2,  elementIdentifier = '7D'O;
+                user_user,                elementIdentifier = '7E'O;
+                ss_VersionIndicator,      elementIdentifier = '7F'O;
+                clir_Suppression,         elementIdentifier = 'A1'O;
+                clir_Invocation,          elementIdentifier = 'A2'O;
+                streamIdentifier,         elementIdentifier = '2D'O;
+                supportedCodecs,          elementIdentifier = '40'O ) "};
+
+// ***************************************************************************
+// ***************************************************************************
+// *     Call Control Messages MSC -> MS
+// ***************************************************************************
+type union PDU_DTAP_CC_MS_MSC
+  {
+    PDU_DTAP_Alerting_MS_MSC          alerting_MS_MSC,
+    PDU_DTAP_CallConfirmed            callConfirmed,
+    PDU_DTAP_CallProceeding           callProceeding,
+    PDU_DTAP_ConnectAck               connectAck,
+    PDU_DTAP_Connect_MS_MSC           connect_MS_MSC,
+    PDU_DTAP_Disconnect_MS_MSC        disconnect_MS_MSC,
+    PDU_DTAP_Facility                 facility,
+    PDU_DTAP_Hold                     hold,
+    PDU_DTAP_Hold_Acknowledge         hold_Acknowledge,
+    PDU_DTAP_Hold_Retrieve            hold_Retrieve,
+    PDU_DTAP_PagingResponse           pagingResponse,
+    PDU_DTAP_Progress                 progress,
+    PDU_DTAP_ReleaseComplete_MS_MSC   releaseComplete_MS_MSC,
+    PDU_DTAP_Release_MS_MSC           release_MS_MSC,
+    PDU_DTAP_Setup_MS_MSC             setup_MS_MSC
+  } with { variant "TAG (
+                alerting_MS_MSC,        messageType ='000001'B;
+                callConfirmed,          messageType ='001000'B;
+                callProceeding,         messageType ='000010'B;
+                connectAck,             messageType ='001111'B;
+                connect_MS_MSC,         messageType ='000111'B;
+                disconnect_MS_MSC,      messageType ='100101'B;
+                facility,               messageType ='111010'B;
+                hold,                   messageType ='011000'B;
+                hold_Acknowledge,       messageType ='011001'B;
+                hold_Retrieve,          messageType ='011100'B;
+                pagingResponse,         messageType ='00100111'B;
+                progress,               messageType ='000011'B;
+                releaseComplete_MS_MSC, messageType ='101010'B;
+                release_MS_MSC,         messageType ='101101'B;
+                setup_MS_MSC,           messageType ='000101'B;
+              )"
+};
+
+// ***************************************************************************
+// *     Call Control Messages MSC -> MS
+// ***************************************************************************
+type union PDU_DTAP_CC_MSC_MS
+  {
+    PDU_DTAP_Alerting_MSC_MS          alerting_MSC_MS,
+    PDU_DTAP_CallConfirmed            callConfirmed,
+    PDU_DTAP_CallProceeding           callProceeding,
+    PDU_DTAP_ConnectAck               connectAck,
+    PDU_DTAP_Connect_MSC_MS           connect_MSC_MS,
+    PDU_DTAP_Disconnect_MSC_MS        disconnect_MSC_MS,
+    PDU_DTAP_Facility                 facility,
+    PDU_DTAP_Hold                     hold,
+    PDU_DTAP_Hold_Acknowledge         hold_Acknowledge,
+    PDU_DTAP_Hold_Retrieve            hold_Retrieve,
+    PDU_DTAP_PagingResponse           pagingResponse,
+    PDU_DTAP_Progress                 progress,
+    PDU_DTAP_ReleaseComplete_MSC_MS   releaseComplete_MSC_MS,
+    PDU_DTAP_Release_MSC_MS           release_MSC_MS,
+    PDU_DTAP_Setup_MSC_MS             setup_MSC_MS
+  } with { variant "TAG (
+                alerting_MSC_MS,        messageType ='000001'B;
+                callConfirmed,          messageType ='001000'B;
+                callProceeding,         messageType ='000010'B;
+                connectAck,             messageType ='001111'B;
+                connect_MSC_MS,         messageType ='000111'B;
+                disconnect_MSC_MS,      messageType ='100101'B;
+                facility,               messageType ='111010'B;
+                hold,                   messageType ='011000'B;
+                hold_Acknowledge,       messageType ='011001'B;
+                hold_Retrieve,          messageType ='011100'B;
+                pagingResponse,         messageType ='00100111'B;
+                progress,               messageType ='000011'B;
+                releaseComplete_MSC_MS, messageType ='101010'B;
+                release_MSC_MS,         messageType ='101101'B;
+                setup_MSC_MS,           messageType ='000101'B;
+              )"
+};
+
+// ***************************************************************************
+// *     Mobility Managemet Messages
+// ***************************************************************************
+type union PDU_DTAP_MM
+  {
+    PDU_DTAP_LocationUpdateAccept     locationUpdateAccept,
+    PDU_DTAP_LocationUpdateReject     locationUpdateReject,
+    PDU_DTAP_LocationUpdateRequest    locationUpdateRequest,
+    PDU_DTAP_AuthenticationRequest    authenticationRequest,
+    PDU_DTAP_AuthenticationResponse   authenticationResponse,
+    PDU_DTAP_IdentityRequest          identityRequest,
+    PDU_DTAP_IdentityResponse         identityResponse,
+    PDU_DTAP_CMServiceAbort           cMServiceAbort,
+    PDU_DTAP_CMServiceAccept          cMServiceAccept,
+    PDU_DTAP_CMServiceReject          cMServiceReject,
+    PDU_DTAP_CMServiceRequest         cMServiceRequest
+  } with { variant "TAG (
+                locationUpdateAccept,   messageType ='000010'B;
+                locationUpdateReject,   messageType ='000100'B;
+                locationUpdateRequest,  messageType ='001000'B;
+                authenticationRequest,  messageType ='010010'B;
+                authenticationResponse, messageType ='010100'B;
+                identityRequest,        messageType ='011000'B;
+                identityResponse,       messageType ='011001'B;
+                cMServiceAbort,         messageType ='100011'B;
+                cMServiceAccept,        messageType ='100001'B;
+                cMServiceReject,        messageType ='100010'B;
+                cMServiceRequest,       messageType ='100100'B
+              )"
+};
+
+// ***************************************************************************
+// *     Radio Resource Management messages
+// ***************************************************************************
+// The messages below defined in 44.018 v4.4.0
+// Some IEs used from 24.008 and some IEs are defined in 44.018
+
+// 44.018 v4.4.0 clause 9.1.15
+type record PDU_DTAP_HandoverCommand
+
+{
+ BIT8       messageType,                        //'101011'B,
+ CellDescription           cellDescription,
+ ChannelDescription2       channelDescription2,
+ HandoverReference         handoverReference,
+ PowerCommandAndAccesstype powerCommandAndAccesstype
+ // only mandatory IEs listed here.
+} with {variant ""}
+
+// 44.018 v4.4.0 clause 9.1.25
+type record PDU_DTAP_PagingResponse {
+      BIT8  messageType, // '100111'B = '27'O Response  Paging
+      CipheringKeySequenceNumber  cipheringKeySequenceNumber,
+      BIT4                        spare1_4,    //   '0000'B
+      MobileStationClassmark2     mobileStationClassmark2,
+      MobileIdentity_LV           mobileIdentity_LV
+} with { variant "" };
+
+type union PDU_DTAP_RRM
+  {
+    PDU_DTAP_PagingResponse           pagingResponse,
+    PDU_DTAP_HandoverCommand          handoverCommand
+  } with { variant "TAG (
+                pagingResponse,         messageType ='00100111'B;
+                handoverCommand,        messageType ='00101011'B
+              )"
+};
+
+// ***************************************************************************
+// *     The container types of all DTAP_PDU
+// ***************************************************************************
+
+// selection based on protocol discriminator as written in 24.007 v4.2.0
+
+// type union tIExtension
+//   {
+//     OCT1    present_,
+//     Dummy   not_present
+//   }
+
+type record DTAP_TransactionId
+  {
+    BIT3    tio,
+    BIT1    tiFlag //,
+    // TIExtension     tIExtension
+    // an extension octet (TI) can be used for session management messages
+    // not yet implemented (see 24.008 clause 10.3.2 for more detail
+  } with { variant "" };
+
+type union TiOrSkip
+  {
+    BIT4          skipIndicator,
+    DTAP_TransactionId transactionId
+  } with { variant "" };
+
+type union DTAP_Discr_MSC_MS
+  {
+    octetstring        gcc,      //group call control
+    octetstring        bcc,      // broadcast call control
+    PDU_DTAP_CC_MSC_MS cc,       // call control; call related SS messages
+    octetstring        gttp,     // GPRS Transparent Transport Protocol
+    PDU_DTAP_MM        mm,       // mobility management messages
+    PDU_DTAP_RRM       rrm,      // radio resource management messages
+    octetstring        gprs_mm,  // GPRS mobility management messages
+    octetstring        sms,      // SMS messages
+    octetstring        gprs_sm,  // GPRS session management messages
+    octetstring        ss,       // non call related SS messages
+    octetstring        loc,      // Location services
+    octetstring        reserved
+  } with { variant "" };
+
+type record PDU_DTAP_MSC_MS
+  {
+    BIT4         discriminator,
+    TiOrSkip     tiOrSkip,
+    DTAP_Discr_MSC_MS    msgs
+  }  with { variant (msgs)"CROSSTAG(
+                          gcc,        discriminator='0000'B;
+                          bcc,        discriminator='0001'B;
+                          cc,         discriminator='0011'B;
+                          gttp,       discriminator='0100'B;
+                          mm,         discriminator='0101'B;
+                          rrm,        discriminator='0110'B;
+                          gprs_mm,    discriminator='1000'B;
+                          sms,        discriminator='1001'B;
+                          gprs_sm,    discriminator='1010'B;
+                          ss,         discriminator='1011'B;
+                          loc,        discriminator='1100'B;
+                          reserved, { discriminator='0010'B,
+                                      discriminator='0111'B,
+                                      discriminator='1101'B,
+                                      discriminator='1110'B,
+                                      discriminator='1111'B }
+                          )";
+           variant (tiOrSkip)"CROSSTAG(
+                          skipIndicator,    { discriminator='0000'B,
+                                              discriminator='0001'B,
+                                              discriminator='0010'B,
+                                              discriminator='0100'B,
+                                              discriminator='0101'B,
+                                              discriminator='0110'B,
+                                              discriminator='0111'B,
+                                              discriminator='1000'B,
+                                              discriminator='1001'B,
+                                              discriminator='1011'B,
+                                              discriminator='1100'B,
+                                              discriminator='1101'B,
+                                              discriminator='1110'B,
+                                              discriminator='1111'B };
+                          transactionId,    { discriminator='0011'B,
+                                              discriminator='1010'B }
+                          )";
+         };
+
+type union DTAP_Discr_MS_MSC
+  {
+    octetstring        gcc,      //group call control
+    octetstring        bcc,      // broadcast call control
+    PDU_DTAP_CC_MS_MSC cc,       // call control; call related SS messages
+    octetstring        gttp,     // GPRS Transparent Transport Protocol
+    PDU_DTAP_MM        mm,       // mobility management messages
+    PDU_DTAP_RRM       rrm,      // radio resource management messages
+    octetstring        gprs_mm,  // GPRS mobility management messages
+    octetstring        sms,      // SMS messages
+    octetstring        gprs_sm,  // GPRS session management messages
+    octetstring        ss,  // non call related SS messages
+    octetstring        loc, // Location services
+    octetstring        reserved
+  } with { variant "" };
+
+type record PDU_DTAP_MS_MSC
+  {
+    BIT4                  discriminator,
+    TiOrSkip              tiOrSkip,
+    DTAP_Discr_MS_MSC     msgs
+  } with { variant (msgs)"CROSSTAG(
+                          gcc,        discriminator='0000'B;
+                          bcc,        discriminator='0001'B;
+                          cc,         discriminator='0011'B;
+                          gttp,       discriminator='0100'B;
+                          mm,         discriminator='0101'B;
+                          rrm,        discriminator='0110'B;
+                          gprs_mm,    discriminator='1000'B;
+                          sms,        discriminator='1001'B;
+                          gprs_sm,    discriminator='1010'B;
+                          ss,         discriminator='1011'B;
+                          loc,        discriminator='1100'B;
+                          reserved, { discriminator='0010'B,
+                                      discriminator='0111'B,
+                                      discriminator='1101'B,
+                                      discriminator='1110'B,
+                                      discriminator='1111'B }
+                          )";
+           variant (tiOrSkip)"CROSSTAG(
+                          skipIndicator,    { discriminator='0000'B,
+                                              discriminator='0001'B,
+                                              discriminator='0010'B,
+                                              discriminator='0100'B,
+                                              discriminator='0101'B,
+                                              discriminator='0110'B,
+                                              discriminator='0111'B,
+                                              discriminator='1000'B,
+                                              discriminator='1001'B,
+                                              discriminator='1011'B,
+                                              discriminator='1100'B,
+                                              discriminator='1101'B,
+                                              discriminator='1110'B,
+                                              discriminator='1111'B };
+                          transactionId,    { discriminator='0011'B,
+                                              discriminator='1010'B }
+                          )";
+         };
+
+external function enc_PDU_DTAP_MSC_MS(in PDU_DTAP_MSC_MS pdu) return octetstring
+  with { extension "prototype(convert) encode(RAW)" }
+external function dec_PDU_DTAP_MSC_MS(in octetstring stream) return PDU_DTAP_MSC_MS
+  with { extension "prototype(convert) decode(RAW)" }
+
+external function enc_PDU_DTAP_MS_MSC(in PDU_DTAP_MS_MSC pdu) return octetstring
+  with { extension "prototype(convert) encode(RAW)" }
+external function dec_PDU_DTAP_MS_MSC(in octetstring stream) return PDU_DTAP_MS_MSC
+  with { extension "prototype(convert) decode(RAW)" }
+
+} // End of module DTAP_typedefs
+with {encode "RAW"}

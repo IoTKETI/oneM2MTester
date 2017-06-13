@@ -1,0 +1,157 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_type_subs_with_elem_subs.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Nov 18 13:34:40 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- type_subs_with_elem_subs.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "www.example.org/type/subs/with/elem/subs" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_type_subs_with_elem_subs {
+
+
+import from XSD all;
+
+
+/* Root element */
+
+
+type SubmitRequestType Submit
+with {
+  variant "element";
+};
+
+
+type record RequestGroup
+{
+	Request_group request
+}
+with {
+  variant "name as uncapitalized";
+};
+
+
+type record SubmitRequestType
+{
+	XSD.String name,
+	RequestAbstractType_derivations request1,
+	RequestAbstractType_derivations request2
+};
+
+
+/* The generic abstract type */
+
+
+type record RequestAbstractType
+{
+	XSD.String commonName
+}
+with {
+  variant "name as uncapitalized";
+  variant "abstract";
+};
+
+
+/* Production implementation */
+
+
+type MyProductionRequestType ProductionRequest
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type record MyProductionRequestType
+{
+	XSD.String commonName,
+	XSD.String productionName
+}
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* Production implementation */
+
+
+type MyProgrammingRequestType ProgrammingRequest
+with {
+  variant "name as uncapitalized";
+  variant "element";
+};
+
+
+type record MyProgrammingRequestType
+{
+	XSD.String commonName,
+	XSD.String programmingName
+}
+with {
+  variant "name as uncapitalized";
+};
+
+
+type union Request_group
+{
+	RequestAbstractType_derivations request,
+	ProductionRequest productionRequest,
+	ProgrammingRequest programmingRequest
+}
+with {
+  variant "untagged";
+  variant (request) "form as qualified";
+  variant (request) "abstract";
+};
+
+
+type union RequestAbstractType_derivations
+{
+	RequestAbstractType requestAbstractType,
+	MyProductionRequestType myProductionRequestType,
+	MyProgrammingRequestType myProgrammingRequestType
+}
+with {
+  variant "name as uncapitalized";
+  variant "useType";
+  variant (requestAbstractType) "abstract";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/type/subs/with/elem/subs'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

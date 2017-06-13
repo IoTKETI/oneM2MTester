@@ -1,0 +1,353 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom 10
+ * All rights reserved. This program and the accompanying materials
+ * are made avail10le under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is avail10le at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating bitstring templates
+module TemplateConcatBit {
+
+import from Types all;
+
+const bitstring c_bit := '1011'B;
+
+template bitstring t_bit := ? length(2..2);
+
+template bitstring t_bit1 := '1011'B & ? length (2) & '01'B;
+template bitstring t_bit1_exp := '1011??01'B;
+
+template bitstring t_bit2 := '1011'B & '01'B & ? & ? length(1) & '01'B;
+template bitstring t_bit2_exp := '101101*?01'B;
+
+template bitstring t_bit3 := ('1011'B & ? length(2..2)) length(6);
+template bitstring t_bit3_exp := '1011??'B length(6);
+
+template bitstring t_bit4 := c_bit & ? length (2) & '01'B;
+template bitstring t_bit4_exp := '1011??01'B;
+
+template bitstring t_bit5 := ('1011'B & t_bit) length(6);
+template bitstring t_bit5_exp := '1011??'B length(6);
+
+template bitstring t_bit6 := '1011'B & ?;
+template bitstring t_bit6_exp := '1011*'B;
+
+template bitstring t_bit7 := ? & '01'B;
+template bitstring t_bit7_exp := '*01'B;
+
+template bitstring t_bit8 := '1011'B & ? & '01'B;
+template bitstring t_bit8_exp := '1011*01'B;
+
+template bitstring t_bit9 := ? & ?;
+template bitstring t_bit9_exp := ?;
+
+template bitstring t_bit10 := ? & ? & '01'B;
+template bitstring t_bit10_exp := '*01'B;
+
+template bitstring t_bit11 := '1011'B & '01'B & ? & ? & ? length(1) & '01'B;
+template bitstring t_bit11_exp := '101101*?01'B;
+
+testcase tc_bit_t_w_literals() runs on CT {
+  if (log2str(t_bit1) != log2str(t_bit1_exp)) {
+    setverdict(fail, "Expected: ", t_bit1_exp, ", got: ", t_bit1);
+  }
+  else if (log2str(t_bit2) != log2str(t_bit2_exp)) {
+    setverdict(fail, "Expected: ", t_bit2_exp, ", got: ", t_bit2);
+  }
+  else if (log2str(t_bit3) != log2str(t_bit3_exp)) {
+    setverdict(fail, "Expected: ", t_bit3_exp, ", got: ", t_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_t_w_refs() runs on CT {
+  if (log2str(t_bit4) != log2str(t_bit4_exp)) {
+    setverdict(fail, "Expected: ", t_bit4_exp, ", got: ", t_bit4);
+  }
+  else if (log2str(t_bit5) != log2str(t_bit5_exp)) {
+    setverdict(fail, "Expected: ", t_bit5_exp, ", got: ", t_bit5);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_t_w_any_value() runs on CT {
+  if (log2str(t_bit6) != log2str(t_bit6_exp)) {
+    setverdict(fail, "Expected: ", t_bit6_exp, ", got: ", t_bit6);
+  }
+  else if (log2str(t_bit7) != log2str(t_bit7_exp)) {
+    setverdict(fail, "Expected: ", t_bit7_exp, ", got: ", t_bit7);
+  }
+  else if (log2str(t_bit8) != log2str(t_bit8_exp)) {
+    setverdict(fail, "Expected: ", t_bit8_exp, ", got: ", t_bit8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_t_dbl_any_value() runs on CT {
+  if (log2str(t_bit9) != log2str(t_bit9_exp)) {
+    setverdict(fail, "Expected: ", t_bit9_exp, ", got: ", t_bit9);
+  }
+  else if (log2str(t_bit10) != log2str(t_bit10_exp)) {
+    setverdict(fail, "Expected: ", t_bit10_exp, ", got: ", t_bit10);
+  }
+  else if (log2str(t_bit11) != log2str(t_bit11_exp)) {
+    setverdict(fail, "Expected: ", t_bit11_exp, ", got: ", t_bit11);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_w_literals() runs on CT {
+  var template bitstring vt_bit1 := '1011'B & ? length (2) & '01'B;
+  var template bitstring vt_bit1_exp := '1011??01'B;
+  
+  var template bitstring vt_bit2 := '1011'B & '01'B & ? & ? length(1) & '01'B;
+  var template bitstring vt_bit2_exp := '101101*?01'B;
+  
+  var template bitstring vt_bit3 := ('1011'B & ? length(2..2)) length(6);
+  var template bitstring vt_bit3_exp := '1011??'B length(6);
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_w_refs() runs on CT {
+  var integer v_len := 3;
+  var bitstring v_bit := '01'B;
+  var template bitstring vt_bit := ?;
+
+  var template bitstring vt_bit1 := c_bit & ? length (2) & '01'B;
+  var template bitstring vt_bit1_exp := '1011??01'B;
+  
+  var template bitstring vt_bit2 := '1011'B & v_bit & vt_bit & ? length(v_len) & v_bit;
+  var template bitstring vt_bit2_exp := '101101*???01'B;
+  
+  var template bitstring vt_bit3 := ('1011'B & t_bit) length(6);
+  var template bitstring vt_bit3_exp := '1011??'B length(6);
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_w_any_value() runs on CT {
+  var template bitstring vt_bit1 := '1011'B & ?;
+  var template bitstring vt_bit1_exp := '1011*'B;
+  
+  var template bitstring vt_bit2 := ? & '01'B;
+  var template bitstring vt_bit2_exp := '*01'B;
+  
+  var template bitstring vt_bit3 := '1011'B & ? & '01'B;
+  var template bitstring vt_bit3_exp := '1011*01'B;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_dbl_any_value() runs on CT {
+  var integer v_len := 3;
+
+  var template bitstring vt_bit1 := ? & ?;
+  var template bitstring vt_bit1_exp := ?;
+  
+  var template bitstring vt_bit2 := ? & ? & '01'B;
+  var template bitstring vt_bit2_exp := '*01'B;
+  
+  var template bitstring vt_bit3 := '1011'B & '01'B & ? & ? & ? length(v_len - 1) & '01'B;
+  var template bitstring vt_bit3_exp := '101101*??01'B;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_dbl_any_value_w_refs() runs on CT {
+  var template bitstring vt_bit := ?;
+  
+  var template bitstring vt_bit1 := vt_bit & ?;
+  var template bitstring vt_bit1_exp := ?;
+  
+  var template bitstring vt_bit2 := ? & vt_bit;
+  var template bitstring vt_bit2_exp := ?;
+  
+  var template bitstring vt_bit3 := vt_bit & vt_bit;
+  var template bitstring vt_bit3_exp := ?;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "1st test. Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "2nd test. Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "3rd test. Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_w_str_elem() runs on CT {
+  var bitstring v_bit := '01'B;
+  var bitstring v_bit2 := '1011'B;
+
+  var template bitstring vt_bit1 := v_bit[0] & ?;
+  var template bitstring vt_bit1_exp := '0*'B;
+  
+  var template bitstring vt_bit2 := '10'B & ? length(3) & v_bit2[2];
+  var template bitstring vt_bit2_exp := '10???1'B;
+  
+  var template bitstring vt_bit3 := ? & v_bit2[0];
+  var template bitstring vt_bit3_exp := '*1'B;
+  
+  var template bitstring vt_bit4 := v_bit2[2] & vt_bit1_exp;
+  var template bitstring vt_bit4_exp := '10*'B;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else if (log2str(vt_bit4) != log2str(vt_bit4_exp)) {
+    setverdict(fail, "Expected: ", vt_bit4_exp, ", got: ", vt_bit4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, '0110'B, omit, omit, omit, omit };
+
+  var template bitstring vt_bit1 := '01'B & ? length(1) & v_rec.bs;
+  var template bitstring vt_bit1_exp := '01?0110'B;
+  
+  var template bitstring vt_bit2 := v_rec.bs & vt_bit1_exp;
+  var template bitstring vt_bit2_exp := '011001?0110'B;
+  
+  var template bitstring vt_bit3 := ? & v_rec.bs;
+  var template bitstring vt_bit3_exp := '*0110'B;
+  
+  var template bitstring vt_bit4 := v_rec.bs & ?;
+  var template bitstring vt_bit4_exp := '0110*'B;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else if (log2str(vt_bit4) != log2str(vt_bit4_exp)) {
+    setverdict(fail, "Expected: ", vt_bit4_exp, ", got: ", vt_bit4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_bit_vt_extra() runs on CT {
+  var bitstring v_bit2 := '1011'B;
+  var Rec v_rec := { omit, omit, '0110'B, omit, omit, omit, omit };
+
+  var template bitstring vt_bit1 := v_rec.bs & '11'B;
+  var template bitstring vt_bit1_exp := '011011'B;
+  
+  var template bitstring vt_bit2 := '11'B & v_rec.bs & '11'B;
+  var template bitstring vt_bit2_exp := '11011011'B;
+  
+  var template bitstring vt_bit3 := v_bit2[3] & v_rec.bs;
+  var template bitstring vt_bit3_exp := '10110'B;
+  
+  var template bitstring vt_bit4 := v_rec.bs & v_bit2[3];
+  var template bitstring vt_bit4_exp := '01101'B;
+  
+  if (log2str(vt_bit1) != log2str(vt_bit1_exp)) {
+    setverdict(fail, "Expected: ", vt_bit1_exp, ", got: ", vt_bit1);
+  }
+  else if (log2str(vt_bit2) != log2str(vt_bit2_exp)) {
+    setverdict(fail, "Expected: ", vt_bit2_exp, ", got: ", vt_bit2);
+  }
+  else if (log2str(vt_bit3) != log2str(vt_bit3_exp)) {
+    setverdict(fail, "Expected: ", vt_bit3_exp, ", got: ", vt_bit3);
+  }
+  else if (log2str(vt_bit4) != log2str(vt_bit4_exp)) {
+    setverdict(fail, "Expected: ", vt_bit4_exp, ", got: ", vt_bit4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_bit_t_w_literals());
+  execute(tc_bit_t_w_refs());
+  execute(tc_bit_t_w_any_value());
+  execute(tc_bit_t_dbl_any_value());
+  execute(tc_bit_vt_w_literals());
+  execute(tc_bit_vt_w_refs());
+  execute(tc_bit_vt_w_any_value());
+  execute(tc_bit_vt_dbl_any_value());
+  execute(tc_bit_vt_dbl_any_value_w_refs());
+  execute(tc_bit_vt_w_str_elem());
+  execute(tc_bit_vt_w_opt_fields());
+  execute(tc_bit_vt_extra());
+}
+
+}

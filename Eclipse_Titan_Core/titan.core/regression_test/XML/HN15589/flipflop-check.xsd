@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:xtdp"
+           targetNamespace="urn:xtdp"
+>
+
+<xs:element name="Outer">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="i" type="Inner"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="Inner">
+  <xs:sequence>
+    <xs:element name="i2" type="Inner2" form="qualified"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Inner2">
+  <xs:sequence>
+    <xs:element name="v3" type="Vec3" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Vec3">
+  <xs:sequence>
+    <xs:element name="v4" type="Vec4" form="qualified" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Vec4">
+  <xs:sequence>
+    <xs:element name="u5" type="U5" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="U5">
+  <xs:choice>
+    <xs:element name="u6" type="U6" />
+    <xs:element name="e6">
+      <xs:complexType></xs:complexType>
+    </xs:element>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="U6">
+  <xs:choice>
+    <xs:element name="s" type="xs:string"/>
+    <xs:element name="e">
+      <xs:complexType></xs:complexType>
+    </xs:element>
+  </xs:choice>
+</xs:complexType>
+
+</xs:schema>

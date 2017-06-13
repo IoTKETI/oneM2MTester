@@ -1,0 +1,50 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module usenil_no_optional_SE {	//^In TTCN-3 module `usenil_no_optional_SE'://
+/*
+33.2.1 The USE-NIL encoding instruction shall only be assigned to a sequence type that has an OPTIONAL
+component without a final ATTRIBUTE encoding instruction...
+*/
+
+type record UN0 { //^In type definition// \
+//^error: The target of an USE-NIL must have at least one component//
+  // empty record
+}
+with {
+  variant "useNil";
+}
+
+type record UN { //^In type definition//
+  integer i,
+  boolean b,
+  charstring last //^error: Last component of USE-NIL must be OPTIONAL//
+}
+with {
+  variant "useNil";
+}
+
+type record UN2 { //^In type definition//
+  integer i,
+  boolean b,
+  charstring last //^error: Last component of USE-NIL must not have ATTRIBUTE//
+}
+with {
+  variant "useNil";
+  variant (i, b, last) "attribute"
+}
+
+}
+with {
+  encode "XML";
+  variant "controlNamespace 'urn:a' prefix 'u'"
+}

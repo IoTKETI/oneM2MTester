@@ -1,0 +1,62 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module HO21968 {
+
+import from titan_HO21968_prefix all;
+external function enc_pfx(in MySeqPrefix par) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+const MySeqPrefix sp := {
+  i_list := {}
+}
+
+import from titan_HO21968_noprefix all;
+external function enc_nopfx(in MySeq par) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+const MySeq sn := {
+  i_list := {}
+}
+
+type component C {}
+
+
+// Check that the result of both encodings
+// 1. Look like the beginning of XML (first character is '<')
+// 2. Do not look like a made-up prefix ("tq")
+testcase tcp() runs on C {
+  var octetstring encoded;
+  encoded := enc_pfx(sp);
+  log(encoded);
+  if (encoded[0]==char2oct("<")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (encoded[1]==char2oct("t") and encoded[2]==char2oct("q")) { setverdict(fail); }
+  else { setverdict(pass); }
+}
+
+testcase tcn() runs on C {
+  var octetstring encoded;
+  encoded := enc_nopfx(sn);
+  log(encoded);
+  if (encoded[0]==char2oct("<")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (encoded[1]==char2oct("t") and encoded[2]==char2oct("q")) { setverdict(fail); }
+  else { setverdict(pass); }
+}
+
+control {
+  execute(tcp())
+  execute(tcn())
+}
+
+}

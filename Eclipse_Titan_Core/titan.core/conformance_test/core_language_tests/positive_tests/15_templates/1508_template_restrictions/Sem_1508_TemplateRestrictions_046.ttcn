@@ -1,0 +1,41 @@
+/******************************************************************************
+ * Copyright (C) 2016 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can be parameter to template(value)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module Sem_1508_TemplateRestrictions_046 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+	boolean b 
+       }	
+	
+	type component GeneralComp {
+	}
+
+
+
+	template (value) ExampleType m_baseTemplate(template (present) integer MyintTemplate := 2) :={
+		a := MyintTemplate,	 
+		b := true
+	}
+	
+	testcase TC_Sem_1508_TemplateRestrictions_046() runs on GeneralComp {
+      
+		
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ }
+
+    control{
+        execute(TC_Sem_1508_TemplateRestrictions_046());
+    }
+}

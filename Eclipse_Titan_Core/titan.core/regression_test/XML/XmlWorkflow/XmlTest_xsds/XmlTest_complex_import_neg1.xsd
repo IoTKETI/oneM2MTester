@@ -1,0 +1,45 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:imp="www.XmlTest.org/complex_import"
+            xmlns:incl="www.XmlTest.org/complex_include"
+            targetNamespace="www.XmlTest.org/complex_import"
+            elementFormDefault="qualified">
+  <annotation>
+    <documentation xml:lang="en">
+      This documentum tests based on
+      >XML Schema Part 0: Primer Second Edition
+      5 Advanced Concepts III. The Quantity Report
+      5.4 Importing Types
+      >XML Schema Part 1: Structures Second Edition
+      ...
+      >ETSI ES 201 873-9 V4.1.2
+      This is the importing schema
+    </documentation>
+  </annotation>
+
+  <import namespace="www.XmlTest.org/complex_include"/>
+
+  <element name="purchaseReportImport">
+    <complexType>
+      <sequence>
+        <element name="regions" type="incl:RegionsType"/>
+        <element name="parts" type="incl:PartsType"/>
+      </sequence>
+      <attribute name="period"       type="duration"/>
+      <attribute name="periodEnding" type="date"/>
+    </complexType>
+  </element>
+  
+  <element name="MyWrongElement" type="MyUnknownType"/>
+
+</schema>

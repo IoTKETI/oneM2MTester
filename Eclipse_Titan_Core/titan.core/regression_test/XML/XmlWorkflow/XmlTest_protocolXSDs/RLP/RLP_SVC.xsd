@@ -1,0 +1,1352 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:element name='Box'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='coord'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='CircularArcArea'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='inRadius'/>
+     <xs:element ref='outRadius'/>
+     <xs:element ref='startAngle'/>
+     <xs:element ref='stopAngle'/>
+     <xs:element ref='angularUnit' minOccurs='0'/>
+     <xs:element ref='distanceUnit' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='CircularArea'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='radius'/>
+     <xs:element ref='distanceUnit' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='CoordinateReferenceSystem'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='Identifier'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='EllipticalArea'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='angle'/>
+     <xs:element ref='semiMajor'/>
+     <xs:element ref='semiMinor'/>
+     <xs:element ref='angularUnit' minOccurs='0'/>
+     <xs:element ref='distanceUnit' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='Identifier'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='code'/>
+     <xs:element ref='codeSpace'/>
+     <xs:element ref='edition'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='LineString'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='coord' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='LinearRing'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+     <xs:element ref='coord'/>
+     <xs:element ref='coord'/>
+     <xs:element ref='coord' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='MultiLineString'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='LineString' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='MultiPoint'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='Point' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='MultiPolygon'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:choice maxOccurs='unbounded'>
+       <xs:element ref='Polygon'/>
+       <xs:element ref='Box'/>
+       <xs:element ref='CircularArea'/>
+       <xs:element ref='CircularArcArea'/>
+       <xs:element ref='EllipticalArea'/>
+     </xs:choice>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='Point'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='coord'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='Polygon'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='outerBoundaryIs'/>
+     <xs:element ref='innerBoundaryIs' minOccurs='0' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='gid' type='xs:ID'/>
+  <xs:attribute name='srsName'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='X'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='Y'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='Z'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='add_info'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='alt'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='alt_acc'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='qos_class'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ASSURED'/>
+     <xs:enumeration value='BEST_EFFORT'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='alt_unc'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='angle'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='angularUnit'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='arfcn'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='base_id'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='base_lat'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='base_long'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='bsic'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='cc'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='cdma_net_param'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='nid'/>
+     <xs:element ref='sid'/>
+     <xs:element ref='base_id'/>
+     <xs:element ref='base_lat' minOccurs='0'/>
+     <xs:element ref='base_long' minOccurs='0'/>
+     <xs:element ref='ref_pn' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='cellid'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='cgi'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='mcc'/>
+     <xs:element ref='mnc'/>
+     <xs:element ref='lac'/>
+     <xs:element ref='cellid'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='change_area'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='target_area'/>
+     <xs:element ref='no_of_reports' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='type' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='MS_ENTERING'/>
+     <xs:enumeration value='MS_LEAVING'/>
+     <xs:enumeration value='MS_WITHIN_AREA'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='loc_estimates' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='TRUE'/>
+     <xs:enumeration value='FALSE'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='client'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='servicetype'/>
+     <xs:element ref='id' minOccurs='0'/>
+     <xs:element ref='serviceid' minOccurs='0'/>
+     <xs:element ref='requestmode' minOccurs='0'/>
+     <xs:element ref='clientname' minOccurs='0'/>
+     <xs:element ref='pseudoid' minOccurs='0'/>
+     <xs:element ref='poi' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='type' default='1'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='1'/>
+     <xs:enumeration value='2'/>
+     <xs:enumeration value='3'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='clientname'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='code'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='codeSpace'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='codeword'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='coord'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='X'/>
+     <xs:element ref='Y' minOccurs='0'/>
+     <xs:element ref='Z' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='direction'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='distanceUnit'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='duration'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='edition'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='eme_event'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='eme_pos' maxOccurs='unbounded'/>
+   </xs:sequence>
+  <xs:attribute name='eme_trigger' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='EME_ORG'/>
+     <xs:enumeration value='EME_REL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='eme_pos'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+     <xs:choice>
+       <xs:element ref='pd'/>
+       <xs:element ref='poserr'/>
+     </xs:choice>
+     <xs:element ref='esrd' minOccurs='0'/>
+     <xs:element ref='esrk' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='pos_method'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='CELL'/>
+     <xs:enumeration value='OTDOA'/>
+     <xs:enumeration value='GPS'/>
+     <xs:enumeration value='A-GPS'/>
+     <xs:enumeration value='E-OTD'/>
+     <xs:enumeration value='U-TDOA'/>
+     <xs:enumeration value='OTHER'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='eqop'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='resp_req' minOccurs='0'/>
+     <xs:element ref='resp_timer' minOccurs='0'/>
+     <xs:choice minOccurs='0'>
+       <xs:element ref='ll_acc'/>
+       <xs:element ref='hor_acc'/>
+     </xs:choice>
+     <xs:element ref='alt_acc' minOccurs='0'/>
+     <xs:element ref='max_loc_age' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='esrd'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='type' default='NA'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NA'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='esrk'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='type' default='NA'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NA'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='frequencyinfo'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='uarfcn_ul' minOccurs='0'/>
+     <xs:element ref='uarfcn_dl' minOccurs='0'/>
+     <xs:element ref='uarfcn_nt' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='geo_info'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='CoordinateReferenceSystem'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='global_uc_id'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='mcc'/>
+     <xs:element ref='mnc'/>
+     <xs:element ref='uc_id'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='gsm_net_param'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='cgi' minOccurs='0'/>
+     <xs:element ref='nmr' minOccurs='0'/>
+     <xs:element ref='ta' minOccurs='0'/>
+     <xs:element ref='lmsi' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='h_ls'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='hor_acc'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='qos_class'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ASSURED'/>
+     <xs:enumeration value='BEST_EFFORT'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='id'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='imsi'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='inRadius'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='innerBoundaryIs'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='LinearRing'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='interval'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='lac'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='lcs_ref'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='lev_conf'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='ll_acc'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='qos_class'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ASSURED'/>
+     <xs:enumeration value='BEST_EFFORT'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='lmsi'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='loc_type'>
+  <xs:complexType>
+  <xs:attribute name='type' default='CURRENT'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='CURRENT'/>
+     <xs:enumeration value='LAST'/>
+     <xs:enumeration value='CURRENT_OR_LAST'/>
+     <xs:enumeration value='CURRENT_OR_LAST_AS_FALLBACK'/>
+     <xs:enumeration value='INITIAL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='locationserver'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='id'/>
+     <xs:element ref='pwd' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='max_loc_age'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='mcc'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='mnc'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='ms_action'>
+  <xs:complexType>
+  <xs:attribute name='type' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='MS_AVAIL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='msid'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='type' default='MSISDN'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='MSISDN'/>
+     <xs:enumeration value='IMSI'/>
+     <xs:enumeration value='IMEI'/>
+     <xs:enumeration value='MIN'/>
+     <xs:enumeration value='MDN'/>
+     <xs:enumeration value='EME_MSID'/>
+     <xs:enumeration value='ASID'/>
+     <xs:enumeration value='OPE_ID'/>
+     <xs:enumeration value='IPV4'/>
+     <xs:enumeration value='IPV6'/>
+     <xs:enumeration value='SESSID'/>
+     <xs:enumeration value='SIP_URI'/>
+     <xs:enumeration value='TEL_URL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='enc' default='ASC'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ASC'/>
+     <xs:enumeration value='CRP'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='msid_range'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='start_msid'/>
+     <xs:element ref='stop_msid'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='msids'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:choice maxOccurs='unbounded'>
+       <xs:sequence>
+         <xs:element ref='msid'/>
+         <xs:element ref='codeword' minOccurs='0'/>
+         <xs:element ref='session' minOccurs='0'/>
+         <xs:element ref='trans_id' minOccurs='0'/>
+       </xs:sequence>
+       <xs:sequence>
+         <xs:element ref='msid_range'/>
+         <xs:element ref='codeword' minOccurs='0' maxOccurs='unbounded'/>
+       </xs:sequence>
+     </xs:choice>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='name_area'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='ndc'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='neid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='vmscid' minOccurs='0'/>
+     <xs:element ref='sgsnid' minOccurs='0'/>
+     <xs:element ref='vlrid' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='net_param'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='h_ls' minOccurs='0'/>
+     <xs:element ref='v_ls' minOccurs='0'/>
+     <xs:element ref='pce' minOccurs='0'/>
+     <xs:element ref='neid' minOccurs='0'/>
+     <xs:element ref='imsi' minOccurs='0'/>
+     <xs:choice minOccurs='0'>
+       <xs:element ref='gsm_net_param'/>
+       <xs:element ref='wcdma_net_param'/>
+       <xs:element ref='cdma_net_param'/>
+     </xs:choice>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='nid'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='nmr'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='nmr_element' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='nmr_element'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='arfcn'/>
+     <xs:element ref='bsic'/>
+     <xs:element ref='rxlev'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='no_of_reports'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='outRadius'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='outerBoundaryIs'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='LinearRing'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pce'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pd'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='time'/>
+     <xs:element ref='shape'/>
+     <xs:sequence minOccurs='0'>
+       <xs:element ref='alt'/>
+       <xs:element ref='alt_unc' minOccurs='0'/>
+     </xs:sequence>
+     <xs:element ref='speed' minOccurs='0'/>
+     <xs:element ref='direction' minOccurs='0'/>
+     <xs:element ref='lev_conf' minOccurs='0'/>
+     <xs:element ref='qop_not_met' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='plmn'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='mcc'/>
+     <xs:element ref='mnc'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='poi'>
+  <xs:complexType>
+  <xs:attribute name='flag' default='OFF'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ON'/>
+     <xs:enumeration value='OFF'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pos'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+     <xs:choice>
+       <xs:element ref='pd'/>
+       <xs:element ref='poserr'/>
+     </xs:choice>
+   </xs:sequence>
+  <xs:attribute name='pos_method'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='CELL'/>
+     <xs:enumeration value='OTDOA'/>
+     <xs:enumeration value='GPS'/>
+     <xs:enumeration value='A-GPS'/>
+     <xs:enumeration value='E-OTD'/>
+     <xs:enumeration value='U-TDOA'/>
+     <xs:enumeration value='OTHER'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='poserr'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='result'/>
+     <xs:element ref='add_info' minOccurs='0'/>
+     <xs:element ref='time'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='primaryscramblingcode'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='prio'>
+  <xs:complexType>
+  <xs:attribute name='type' default='NORMAL'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NORMAL'/>
+     <xs:enumeration value='HIGH'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pseudoid'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pushaddr'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='url'/>
+     <xs:element ref='id' minOccurs='0'/>
+     <xs:element ref='pwd' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='pwd'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='qop'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:choice minOccurs='0'>
+       <xs:element ref='ll_acc'/>
+       <xs:element ref='hor_acc'/>
+     </xs:choice>
+     <xs:element ref='alt_acc' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='qop_not_met'>
+  <xs:complexType/>
+ </xs:element>
+ <xs:element name='radius'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='ref_pn'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='req_id'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='requestmode'>
+  <xs:complexType>
+   <xs:choice minOccurs='0'>
+     <xs:element ref='requestor'/>
+     <xs:element ref='session'/>
+   </xs:choice>
+  <xs:attribute name='type' default='PASSIVE'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='ACTIVE'/>
+     <xs:enumeration value='PASSIVE'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='requestor'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='type' default='MSISDN'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='MSISDN'/>
+     <xs:enumeration value='NAME'/>
+     <xs:enumeration value='EMAIL'/>
+     <xs:enumeration value='URL'/>
+     <xs:enumeration value='SIPURL'/>
+     <xs:enumeration value='IMS'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='resp_req'>
+  <xs:complexType>
+  <xs:attribute name='type' default='DELAY_TOL'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO_DELAY'/>
+     <xs:enumeration value='LOW_DELAY'/>
+     <xs:enumeration value='DELAY_TOL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='resp_timer'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='result'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='resid' use='required'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='rlp_hdr'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='locationserver'/>
+     <xs:element ref='client' minOccurs='0'/>
+     <xs:element ref='serving_node_action' minOccurs='0'/>
+     <xs:element ref='supported_shapes' minOccurs='0'/>
+     <xs:element ref='net_param' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='ver' fixed='1.0.0'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='rlp_svc_init'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='rlp_hdr'/>
+      <xs:element ref='srlir'/>
+   </xs:sequence>
+  <xs:attribute name='ver' fixed='1.0.0'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='rxlev'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sac'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sai'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='mcc'/>
+     <xs:element ref='mnc'/>
+     <xs:element ref='lac'/>
+     <xs:element ref='sac'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='semiMajor'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='semiMinor'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='service_coverage'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:sequence maxOccurs='unbounded'>
+       <xs:element ref='cc'/>
+       <xs:element ref='ndc' minOccurs='0' maxOccurs='unbounded'/>
+     </xs:sequence>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='serviceid'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='servicetype'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='serving_node_action'>
+  <xs:complexType>
+  <xs:attribute name='passive_type' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='POSITION_NOT_ALLOWED'/>
+     <xs:enumeration value='POSITION'/>
+     <xs:enumeration value='NOTIFY_AND_POSITION'/>
+     <xs:enumeration value='POSITION_IF_NOT_DISALLOWED'/>
+     <xs:enumeration value='POSITION_IF_ALLOWED'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='active_type' default='POSITION_NOT_ALLOWED'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='POSITION_NOT_ALLOWED'/>
+     <xs:enumeration value='POSITION'/>
+     <xs:enumeration value='NOTIFY_AND_POSITION'/>
+     <xs:enumeration value='POSITION_IF_NOT_DISALLOWED'/>
+     <xs:enumeration value='POSITION_IF_ALLOWED'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='session'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='type' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='APN'/>
+     <xs:enumeration value='DIAL'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sgsnid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='cc' minOccurs='0'/>
+     <xs:element ref='ndc' minOccurs='0'/>
+     <xs:element ref='sgsnno'/>
+   </xs:sequence>
+  <xs:attribute name='capability'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='1'/>
+     <xs:enumeration value='2'/>
+     <xs:enumeration value='3'/>
+     <xs:enumeration value='4'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sgsnno'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='shape'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='Point'/>
+     <xs:element ref='LineString'/>
+     <xs:element ref='Polygon'/>
+     <xs:element ref='Box'/>
+     <xs:element ref='CircularArea'/>
+     <xs:element ref='CircularArcArea'/>
+     <xs:element ref='EllipticalArea'/>
+     <xs:element ref='MultiLineString'/>
+     <xs:element ref='MultiPoint'/>
+     <xs:element ref='MultiPolygon'/>
+     <xs:element ref='LinearRing'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='sid'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='speed'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='srlir'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+     <xs:element ref='codeword' minOccurs='0'/>
+     <xs:element ref='eqop' minOccurs='0'/>
+     <xs:element ref='geo_info' minOccurs='0'/>
+     <xs:element ref='loc_type' minOccurs='0'/>
+     <xs:element ref='prio' minOccurs='0'/>
+     <xs:element ref='pushaddr' minOccurs='0'/>
+     <xs:element ref='service_coverage' minOccurs='0'/>
+   </xs:sequence>
+  <xs:attribute name='ver' fixed='1.0.0'/>
+  <xs:attribute name='res_type' default='SYNC'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='SYNC'/>
+     <xs:enumeration value='ASYNC'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='recv_role' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='HLS'/>
+     <xs:enumeration value='VLS'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='startAngle'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='start_msid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='start_time'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='utc_off' default='0000'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='stopAngle'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='stop_msid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='stop_time'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='utc_off' default='0000'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='supl_message'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='supl_session_id'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='supported_shapes'>
+  <xs:complexType>
+  <xs:attribute name='Point' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='LineString' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='Polygon' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='Box' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='CircularArea' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='CircularArcArea' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='EllipticalArea' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='MultiLineString' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='MultiPoint' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='MultiPolygon' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='LinearRing' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='Altitude' default='NO'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='NO'/>
+     <xs:enumeration value='YES'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='ta'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='target_area'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:sequence>
+       <xs:element ref='shape'/>
+       <xs:element ref='cc' minOccurs='0'/>
+     </xs:sequence>
+     <xs:element ref='cc'/>
+     <xs:element ref='plmn' maxOccurs='unbounded'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='time'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='utc_off' default='0000'/>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='time_remaining'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='tlrr_event'>
+  <xs:complexType>
+   <xs:choice>
+     <xs:element ref='ms_action'/>
+     <xs:element ref='change_area'/>
+   </xs:choice>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='trans_id'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='trl_pos'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='msid'/>
+     <xs:choice>
+       <xs:element ref='pd'/>
+       <xs:element ref='poserr'/>
+       <xs:element ref='time'/>
+     </xs:choice>
+   </xs:sequence>
+  <xs:attribute name='trl_trigger' use='required'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='MS_AVAIL'/>
+     <xs:enumeration value='CHANGE_AREA'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name='pos_method'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='CELL'/>
+     <xs:enumeration value='OTDOA'/>
+     <xs:enumeration value='GPS'/>
+     <xs:enumeration value='A-GPS'/>
+     <xs:enumeration value='E-OTD'/>
+     <xs:enumeration value='U-TDOA'/>
+     <xs:enumeration value='OTHER'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='uarfcn_dl'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='uarfcn_nt'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='uarfcn_ul'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='uc_id'>
+  <xs:complexType mixed='true'>
+  <xs:attribute name='status' default='CURRENT'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='STALE'/>
+     <xs:enumeration value='CURRENT'/>
+     <xs:enumeration value='UNKNOWN'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='url'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='v_ls'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='vlrid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='cc' minOccurs='0'/>
+     <xs:element ref='ndc' minOccurs='0'/>
+     <xs:element ref='vlrno'/>
+   </xs:sequence>
+  <xs:attribute name='capability'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='1'/>
+     <xs:enumeration value='2'/>
+     <xs:enumeration value='3'/>
+     <xs:enumeration value='4'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='vlrno'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='vmscid'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='cc' minOccurs='0'/>
+     <xs:element ref='ndc' minOccurs='0'/>
+     <xs:element ref='vmscno'/>
+   </xs:sequence>
+  <xs:attribute name='capability'>
+   <xs:simpleType>
+    <xs:restriction base='xs:string'>
+     <xs:enumeration value='1'/>
+     <xs:enumeration value='2'/>
+     <xs:enumeration value='3'/>
+     <xs:enumeration value='4'/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='vmscno'>
+  <xs:complexType mixed='true'>
+  </xs:complexType>
+ </xs:element>
+ <xs:element name='wcdma_net_param'>
+  <xs:complexType>
+   <xs:sequence>
+     <xs:element ref='global_uc_id' minOccurs='0'/>
+     <xs:element ref='frequencyinfo' minOccurs='0'/>
+     <xs:element ref='primaryscramblingcode' minOccurs='0'/>
+     <xs:element ref='sai' minOccurs='0'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+</xs:schema>

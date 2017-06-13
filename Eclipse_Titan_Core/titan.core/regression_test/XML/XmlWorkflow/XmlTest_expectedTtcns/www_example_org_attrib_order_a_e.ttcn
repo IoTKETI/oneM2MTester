@@ -1,0 +1,123 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_attrib_order_a.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Fri Aug 28 12:53:34 2015
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- attrib_order_a.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/attrib/order/a" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_attrib_order_a {
+
+
+import from XSD all;
+
+
+import from www_example_org_attrib_order_b all;
+
+
+import from NoTargetNamespace2 all;
+
+
+const XSD.String c_defaultForEmpty_1 := "fixed";
+
+
+type XSD.String Local1 (c_defaultForEmpty_1)
+with {
+  variant "defaultForEmpty as c_defaultForEmpty_1";
+  variant "name as uncapitalized";
+  variant "attribute";
+};
+
+
+type XSD.String Local2
+with {
+  variant "name as uncapitalized";
+  variant "attribute";
+};
+
+
+type record E17A
+{
+	AttrNoTargetNamespace attrNoTargetNamespace optional,
+	AttrNoTargetNamespace2 attrNoTargetNamespace2 optional,
+	Lang lang optional,
+	Local1 local1 optional,
+	Local2 local2 optional,
+	Attr1 attr1 optional,
+	XSD.Float barInAgroup optional,
+	XSD.Float fooInAgroup optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (attrNoTargetNamespace) "name as capitalized";
+  variant (attrNoTargetNamespace) "attribute";
+  variant (attrNoTargetNamespace2) "name as capitalized";
+  variant (attrNoTargetNamespace2) "attribute";
+  variant (lang) "attribute";
+  variant (local1) "attribute";
+  variant (local2) "attribute";
+  variant (attr1) "name as capitalized";
+  variant (attr1) "namespace as 'www.example.org/attrib/order/b' prefix 'A'";
+  variant (attr1) "attribute";
+  variant (barInAgroup) "namespace as 'www.example.org/attrib/order/b' prefix 'A'";
+  variant (barInAgroup) "attribute";
+  variant (fooInAgroup) "namespace as 'www.example.org/attrib/order/b' prefix 'A'";
+  variant (fooInAgroup) "attribute";
+};
+
+
+type union Lang
+{
+	XSD.Language language_,
+	enumerated {
+		x
+	} alt_
+}
+with {
+  variant "name as uncapitalized";
+  variant "useUnion";
+  variant "attribute";
+  variant (language_) "name as 'language'";
+  variant (alt_) "name as ''";
+  variant (alt_) "text 'x' as ''";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/attrib/order/a' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

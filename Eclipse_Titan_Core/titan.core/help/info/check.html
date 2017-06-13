@@ -1,0 +1,178 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>check</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="charstring.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="clear.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>check</h1>
+<hr align="left" width="75%">
+<p>The keyword denotes a generic communication operation that allows read access to the top element of message-based and procedure-based incoming port queues without removing the top element from
+the queue. It can be used to check the <a href="#top"> top element of the port queue</a> or to check whether <a href="#something">anything waits</a> for processing in the port queue
+<ul>
+  <li>If the queue is empty, the operation fails.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="any.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a></li>
+  <li><a href="catch.html"><b><font face="Courier New" color="#003258" size="4">catch</font></b></a></li>
+  <li><a href="getcall.html"><b><font face="Courier New" color="#003258" size="4">getcall</font></b></a></li>
+  <li><a href="getreply.html"><b><font face="Courier New" color="#003258" size="4">getreply</font></b></a></li>
+  <li><a href="port.html"><b><font face="Courier New" color="#003258" size="4">port</font></b></a></li>
+  <li><a href="receive.html"><b><font face="Courier New" color="#003258" size="4">receive</font></b></a></li>
+  <li><a href="from.html"><b><font face="Courier New" color="#003258" size="4">from</font></b></a></li>
+  <li><a href="sender.html"><b><font face="Courier New" color="#003258" size="4">sender</font></b></a> &nbsp;</li>
+</ul>
+<hr align="left" width="75%">
+<h4>1. Checking the <a name="top"> top</a> element of the port queue</h4>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><i>port_reference</i><font face="Courier New" color="#003258" size="5"><b>.check ( </b></font> <i> communication_operation&nbsp; </i><font face="Courier New"
+      color="#003258" size="5"><b>);</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i> port_reference</i> points out the port where the procedure or message is awaited.</p>
+  <ul>
+    <li>
+    <p>the keywords <b><font face="Courier New" color="#003258" size="4">any port</font> </b> may be used to indicate that communication through any port will be accepted (see the <a
+      href="#Example 4:">example 4</a>).</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">check</font> </b> keyword introduces the queue verification.</p>
+  </li>
+  <li>
+  <p>The <i>communication_operation</i> may be one of the following&nbsp;:</p>
+  <ul>
+    <li><a href="receive.html"><b><font face="Courier New" color="#003258" size="4">catch</font></b></a> (see the <a href="#Example 1">example1</a>);</li>
+    <li><a href="getcall.html"><b><font face="Courier New" color="#003258" size="4">getcall</font></b></a> (see the <a href="#Example 2">example 2</a>);</li>
+    <li><a href="getreply.html"><b><font face="Courier New" color="#003258" size="4">getreply</font></b></a> (see the <a href="#Example 3">example 3</a>);&nbsp;</li>
+    <li><a href="receive.html"><b><font face="Courier New" color="#003258" size="4">receive</font></b></a> (see the <a href="#Example 4:">example 4</a>).</li>
+  </ul>
+  </li>
+</ul>
+<hr align="left" width="75%">
+<h4>2. Checking whether <a name="something" href="#Example 5">anything waits for processing in the port queue</a></h4>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><i>port_reference</i><font face="Courier New" color="#003258" size="5"><b>.check </b></font> [ <font face="Courier New" color="#003258" size="5"><b>from </b></font><i>address_reference</i>
+    ] [ <font face="Courier New" color="#003258" size="5"><b>-&gt; sender</b></font><i> address_reference</i> ]<font face="Courier New" color="#003258" size="5"><b>;</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i> port_reference</i> points out the port where the procedure or message is awaited.</p>
+  <ul>
+    <li>
+    <p>the keywords <b><font face="Courier New" color="#003258" size="4">any port</font> </b> may be used to indicate that communication through any port will be accepted (see the <a
+      href="#Example 6">example 6</a>).</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">check</font> </b> keyword introduces the queue verification.</p>
+  </li>
+  <li>
+  <p>The optional <b><font face="Courier New" color="#003258" size="4">from</font> </b> keyword&nbsp; is used when a port is connected to several entities and restriction to one communication
+  partner is required (see the <a href="#Example 6">example 6</a>).</p>
+  </li>
+  <li>
+  <p>The optional <a href="sender.html"><b><font face="Courier New" color="#003258" size="4">sender</font></b></a> keyword is used to store the address of the sender (see the <a
+    href="#Example 7">example 7</a>).</p>
+  </li>
+  <li>
+  <p><i>address_reference</i> is one of the following:</p>
+  <ul>
+    <li>a component reference (cf. <a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a>)&nbsp; or the keyword <a href="system.html"
+      target="_blank"><b><font face="Courier New" color="#003258" size="4">system</font></b></a>, in case of one-to-many connections.</li>
+    <li>
+    <p>an address reference (cf. <a href="address.html"><b><font face="Courier New" color="#003258" size="4">address</font></b></a>) , when there are several entities within the
+    system under test.</p>
+    </li>
+  </ul>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p><a name="Example 1">Example 1</a>: catch
+<p><font face="Courier New">MyPort2_PCO.check(catch(S_MyProc, tr_MyTemplate(5, v_MyVar)));</font>
+<p>The operation is used to check whether there is an exception waiting to be caught at the port MyPort2_PCO. The signature S_MyProc defines the exception. The check operation is successful only
+then, when the exception matches the criteria described by the template tr_MyTemplate.</p>
+<hr align="left" width="50%">
+<p><a name="Example 2">Example 2</a>:getcall</p>
+<p><font face="Courier New">MyPort2_PCO.check(getcall(S_MyProc:{5, MyVar}) from v_MyPartner);</font>
+<p>The operation is used to check whether there is a procedure call waiting at the port MyPort2_PCO. The signature S_MyProc defines in-line the procedure parameters. The check operation is
+successful only then, when the exception matches the criteria described in the in-line signature and comes from the communication partner pointed out by the variable v_MyPartner.</p>
+<hr align="left" width="50%">
+<p><a name="Example 3">Example 3</a>: getreply</p>
+<p><font face="Courier New">MyPort2_PCO.check(getreply(S_MyProc1:{?, v_MyVar} value *) -&gt; value vl_MyReturnValue param(pl_MyPar1,-));</font></p>
+<p>The operation is used to check whether there is a response&nbsp; waiting at the port MyPort2_PCO. The signature S_MyProc1 defines in-line the accepted response parameters (the first one is
+don't care, the second one must match the value contained in v_MyVar). The check operation is successful only then, when the exception matches the criteria described in the in-line signature (the
+returned value does not matter) .The returned value is saved in the variable v_MyReturnValue.</p>
+<hr align="left" width="50%">
+<p><a name="Example 4:">Example 4:</a> receive&nbsp;</p>
+<p><font face="Courier New">any port.check(receive(5));</font></p>
+<p>The operation is used to check whether there is a message waiting at no matter which&nbsp; port.&nbsp; The check operation is successful only then, when the message contains the integer value
+five.</p>
+<hr align="left" width="50%">
+<p><a name="Example 5">Example 5</a>: checking anything</p>
+<p><font face="Courier New">MujPort_PCO.check;</font></p>
+<p>&nbsp;Checks whether anything waits for processing in the port queue at&nbsp; MujPort_PCO.</p>
+<hr align="left" width="50%">
+<p><a name="Example 6">Example 6</a>: checking anything on any port</p>
+<p><font face="Courier New">any port.check (from v_MyPartner);</font></p>
+<p>Checks whether anything from v_MyPartner waits for processing in any port queue.</p>
+<hr align="left" width="50%">
+<p><a name="Example 7">Example 7</a>: checking anything on any port and saving the sender</p>
+<p><font face="Courier New">any port.check (-&gt; sender v_MyNewPartner);</font></p>
+<p>Checks whether anything waits for processing in any port queue. The address of the sender is saved in the variable v_MyNewPartner.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#checkstatement">BNF definition</a> of <font face="Courier New"> check</font></p>
+</body>
+</html>

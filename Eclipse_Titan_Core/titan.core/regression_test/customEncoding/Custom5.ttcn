@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module Custom5 {
+
+import from Custom3 all;
+import from Types all;
+
+// Coding function declarations for test 5
+external function f_enc_set(in Set x) return bitstring
+  with { extension "prototype(convert) encode(localCustom)" }
+  
+external function f_dec_set(inout bitstring b, out Set x) return integer
+  with { extension "prototype(sliding) decode(localCustom)" }
+
+// these let encvalue and decvalue know which encoding to use for the ASN.1 type
+external function f_enc_set2(in Set2 x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" };
+  
+external function f_dec_set2(in octetstring x) return Set2
+  with { extension "prototype(convert) decode(JSON)" };
+
+// PER coder functions, these need to be implemented manually, just like custom
+// coder functions
+external function f_enc_setof(in SetOf x) return bitstring
+  with { extension "prototype(convert) encode(PER)" };
+  
+external function f_dec_setof(inout bitstring x, out SetOf y) return integer
+  with { extension "prototype(sliding) decode(PER)" };
+
+}

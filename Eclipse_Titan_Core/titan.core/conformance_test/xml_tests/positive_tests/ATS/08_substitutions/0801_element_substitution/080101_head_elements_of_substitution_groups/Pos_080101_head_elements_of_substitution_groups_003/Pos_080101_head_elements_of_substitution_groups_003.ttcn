@@ -1,0 +1,81 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:8.1.1, Blocking substitution
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+module Pos_080101_head_elements_of_substitution_groups_003 {
+
+    import from schema_Pos_080101_head_elements_of_substitution_groups_003 language "XSD" all;
+
+    template Ize m_msg := {
+		headNoSubstition_list:= {
+			{ headNoSubstition := "anything" }
+			//{ groupMember1 := "any thing" }, <-- substitude blocked cannot be decoded
+			//{ groupMember2 := "something" } <-- substitude blocked cannot be decoded
+		}
+    }
+
+	external function enc_MyType(in Ize pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return Ize
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Pos_080101_head_elements_of_substitution_groups_003() runs on C system C {
+        var Raw v_rcv;
+
+        var Raw  v_Raw:="<ns229:ize xmlns:ns229='schema:Pos_080101_head_elements_of_substitution_groups_003'>\n\t<ns229:headNoSubstition>anything</ns229:headNoSubstition>\n</ns229:ize>\n\n";
+
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_080101_head_elements_of_substitution_groups_003(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+}

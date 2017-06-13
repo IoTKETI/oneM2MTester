@@ -1,0 +1,487 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module bitstring_test {
+
+//=========================================================================
+// Import Part
+//=========================================================================
+import from types all;
+import from functions all;
+//=========================================================================
+// Module Parameters
+//=========================================================================
+modulepar template boolean tspt_b_t := true;
+
+modulepar {
+  //modulepar bitstrings not modified from cfg file
+  template bitstring tspt_bs_v := '01101'B;
+  template bitstring tspt_bs_o := omit;
+  template bitstring tspt_bs_a := *;
+  template bitstring tspt_bs_q := ?;
+  template bitstring tspt_bs_al1 := * length(2); //length restriction
+  template bitstring tspt_bs_al2 := * length(2..4);
+  template bitstring tspt_bs_ql1 := ? length(2);
+  template bitstring tspt_bs_ql2 := ? length(2..4);
+  template bitstring tspt_bs_vl1 := ('01101'B);
+  template bitstring tspt_bs_vl2 := ('01101'B,'1010'B);
+  template bitstring tspt_bs_vl3 := ('01101'B,'1010'B,'101'B);
+  template bitstring tspt_bs_c1 := complement('01101'B)
+  template bitstring tspt_bs_c2 := complement('01101'B,'1010'B);
+  template bitstring tspt_bs_c3 := complement('01101'B,'1010'B,'101'B);
+  //template bitstring tspt_bs_r1 := ('A'B..'B'B); //range not allowed
+  //template bitstring tspt_bs_r2 := ('a'B..'c'B);
+  template bitstring tspt_bs_pa := '000*111'B
+  template bitstring tspt_bs_pq := '000?111'B
+  
+  template bitstring tspt_bs_vifp := '01101'B ifpresent;
+  template bitstring tspt_bs_oifp := omit ifpresent;
+  template bitstring tspt_bs_aifp := * ifpresent;
+  template bitstring tspt_bs_qifp := ? ifpresent;
+  template bitstring tspt_bs_al1ifp := * length(2) ifpresent; //length restriction
+  template bitstring tspt_bs_al2ifp := * length(2..4) ifpresent;
+  template bitstring tspt_bs_ql1ifp := ? length(2) ifpresent;
+  template bitstring tspt_bs_ql2ifp := ? length(2..4) ifpresent;
+  template bitstring tspt_bs_vl1ifp := ('01101'B) ifpresent;
+  template bitstring tspt_bs_vl2ifp := ('01101'B,'1010'B) ifpresent;
+  template bitstring tspt_bs_vl3ifp := ('01101'B,'1010'B,'101'B) ifpresent;
+  template bitstring tspt_bs_c1ifp := complement('01101'B) ifpresent
+  template bitstring tspt_bs_c2ifp := complement('01101'B,'1010'B) ifpresent;
+  template bitstring tspt_bs_c3ifp := complement('01101'B,'1010'B,'101'B) ifpresent;
+  //template bitstring tspt_bs_r1ifp := ('A'B..'B'B) ifpresent; //range not allowed
+  //template bitstring tspt_bs_r2ifp := ('a'B..'c'B) ifpresent; //range not allowed
+  template bitstring tspt_bs_paifp := '000*111'B  ifpresent
+  template bitstring tspt_bs_pqifp := '000?111'B  ifpresent  
+  
+  //modulepar bitstrings modified from cfg file
+  template bitstring tspt_bs_mod4v := * //after mod:'01101';
+  template bitstring tspt_bs_mod4o := * //omit;
+  template bitstring tspt_bs_mod4a := '0'B //*;
+  template bitstring tspt_bs_mod4q := ''B //?;
+  template bitstring tspt_bs_mod4al1 := '1'B //* length(2); //length restriction
+  template bitstring tspt_bs_mod4al2 := '1010010001'B //mofified for: * length(2..4);
+  template bitstring tspt_bs_mod4ql1 := '1010010001'B //mofified for:? length(2);
+  template bitstring tspt_bs_mod4ql2 := '1010010001'B //mofified for:? length(2..4);
+  template bitstring tspt_bs_mod4vl1 := ('01101'B) //TODO: Adam //It should be mofified for: ('01101'B);
+  template bitstring tspt_bs_mod4vl2 := '1010010001'B //mofified for:('01101'B,'1010'B);
+  template bitstring tspt_bs_mod4vl3 := '1010010001'B //mofified for:('01101'B,'1010'B,'B12'B);
+  template bitstring tspt_bs_mod4c1 := '1010010001'B //mofified for:complement('01101')
+  template bitstring tspt_bs_mod4c2 := '1010010001'B //mofified for:complement('01101','1010');
+  template bitstring tspt_bs_mod4c3 := '1010010001'B //mofified for:complement('01101','1010','101');
+  template bitstring tspt_bs_mod4r1 := '1010010001'B //mofified for:('A'..'B'); //range
+  template bitstring tspt_bs_mod4r2 := '1010010001'B //mofified for:('a'..'c');
+  template bitstring tspt_bs_mod4pa := '1010010001'B //mofified for:pattern 'abc*123'
+  template bitstring tspt_bs_mod4pq := '1010010001'B //mofified for:pattern 'abc?123'
+  
+  template bitstring tspt_bs_mod4vifp := '1010010001'B //mofified for:'01101' ifpresent;
+  template bitstring tspt_bs_mod4oifp := '1010010001'B //mofified for:omit ifpresent;
+  template bitstring tspt_bs_mod4aifp := '1010010001'B //mofified for:* ifpresent;
+  template bitstring tspt_bs_mod4qifp := '1010010001'B //mofified for:? ifpresent;
+  template bitstring tspt_bs_mod4al1ifp := '1010010001'B //mofified for:* length(2) ifpresent; //length restriction
+  template bitstring tspt_bs_mod4al2ifp := '1010010001'B //mofified for:* length(2..4) ifpresent;
+  template bitstring tspt_bs_mod4ql1ifp := '1010010001'B //mofified for:? length(2) ifpresent;
+  template bitstring tspt_bs_mod4ql2ifp := '1010010001'B //mofified for:? length(2..4) ifpresent;
+  template bitstring tspt_bs_mod4vl1ifp :=  ('01101'B) ifpresent //TODO: Adam //It should be mofified for: ('01101'B);
+  template bitstring tspt_bs_mod4vl2ifp := '1010010001'B //mofified for:('01101','1010') ifpresent;
+  template bitstring tspt_bs_mod4vl3ifp := '1010010001'B //mofified for:('01101','1010','B12') ifpresent;
+  template bitstring tspt_bs_mod4c1ifp := '1010010001'B //mofified for:complement('01101') ifpresent
+  template bitstring tspt_bs_mod4c2ifp := '1010010001'B //mofified for:complement('01101','1010') ifpresent;
+  template bitstring tspt_bs_mod4c3ifp := '1010010001'B //mofified for:complement('01101','1010','101') ifpresent;
+  //template bitstring tspt_bs_mod4r1ifp := '1010010001'B //mofified for:('0'B..'1'B) ifpresent; //range
+  //template bitstring tspt_bs_mod4r2ifp := '1010010001'B //mofified for:('0'B..'1'B) ifpresent;
+  template bitstring tspt_bs_mod4paifp := '1010010001'B //mofified for:pattern 'abc*xyz'B  ifpresent
+  template bitstring tspt_bs_mod4pqifp := '1010010001'B //mofified for:pattern 'abc?xyz'B  ifpresent  
+  
+}
+
+//=========================================================================
+// Functions
+//=========================================================================
+
+function f_string2ttcn_RBS_t(in charstring pl_rbs, in template RBS pl_expected_result) {
+	var template RBS vl_result;
+	@try {
+	 string2ttcn(pl_rbs,vl_result);
+	 setverdict(pass) 
+	}
+	@catch(err_str) {
+    log("string2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log(pl_expected_result);
+  log(vl_result);
+  if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+function f_string2ttcn_RBS_t_str(in charstring pl_rec, in charstring pl_expected_result) {
+	var template RBS vl_result;
+	@try {
+	 string2ttcn(pl_rec,vl_result);
+	 setverdict(pass) 
+	}
+	@catch(err_str) {
+    log("str2ttcn() failed: ",err_str);
+    setverdict(fail);
+  }
+  log("Expected result: ", pl_expected_result);
+  log("Result: ", vl_result);
+  if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+}
+
+//template string -> variable conversion
+//expected result: error
+function f_string2ttcn_RBS_v(in charstring pl_cs, in template RBS pl_expected_result, in boolean pl_ok_expected) {
+  var RBS vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("string2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( log2str(pl_expected_result) == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("string2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ",pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//this function is the same but uses
+function f_string2ttcn_RBS_v_str(in charstring pl_cs, charstring pl_expected_result, in boolean pl_ok_expected) {
+  var RBS vl_result;
+  if( pl_ok_expected ) {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(pass);
+    }
+    @catch(err_str) {
+      log("str2ttcn() failed: ",err_str);
+      setverdict(fail);
+    }
+    if( pl_expected_result == log2str(vl_result) ) { setverdict(pass) } else { setverdict(fail) }
+  } 
+  else 
+  {
+    @try {
+      string2ttcn(pl_cs, vl_result);
+      setverdict(fail);
+    }
+    @catch(err_str) {
+      log("str2ttcn() conversion error: ",err_str);
+      setverdict(pass,"Expected error, ok");
+    }
+    
+  }
+  log("Expected result: ", pl_expected_result );
+  log("Result: ", vl_result);
+}
+
+//=========================================================================
+// Testcases
+//=========================================================================
+
+
+testcase tc_bs_1() runs on MC {
+  var template BitStrings_1_2 vlt_bs := ?;
+  log(vlt_bs);
+}
+
+testcase tc_bs_ModulePar_emb() runs on MC {
+  log(t_rbs(tspt_bs_mod4v));
+  if(log2str(t_rbs(tspt_bs_mod4v)) != "{ bs := \'01101\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4o));
+  if(log2str(t_rbs(tspt_bs_mod4o)) != "{ bs := omit }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4a));
+  if(log2str(t_rbs(tspt_bs_mod4a)) != "{ bs := * }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4q));
+  if(log2str(t_rbs(tspt_bs_mod4q)) != "{ bs := ? }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al1));
+  if(log2str(t_rbs(tspt_bs_mod4al1)) != "{ bs := * length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al2));
+  if(log2str(t_rbs(tspt_bs_mod4al2)) != "{ bs := * length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql1));
+  if(log2str(t_rbs(tspt_bs_mod4ql1)) != "{ bs := ? length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql2));
+  if(log2str(t_rbs(tspt_bs_mod4ql2)) != "{ bs := ? length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(">",t_rbs(tspt_bs_mod4vl1),"<");
+  if(log2str(t_rbs(tspt_bs_mod4vl1)) != "{ bs := \'01101\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl2));
+  if(log2str(t_rbs(tspt_bs_mod4vl2)) != "{ bs := (\'01101\'B, \'1010\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  
+  log(t_rbs(tspt_bs_mod4vl3));
+  if(log2str(t_rbs(tspt_bs_mod4vl3)) != "{ bs := (\'01101\'B, \'1010\'B, \'101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c1));
+  if(log2str(t_rbs(tspt_bs_mod4c1)) != "{ bs := complement (\'01101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c2));
+  if(log2str(t_rbs(tspt_bs_mod4c2)) != "{ bs := complement (\'01101\'B, \'1010\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c3));
+  if(log2str(t_rbs(tspt_bs_mod4c3)) != "{ bs := complement (\'01101\'B, \'1010\'B, \'101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pa));
+  if(log2str(t_rbs(tspt_bs_mod4pa)) != "{ bs := \'000*111\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pq));
+  if(log2str(t_rbs(tspt_bs_mod4pq)) != "{ bs := \'000?111\'B }") {setverdict(fail)} else {setverdict(pass)};
+  //==
+  log(t_rbs(tspt_bs_mod4vifp));
+  if(log2str(t_rbs(tspt_bs_mod4vifp)) != "{ bs := \'01101\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4oifp));
+  if(log2str(t_rbs(tspt_bs_mod4oifp)) != "{ bs := omit ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4aifp));
+  if(log2str(t_rbs(tspt_bs_mod4aifp)) != "{ bs := * ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4qifp));
+  if(log2str(t_rbs(tspt_bs_mod4qifp)) != "{ bs := ? ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al1ifp));
+  if(log2str(t_rbs(tspt_bs_mod4al1ifp)) != "{ bs := * length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al2ifp));
+  if(log2str(t_rbs(tspt_bs_mod4al2ifp)) != "{ bs := * length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql1ifp));
+  if(log2str(t_rbs(tspt_bs_mod4ql1ifp)) != "{ bs := ? length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql2ifp));
+  if(log2str(t_rbs(tspt_bs_mod4ql2ifp)) != "{ bs := ? length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl1ifp));
+  if(log2str(t_rbs(tspt_bs_mod4vl1ifp)) != "{ bs := \'01101\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl2ifp));
+  if(log2str(t_rbs(tspt_bs_mod4vl2ifp)) != "{ bs := (\'01101\'B, \'1010\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl3ifp));
+  if(log2str(t_rbs(tspt_bs_mod4vl3ifp)) != "{ bs := (\'01101\'B, \'1010\'B, \'101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c1ifp));
+  if(log2str(t_rbs(tspt_bs_mod4c1ifp)) != "{ bs := complement (\'01101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c2ifp));
+  if(log2str(t_rbs(tspt_bs_mod4c2ifp)) != "{ bs := complement (\'01101\'B, \'1010\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c3ifp));
+  if(log2str(t_rbs(tspt_bs_mod4c3ifp)) != "{ bs := complement (\'01101\'B, \'1010\'B, \'101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4paifp));
+  if(log2str(t_rbs(tspt_bs_mod4paifp)) != "{ bs := \'000*111'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pqifp));
+  if(log2str(t_rbs(tspt_bs_mod4pqifp)) != "{ bs := \'000?111\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+}
+
+testcase tc_bs_ttcn2string_emb() runs on MC {
+  log(t_rbs(tspt_bs_mod4v));
+  if(ttcn2string(t_rbs(tspt_bs_mod4v)) != "{ bs := \'01101\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4o));
+  if(ttcn2string(t_rbs(tspt_bs_mod4o)) != "{ bs := omit }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4a));
+  if(ttcn2string(t_rbs(tspt_bs_mod4a)) != "{ bs := * }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4q));
+  if(ttcn2string(t_rbs(tspt_bs_mod4q)) != "{ bs := ? }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al1));
+  if(ttcn2string(t_rbs(tspt_bs_mod4al1)) != "{ bs := * length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al2));
+  if(ttcn2string(t_rbs(tspt_bs_mod4al2)) != "{ bs := * length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql1));
+  if(ttcn2string(t_rbs(tspt_bs_mod4ql1)) != "{ bs := ? length (2) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql2));
+  if(ttcn2string(t_rbs(tspt_bs_mod4ql2)) != "{ bs := ? length (2 .. 4) }") {setverdict(fail)} else {setverdict(pass)};
+  log(">",t_rbs(tspt_bs_mod4vl1),"<");
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl1)) != "{ bs := \'01101\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl2));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl2)) != "{ bs := (\'01101\'B, \'1010\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  
+  log(t_rbs(tspt_bs_mod4vl3));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl3)) != "{ bs := (\'01101\'B, \'1010\'B, \'101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c1));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c1)) != "{ bs := complement (\'01101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c2));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c2)) != "{ bs := complement (\'01101\'B, \'1010\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c3));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c3)) != "{ bs := complement (\'01101\'B, \'1010\'B, \'101\'B) }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pa));
+  if(ttcn2string(t_rbs(tspt_bs_mod4pa)) != "{ bs := \'000*111\'B }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pq));
+  if(ttcn2string(t_rbs(tspt_bs_mod4pq)) != "{ bs := \'000?111\'B }") {setverdict(fail)} else {setverdict(pass)};
+  //==
+  log(t_rbs(tspt_bs_mod4vifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vifp)) != "{ bs := \'01101\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4oifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4oifp)) != "{ bs := omit ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4aifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4aifp)) != "{ bs := * ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4qifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4qifp)) != "{ bs := ? ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al1ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4al1ifp)) != "{ bs := * length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4al2ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4al2ifp)) != "{ bs := * length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql1ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4ql1ifp)) != "{ bs := ? length (2) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4ql2ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4ql2ifp)) != "{ bs := ? length (2 .. 4) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl1ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl1ifp)) != "{ bs := \'01101\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl2ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl2ifp)) != "{ bs := (\'01101\'B, \'1010\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4vl3ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4vl3ifp)) != "{ bs := (\'01101\'B, \'1010\'B, \'101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c1ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c1ifp)) != "{ bs := complement (\'01101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c2ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c2ifp)) != "{ bs := complement (\'01101\'B, \'1010\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4c3ifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4c3ifp)) != "{ bs := complement (\'01101\'B, \'1010\'B, \'101\'B) ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4paifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4paifp)) != "{ bs := \'000*111'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+  log(t_rbs(tspt_bs_mod4pqifp));
+  if(ttcn2string(t_rbs(tspt_bs_mod4pqifp)) != "{ bs := \'000?111\'B ifpresent }") {setverdict(fail)} else {setverdict(pass)};
+}
+
+//=============== string2ttcn ==============================
+
+testcase tc_bs_string2ttcn_mod4v() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4v)),t_rbs(tspt_bs_mod4v))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4v)),t_rbs(tspt_bs_mod4v),true)  
+}
+
+testcase tc_bs_string2ttcn_mod4o() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4o)),t_rbs(tspt_bs_mod4o))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4o)),t_rbs(tspt_bs_mod4o),true) 
+}
+
+testcase tc_bs_string2ttcn_mod4a() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4a)),t_rbs(tspt_bs_mod4a))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4a)),t_rbs(tspt_bs_mod4a),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4q() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4q)),t_rbs(tspt_bs_mod4q))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4q)),t_rbs(tspt_bs_mod4q),false) 
+}
+
+testcase tc_bs_string2ttcn_mod4al1() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4al1)),t_rbs(tspt_bs_mod4al1))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4al1)),t_rbs(tspt_bs_mod4al1),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4al2() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4al2)),t_rbs(tspt_bs_mod4al2))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4al2)),t_rbs(tspt_bs_mod4al2),false)  
+}
+
+
+testcase tc_bs_string2ttcn_mod4ql1() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4ql1)),t_rbs(tspt_bs_mod4ql1))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4ql1)),t_rbs(tspt_bs_mod4ql1),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4ql2() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4ql2)),t_rbs(tspt_bs_mod4ql2))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4ql2)),t_rbs(tspt_bs_mod4ql2),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4vl1() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4vl1)),t_rbs(tspt_bs_mod4vl1))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4vl1)),t_rbs(tspt_bs_mod4vl1),true)  
+}
+
+testcase tc_bs_string2ttcn_mod4vl2() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4vl2)),t_rbs(tspt_bs_mod4vl2))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4vl2)),t_rbs(tspt_bs_mod4vl2),false)  
+}
+
+
+testcase tc_bs_string2ttcn_mod4vifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4vifp)),t_rbs(tspt_bs_mod4vifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4vifp)),t_rbs(tspt_bs_mod4vifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4oifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4oifp)),t_rbs(tspt_bs_mod4oifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4oifp)),t_rbs(tspt_bs_mod4oifp),false) 
+}
+
+testcase tc_bs_string2ttcn_mod4aifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4aifp)),t_rbs(tspt_bs_mod4aifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4aifp)),t_rbs(tspt_bs_mod4aifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4qifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4qifp)),t_rbs(tspt_bs_mod4qifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4qifp)),t_rbs(tspt_bs_mod4qifp),false) 
+}
+
+testcase tc_bs_string2ttcn_mod4al1ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4al1ifp)),t_rbs(tspt_bs_mod4al1ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4al1ifp)),t_rbs(tspt_bs_mod4al1ifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4al2ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4al2ifp)),t_rbs(tspt_bs_mod4al2ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4al2ifp)),t_rbs(tspt_bs_mod4al2ifp),false)  
+}
+
+
+testcase tc_bs_string2ttcn_mod4ql1ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4ql1ifp)),t_rbs(tspt_bs_mod4ql1ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4ql1ifp)),t_rbs(tspt_bs_mod4ql1ifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4ql2ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4ql2ifp)),t_rbs(tspt_bs_mod4ql2ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4ql2ifp)),t_rbs(tspt_bs_mod4ql2ifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4vl1ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4vl1ifp)),t_rbs(tspt_bs_mod4vl1ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4vl1ifp)),t_rbs(tspt_bs_mod4vl1ifp),false)  
+}
+
+testcase tc_bs_string2ttcn_mod4vl2ifp() runs on MC {
+  f_string2ttcn_RBS_t(ttcn2string(t_rbs(tspt_bs_mod4vl2ifp)),t_rbs(tspt_bs_mod4vl2ifp))
+  f_string2ttcn_RBS_v(ttcn2string(t_rbs(tspt_bs_mod4vl2ifp)),t_rbs(tspt_bs_mod4vl2ifp),false)  
+}
+
+//=========================================================================
+// Control
+//=========================================================================
+
+
+control {
+  log("***bitstring tests****");
+  execute(tc_bs_ModulePar_emb());
+  execute(tc_bs_ttcn2string_emb());
+  execute(tc_bs_string2ttcn_mod4v());
+  execute(tc_bs_string2ttcn_mod4o());
+  execute(tc_bs_string2ttcn_mod4a());
+  execute(tc_bs_string2ttcn_mod4q());
+  execute(tc_bs_string2ttcn_mod4al1());
+  execute(tc_bs_string2ttcn_mod4al2());
+  execute(tc_bs_string2ttcn_mod4ql1());
+  execute(tc_bs_string2ttcn_mod4ql2());
+  execute(tc_bs_string2ttcn_mod4vl1());
+  execute(tc_bs_string2ttcn_mod4vl2());
+  //execute(tc_bs_string2ttcn_mod4vl3());  
+  
+  execute(tc_bs_string2ttcn_mod4vifp());
+  execute(tc_bs_string2ttcn_mod4oifp());
+  execute(tc_bs_string2ttcn_mod4aifp());
+  execute(tc_bs_string2ttcn_mod4qifp());
+  execute(tc_bs_string2ttcn_mod4al1ifp());
+  execute(tc_bs_string2ttcn_mod4al2ifp());
+  execute(tc_bs_string2ttcn_mod4ql1ifp());
+  execute(tc_bs_string2ttcn_mod4ql2ifp());
+  execute(tc_bs_string2ttcn_mod4vl1ifp());
+  execute(tc_bs_string2ttcn_mod4vl2ifp());
+}
+
+}
+

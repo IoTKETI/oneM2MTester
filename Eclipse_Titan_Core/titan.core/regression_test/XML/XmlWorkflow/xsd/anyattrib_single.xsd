@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/anyattrib/single"
+ targetNamespace="www.example.org/anyattrib/single"> 
+
+
+<xsd:attributeGroup name="attrGroup">
+	<xsd:attribute name="attrInGroup2" type="token"/>
+	<xsd:attribute name="attrInGroup1" type="token"/>
+	<xsd:anyAttribute namespace="##targetNamespace"/> 
+</xsd:attributeGroup> 
+
+<xsd:complexType name="e25seq">
+	<xsd:sequence>
+		<xsd:element name="titleElemBase" type="xsd:string"/>
+		<xsd:element name="forenameElemBase" type="xsd:string"/>
+		<xsd:element name="surnameElemBase" type="xsd:string"/>
+	</xsd:sequence>
+	<xsd:attributeGroup ref="this:attrGroup"/>
+	<xsd:anyAttribute namespace="http://www.w3.org/1999/xhtml ##targetNamespace"/> 
+</xsd:complexType>
+
+<xsd:element name="e45c">
+	<xsd:complexType>
+		<xsd:anyAttribute namespace="##local http://www.example.org/attribute"/>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name="e45d">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="this:e45c">
+				<xsd:anyAttribute namespace="##targetNamespace"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+ </xsd:element>
+
+
+<xsd:complexType name="ExtBase">
+	<xsd:sequence>
+		<element name="field" type="string"/>
+	</xsd:sequence>
+	<xsd:anyAttribute namespace="##targetNamespace"/>
+</xsd:complexType>
+
+<xsd:element name="MyType">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="this:ExtBase">
+				<xsd:attribute name="ding" type="string"/>
+				<xsd:anyAttribute namespace="##any"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:complexType name="ExtBase2">
+	<xsd:sequence>
+		<xsd:element name="field" type="string"/>
+	</xsd:sequence>
+	<xsd:anyAttribute namespace="##other"/>
+</xsd:complexType>
+
+<xsd:element name="MyType2">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="this:ExtBase2">
+				<xsd:attribute name="ding" type="string"/>
+				<xsd:anyAttribute namespace="##targetNamespace"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

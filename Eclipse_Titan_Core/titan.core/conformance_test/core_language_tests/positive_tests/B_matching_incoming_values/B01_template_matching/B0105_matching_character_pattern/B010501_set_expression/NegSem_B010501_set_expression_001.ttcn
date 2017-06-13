@@ -1,0 +1,34 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ * @version 0.0.1
+ * @purpose 1:B.1.5.1, Ensure that the IUT correctly handles template matching of character pattern set expressions
+ * @verdict pass reject
+ ***************************************************/
+module NegSem_B010501_set_expression_001 {
+	type record MessageType {
+		charstring field1
+	}
+
+	type port loopbackPort message {
+		inout MessageType;
+	} with {extension "internal"}
+
+	type component GeneralComp {
+		port loopbackPort messagePort;
+	}
+
+	testcase TC_NegSem_B010501_set_expression_001() runs on GeneralComp {
+
+		var boolean m_res := match( "test", pattern "te[p[q-t]x]t");   // embedded set is not allowed
+
+		setverdict(fail);
+		
+	}
+	control {
+		execute(TC_NegSem_B010501_set_expression_001());
+	}
+}
+ 

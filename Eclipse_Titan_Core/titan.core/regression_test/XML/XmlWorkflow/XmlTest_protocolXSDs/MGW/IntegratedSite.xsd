@@ -1,0 +1,3760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema      targetNamespace="http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02"
+           xmlns:IntegratedSite="http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:confd="http://tail-f.com/ns/confd/1.0"
+           xmlns:IsTypes="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xml:lang="en">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema" schemaLocation="XMLSchema.xsd"/>
+  <xs:import namespace="http://tail-f.com/ns/confd/1.0" schemaLocation="confd.xsd"/>
+  <xs:import namespace="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02" schemaLocation="IsTypes.xsd"/>
+  <xs:complexType name="dataModelVersionType-10">
+    <xs:sequence>
+      <xs:element name="major" type="xs:integer"/>
+      <xs:element name="minor" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FtpData">
+    <xs:annotation>
+      <xs:documentation>
+
+	Data to specify FTP server info.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="host" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Hostname to FTP server.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="user" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Username to FTP server.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="password" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Password to FTP server.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="path" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Absolute path including filename.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="bsProdFilterType-1">
+    <xs:sequence>
+      <xs:element name="prodNo" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+		  The blade system product number (CSA product number).
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="prodRev" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+		  The revision of the blade system product (CSA product revision).
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="JobData">
+    <xs:annotation>
+      <xs:documentation>
+
+	Data to specify job status during its execution.
+	A description of "jobs" can be found in the document "Service Guide - Software",
+	6/154 43-CNA 113 13 Uen.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="jobDateOrdered" type="xs:dateTime"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Date and time when the job was ordered.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobStatus" type="IntegratedSite:jobStatusType-34"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Indicator of job status.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobResult" type="IntegratedSite:jobResultType-35"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Possible result of a job action.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobInfo" type="xs:token"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Textual description of additional info about the job.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobProgress" type="xs:unsignedInt"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Current progress step of the job. This parameter is used
+	    together with jobLastStep to
+	    be able to present rough progress tracking to the user.
+	    For example: "'jobProgress' of 'jobLastStep' steps complete"
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobLastStep" type="xs:unsignedInt"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Last progress step of the job. This parameter is used
+	    together with jobProgress to
+	    be able to present rough progress tracking to the user.
+	    For example: "'jobProgress' of 'jobLastStep' steps complete"
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="jobProgressReport" type="xs:boolean"      >
+        <xs:annotation>
+          <xs:documentation>
+
+	    Determines if progress reports should be issued during the job.
+	    If this parameter is true, progress reports will be issued at
+	    each step of the job. If this parameter is false, no progress
+	    reports are issued. When a job finishes, a report describing
+	    the result of the job is however always issued.
+
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="dnsDomainType-14">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[a-zA-Z]+(\.[a-zA-Z]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InterSubrackLink_HwmIslType">
+    <xs:annotation>
+      <xs:documentation>
+
+      Inter-subrack link type definition. The valid values
+      corresponds to using a inter-subrack link board
+      or connecting the subracks using MXB front ports.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="islb|frontPort"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmKnockOutPreference">
+    <xs:annotation>
+      <xs:documentation>
+
+       The knock-out preference of a blade.
+       \"protected\" reflects a mode where the blade
+       is immune to shutdown or lock requests.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="normal|protected"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="updateModeType-9">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="unsafe|readOnly|safe|preliminary"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmRedundancyGroups">
+    <xs:annotation>
+      <xs:documentation>
+
+        This datatype defines the valid redundancy groups for bs blades.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="0|1|2|3|4|5|6|7|8|9"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Slot_HwmSlotState">
+    <xs:annotation>
+      <xs:documentation>
+
+      HwmSlotState type definition. This type describes the different slot states.
+      Used and unused corresponds to whether the slot is assigned to a blade within
+      a blade system and vice versa.Occupied and empty corresponds to whether a
+      physical blade is inserted in the slot and vice versa.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="unusedEmpty|usedEmpty|unusedOccupied|usedOccupied"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="relatedSDPsType-32">
+    <xs:list itemType="confd:objectRef"/>
+  </xs:simpleType>
+  <xs:simpleType name="subrack1IdType-22">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="31"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="rlspLinkDownThresholdType-12">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="65535"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrackIdType-3">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="31"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack2IdType-26">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="31"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="identityType-7">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="4096"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="numberType-21">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="25"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="slotNoType-4">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="25"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="physicalAddrPlug0Type-18">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="15"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmOperationalState">
+    <xs:annotation>
+      <xs:documentation>
+
+      The operational state of blades and blade systems.
+      This state reflects if the entity is on or off.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="disabled|enabled"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="physicalAddrPlug1Type-19">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="15"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SwmMatchStrategy">
+    <xs:annotation>
+      <xs:documentation>
+
+	Describes how to interpret a given file name and path when
+	downloading files.
+	For exact file match strategy, all files that exactly
+	match the given file name will match.
+	For prefix file match strategy, all files that match
+	the given prefix will match.
+	If exact or prefix has been selected and if the path ends
+	with a directory name, all files in that directory will match.
+	The value unknown is deprecated.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="exact|prefix|unknown"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="bladeSwgRefsType-2">
+    <xs:list itemType="confd:objectRef"/>
+  </xs:simpleType>
+  <xs:simpleType name="HwmValidNameCharacters">
+    <xs:annotation>
+      <xs:documentation>
+
+        This datatype defines the valid characters of name attributes.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[-a-zA-Z0-9_\\\(\) \.:;]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmBusType">
+    <xs:annotation>
+      <xs:documentation>
+
+      The bus type used by a blade.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="ipmi|mbus"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack1XslotType-23">
+    <xs:restriction base="xs:integer">
+      <xs:enumeration value="25"/>
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack1PslotType-24">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="25"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="jobResultType-35">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="ok|inputError|executionError|unknown"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack2XslotType-27">
+    <xs:restriction base="xs:integer">
+      <xs:enumeration value="25"/>
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack2PslotType-28">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="25"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="physicalAddrPlug3Type-20">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="15"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="statusType-33">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="complete|incomplete|inconsistent"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="jobStatusType-34">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="notStarted|ongoing|complete"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DummyEmptyType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="widthType-16">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="12"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="maskType-5">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="32"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="maskType-6">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="32"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="rlspLinkUpThresholdType-13">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="65535"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmAvailabilityStatus">
+    <xs:annotation>
+      <xs:documentation>
+
+       The availability status of blades and blade systems.
+       This status is set by the system, depending on the
+       availability conditions of the concerned unit.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="available|failed|offLine|dependency|degraded|upgrading|startingUp|goingOffLine|notInstalled|powerOff"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HwmAdministrativeState">
+    <xs:annotation>
+      <xs:documentation>
+
+      The administrative state of blades and blade systems.
+      This state reflects what the administrator has done.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="locked|shuttingDown|unlocked"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="pbitsType-8">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="7"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="islTypeType-30">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="islb|frontPort"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="typeType-31">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="bladeSystemInformation|bladeInformation|application|rootFileSystem|kernel|correction|ipmi"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack1PortType-25">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="6"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="idType-17">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="31"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="subrack2PortType-29">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="6"/>
+      <xs:minInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="modeType-15">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="prepare|publish|accept|reject|purge"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="rlspMarkerGenerateIntervalType-11">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="200"/>
+      <xs:minInclusive value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="IntegratedSite">
+    <xs:annotation>
+      <xs:documentation>
+
+    Management information model for the integrated site.
+    This also the top model in the configuration structure under which all
+    blade system specific models are mounted.
+
+    Hardware management, software management and network configuration are the
+    services that are available through this model in IS 2.0 perspective.
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AdministrativeData">
+          <xs:annotation>
+            <xs:documentation>
+
+      A collection of administrative data for the entire site.
+
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="siteAlias" type="xs:token" minOccurs="0"              >
+                <xs:annotation>
+                  <xs:documentation>
+
+	Human-readable name for the site.
+
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="ipb" type="xs:token" minOccurs="0"              >
+                <xs:annotation>
+                  <xs:documentation>
+
+	IS Customer identification code.
+
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="SystemRestart">
+                <xs:annotation>
+                  <xs:documentation>
+
+     System restart.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="sisSRSongoing" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	Returns true if a SIS sequential restart is ongoing, otherwise false.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="BladeSystems">
+          <xs:annotation>
+            <xs:documentation>
+
+      Parent of all blade systems.
+
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BladeSystem" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      This class describes a blade system.
+      It serves as a mount point for the blade system specific model.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="IntegratedSite:HwmValidNameCharacters"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	A required user friendly blade system name. The name must be unique within the site
+        and can only be set once.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="alias" type="IntegratedSite:HwmValidNameCharacters" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	An optional blade system alias. The default value of the alias is the blade system name.
+        The alias can be updated as long as the blade system state is enabled/available.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="number" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	An identifier for the blade system. This number increases in steps of 1 for each
+        created blade system.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="typeName" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        Name of the blade system type.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="swgRef" type="confd:objectRef"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	Reference to the software group (SWG) that the blade system implements.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="scpRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Optional reference to the software correction package (SCP) applied to the software group.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="admState" type="IntegratedSite:HwmAdministrativeState" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          The administrative state of the blade system.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="opState" type="IntegratedSite:HwmOperationalState" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          The operational state of the blade system.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="availStatus" type="IntegratedSite:HwmAvailabilityStatus" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+                          The availability status of the blade system.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bsdRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	Optional reference to the blade system domain that the blade system belongs to.
+        A blade system domain is a purely logical concept that enables
+        grouping of  blade systems.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bsomAddress" type="confd:inetAddressIPv4" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+      IP address of the blade system OAM Master.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="externalBootServerRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+    		The reference to the external boot server class (if any) that
+    		this blade system has:
+            /IntegratedSite/NetworkConfiguration/ExternalBootServer
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="autoCreatePrivateNetwork" type="xs:boolean" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+    		A flag which tells if a private network should be
+    		automatically created when the bladesystem is created.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="namespace" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+			  If the blade system has a management information model, this
+			  attributes shows the namespace for the currently active software
+			  on the blade system. If the blade system does not have a management
+                          information model, this attribute does not have a value.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Blade" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>
+
+      This class describes a blade.
+      A blade is identified by a subrack number and a slot number.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="subrackId" type="IntegratedSite:subrackIdType-3"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	A reference to the associated subrack, which is the value of 'subrackId'
+	for the associated subrack. The subrack identifier, where the blade is located at.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="slotNo" type="IntegratedSite:slotNoType-4"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                The slot number for this blade within the subrack.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="slotLabel" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	The slot label of the blade. It will only be set at creation.
+	This should be used in alarms related to the slot to inform the
+	operator of what position in the subrack the blade is localised.
+	For E-GEM (Enhanced Generic Ericsson Magazine) subracks it will result in
+        a string, for example X02 for slot 0 up to X80 for slot 25.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="typeRef" type="confd:objectRef"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Reference to the type of the blade.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="requiredSwgRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                Reference to the software group with the lowest allowed revision for the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bladeSwgRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                Reference to the software group installed on the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsom" type="xs:boolean" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+       Indicates if this blade is a BSOM candidate.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="knockOutPreference" type="IntegratedSite:HwmKnockOutPreference" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Set to protected if the  blade should not be locked or shutdown before the
+	main switch blade.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="userLabel" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	An optional user friendly blade name, which is always possible to set.
+	Default value for non-infrastructure blades is an empty string.
+        MXB blade user label defaults to blade type and subrack-slot, for example
+        \"MXB 0-0\"
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="admState" type="IntegratedSite:HwmAdministrativeState" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	The administrative state of the blade.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="opState" type="IntegratedSite:HwmOperationalState" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The operational state of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="availStatus" type="IntegratedSite:HwmAvailabilityStatus" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The availability status of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="busType" type="IntegratedSite:HwmBusType" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The type of maintenance bus on the connected blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodNo" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The product number of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodRev" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The product revision of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="serialNo" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The serial number of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The product name of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="vendor" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                The vendor name of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="mfgDate" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The manufacturing date of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="macAddressAggregate" type="IsTypes:MacAddress" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The aggregated MAC address of the blade.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="macAddressLeft" type="IsTypes:MacAddress" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	The left link MAC address of the blade. Only used by some blades.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="macAddressRight" type="IsTypes:MacAddress" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	The right link MAC address of the found Blade. Only used by some blades.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="changeDate" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+                                The date when the blade was last changed.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="redundancyGroup" type="IntegratedSite:HwmRedundancyGroups" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+        The redundancy group for this blade within the blade system.
+        This parameter is used to protect the last blade in the blade system
+        from getting restarted by LanFM.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="isbsAddress" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	IP address on the IS Boot (ISBS) subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="isobAddress" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	IP address on the IS OAM Boot (ISOB) subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="islctAddress" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	IP address on the IS Local Craft (ISLCT) subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="LinkSap" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+      A Blade may have one or more resilient interfaces
+      to the backplane. Such an interface is called a
+      Link Service Access Point, which is the
+      point where you access layer 2. Link Service Access Points are
+      automatically created and deleted along with the
+      hosting blade.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="id" type="xs:integer"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	The id of a LinkSap is a number from 0 to X within the slot.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <!--
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_Blade_LinkSap">
+                        <xs:selector xpath="IntegratedSite:LinkSap"/>
+                        <xs:field xpath="IntegratedSite:id"/>
+                      </xs:key>
+                      -->
+                    </xs:element>
+                    <xs:element name="BsNetworkConfiguration">
+                      <xs:annotation>
+                        <xs:documentation>
+
+      The MO branch where the blade system specific
+      Network resources are mapped to common Integrated Site
+      resources. This mapping activity must be performed before
+      a new blade or blade system successfully can be
+      unlocked via the Hardware service. Some blade
+      systems have partly pre-registered
+      network requirements, while others demand that
+      you read the corresponding information from
+      separate Operation Procedure Instructions and
+      manually register the blade system network
+      requirements. The pre-registered network
+      requirements automates parts of the blade
+      system-specific configuration activity.
+
+      In an Integrated Site, the blade systems obtain
+      their actual network configuration dynamically in
+      runtime. When you change the network
+      configuration it will affect blade systems. In
+      order to minimize the disturbance of active blade
+      systems, the changes are normally applied in a
+      separate storage which is not visible to the
+      blade systems. In order to make use of the new
+      unpublished configuration, it must explicitly be
+      published by altering the updateMode. If the new
+      settings introduces severe problems the
+      configuration can be reverted to the old settings
+      by altering the updateMode.
+
+      The common Network configuration including
+      updateMode and its publish mechanism is specified
+      in class /IntegratedSite/NetworkConfiguration.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="BsIpTrafficClass" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+
+       A BS IP Traffic Class is the
+       requirement a blade system has of an IS IP
+       Traffic Class.
+
+       BS IP Traffic Classes can either be created
+       manually by the operator or they can be automatically
+       created from pre-registered network requirements
+       bundled with the blade system software. Regardless
+       of how they are created, each one needs to be
+       mapped to an IS IP Traffic Class before the blades
+       can be unlocked via the Hardware service. The
+       mapping is done with the 'isIpTrafficClassRef'
+       attribute.
+
+       Different instances of a blade system type may
+       call their BS IP Traffic Classes the same thing but
+       in the end the IS Site Designer may choose to
+       map them to the same or different IS IP Traffic
+       Classes.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:token"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+         The name of the BS IP Traffic Class. It is
+         unique within the blade system.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+         A short description of The BS IP Traffic Class.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="isIpTrafficClassRef" type="confd:objectRef" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	The mapping to a corresponding IS IP Traffic
+	Class. This mapping must be done before the
+	blades of the blade system can be unlocked.
+    Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsIpTrafficClass
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="BsLanTrafficClass" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	A BS LAN Traffic Class is the
+	requirement a blade system has of an IS LAN
+	Traffic Class. Different instances of a Blade
+	System type may call their BS Traffic Classes
+	the same thing but in the end the IS Site
+	Designer may choose to map them to the same or
+	different IS LAN Traffic Classes.
+
+       	BS LAN Traffic Classes can either be created
+       	manually by the operator or they can be automatically
+       	created from pre-registered network requirements
+       	bundled with the blade system software. Regardless
+       	of how they are created, each one needs to be
+       	mapped to an IS LAN Traffic Class before the blades
+       	can be unlocked via the Hardware service. The
+       	mapping is done with the 'isLanTrafficClassRef'
+       	attribute.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:token"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	 Name of the BS LAN Traffic Class. It is unique within the blade system.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+         Short description of the BS LAN Traffic Class.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="isLanTrafficClassRef" type="confd:objectRef" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	The mapping to a corresponding IS LAN Traffic
+	Class. This mapping must be done before the
+	blades of the blade system can be unlocked.
+    Mapped to:
+    /IntegratedSite/NetworkConfiguration/IsLanTrafficClass
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="BsLogicalNetwork" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+
+       A BS Logical Network is associated to
+       one IS Logical Network. A BS Logical Network
+       is the requirement a blade system has of an
+       IS Logical Network.
+
+       BS Logical Networks can either be created
+       manually by the operator or they can be
+       automatically created from pre-registered
+       network requirements bundled with the Blade
+       System software. Regardless of how they are
+       created, each one needs to be mapped to an IS
+       Logical Network before the blades can be
+       unlocked. The mapping is done with the
+       'isLogicalNetworkRef' attribute.
+
+       Different instances of a blade system type may call
+       their BS Logical Networks the same thing but in
+       the end the IS Site Designer can choose to map
+       them to the same or different IS Logical
+       Network.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:token"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	Name of the BS logical network. It is unique within the blade system.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	Short description of the BS Logical Network.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="private" type="xs:boolean" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	Flag that shows whether the BS Logical Network
+	is private for this blade system or if it may
+	be shared among several blade systems.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="isLogicalNetworkRef" type="confd:objectRef" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	The mapping to a corresponding IS Logical Network. This
+	mapping must be done before the blades of the
+	blade system can be unlocked.
+	Mapped to:
+      /IntegratedSite/NetworkConfiguration/IsLogicalNetwork
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="BsSubnet" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+       A BS Subnet is associated to one IS
+       Subnet. A BS Subnet is the requirement a
+       blade system has of an IS Subnet.
+
+       BS Subnets can either be created manually by the
+       operator or they can be automatically created
+       from pre-registered network requirements bundled
+       with the blade system software. Regardless of
+       how they are created, each one needs to be
+       mapped to both a BS VLan and an IS Subnet before
+       blades can be unlocked via the Hardware service.
+       The mappings are done with the
+       'bsVlanRef' and 'isSubnetRef' attributes.Each BS
+       Subnet contains one or more BS Subnet
+       Segments.
+
+       Different instances of a blade system type may
+       call their BS Subnets the same thing but in the
+       end the IS Site Designer can choose to map them
+       to the same or different IS Subnet.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="name" type="xs:token"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Name of the BS Subnet. It is unique within the BS Logical Network.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="description" type="xs:token" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Short description of the BS Subnet.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="bsVlanRef" type="confd:objectRef" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	The mapping to a corresponding BS Vlan. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to class:
+     /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsVlan
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="isSubnetRef" type="confd:objectRef" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	The mapping to a corresponding IS Subnet. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsLogicalNetwork/IsSubnet
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="BsSubnetSegment" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+       A BS Subnet Segment is associated to one
+       IS Subnet Segment. A BS Subnet Segment is the
+       requirement a blade system has of an IS Subnet
+       Segment.
+
+       BS Subnet Segments can either be created manually
+       by the operator or they can be automatically created from
+       pre-registered network requirements bundled with
+       the blade system software. Regardless of how they
+       are created, each one needs to be mapped to an IS
+       Subnet Segment before the blades can be unlocked
+       via the Hardware service.  The mapping is done
+       with the 'isSubnetSegmentRef' attribute.
+
+       Different instances of a blade system type may
+       call their BS Subnet Segments the same thing but
+       in the end the IS Site Designer can choose to
+       map them to the same or different IS Subnet
+       Segment.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="name" type="xs:token"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	Name of the BS Subnet Segment. It is unique within the BS Subnet.
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="description" type="xs:token" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	Short description of the BS Subnet Segment.
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="numOfIpaddresses" type="xs:integer" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	Required number of IP addresses in the corresponding IS Subnet Segment.
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="dhcpEnabled" type="xs:boolean" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	Flag that controls whether the corresponding IS
+	Subnet Segment is required to have DHCP enabled
+	or not.
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="routerRequired" type="xs:boolean" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	Flag that controls whether the corresponding IS
+	Subnet Segment is required to have a router
+	configured or not.
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="isSubnetSegmentRef" type="confd:objectRef" minOccurs="0"                                            >
+                                              <xs:annotation>
+                                                <xs:documentation>
+
+	The mapping to a corresponding IS Subnet
+	Segment. The mapping here must be done before
+	the blades of the blade system can be unlocked.
+    Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsLogicalNetwork/IsSubnet/IsSubnetSegment
+
+                                                </xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                  <!--
+                                  <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork_BsSubnet_BsSubnetSegment">
+                                    <xs:selector xpath="IntegratedSite:BsSubnetSegment"/>
+                                    <xs:field xpath="IntegratedSite:name"/>
+                                  </xs:key>
+                                  -->
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                            <!--
+                            <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork_BsSubnet">
+                              <xs:selector xpath="IntegratedSite:BsSubnet"/>
+                              <xs:field xpath="IntegratedSite:name"/>
+                            </xs:key>
+                            -->
+                          </xs:element>
+                          <xs:element name="BsVlan" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+
+       A BS VLAN is mapped to one IS VLAN. A BS VLAN is
+       the requirement a blade system has of an IS
+       VLAN. Different instances of a blade system type
+       may call their BS VLANs the same thing but in the
+       end the IS Site Designer can choose to map them
+       to the same or different IS VLAN.
+
+       BS VLANs can either be created manually by the
+       operator or they can be automatically created
+       from pre-registered network requirements bundled
+       with the blade system software.  Regardless of
+       how they are created, each one needs to be
+       mapped to an IS VLAN before the blades can be
+       unlocked. The mapping is done with the
+       'isVlanRef' attribute.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:token"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	 Name of the BS VLAN. It is unique within the blade system.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	Short description of the BS VLAN.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="private" type="xs:boolean" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+          Setting the private attribute to true, means
+          that the corresponding IS VLAN can not be
+          used by other blade systems. The IS VLAN is
+          private for this particular blade system.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="isVlanRef" type="confd:objectRef" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	The mapping to a corresponding IS VLAN. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to class:
+     /IntegratedSite/NetworkConfiguration/IsVlan
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="BsVlanSap" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+      There is a BS VLAN Service Access Point (BSVSAP)
+      for each Link Service Access Point that an IS
+      VLAN straddles. It is per BS VLAN Service Access
+      Point that certain VLAN properties are configured
+      (such as if it is mandatory to enable isolation protection).
+
+      BS VLAN Service Access Points can either be
+      created manually by the operator or they can be
+      automatically created from pre-registered network
+      requirements bundled with the blade system
+      software. Regardless of how they are created,
+      each one needs to be mapped to a Link SAP before
+      the blades can be unlocked.  The mapping is done
+      with the 'linkSapRef' attribute.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="name" type="xs:token"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Name of the BS VLAN SAP. It is unique within the BS VLAN.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="description" type="xs:token" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Short description of the BS VLAN SAP.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="static" type="xs:boolean" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Flag which controls whether this BS VLAN SAP
+	makes static or dynamic use of the
+	corresponding IS VLAN.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="protected" type="xs:boolean" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	Flag which controls whether this BS VLAN SAP should be
+	isolation protected or not.
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="linkSapRef" type="confd:objectRef" minOccurs="0"                                      >
+                                        <xs:annotation>
+                                          <xs:documentation>
+
+	A mapping to the corresponding Link Service Access Point.
+    Mapped to:
+     /IntegratedSite/BladeSystems/BladeSystem/Blade/LinkSap
+
+                                          </xs:documentation>
+                                        </xs:annotation>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                            <!--
+                            <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsVlan_BsVlanSap">
+                              <xs:selector xpath="IntegratedSite:BsVlanSap"/>
+                              <xs:field xpath="IntegratedSite:name"/>
+                            </xs:key>
+                            -->
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <!--
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsIpTrafficClass">
+                        <xs:selector xpath="IntegratedSite:BsIpTrafficClass"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLanTrafficClass">
+                        <xs:selector xpath="IntegratedSite:BsLanTrafficClass"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork">
+                        <xs:selector xpath="IntegratedSite:BsLogicalNetwork"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsVlan">
+                        <xs:selector xpath="IntegratedSite:BsVlan"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      -->
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <!--
+                <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_Blade">
+                  <xs:selector xpath="IntegratedSite:Blade"/>
+                  <xs:field xpath="IntegratedSite:subrackId"/>
+                  <xs:field xpath="IntegratedSite:slotNo"/>
+                </xs:key>
+                -->
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <!--
+          <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem">
+            <xs:selector xpath="IntegratedSite:BladeSystem"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          -->
+        </xs:element>
+        <xs:element name="Hardware">
+          <xs:annotation>
+            <xs:documentation>
+
+     The purpose of the Hardware Management function is to make it possible to manage
+     the Hardware Inventory (HWI) for the Integrated Site and to present its content via ISM
+     and Common Management Framework (CMF).
+
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="activeSis" type="xs:token" minOccurs="0"              >
+                <xs:annotation>
+                  <xs:appinfo confd:config="false"/>
+                  <xs:documentation>
+
+          The subrack and slot of the active SIS (OM role). The format is "subrack.slot".
+
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="BladeSystemDomain" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      This class describes a blade system domain.A blade system domain
+      is a purely logical concept that enables grouping of blade systems.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="IntegratedSite:HwmValidNameCharacters"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The blade system domain name.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The description of the blade system domain.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="BladeType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:appinfo confd:config="false"/>
+                  <xs:documentation>
+
+      This class describes a blade type. A blade type points out pairs of blade hardware product
+      identity (ROJ-number) and blade software groups (BL-SWG) comprising the kernel and
+      root file system. Blade types are registered when downloading blade system software.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="type" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The blade type product number, for example \"CNA12801\"
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="swgProdNo" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The blade software group identifier, for example \"CXS10138\"
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="swgProdRev" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The blade software group revision, for example \"R4A01\"
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="bladeSwgRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          Reference to corresponding blade software group,
+       for example with id \"CXS10138\" and revision \"R4A01\". This is the installed
+       software of the blade type but not necessarily the active software.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="name" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The name of the blade type, for example \"EXB\"
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="width" type="IntegratedSite:widthType-16" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The width of the blade. The data type unit is number of slots
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="oneGLinks" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	The 1G links used by the blade type, for example \"0,1\". Start counting from the leftmost backplane position.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="linkAggregates" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	The 1G links used for link aggregation by the blade type, for example \"0-1\". Start counting from the leftmost backplane position.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="tenGLinks" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	The 10G links used by the blade type, for example \"0,1\". Start counting from the leftmost backplane position.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="hasHwData" type="xs:boolean" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+	True if possible to read product info via the maintenance bus.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="isMxb" type="xs:boolean" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          True if this is a MXB type.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="availOneGSlots" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Deprecated. Kept for backwards compatibility.
+	Only valid for MXBs. A list of slots that have 1G links.
+	Could be a single slot or a range or a combination thereof.
+	Examples: \"1-24\" or \"1,3-13,15-24\".
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="aggregateRanges" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Deprecated. Kept for backwards compatibility.
+	Only valid for MXBs. Specifies which slots can be used
+	for link aggregation. Ranges are specified in the form \"1-12,13-24\".
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="usesExternalBootServer" type="xs:boolean" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          True if the blade uses external boot server.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="InterSubrackLink" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      This class describes an inter-subrack link.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="subrack1Id" type="IntegratedSite:subrack1IdType-22"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The identifier of the first subrack.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack1Xslot" type="IntegratedSite:subrack1XslotType-23"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         The position of the main switch board that terminates
+         the inter-subrack link in the first subrack.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack1Pslot" type="IntegratedSite:subrack1PslotType-24"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The position of the physical board that terminates
+        the inter-subrack link in the first subrack. The value
+        of this attribute is equal to subrack1Xslot if the link
+        is configured with MXB front ports.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack1Port" type="IntegratedSite:subrack1PortType-25"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The termination port on the physical board indentified
+        by subrack1Pslot.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack2Id" type="IntegratedSite:subrack2IdType-26"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The identifier of the second subrack.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack2Xslot" type="IntegratedSite:subrack2XslotType-27"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The position of the main switch board that terminates
+                   the inter-subrack link in the second subrack.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack2Pslot" type="IntegratedSite:subrack2PslotType-28"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The position of the physical board that terminates
+        the inter-subrack link in the second subrack. The value
+        of this attribute is equal to subrack2Xslot if the link
+        is configured with MXB front ports.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="subrack2Port" type="IntegratedSite:subrack2PortType-29"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         The termination port on the physical board indentified
+         by subrack2Pslot.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="islType" type="IntegratedSite:islTypeType-30" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Type definition of the inter-subrack link.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="islName" type="IntegratedSite:HwmValidNameCharacters" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          An optional user friendly inter-subrack link name.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Subrack" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      This class describes a subrack.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="id" type="IntegratedSite:idType-17"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The subrack identifier.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="type" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The subrack type, for example \"EGEM\"
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="userLabel" type="IntegratedSite:HwmValidNameCharacters" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          An optional user friendly subrack name.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="position" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The subrack position in the cabinet.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="cabinetPosition" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The cabinet position in the site.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="location" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+                          The site location, for example the visiting address.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="availableOneGSlots" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Available slots for 1G switch links. Information is read from the type
+	of MXB that is created in the subrack.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="availableTenGSlots" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Available slots for 10G switch links. Information is read from the type
+	of MXB that is created in the subrack.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="aggregateSlots" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Links ranges for (1G) link aggregation. Information is read from the
+	type of MXB that is created in the subrack.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="physicalAddrPlug0" type="IntegratedSite:physicalAddrPlug0Type-18"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         The value of the physical plug 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="physicalAddrPlug1" type="IntegratedSite:physicalAddrPlug1Type-19"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         The value of the physical plug 1.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="physicalAddrPlug3" type="IntegratedSite:physicalAddrPlug3Type-20"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         The value of the physical plug 3.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="leftMxbBsSwgRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Reference to the blade system SWG of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="leftMxbScpRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Optional reference to the blade system SCP of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="leftMxbBladeSwgRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Reference to the blade SWG of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rightMxbBsSwgRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Reference to the blade system SWG of the right MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rightMxbScpRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+         Optional reference to the blade system SCP of the right
+        MXB in the subrack. If not given the system will use
+        the same as the MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rightMxbBladeSwgRef" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Reference to the blade SWG of the right MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Slot" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+      This class corresponds to slots, there is one instance
+      for each slot. The slots are grouped per subrack. A slot is
+      identified by the subrack identifier and slot number.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="number" type="IntegratedSite:numberType-21"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	The value of this attribute identifies the
+	slot position within the subrack.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="state" type="IntegratedSite:Slot_HwmSlotState" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	See HwmSlotState description.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Optional reference to the blade system that uses this
+	slot. The value of this attribute will only have meaning in a
+	conceptual row if the value of hwmSlotState instance is either
+	usedOccupied  or usedEmpty in the same conceptual row,
+	which means that there is a blade system created using this slot.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <!--
+                <xs:key name="key_IntegratedSite_Hardware_Subrack_Slot">
+                  <xs:selector xpath="IntegratedSite:Slot"/>
+                  <xs:field xpath="IntegratedSite:number"/>
+                </xs:key>
+                -->
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <!--
+          <xs:key name="key_IntegratedSite_Hardware_BladeSystemDomain">
+            <xs:selector xpath="IntegratedSite:BladeSystemDomain"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_BladeType">
+            <xs:selector xpath="IntegratedSite:BladeType"/>
+            <xs:field xpath="IntegratedSite:type"/>
+            <xs:field xpath="IntegratedSite:swgProdNo"/>
+            <xs:field xpath="IntegratedSite:swgProdRev"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_InterSubrackLink">
+            <xs:selector xpath="IntegratedSite:InterSubrackLink"/>
+            <xs:field xpath="IntegratedSite:subrack1Id"/>
+            <xs:field xpath="IntegratedSite:subrack1Xslot"/>
+            <xs:field xpath="IntegratedSite:subrack1Pslot"/>
+            <xs:field xpath="IntegratedSite:subrack1Port"/>
+            <xs:field xpath="IntegratedSite:subrack2Id"/>
+            <xs:field xpath="IntegratedSite:subrack2Xslot"/>
+            <xs:field xpath="IntegratedSite:subrack2Pslot"/>
+            <xs:field xpath="IntegratedSite:subrack2Port"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_Subrack">
+            <xs:selector xpath="IntegratedSite:Subrack"/>
+            <xs:field xpath="IntegratedSite:id"/>
+          </xs:key>
+          -->
+        </xs:element>
+        <xs:element name="NetworkConfiguration">
+          <xs:annotation>
+            <xs:documentation>
+
+      The MO branch where the common Network resources are configured.
+
+      The Network configuration service provides support for
+      configuration of various network properties of an
+      Integrated Site. It contains the following configuration
+      parts:
+
+       * Blade system specific configuration - mapping blade
+         system network requirements to common Integrated Site
+         resources.  This activity must be performed before a
+         new blade or blade system successfully can be unlocked
+         via the Hardware service. Some blade systems
+         have partly pre-registered network requirements,
+         while others demand that you read the corresponding
+         information from separate BS specific
+         instructions and manually configure the blade system
+         network requirements. The pre-registered network
+         requirements automates parts of the blade
+         system-specific configuration activity. The blade
+         system specific configuration is specified in a
+         separate class, BladeSystems/BladeSystem/BsNetworkConfiguration.
+
+       * Common configuration - configuration of common
+         Integrated Site resources, such as subnets, VLANs,
+         traffic classes, and so on. Blade system network requirements
+         are mapped to these common resources.
+
+       * Publish configuration changes - publish updated
+         configuration. In an Integrated Site, the blade
+         systems obtain their actual network configuration
+         dynamically in runtime. When you change the network
+         configuration it will affect blade systems. In order to
+         minimize the disturbance of active blade systems, the
+         changes are normally applied in a separate storage,
+         which is not visible to the blade systems. In order to
+         make use of the new unpublished configuration, it must be
+         explicitly published by altering the updateMode. If
+         the new settings introduce severe problems, the
+         configuration can be reverted to the old settings by
+         altering the updateMode.
+
+       * External Boot Server - configuration of External Boot Server
+         for Blade Systems that do not want to boot from the SIS, but
+         instead fetch their boot files from a server outside the IS
+         rack.
+
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ExternalBootServer" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+  		An external boot server is a concept for blade systems
+  		that do not want to download boot files internally from the SIS
+  		TFTP server. Instead, they download the files from an external
+  		server, via a proxy agent implemented in SIS.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			A unique name of the boot server
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			Short description of the boot server.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="path" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The path to the files on the external boot server. Must start with /.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="fileName" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The name of the file to download.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="proxyIp" type="confd:inetAddressIPv4" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+  			The ip address to use when accessing the external server. This is generated automatically.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pingInterval" type="xs:integer"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			At what interval SIS pings the external boot server,
+  			for supervising the connection to it.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideAExternalBootIp" type="confd:inetAddressIPv4"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The A side IP address for the external server.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideAIsIp" type="confd:inetAddressIPv4"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The A side IP address for the IS.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideABsSegment" type="confd:objectRef"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The A side subnet segment for the IS.
+            A reference to a Managed Object of type
+             /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsLogicalNetwork/BsSubnet/BsSubnetSegment
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideBExternalBootIp" type="confd:inetAddressIPv4"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The B side IP address for the external server.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideBIsIp" type="confd:inetAddressIPv4"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The B side IP address for the IS.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sideBBsSegment" type="confd:objectRef"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+  			The B side subnet segment for the IS.
+            A reference to a Managed Object of type
+             /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsLogicalNetwork/BsSubnet/BsSubnetSegment
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="IsIpTrafficClass" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+         An IS IP Traffic Class is a homogenous type of
+         (layer 3) traffic that has consistent requirements for
+         Quality of Service and security, for example circuit switched
+         payload. One Integrated Site constitutes one DiffServ
+         domain. For each DiffServ code point that will be used
+         within the site, there should be a configured mapping
+         to corresponding priority bits (pbits) to be used
+         within the site. All traffic of the same class uses the
+         same priority bits (pbits). The pbits is defined in an
+         IS LAN Traffic Class. Each DiffServ code point that is
+         used within the site shall be defined in an IS IP
+         Traffic Class. When the traffic is routed outside the
+         site the routers may remap the DiffServ code points to
+         values valid in other DiffServ domains. An IS IP
+         Traffic Class has a site unique name. IS IP Traffic
+         Classes and IS Subnets are orthogonal concepts.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Name of the IS IP Traffic Class.
+        Unique within the entire Integrated Site.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Short description of the IS IP Traffic Class.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="dscp" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        DiffServ Code Point setting for this IS IP Traffic Class.
+        If there are two IS IP Traffic Classes with the same DSCP, they
+        both must refer to an IS LAN Traffic Class with identical P-bit setting.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="isLanTrafficClass" type="confd:objectRef" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Reference to a Managed Object of type
+         /IntegratedSite/NetworkConfiguration/ISLanTrafficClass.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="IsLanTrafficClass" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+        An IS LAN Traffic Class is a homogenous type
+        of (layer 2) traffic that has consistent requirements
+        for Class of Service, for example  circuit switched
+        payload. All traffic of the same class uses the same
+        priority bits (pbits). An IS LAN Traffic Class has a
+        site unique name. IS LAN Traffic Classes and IS VLANs
+        are orthogonal concepts. An IS LAN Traffic Class may be
+        shared between several Blade Systems.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Name of the IS LAN Traffic Class.
+        Unique within the entire Integrated Site.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Short description of the IS LAN Traffic Class.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="pbits" type="IntegratedSite:pbitsType-8" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        P-bit setting for this IS LAN Traffic Class.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="IsLogicalNetwork" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      An IS Logical Network (ISLN) is an IP network
+      with unconstrained network layer connectivity. Note
+      that there is no room for NAT (Network Address
+      Translation) in an IS Logical Network. An Integrated
+      Site will take part in multiple IS Logical Networks
+      simultaneously. An IS Logical Network may span several
+      Integrated Sites. Naming of such IS Logical Networks
+      should (but does not have to) be coordinated between
+      sites. Inside a site, an IS Logical Network merely
+      serves as a place holder for subnets and their
+      associated VLANs. In some cases it may hold several
+      subnets. An IS Logical Network may be shared between
+      several Blade Systems.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:token"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Name of the IS Logical Network.
+        Unique within the entire Integrated Site.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Short description of the IS Logical network.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="IsSubnet" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>
+
+      An IS Subnet is an IP subnet. An IS
+      Subnet has a starting address for the IP network, a
+      netmask (we use prefix length notation) and a broadcast
+      address. It is also connected to one IS VLAN. Each IS
+      Subnet is divided into one or more segments, so called
+      IS Subnet Segments. In many cases, the IS Subnet
+      contains only one IS Subnet Segment. The name of an IS
+      Subnet is unique only within its IS Logical Network.
+      An IS Subnet may be shared between several Blade Systems.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="name" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+        Name of the IS Subnet. Unique within the IS Logical Network.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="description" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+        Short description of the IS Subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="address" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+        IP network address of the IS Subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="mask" type="IntegratedSite:maskType-5" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+                                Prefix length of the IP network address.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="longMask" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+        IP network mask of the IS Subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="broadcastAddress" type="confd:inetAddressIPv4" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+        Broadcast address of the IS Subnet.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="isVlanRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+        A reference to a Managed Object of type
+          /IntegratedSite/NetworkConfiguration/IsVlan
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="IsSubnetSegment" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+
+      An IS Subnet Segment is a segment of a
+      subnet and is mainly used when hosts on the IS
+      Subnet want to use different default gateways
+      and still be able to send packets between each
+      other without passing any gateway. The DHCP
+      server will associate a subnet section with
+      each IS Subnet Segment that is configured to
+      be enabled for DHCP. Each IS Subnet Segment
+      that is intended to handle traffic that should
+      be routed, has an IP address configured for its router.
+      The IS Subnet Segments for ISBS,
+      ISOB, and ISOS are link local and do not have
+      an associated router. The name of an IS Subnet
+      Segment is unique only within its IS Subnet.
+      An IS Subnet Segment may be shared between
+      several Blade Systems.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:token"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        Name of the IS Subnet Segment. Unique within the IS Subnet.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="xs:token" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        Short description of the IS Subnet Segment.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="address" type="confd:inetAddressIPv4" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        IP network address of the IS Subnet Segment.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="mask" type="IntegratedSite:maskType-6" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        Prefix length of the IP network address.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="longMask" type="confd:inetAddressIPv4" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:appinfo confd:config="false"/>
+                                    <xs:documentation>
+
+        IP network mask of the IS Subnet Segment.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="routerAddress" type="confd:inetAddressIPv4" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        Router address for the IS Subnet Segment.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="dhcpEnabled" type="xs:boolean" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+        Flag that controls whether DHCP should be enabled or not for this
+        IS Subnet Segment.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <!--
+                      <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork_IsSubnet_IsSubnetSegment">
+                        <xs:selector xpath="IntegratedSite:IsSubnetSegment"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      -->
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <!--
+                <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork_IsSubnet">
+                  <xs:selector xpath="IntegratedSite:IsSubnet"/>
+                  <xs:field xpath="IntegratedSite:name"/>
+                </xs:key>
+                -->
+              </xs:element>
+              <xs:element name="IsVariables">
+                <xs:annotation>
+                  <xs:documentation>
+
+     Miscellaneous global variable settings.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="updateMode" type="IntegratedSite:updateModeType-9" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        The updateMode is a global attribute which controls
+        how updates of the network configuration is handled.
+
+        The updateMode can have the following persistent
+        states:
+
+          * Safe - In Safe mode, all updates are placed in a
+            separate storage, which is not visible to the blade
+            systems. Updates are not published automatically.
+
+          * Preliminary - In Preliminary mode no updates of the
+            separate storage are allowed. This mode is a temporary
+            mode that is used only while a new parameter setting
+            is being tried out.
+
+          * ReadOnly - In ReadOnly mode, no updates are allowed at all.
+
+          * Unsafe - In Unsafe mode, all updates are immediately
+            published to the blade systems without any possibility
+            to undo the changes. You should avoid this mode.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="dataModelVersion" minOccurs="0" type="IntegratedSite:dataModelVersionType-10">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        The data model version consists of a major and a
+        minor part. The minor part is incremented when the data
+        model (the structure of the data) is extended. The
+        major part is incremented when the data model is not
+        backwards compatible with the previous version.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rlspMarkerGenerateInterval" type="IntegratedSite:rlspMarkerGenerateIntervalType-11" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The RLSP marker generate interval in milliseconds.
+        It is recommended that the interval should be
+        increased in steps of 10.
+
+        Note that after publishing an update of this value,
+        a total site restart is necessary.
+
+        This is an advanced option that should only be
+        changed by Ericsson personnel.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rlspLinkDownThreshold" type="IntegratedSite:rlspLinkDownThresholdType-12" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        Threshold for the number of consecutive RLSP marker
+        PDUs that needs to be missing before the link is
+        regarded as down.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="rlspLinkUpThreshold" type="IntegratedSite:rlspLinkUpThresholdType-13" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        Threshold for the number of consecutive RLSP marker
+        PDUs that needs to be received before the link
+        is regarded as up.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="timezoneDstRule" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        The Daylight Saving Time (DST) rule (timezone_dst_rule)
+        has a syntax that is described in IEEE 1003.11. With
+        the information in this string, Blade Systems can
+        configure their clock to comply with the local time
+        zone. On Posix compatible blades its value fits nicely
+        into the TZ environment variable.
+
+        Here follows a condensed summary of the time zone
+        syntax described in IEEE 1003.1. The timezone_dst_rule
+        val has a syntax like std offset or std offset dst
+        [offset],start[/time],end[/time] where the first format
+        is used when there is no Daylight Saving Time in the
+        local time zone. The std string specifies the name of
+        the time zone.  The offset specifies the time value you
+        must add to the local time to get a Coordinated
+        Universal Time value. For example, here is how we would
+        specify Eastern Standard Time, but without any Daylight
+        Saving Time alternative: "EST+5". The second format is
+        used when there is Daylight Saving Time. The dst string
+        and offset specify the name and offset for the
+        corresponding Daylight Saving Time zone; if the offset
+        is omitted, it defaults to one hour ahead of standard
+        time.The remainder of the specification describes when
+        Daylight Saving Time is in effect. The start field is
+        when Daylight Saving Time goes into effect and the end
+        field is when the change is made back to standard
+        time. The following formats are recognized for these
+        fields: Jn specifies the Julian day, with n between
+        1 and 365. February 29 is never counted, even in leap
+        years. n specifies the Julian day, with n between 0and
+        365. February 29 is counted in leap years.  Mm.w.d
+        specifies day d of week w of month m. The day d must be
+        between 0 (Sunday) and 6.  The week must be between
+        1 and 5; week 1 is the first week in which day d occurs,
+        and week 5 specifies the last d day in the month. The
+        month m should be between 1 and 12. The time fields
+        specify when, in the local time currently in effect,
+        the change to the other time occurs. If omitted, the
+        default is 02:00:00.
+
+        For example "EST+5EDT,M4.1.0/2,M10.5.0/2", specifies
+        the Eastern time zone in the United States, including
+        the appropriate Daylight Saving Time and its dates of
+        applicability. The normal offset from UTC is 5 hours;
+        since this is west of the prime meridian, the sign is
+        positive.  Summer time begins on the first Sunday in
+        April at 2:00am, and ends on the last Sunday in October
+        at 2:00am.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="dnsDomain" type="IntegratedSite:dnsDomainType-14" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+        The DNS domain used by IS in the DNS-server.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="notifyAfter" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Number of seconds from when a new network
+        configuration has been published until the
+        Blade Systems will apply the changes.
+
+        This is an advanced option that should only be
+        changed by Ericsson personnel.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="defaultDhcpLeaseTime" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The default DHCP lease time in seconds.
+
+        This is an advanced option that should only be
+        changed by Ericsson personnel.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="lifeTimeDhcpLeaseTime" type="xs:integer" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        The lifetime of a DHCP lease in seconds.
+
+        This is an advanced option that should only be
+        changed by Ericsson personnel.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="IsVlan" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+
+      An IS VLAN is just a VLAN (Virtual LAN).
+      It may be shared between several Blade Systems.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="identity" type="IntegratedSite:identityType-7"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Identity of the IS VLAN. Unique within the entire Integrated Site.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" type="xs:token" minOccurs="0"                    >
+                      <xs:annotation>
+                        <xs:documentation>
+
+        Short description of the IS VLAN
+
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <!--
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_ExternalBootServer">
+            <xs:selector xpath="IntegratedSite:ExternalBootServer"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsIpTrafficClass">
+            <xs:selector xpath="IntegratedSite:IsIpTrafficClass"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLanTrafficClass">
+            <xs:selector xpath="IntegratedSite:IsLanTrafficClass"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork">
+            <xs:selector xpath="IntegratedSite:IsLogicalNetwork"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsVlan">
+            <xs:selector xpath="IntegratedSite:IsVlan"/>
+            <xs:field xpath="IntegratedSite:identity"/>
+          </xs:key>
+          -->
+        </xs:element>
+        <xs:element name="Software">
+          <xs:annotation>
+            <xs:documentation>
+
+	Describes the Software management service
+	in the Integrated Site services Management Function Area (MFA).
+
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SoftwareInventory">
+                <xs:annotation>
+                  <xs:documentation>
+
+	This class includes actions to download files and import backups
+	into the software inventory.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Backup" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	An instance of a backup that is stored locally.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="id" type="xs:unsignedInt"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The site local backup identity.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="name" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  A backup name selected by the user or a generated name.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  A reference to the blade system that this backup was created from.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="date" type="xs:dateTime" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The date and time when this backup was created.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="size" type="xs:unsignedInt" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The size of the backup file in kilobytes. If the backup file
+	  size is smaller than 0,5 kbyte the value will be 0.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="SoftwareAlarm" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Represents an alarm related to software.
+	This class can be used for listing software alarms.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="id" type="xs:unsignedInt"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The alarm identity.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  A reference to the blade system affected by the alarm
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="cause" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Textual description of the cause of the alarm.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="info" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Textual description providing additional information about the alarm.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="SoftwareDeliveryPackage" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Container of files of data, or binary executables, needed to run
+	the system.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="prodNo" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Product number of the software delivery package.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodRev" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Product revision of the software delivery package.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Product name of the software delivery package.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="type" type="IntegratedSite:typeType-31" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Type of the software delivery package.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="SoftwareGroup" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	Contains one or more SoftwareDeliveryPackage.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="prodNo" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Product number of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodRev" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Product revision of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="prodName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Product name of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsProdNo" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Blade system product number of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsProdRev" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Blade system revision of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsProdName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Blade system name of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="integratedSystemProdNo" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Integrated system product number of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="integratedSystemProdRev" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Integrated system revision of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="integratedSystemProdName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Integrated system name of the software group.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="relatedSDPs" type="IntegratedSite:relatedSDPsType-32" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Software delivery packages related to this software group.
+	  A related software delivery package can be a CXP or
+	  a software correction package, CXR.
+	  A related software delivery package does not necessarily have
+	  to be active.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="status" type="IntegratedSite:statusType-33" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Indicates status of a software group. A software group is
+	  complete if all included load module containers have been
+	  downloaded and unpacked correctly, if not, it is incomplete.
+	  A software group is inconsistent if the checksums of the load
+	  module containers do not match the information in the system
+	  information CXP, or if the XML data could not be registered.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <!--
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_Backup">
+                  <xs:selector xpath="IntegratedSite:Backup"/>
+                  <xs:field xpath="IntegratedSite:id"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareAlarm">
+                  <xs:selector xpath="IntegratedSite:SoftwareAlarm"/>
+                  <xs:field xpath="IntegratedSite:id"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareDeliveryPackage">
+                  <xs:selector xpath="IntegratedSite:SoftwareDeliveryPackage"/>
+                  <xs:field xpath="IntegratedSite:prodNo"/>
+                  <xs:field xpath="IntegratedSite:prodRev"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareGroup">
+                  <xs:selector xpath="IntegratedSite:SoftwareGroup"/>
+                  <xs:field xpath="IntegratedSite:prodNo"/>
+                  <xs:field xpath="IntegratedSite:prodRev"/>
+                </xs:key>
+                -->
+              </xs:element>
+              <xs:element name="SoftwareJobs">
+                <xs:annotation>
+                  <xs:documentation>
+
+	Contains system created data through ordered job actions.
+
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="BackupCreateJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class handles creation of backups.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Given or system generated name of the backup job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the site local backup identity.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the blade system the backup was created from.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The name of the backup.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="BackupExportJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class handles export of locally stored backup files to
+	an FTP server.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Given or system created name of the backup job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ftpData" minOccurs="0" type="IntegratedSite:FtpData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing the
+	  FTP details.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the backup to be exported.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  This name is set to be the file name of the backup.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="BackupImportJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class handles import of backup files from the FTP server.
+	The backup file is stored locally, but not loaded into the system.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Given or system created name of the backup job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ftpData" minOccurs="0" type="IntegratedSite:FtpData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing the
+	  FTP details.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="BackupRestoreJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class handles restore of backups of the system.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Given or system created name of the backup job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the backup to be restored.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the blade system that should be restored.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="backupName" type="xs:token" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The name of the backup.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="SoftwareChangeJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class handles software change jobs toward the system.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	Given or system generated name of the backup job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="bsRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the blade system that should change software.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="swgRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the blade system software group to be
+	  used in the software change.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="scpRef" type="confd:objectRef" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to the software correction package to be
+	  used in the software change.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="maxTime" type="xs:unsignedInt" minOccurs="0"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  The maximum time allowed for the software change
+	  job to finish. After this time, the job will be interrupted.
+	  The value 0 means that maxTime will be given the
+	  timer value registered with the blade system software group.
+	  If no such value has been registered,
+	  maxTime will be given a system default timer value.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="SoftwareChangeJobBladeInfo" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:appinfo confd:config="false"/>
+                              <xs:documentation>
+
+	This class handles blade information for a blade involved in
+        a software change job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="subrackId" type="xs:unsignedInt"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	  The subrack ID for the blade.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="slotNo" type="xs:unsignedInt"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	  The slot number for the blade.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="bladeSwgRef" type="confd:objectRef" minOccurs="0"                                >
+                                  <xs:annotation>
+                                    <xs:documentation>
+
+	  Reference to the blade software group to be used
+	  in the software change.
+
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <!--
+                      <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareChangeJob_SoftwareChangeJobBladeInfo">
+                        <xs:selector xpath="IntegratedSite:SoftwareChangeJobBladeInfo"/>
+                        <xs:field xpath="IntegratedSite:subrackId"/>
+                        <xs:field xpath="IntegratedSite:slotNo"/>
+                      </xs:key>
+                      -->
+                    </xs:element>
+                    <xs:element name="SoftwareDownloadJob" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:appinfo confd:config="false"/>
+                        <xs:documentation>
+
+	This class contains information about requested, ongoing,
+	and completed software file download jobs.
+
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="jobName" type="xs:token"                          >
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Given or system generated name of the download job.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="jobData" minOccurs="0" type="IntegratedSite:JobData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing job status
+	  during the job execution.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="ftpData" minOccurs="0" type="IntegratedSite:FtpData">
+                            <xs:annotation>
+                              <xs:documentation>
+
+	  Reference to a data type representing the
+	  FTP details.
+
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="matchStrategy" type="IntegratedSite:SwmMatchStrategy" minOccurs="0"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <!--
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupCreateJob">
+                  <xs:selector xpath="IntegratedSite:BackupCreateJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupExportJob">
+                  <xs:selector xpath="IntegratedSite:BackupExportJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupImportJob">
+                  <xs:selector xpath="IntegratedSite:BackupImportJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupRestoreJob">
+                  <xs:selector xpath="IntegratedSite:BackupRestoreJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareChangeJob">
+                  <xs:selector xpath="IntegratedSite:SoftwareChangeJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareDownloadJob">
+                  <xs:selector xpath="IntegratedSite:SoftwareDownloadJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                -->
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

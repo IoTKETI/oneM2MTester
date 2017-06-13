@@ -1,0 +1,59 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module ns_xml_SE {	//^In TTCN-3 module `ns_xml_SE'://
+/*
+29.1.7
+The "NCName" production is defined in W3C XML Namespaces, clause 2, production 4, and shall not
+start with 'xm' and shall not match the pattern (('X'|'x')('M'|'m')('L'|'l')).
+NOTE  This is a requirement imposed by W3C XML Namespaces. 
+*/
+type record R
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'XmLink'" }  
+
+type record R1 //^In type definition// \
+//^error: Prefix shall not start with 'xml' and shall not match the pattern \(\(\'X\'\|\'x\'\)\(\'M\'\|\'m\'\)\(\'L\'\|\'l\'\)\)//
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'xml'" }  
+
+type record R2 //^In type definition// \
+//^error: Prefix shall not start with 'xml' and shall not match the pattern \(\(\'X\'\|\'x\'\)\(\'M\'\|\'m\'\)\(\'L\'\|\'l\'\)\)//
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'xmllink'" }  
+
+type record R3 //^In type definition// \
+//^error: Prefix shall not start with 'xml' and shall not match the pattern \(\(\'X\'\|\'x\'\)\(\'M\'\|\'m\'\)\(\'L\'\|\'l\'\)\)//
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'Xml'" }  
+
+type record R4 //^In type definition// \
+//^error: Prefix shall not start with 'xml' and shall not match the pattern \(\(\'X\'\|\'x\'\)\(\'M\'\|\'m\'\)\(\'L\'\|\'l\'\)\)//
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'XML'" }  
+
+type record R5
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'XMLlink'" }  
+
+type record R6
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'xMllink'" }  
+
+type record R7
+{}
+with { variant "namespace as 'http:://www.example.org/link' prefix 'xmLlink'" }  
+
+}
+with {
+encode "XML"
+}

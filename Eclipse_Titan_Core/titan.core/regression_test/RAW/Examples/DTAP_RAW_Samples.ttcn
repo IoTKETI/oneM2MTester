@@ -1,0 +1,319 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Hanko, Matyas
+ *   Koppany, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module DTAP_RAW_Samples
+{
+import from DTAP_typedefs all;
+//import from DTAP_EncDec all;
+
+// ------------- PDU_DTAP_LocationUpdateRequest -----------------------
+
+const octetstring DTAPstr01 := '05087042F099012D390829262001030000153303391883'O
+
+template PDU_DTAP_MS_MSC DTAP01 := {
+    discriminator:= '0101'B,
+    tiOrSkip     := {skipIndicator := '0000'B},
+    msgs         := {mm := {locationUpdateRequest := {
+        messageType := '001000'B,
+        nsd         := '00'B,
+        locationUpdatingType := {
+            lut     := '00'B,
+            spare1_1:= '0'B,
+            fop     := '0'B
+        },
+        cipheringKeySequenceNumber := {
+            keySequence := '111'B,
+            spare1_1    := '0'B
+        },
+        locationAreaIdentification := {
+            mcc_mnc     := '42F099'O,
+            lac         := '012D'O
+        },
+        mobileStationClassmark1    := {
+            rf_PowerCapability := '001'B,
+            a5_1               := '1'B,
+            esind              := '1'B,
+            revisionLevel      := '01'B,
+            spare1_1           := '0'B
+        },
+        mobileIdentity_LV          := {
+            lengthIndicator    := 8,
+            typeOfIdentity     := '001'B,
+            oddEvenIndicator   := '1'B,
+            identity := {imsi_imei := {
+                firstdigit       := '0010'B,
+                digits           := '26200103000015'O
+            }}
+        },
+        classmarkInformationType2_forUMTS := {
+            elementIdentifier  := '33'O,
+            lengthIndicator    :=  3,
+            rf_PowerCapability := '001'B,
+            a5_1               := '1'B,
+            esind              := '1'B,
+            revisionLevel      := '01'B,
+            spare1_1           := '0'B,
+            fc                 := '0'B,
+            spare1_2           := '00'B,
+            sm_Capability      := '1'B,
+            ss_ScreenIndicator := '01'B,
+            ps_Capability      := '0'B,
+            spare2_1           := '0'B,
+            a5_2               := '1'B,
+            a5_3               := '1'B,
+            spare3_5           := '00000'B,
+            cm3                := '1'B
+        }
+    }//locationUpdateRequest end
+  }// mm end
+}//msgs end
+}//DTAP01 end
+
+// ------------- PDU_DTAP_LocationUpdateAccept -----------------------
+
+const octetstring DTAPstr02 := '050242F099012D17082926200103000015'O
+
+template PDU_DTAP_MS_MSC DTAP02 := {
+    discriminator:= '0101'B,
+    tiOrSkip     := {skipIndicator := '0000'B},
+    msgs         := {mm := {locationUpdateAccept := {
+        messageType := '000010'B,
+        nsd         := '00'B,
+        locationAreaIdentification := {
+            mcc_mnc := '42F099'O,
+            lac     := '012D'O
+
+        },
+        mobileIdentity_TLV    := {
+            elementIdentifier := '17'O,
+            lengthIndicator   := 8,
+            typeOfIdentity    := '001'B,
+            oddEvenIndicator  := '1'B,
+            identity := {imsi_imei:={
+                firstdigit    := '0010'B,
+                digits        := '26200103000015'O
+            }}
+        }
+
+    }//locationUpdateAccept end
+  }// mm end
+}//msgs end
+}//DTAP02 end
+
+// ------------- PDU_DTAP_CallProceeding -----------------------------
+
+const octetstring DTAPstr03 := '8302'O
+
+template PDU_DTAP_MS_MSC DTAP03 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '1'B
+    }},
+    msgs         := {cc  := {callProceeding := {
+        messageType 	 := '000010'B,
+        nsd         	 := '00'B,
+        repeatIndicator  := omit,
+        bearerCapability1:= omit,
+        bearerCapability2:= omit,
+        facility         := omit,
+        progressIndicator:= omit,
+        priorityGranted  := omit
+
+    }//callProceeding end
+  }// cc end
+}//msgs end
+}//DTAP03 end
+
+// ------------- PDU_DTAP_Alerting_MSC_MS -----------------------------
+
+const octetstring DTAPstr04 := '83011E02E288'O
+
+template PDU_DTAP_MSC_MS DTAP04 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '1'B
+    }},
+    msgs         := {cc  := {alerting_MSC_MS := {
+        messageType 	 := '000001'B,
+        nsd         	 := '00'B,
+        facility         := omit,
+        progressIndicator:= {
+            elementIdentifier    := '1E'O,
+            progressIndicator_LV := {
+                lengthIndicator    := 2,
+                location           := '0010'B,
+                spare1_1           := '0'B,
+                codingStandard     := '11'B,
+                ext1               := '1'B,
+                progressDescription:= '0001000'B,
+                ext2               := '1'B
+            }
+        },
+        user_user := omit
+    }//alerting_MSC_MS end
+  }// cc end
+}//msgs end
+}//DTAP04 end
+
+// ------------- PDU_DTAP_Connect_MSC_MS -----------------------------
+
+const octetstring DTAPstr05 := '83071E02E2A0'O
+
+template PDU_DTAP_MSC_MS DTAP05 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '1'B
+    }},
+    msgs         := {cc  := {connect_MSC_MS := {
+        messageType 	 := '000111'B,
+        nsd         	 := '00'B,
+        facility         := omit,
+        progressIndicator:= {
+            elementIdentifier    := '1E'O,
+            progressIndicator_LV := {
+                lengthIndicator    := 2,
+                location           := '0010'B,
+                spare1_1           := '0'B,
+                codingStandard     := '11'B,
+                ext1               := '1'B,
+                progressDescription:= '0100000'B,
+                ext2               := '1'B
+            }
+        },
+	connectedNumber     := omit,
+        connectedSubAddress := omit,
+        user_user           := omit
+    }//connect_MSC_MS end
+  }// cc end
+}//msgs end
+}//DTAP05 end
+
+// ------------- PDU_DTAP_ConnectAck -----------------------------
+
+const octetstring DTAPstr06 := '038F'O
+
+template PDU_DTAP_MS_MSC DTAP06 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '0'B
+    }},
+    msgs         := {cc  := {connectAck  := {
+        messageType 	 := '001111'B,
+        nsd         	 := '10'B
+    }//connectAck end
+  }// cc end
+}//msgs end
+}//DTAP06 end
+
+// ------------- PDU_DTAP_Disconnect_MSC_MS -----------------------------
+
+const octetstring DTAPstr07 := '832502E090'O
+
+template PDU_DTAP_MSC_MS DTAP07 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '1'B
+    }},
+    msgs         := {cc  := {disconnect_MSC_MS := {
+        messageType 	 := '100101'B,
+        nsd         	 := '00'B,
+        cause    := {
+            lengthIndicator  := 2,
+            oct3 := {
+                location       := '0000'B,
+                spare1_1       := '0'B,
+                codingStandard := '11'B,
+                ext1           := '1'B,
+                recommendation := omit,
+                ext2           := omit
+            },
+            causeValue  := '0010000'B,
+            ext3        := '1'B,
+            diagnostics := omit
+        },
+        facility          := omit,
+        progressIndicator := omit,
+        user_user         := omit
+    }//disconnect_MSC_MS end
+  }// cc end
+}//msgs end
+}//DTAP07 end
+
+// ------------- PDU_DTAP_Release_MS_MSC -----------------------------
+
+const octetstring DTAPstr08 := '03ED'O
+
+template PDU_DTAP_MS_MSC DTAP08 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '0'B
+    }},
+    msgs         := {cc  := {release_MS_MSC  := {
+        messageType 	   := '101101'B,
+        nsd         	   := '11'B,
+	cause 		   := omit,
+        secondCause 	   := omit,
+        facility 	   := omit,
+        user_user 	   := omit,
+        ss_VersionIndicator:= omit
+
+    }//release_MS_MSC end
+  }// cc end
+}//msgs end
+}//DTAP08 end
+
+// ------------- PDU_DTAP_ReleaseComplete_MSC_MS -----------------------------
+
+const octetstring DTAPstr09 := '832A0802E290'O
+
+template PDU_DTAP_MSC_MS DTAP09 := {
+    discriminator:= '0011'B,
+    tiOrSkip     := {transactionId := {
+           tio      := '000'B,
+           tiFlag   := '1'B
+    }},
+    msgs         := {cc  := {releaseComplete_MSC_MS := {
+        messageType 	 := '101010'B,
+        nsd         	 := '00'B,
+        cause    := {
+	    elementIdentifier := '08'O,
+            dtap_Cause_LV     := {
+               lengthIndicator  := 2,
+               oct3 := {
+                  location       := '0010'B,
+                  spare1_1       := '0'B,
+                  codingStandard := '11'B,
+                  ext1           := '1'B,
+                  recommendation := omit,
+                  ext2           := omit
+               },
+               causeValue  := '0010000'B,
+               ext3        := '1'B,
+               diagnostics := omit
+	    }
+        },
+        facility          := omit,
+        user_user         := omit
+    }//releaseComplete_MSC_MS end
+  }// cc end
+}//msgs end
+}//DTAP09 end
+
+}

@@ -1,0 +1,417 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Baranyi, Botond – initial implementation
+*
+******************************************************************************/
+module AdvancedRedirects {
+
+import from ProcPort all;
+
+// test for return value and exception redirects with multiple variable references and field assignments
+testcase tc_MultiValueRedirect() runs on ProcComponent4 {
+  connect(mtc:Port4, mtc:Port4);
+  var MyRecord2 rec_val := { num := 12, str := "xyz" };
+  Port4.reply(MyProc7: { "" } value rec_val);
+  Port4.raise(MyProc7, rec_val);
+  timer tmr;
+  var MyRecord2 redir_rec[2];
+  var integer redir_int[2];
+  var universal charstring redir_str[2];
+  tmr.start(1.0);
+  alt {
+    [] Port4.getreply(MyProc7: { ? } value rec_val) -> value (redir_rec[0], redir_int[0] := num, redir_str[0] := str) {
+      if (redir_rec[0] != rec_val) { setverdict(fail, "Invalid record return value: ", redir_rec[0]); }
+      if (redir_int[0] != rec_val.num) { setverdict(fail, "Invalid integer return value: ", redir_int[0]); }
+      if (redir_str[0] != rec_val.str) { setverdict(fail, "Invalid charstring return value: ", redir_str[0]); }
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) { setverdict(fail, "Return value test - invalid return value."); }
+    [] Port4.catch(MyProc7, MyRecord2: ?) { setverdict(fail, "Return value test - exception caught."); }
+    [] tmr.timeout { setverdict(fail, "Return value test - timeout"); }
+  }
+  tmr.stop;
+  tmr.start(1.0);
+  alt {
+    [] Port4.catch(MyProc7, rec_val) -> value (redir_rec[1], redir_int[1] := num, redir_str[1] := str) {
+      if (redir_rec[1] != rec_val) { setverdict(fail, "Invalid record exception: ", redir_rec[1]); }
+      if (redir_int[1] != rec_val.num) { setverdict(fail, "Invalid integer exception: ", redir_int[1]); }
+      if (redir_str[1] != rec_val.str) { setverdict(fail, "Invalid charstring exception: ", redir_str[1]); }
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) { setverdict(fail, "Exception test - invalid exception."); }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) { setverdict(fail, "Exception test - reply received."); }
+    [] tmr.timeout { setverdict(fail, "Exception test - timeout"); }
+  }
+  setverdict(pass);
+}
+
+// tests for decoded parameter and value redirects
+// (in these tests the received parameters and values are not matched with a 'decmatch' template)
+function DecodedRedirect_behav(in MyRecord2 val, in universal charstring reply_val) runs on ProcComponent4 {
+  timer tmr := 1.0;
+  var universal charstring val_enc := encvalue_unichar(val);
+  var MyRecord2 redir;
+  
+  // testing parameter redirect in getcall:
+  tmr.start;
+  alt {
+    [] Port4.getcall(MyProc7: { val_enc }) -> param (redir := @decoded x) {
+      if (redir != val) { setverdict(fail, "Getcall parameter redirect failed: ", redir); }
+      else {
+        var MyRecord2 reply_rec := { num := -1, str := reply_val };
+        Port4.reply(MyProc7: { reply_val } value reply_rec);
+        Port4.raise(MyProc7, reply_rec);
+      }
+    }
+    [] Port4.getcall(MyProc7: { ? }) { setverdict(fail, "Invalid getcall parameter."); }
+    [] tmr.timeout { setverdict(fail, "Getcall timed out."); }
+  }
+}
+
+testcase tc_DecodedRedirect() runs on ProcComponent4 {
+  var ProcComponent4 ct := ProcComponent4.create;
+  connect(ct:Port4, mtc:Port4);
+  var MyRecord2 val := { num := 4, str := "stuff" };
+  // use this string instead of an actual encoded value for reply/getreply and raise/catch,
+  // because finding a value that can be encoded with UTF-16 or UTF-32 is difficult
+  // (after this string is decoded into an octetstring, only the octetstring's length is matched)
+  var universal charstring reply_val := "payload";
+  ct.start(DecodedRedirect_behav(val, reply_val));
+  var universal charstring val_enc := encvalue_unichar(val);
+  var MyOctetstring redir[3];
+  // these encoding strings are not known at compile-time (the code generated for them is different)
+  var charstring str_enc8 := "UTF-8", str_enc16 := "UTF-16", str_enc32 := "UTF-32LE";
+  
+  // testing parameter and (return) value redirect in getreply:
+  Port4.call(MyProc7: { val_enc }, 1.0) {
+    [] Port4.getreply(MyProc7: { reply_val }
+                      value MyRecord2: { num := ?, str := reply_val })
+                      -> value (redir[0] := @decoded("UTF-8") str)
+                      param (redir[1] := @decoded(str_enc16) x) {
+      if (redir[0] != unichar2oct(reply_val, "UTF-8")) {
+        setverdict(fail, "Getreply parameter redirect failed: ", redir[0]);
+      }
+      if (redir[1] != unichar2oct(reply_val, str_enc16)) {
+        setverdict(fail, "Getreply value redirect failed: ", redir[1]);
+      }
+    }
+    [] Port4.getreply(MyProc7: { decmatch(str_enc16) MyOctetstring: ? length (16) } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply return value.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply parameter.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Exception (MyRecord2) caught in getreply test.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Exception (MyRecord3) caught in getreply test.");
+    }
+    [] Port4.catch(timeout) { setverdict(fail, "Getreply test timed out."); }
+  }
+  
+  // testing (exception) value redirect in catch:
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] Port4.catch(MyProc7, MyRecord2: { num := ?, str := reply_val })
+                   -> value (redir[2] := @decoded(str_enc32) str) {
+      if (redir[2] != unichar2oct(reply_val, str_enc32)) {
+        setverdict(fail, "Exception value redirect failed: ", redir[2]);
+      }
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Invalid exception value caught.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Invalid type of exception caught.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Reply received in exception test.");
+    }
+    [] tmr.timeout { setverdict(fail, "Exception test timed out."); }
+  }
+  setverdict(pass);
+}
+
+// additional tests for decoded parameter and value redirects
+// (in these tests the value and parameter redirects with the '@decoded' modifier
+// are optimized to reuse the decoding result in the 'decmatch' template instead of
+// decoding the same string twice)
+function DecodedRedirect2_behav(in MyRecord2 val, in universal charstring reply_val) runs on ProcComponent4 {
+  timer tmr := 1.0;
+  var MyRecord2 redir;
+  
+  // testing parameter redirect in getcall:
+  tmr.start;
+  alt {
+    [] Port4.getcall(MyProc7: { decmatch("UTF-8") MyRecord2: val }) -> param (redir := @decoded x) {
+      if (redir != val) { setverdict(fail, "Getcall parameter redirect failed: ", redir); }
+      else {
+        var MyRecord2 reply_rec := { num := -1, str := reply_val };
+        Port4.reply(MyProc7: { reply_val } value reply_rec);
+        Port4.raise(MyProc7, reply_rec);
+      }
+    }
+    [] Port4.getcall(MyProc7: { ? }) { setverdict(fail, "Invalid getcall parameter."); }
+    [] tmr.timeout { setverdict(fail, "Getcall timed out."); }
+  }
+}
+
+testcase tc_DecodedRedirect2() runs on ProcComponent4 {
+  var ProcComponent4 ct := ProcComponent4.create;
+  connect(ct:Port4, mtc:Port4);
+  var MyRecord2 val := { num := 4, str := "stuff" };
+  // use this string instead of an actual encoded value for reply/getreply and raise/catch,
+  // because finding a value that can be encoded with UTF-16 or UTF-32 is difficult
+  // (after this string is decoded into an octetstring, only the octetstring's length is matched)
+  var universal charstring reply_val := "payload";
+  ct.start(DecodedRedirect2_behav(val, reply_val));
+  var universal charstring val_enc := encvalue_unichar(val);
+  var MyOctetstring redir[3];
+  // these encoding strings are not known at compile-time (the code generated for them is different)
+  var charstring str_enc8 := "UTF-8", str_enc16 := "UTF-16", str_enc32 := "UTF-32LE";
+  
+  // testing parameter and (return) value redirect in getreply:
+  Port4.call(MyProc7: { val_enc }, 1.0) {
+    [] Port4.getreply(MyProc7: { decmatch(str_enc16) MyOctetstring: ? length (16) }
+                      value MyRecord2: { num := ?, str := decmatch(str_enc8) MyOctetstring: ? length (7) })
+                      -> value (redir[0] := @decoded("UTF-8") str)
+                      param (redir[1] := @decoded(str_enc16) x) {
+      if (redir[0] != unichar2oct(reply_val, "UTF-8")) {
+        setverdict(fail, "Getreply parameter redirect failed: ", redir[0]);
+      }
+      if (redir[1] != unichar2oct(reply_val, str_enc16)) {
+        setverdict(fail, "Getreply value redirect failed: ", redir[1]);
+      }
+    }
+    [] Port4.getreply(MyProc7: { decmatch(str_enc16) MyOctetstring: ? length (16) } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply return value.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply parameter.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Exception (MyRecord2) caught in getreply test.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Exception (MyRecord3) caught in getreply test.");
+    }
+    [] Port4.catch(timeout) { setverdict(fail, "Getreply test timed out."); }
+  }
+  
+  // testing (exception) value redirect in catch:
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] Port4.catch(MyProc7, MyRecord2: { num := ?, str := decmatch("UTF-32LE") MyOctetstring: ? length(32) })
+                   -> value (redir[2] := @decoded(str_enc32) str) {
+      if (redir[2] != unichar2oct(reply_val, str_enc32)) {
+        setverdict(fail, "Exception value redirect failed: ", redir[2]);
+      }
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Invalid exception value caught.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Invalid type of exception caught.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Reply received in exception test.");
+    }
+    [] tmr.timeout { setverdict(fail, "Exception test timed out."); }
+  }
+  setverdict(pass);
+}
+
+// further tests for decoded parameter and value redirects
+// (in these tests the 'decmatch' templates cannot be identified at compile-time,
+// so the decision of whether to decode the redirected value again or use the
+// decoding result in the matched template is made at runtime)
+function DecodedRedirect3_behav(in MyRecord2 val) runs on ProcComponent4 {
+  timer tmr := 1.0;
+  var MyRecord2 redir;
+  var template MyProc7 vt_proc7 := { x := decmatch MyRecord2: val };
+  
+  // testing parameter redirect in getcall:
+  tmr.start;
+  alt {
+    [] Port4.getcall(vt_proc7) -> param (redir := @decoded x) {
+      if (redir != val) { setverdict(fail, "Getcall parameter redirect failed: ", redir); }
+      else {
+        var universal charstring val_enc := encvalue_unichar(val);
+        var MyRecord2 reply_val := { num := val.num, str := val_enc };
+        var MyRecord3 raise_val := { elems := { reply_val } };
+        Port4.reply(MyProc7: { val_enc } value reply_val);
+        Port4.raise(MyProc7, raise_val);
+      }
+    }
+    [] Port4.getcall(MyProc7: { ? }) { setverdict(fail, "Invalid getcall parameter."); }
+    [] tmr.timeout { setverdict(fail, "Getcall timed out."); }
+  }
+}
+
+testcase tc_DecodedRedirect3() runs on ProcComponent4 {
+  var ProcComponent4 ct := ProcComponent4.create;
+  connect(ct:Port4, mtc:Port4);
+  var MyRecord2 val := { num := 4, str := "stuff" };
+  ct.start(DecodedRedirect3_behav(val));
+  var universal charstring val_enc := encvalue_unichar(val);
+  var MyRecord2 redir[3];
+  var template MyRecord2 vt_rec2 := { num := ?, str := decmatch MyRecord2: val };
+  var charstring str_enc8 := "UTF-8";
+  
+  // testing parameter and (return) value redirect in getreply:
+  Port4.call(MyProc7: { val_enc }, 1.0) {
+    [] Port4.getreply(MyProc7TemplatePard(decmatch MyRecord2: val)
+                      value modifies vt_rec2 := { num := val.num })
+                      -> value (redir[0] := @decoded str)
+                      param (redir[1] := @decoded(str_enc8) x) {
+      if (redir[0] != val) {
+        setverdict(fail, "Getreply parameter redirect failed: ", redir[0]);
+      }
+      if (redir[1] != val) {
+        setverdict(fail, "Getreply value redirect failed: ", redir[1]);
+      }
+    }
+    [] Port4.getreply(MyProc7TemplatePard(decmatch MyRecord2: val) value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply return value.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply parameter.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Exception (MyRecord2) caught in getreply test.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Exception (MyRecord3) caught in getreply test.");
+    }
+    [] Port4.catch(timeout) { setverdict(fail, "Getreply test timed out."); }
+  }
+  
+  // testing (exception) value redirect in catch:
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] Port4.catch(MyProc7, MyRecord3: { elems := { vt_rec2 } })
+                   -> value (redir[2] := @decoded(str_enc8) elems[0].str) {
+      if (redir[2] != val) {
+        setverdict(fail, "Exception value redirect failed: ", redir[2]);
+      }
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Invalid exception value caught.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Invalid type of exception caught.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Reply received in exception test.");
+    }
+    [] tmr.timeout { setverdict(fail, "Exception test timed out."); }
+  }
+  setverdict(pass);
+}
+
+// even more tests for decoded parameter and value redirects
+// (in these tests the sent/received strings are decoded into 2 different types:
+// the matching 'decmatch' templates decode the strings into MyRecord2, while the
+// value and parameter redirects decode the string into MyRecord4)
+function DecodedRedirect4_behav(in MyRecord2 val2, in MyRecord4 val4) runs on ProcComponent4 {
+  timer tmr := 1.0;
+  var MyRecord4 redir;
+  
+  // testing parameter redirect in getcall:
+  tmr.start;
+  alt {
+    [] Port4.getcall(MyProc7: { decmatch MyRecord2: val2 }) -> param (redir := @decoded x) {
+      if (redir != val4) { 
+        setverdict(fail, "Getcall parameter redirect failed: ", redir);
+      }
+      else {
+        var universal charstring val_enc := encvalue_unichar(val2);
+        var MyRecord2 reply_val := { num := val2.num, str := val_enc };
+        var MyRecord3 raise_val := { elems := { reply_val } };
+        Port4.reply(MyProc7: { val_enc } value reply_val);
+        Port4.raise(MyProc7, raise_val);
+      }
+    }
+    [] Port4.getcall(MyProc7: { ? }) { setverdict(fail, "Invalid getcall parameter."); }
+    [] tmr.timeout { setverdict(fail, "Getcall timed out."); }
+  }
+}
+
+testcase tc_DecodedRedirect4() runs on ProcComponent4 {
+  var ProcComponent4 ct := ProcComponent4.create;
+  connect(ct:Port4, mtc:Port4);
+  var MyRecord2 val2 := { num := 4, str := "ADDC" };
+  var MyRecord4 val4 := { attr := "4", val := 'ADDC'O };
+  ct.start(DecodedRedirect4_behav(val2, val4));
+  var universal charstring val_enc := encvalue_unichar(val2);
+  var MyRecord4 redir[3];
+  
+  // testing parameter and (return) value redirect in getreply:
+  Port4.call(MyProc7: { val_enc }, 1.0) {
+    [] Port4.getreply(MyProc7TemplatePard(decmatch MyRecord2: val2)
+                      value MyRecord2: { num := ?, str := decmatch MyRecord2: val2 })
+                      -> value (redir[0] := @decoded str)
+                      param (redir[1] := @decoded x) {
+      if (redir[0] != val4) {
+        setverdict(fail, "Getreply parameter redirect failed: ", redir[0]);
+      }
+      if (redir[1] != val4) {
+        setverdict(fail, "Getreply value redirect failed: ", redir[1]);
+      }
+    }
+    [] Port4.getreply(MyProc7TemplatePard(decmatch MyRecord2: val2) value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply return value.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Invalid getreply parameter.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Exception (MyRecord2) caught in getreply test.");
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Exception (MyRecord3) caught in getreply test.");
+    }
+    [] Port4.catch(timeout) { setverdict(fail, "Getreply test timed out."); }
+  }
+  
+  // testing (exception) value redirect in catch:
+  var template MyRecord3 vt_rec3 := { elems := { { num := ?, str := decmatch MyRecord2: val2 } } };
+  timer tmr := 1.0;
+  tmr.start;
+  alt {
+    [] Port4.catch(MyProc7, vt_rec3) -> value (redir[2] := @decoded elems[0].str) {
+      if (redir[2] != val4) {
+        setverdict(fail, "Exception value redirect failed: ", redir[2]);
+      }
+    }
+    [] Port4.catch(MyProc7, MyRecord3: ?) {
+      setverdict(fail, "Invalid exception value caught.");
+    }
+    [] Port4.catch(MyProc7, MyRecord2: ?) {
+      setverdict(fail, "Invalid type of exception caught.");
+    }
+    [] Port4.getreply(MyProc7: { ? } value MyRecord2: ?) {
+      setverdict(fail, "Reply received in exception test.");
+    }
+    [] tmr.timeout { setverdict(fail, "Exception test timed out."); }
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc_MultiValueRedirect());
+  execute(tc_DecodedRedirect());
+  execute(tc_DecodedRedirect2());
+  execute(tc_DecodedRedirect3());
+  execute(tc_DecodedRedirect4());
+}
+
+}

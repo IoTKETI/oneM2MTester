@@ -1,0 +1,106 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_substitutiongroup_rename.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Nov 25 14:32:37 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- substitutiongroup_rename.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "www.example.org/substitutiongroup/rename" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_substitutiongroup_rename {
+
+
+import from XSD all;
+
+
+type record BaseElement_1
+{
+
+}
+with {
+  variant "name as 'BaseElement_'";
+};
+
+
+type record Audit
+{
+	BaseElement_group baseElement optional
+}
+with {
+  variant (baseElement) "name as capitalized";
+};
+
+
+type XSD.Integer Case
+with {
+  variant "abstract";
+  variant "element";
+};
+
+
+type XSD.String BaseElement
+with {
+  variant "name as 'BaseElement__'";
+  variant "abstract";
+  variant "element";
+};
+
+
+type Audit Case_1
+with {
+  variant "name as 'Case_'";
+  variant "element";
+};
+
+
+type union BaseElement_group
+{
+	BaseElement_1 baseElement,
+	Case_1 case_
+}
+with {
+  variant "untagged";
+  variant (baseElement) "name as capitalized";
+  variant (baseElement) "form as qualified";
+  variant (baseElement) "abstract";
+  variant (case_) "name as capitalized";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/substitutiongroup/rename' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

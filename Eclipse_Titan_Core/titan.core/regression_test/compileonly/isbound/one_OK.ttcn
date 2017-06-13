@@ -1,0 +1,80 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module one_OK
+{
+    type record length (10) of integer int10;
+    type record length (2..infinity) of integer int2up;
+
+    type component C1
+    {
+    }
+
+    testcase tc_empty_unbound() runs on C1
+    {
+        var int10 v_int10_default;
+        var int10 v_int10_empty := {-,-,-,-,-,-,-,-,-,-};
+    }
+
+    testcase tc1() runs on C1
+    {
+        var int10 v_int10 := {1,2,-,-,-,-,-,-,-,-} // unbound
+        var int2up v_int2up := {1,-} //unbound
+
+        var integer i1 := 33;
+        var integer i2 := 2;
+        var integer i3 := i1 + i2;
+
+        if ( isvalue(v_int10) ) {
+            log(":( :( ", v_int10, " should be unbound");
+            setverdict(fail);
+        }
+        else {
+            setverdict(pass);
+        }
+
+        if ( isvalue(i1) ) {
+            log(":( :( ", i1, " should be unbound");
+            setverdict(fail);
+        }
+        else {
+            setverdict(pass);
+        }
+
+        if ( isvalue(v_int10[3]) ) {
+            log(":( :( ", v_int10[3], " should be unbound");
+            setverdict(fail);
+        }
+        else {
+            setverdict(pass);
+        }
+    }
+
+    testcase tc_full_bound() runs on C1
+    {
+        log("Start tc_full_bound");
+        var int10 v_int11 := {1,2,3,4,5,6,7,8,9,10} // bound
+        if ( isvalue(v_int11) ) {
+            setverdict(pass);
+        }
+        else {
+            log(":( :( ", v_int11, " should be bound");
+            setverdict(fail);
+        }
+    }
+
+    control
+    {
+        execute(tc1());
+        execute(tc_full_bound());
+    }
+}

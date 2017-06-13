@@ -1,0 +1,1802 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Delic, Adam
+ *   Kovacs, Ferenc
+ *   Szabados, Kristof
+ *   Pandi, Krisztian
+ *
+ ******************************************************************************/
+module negtest
+{
+import from Types all;
+
+type component MyComp {}
+
+external function encode_MySeq(in MySeq pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified(in MySeqModified pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified2(in MySeqModified2 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified3(in MySeqModified3 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified4(in MySeqModified4 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified5(in MySeqModified5 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModifiedT(in MySeqModifiedT pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqModified6(in MySeqModified6 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqTerr(in MySeqTerr pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+
+external function encode_MySeqOf(in MySeqOf pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqOfModified(in MySeqOfModified pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MySeqOfModified2(in MySeqOfModified2 pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+
+external function encode_MyUnion(in MyUnion pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MyUnionModified(in MyUnionModified pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" }
+external function encode_MyRecursiveSeq(in MyRecursiveSeq pdu) return octetstring with { extension "prototype(convert) encode(BER:BER_ENCODE_DER)" };
+
+//TEXT_encoder
+external function encode_TEXT_Record(in TEXT_record pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified(in TEXT_record_modified pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified2(in TEXT_record_modified2 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified3(in TEXT_record_modified3 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordComma(in TEXT_record_comma pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified4(in TEXT_record_comma pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified5(in TEXT_record_int_bool pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified6(in TEXT_record_int_bool2 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_Record_of(in TEXT_record_of pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_rofint(in TEXT_rofint pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_Union(in TEXT_union pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_Union2(in TEXT_union2 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordSingle(in TEXT_record_single pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified7(in TEXT_record_int_bool3 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_TEXT_RecordModified8(in TEXT_record_optional pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+external function encode_MyRecursiveRec(in MyRecursiveRec pdu) return charstring with { extension "prototype(convert) encode(TEXT)" };
+
+const MySeq c_myseq := { i:=321, b:=false }
+with {
+  erroneous (i) "value := omit"
+}
+
+const MySeq c_myseq2 := { i:=321, b:=false }
+with {
+  erroneous (b) "value := omit"
+  erroneous (i) "value := omit"
+  erroneous (i) "before := '10101'B"
+  erroneous (i) "after := 'ABCD'O"
+  erroneous (b) "after := 3.1415"
+}
+
+const MySeq c_myseq3 := { i:=321, b:=false }
+with {
+  erroneous (b) "before := omit all"
+}
+
+const MySeq c_myseq4 := { i:=321, b:=false }
+with {
+  erroneous (i) "after := omit all"
+  erroneous (i) "value := omit"
+}
+
+const MySeq c_myseq5 := { i:=321, b:=false }
+with {
+  erroneous (i) "after := omit all"
+  erroneous (i) "value := MySeqOf:{11,22,33}"
+}
+
+template MySeq t_myseq6_par(template integer p_i, template boolean p_b) := { i:=p_i, b:=p_b }
+with {
+  erroneous (b) "value := omit"
+  erroneous (i) "value := omit"
+  erroneous (b) "after := MyUnion:{b:=true}"
+}
+
+const MySeqOf c_myseqof := { 1,2,3,4,5 }
+with {
+  erroneous([0]) "after := omit all"
+  erroneous([0]) "value := 3.14"
+  erroneous([0]) "before := 0.0001"
+}
+
+const MySeqOf c_myseqof2 := { 1,2,3,4,5 }
+with {
+  erroneous([2]) "before := omit all"
+  erroneous([2]) "value := false"
+  erroneous([2]) "after := omit all"
+}
+
+const MyUnion c_myunion := { s:={ i:=123, b:=true} }
+with {
+  erroneous (s.i) "value := omit"
+  erroneous (s.b) "value := omit"
+}
+
+const MyUnion c_myunion2 := { i:=333 }
+with {
+  erroneous (i) "value := 3.14"
+}
+
+const MyUnion c_myunion3e := { i:=321 }
+with {
+  erroneous (i) "value(raw) := 'ABCD'O"
+}
+
+const MySeqModified2 c_seq_rawerr := {  bs:='10101'B, i:=12345, oc:='123456'O, b:=true, r:=3.14 }
+with {
+  erroneous (bs) "before(raw) := 'ABCDEF'O"
+  erroneous (oc) "after(raw) := 'ABCDEF'O"
+  erroneous (i) "value(raw) := 'FFFFFFFFFFFFFF'O"
+}
+
+const MySeqOf c_seqof_rawerr :={ 1, 2, 3, 4, 5 }
+with {
+  erroneous ([0]) "before(raw) := 'DEADBEEF'O"
+  erroneous ([0]) "after(raw) := 'CAFEFEED'O"
+  erroneous ([3]) "value(raw) := 'BEEBEEFACE'O"
+}
+
+const MySeqOf c_seqof_erroneous_inside :={ 1, 2, 3, 4, 5 }
+with {
+  erroneous ([0]) "before(raw) := 'DEADBEEF'O"
+  erroneous ([0]) "after(raw) := 'CAFEFEED'O"
+  erroneous ([3]) "value := c_seq_rawerr"
+}
+
+template MySeq t_myseq_err := { i:=12, b:=true }
+with {
+  erroneous (i) "value := omit"
+}
+
+template MySeq t_myseqpar_err(template integer p_i, template boolean p_b) := { i:=p_i, b:=p_b }
+with { erroneous (i) "value := omit" erroneous(b) "after := 123" }
+
+template MySeq t_myseq_err2 := { i:=12, b:=true }
+with {
+  erroneous (i) "value := MyInt:12"
+  erroneous (b) "value := MyBool:true"
+}
+
+const MyRecursiveSeq c_myrecursiveseq := { r := { r := omit } }
+with { erroneous (r.r) "value:=1" }
+
+group TEXT_group{
+
+  type record TEXT_record {
+    charstring f1,
+    charstring f2
+  } with { variant "SEPARATOR('\n\r')"};
+
+  type record TEXT_record_modified {
+    charstring f2
+  } with { variant "SEPARATOR('\n\r')"};
+
+  const TEXT_record c_myrecord_err:= {f1:="value1",f2:="value2"}
+  with {
+    erroneous (f2) "before := omit all" 
+  }
+
+  type record TEXT_record_modified2 {
+    charstring f1
+  } with { variant "SEPARATOR('\n\r')"};
+
+  const TEXT_record c_myrecord_err2:= {f1:="value1",f2:="value2"}
+  with {
+    erroneous (f1) "after := omit all" 
+  }
+
+  type record TEXT_record_modified3 {
+    charstring f1,
+    charstring f2
+  } with { variant "SEPARATOR('\n\r')"};
+
+  const TEXT_record c_myrecord_err3:= {f1:="value1",f2:="value2"}
+  with {
+    erroneous (f1) "value := ""ERRORVALUE1"""
+    erroneous (f2) "value := ""ERRORVALUE2""" 
+  }
+
+  type record TEXT_record_comma {
+    charstring f1,
+    charstring f2
+  } with { variant "SEPARATOR(',')"};
+
+  const TEXT_record_comma c_myrecord_err4:= {f1:="value1",f2:="value2"}
+  with {
+    erroneous (f1) "value := ""ERRORVALUE1"""
+    erroneous (f2) "value := ""ERRORVALUE2""" 
+  }
+
+  const TEXT_record_comma c_myrecord_err5:= {f1:="value1",f2:="value2"}
+  with {
+    erroneous (f1) "value(raw) := 'FEDA'O"
+    erroneous (f2) "value(raw) := 'ADEF'O" 
+  }
+
+  type record TEXT_record_int_bool {
+    integer i,
+    boolean b
+  } with { variant "SEPARATOR('\n\r')"};
+
+  const TEXT_record_int_bool c_myrecord_err6:={i:=12,b:=true}
+  with{
+    erroneous (i) "value := 13"
+    erroneous (b) "value := false"
+  }
+
+  type record TEXT_record_int_bool2 {
+    charstring i,
+    charstring b
+  } with { variant "SEPARATOR('\n\r')"};
+
+  const TEXT_record_int_bool c_myrecord_err7:={i:=12,b:=true}
+  with{
+    erroneous (i) "value(raw) := 'ABCD'O"
+    erroneous (b) "value(raw) := 'BABA'O"
+  }
+
+  const TEXT_record_int_bool c_myrecord_err8:={i:=12,b:=true}
+  with{
+    erroneous (i) "after(raw) := 'ABAB'O"
+    erroneous (b) "before(raw) := 'BABA'O"
+  }
+
+  type record of integer TEXT_rofint with { variant "BEGIN('PDU:'),END(':UDP'),SEPARATOR(',')"};
+
+  const TEXT_rofint c_rofint := { 1,2,3,4,5,6,7,8 }
+  with {
+    erroneous ([0]) "before:=0"
+  }
+
+  type record TEXT_record1{
+    charstring f1,
+    charstring f2
+  } with { variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+  type record of TEXT_record1 TEXT_record_of  with { variant "BEGIN('PDU:'),END(':UDP')"};
+
+  const TEXT_record_of  c_myrecord_of_err:={{f1:="v1",f2:="v2"},{f1:="v3",f2:="v4"}}
+  with{
+    erroneous ([0]) "value := omit"
+  }
+
+  const TEXT_record_of  c_myrecord_of_err2:={{f1:="v1",f2:="v2"},{f1:="v3",f2:="v4"}}
+  with{
+    erroneous ([0].f1) "value := ""f1"""
+    erroneous ([1].f2) "value := ""f2"""
+  }
+
+  const TEXT_record_of  c_myrecord_of_err3:={{f1:="v1",f2:="v2"},{f1:="v3",f2:="v4"}}
+  with{
+    erroneous ([0].f1) "value(raw) := '4141'O" 
+    erroneous ([0].f2) "value(raw) := '4646'O"
+    erroneous ([1].f1) "value(raw) := '4545'O"
+    erroneous ([1].f2) "value(raw) := '4242'O"
+  }
+
+  type union TEXT_union {
+    charstring f1,
+    charstring f2
+  } with { variant "BEGIN('Head:'),END(':end')";
+    variant (f1) "BEGIN('f1:'),END(':1f')"
+    variant (f2) "BEGIN('f2:'),END(':2f')" };
+
+  const TEXT_union  c_mytextunion_err:={f1:="value2"}
+  with{
+    erroneous (f1) "value := TEXT_union.f1:""IRON"""
+  }
+
+  type union TEXT_union2 {
+    charstring f1,
+    charstring f2
+  } with { variant "BEGIN('Head:'),END(':end')"};
+
+  const TEXT_union2  c_mytextunion_err2:={f1:="value2"}
+  with{
+    erroneous (f1) "value(raw) :=TEXT_union.f1:""ABCD"""
+  }
+
+  template TEXT_record t_mytextreq_err := { f1:="ORIG", f2:="INAL" }
+  with {
+    erroneous (f1) "value := omit"
+  }
+
+  type record TEXT_record_int_bool3 {
+    integer i,
+    boolean b
+  }with { variant "BEGIN('BEGIN:'),END(':END'),SEPARATOR('_SEPARATOR_')"};
+  
+  const TEXT_record_int_bool3 c_myrecord_err10:={i:=13,b:=true}
+  with{
+    erroneous (i) "before(raw) := '4444'O"
+    erroneous (i) "value(raw) := '2020'O"
+    erroneous (i) "after(raw) := '2222'O"
+    erroneous (b) "before(raw) := '5555'O"
+    erroneous (b) "value(raw) := '3333'O"
+    erroneous (b) "after(raw) := '6666'O"
+  }
+
+  type record TEXT_record_single{
+    charstring s
+  }
+  with { variant "BEGIN('BEGIN:'),END(':END'),SEPARATOR('_SEPARATOR_')"};
+
+  const TEXT_record_single c_myrecord_err11:={s:="SINGLE CHARSTRING"}
+  with{
+    erroneous (s) "before(raw) := '4444'O"    
+    erroneous (s) "value(raw) := '2222'O"
+    erroneous (s) "after(raw) := '3333'O"
+  }
+
+  const TEXT_record_int_bool3 c_myrecord_err12:={i:=13,b:=true}
+  with{
+    erroneous (i) "value := omit"
+    erroneous (i) "after(raw) := '4444'O"
+  }
+  
+  type record TEXT_record_optional{
+    charstring s optional
+  }
+  with { variant "BEGIN('BEGIN:'),END(':END'),SEPARATOR('_SEPARATOR_')"};
+  
+  const TEXT_record_optional c_myrecord_err13:={s:="optional"}
+  with{
+    erroneous (s) "value := omit"
+  }
+
+  type record MyRecursiveRec { MyRecursiveRec s optional } with { variant "BEGIN('<MySeq>')"; variant "END('</MySeq>')"; }
+  const MyRecursiveRec c_myrecursiverec := { s := { s := omit } }
+  with { erroneous (s.s) "value:=""error""" }
+
+}with {encode "TEXT"}
+
+// in this testcase the erroneous values are compared with corresponding
+// modified types by encoding both ways and comparing the resulting octetstring
+testcase negtest_compare_with_erroneous_types_BER() runs on MyComp
+{
+  // sequence values
+
+  const MySeqModified c_myseqmod := { i:=omit, b:=false };
+  if (encode_MySeq(c_myseq)==encode_MySeqModified(c_myseqmod))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MySeqModified2 c_myseqmod2 := { bs := '10101'B, i := omit, oc := 'ABCD'O, b := omit, r := 3.141500 };
+  if (encode_MySeq(c_myseq2)==encode_MySeqModified2(c_myseqmod2))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MySeqModified3 c_myseqmod3 := { b := false };
+  if (encode_MySeq(c_myseq3)==encode_MySeqModified3(c_myseqmod3))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MySeqModified4 c_myseqmod4 := {};
+  if (encode_MySeq(c_myseq4)==encode_MySeqModified4(c_myseqmod4))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MySeqModified5 c_myseqmod5 := { sof:={11,22,33} };
+  if (encode_MySeq(c_myseq5)==encode_MySeqModified5(c_myseqmod5))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence of values
+
+  const MySeqOfModified c_myseqofmod := { 0.0001, 3.14 };
+  if (encode_MySeqOf(c_myseqof)==encode_MySeqOfModified(c_myseqofmod))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MySeqOfModified2 c_myseqofmod2 := { false };
+  if (encode_MySeqOf(c_myseqof2)==encode_MySeqOfModified2(c_myseqofmod2))
+    { setverdict(pass); } else { setverdict(fail); }
+  
+  // union values
+
+  const MyUnionModified c_myunionmod := { s := {} };
+  if (encode_MyUnion(c_myunion)==encode_MyUnionModified(c_myunionmod))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  const MyUnionModified c_myunionmod2 := { r := 3.14 };
+  if (encode_MyUnion(c_myunion2)==encode_MyUnionModified(c_myunionmod2))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence template
+  var template MySeqModified t_myseqmod := { i:=omit, b:=true };
+  if (encode_MySeq(valueof(t_myseq_err))==encode_MySeqModified(valueof(t_myseqmod)))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence parametrized template
+  var template MySeqModifiedT t_myseqmod2 := { b:=true, i:=123 };
+  if (encode_MySeq(valueof(t_myseqpar_err(12,true)))==encode_MySeqModifiedT(valueof(t_myseqmod2)))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  var template MySeqModified6 t_myseqmod6 := { u:={b:=true} };
+  if (encode_MySeq(valueof(t_myseq6_par(12,true)))==encode_MySeqModified6(valueof(t_myseqmod6)))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence with tagged fields
+  var template MySeqTerr t_myseq_terr := { i:=12, b:=true }
+  if (encode_MySeq(valueof(t_myseq_err2))==encode_MySeqTerr(valueof(t_myseq_terr)))
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+// in this testcase the erroneous values are encoded and directly compared with
+// the expected octetstrings
+testcase negtest_compare_with_octetstring_BER() runs on MyComp
+{
+  // sequence with raw value
+  if (encode_MySeqModified2(c_seq_rawerr)=='3023ABCDEF030203A8FFFFFFFFFFFFFF0403123456ABCDEF0101FF0908033331342E452D32'O)
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence of with raw value
+  if (encode_MySeqOf(c_seqof_rawerr)=='3019DEADBEEF020101CAFEFEED020102020103BEEBEEFACE020105'O)
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // sequence of that has another errnoeus sequence inside
+  if (encode_MySeqOf(c_seqof_erroneous_inside)=='3039DEADBEEF020101CAFEFEED0201020201033023ABCDEF030203A8FFFFFFFFFFFFFF0403123456ABCDEF0101FF0908033331342E452D32020105'O)
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // union with raw value
+  if (encode_MyUnion(c_myunion3e)=='ABCD'O)
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // recursive with erroenous embedded on an optional path
+  if (encode_MyRecursiveSeq(c_myrecursiveseq)=='30053003020101'O)
+    { setverdict(pass); } else { setverdict(fail); }
+  
+  if (encode_MyRecursiveRec(c_myrecursiverec)=="<MySeq><MySeq>error</MySeq></MySeq>")
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+type union U {
+  R r,
+  ROF rof,
+  integer i,
+  boolean b
+}
+with { encode "TEXT" variant "" }
+
+type record of integer ROF
+with { encode "TEXT" variant "" }
+
+type record R {
+  charstring cs,
+  octetstring os,
+  bitstring bs,
+  ROF rof
+}
+with { encode "TEXT" variant "" }
+
+template U tu := { i := 123 }
+with {
+  erroneous (b) "value := 777"
+  erroneous (r.rof[10]) "before := omit all"
+  erroneous (rof[7]) "value(raw) := 'ABCD'O"
+  erroneous (r.cs) "value(raw) := 'DEADBEEF'O"
+  erroneous (r.os) "value := omit"
+  erroneous (r.rof[100]) "after := omit all"
+}
+
+const ROF c_rofa := { 1,2,3 }
+with {
+  erroneous ([0]) "value := 333"
+  erroneous ([1]) "value := 333"
+  erroneous ([2]) "value := 333"
+}
+
+const ROF c_rofb := { 1,2,3 }
+with {
+  erroneous ([0],[1],[2]) "value := 333"
+}
+
+const ROF c_rof1 := {1,2,3}
+const ROF c_rof2 := c_rof1  with { erroneous ([0],[1],[2]) "after := 11" }
+const ROF c_rof3 := {1,2,3} with { erroneous ([0],[1],[2]) "after := 11" }
+
+const ROF c_rof1b := {1,2,3} with { erroneous ([0],[1],[2]) "after := 22" }
+const ROF c_rof2b := c_rof1b with { erroneous ([0],[1],[2]) "after := 11" }
+const ROF c_rof3b := {1,2,3} with { erroneous ([0],[1],[2]) "after := 11" }
+
+testcase erroneous_logging() runs on MyComp
+{
+  if (log2str(tu)=="{ i := 123 } with erroneous { " &
+    "{ value b := 777 } " &
+    "{ value(raw) r.cs := 'DEADBEEF'O } " &
+    "{ value r.os := omit } " &
+    "{ before r.rof[10] := omit all } " &
+    "{ after r.rof[100] := omit all } " &
+    "{ value(raw) rof[7] := 'ABCD'O } " &
+    "}")
+  { setverdict(pass); } else { setverdict(fail); }
+
+  // multiple qualifiers in one erroneous
+  if (log2str(c_rofa)==log2str(c_rofb))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // erroneous references a non-erroneous
+  if (log2str(c_rof2)==log2str(c_rof3))
+    { setverdict(pass); } else { setverdict(fail); }
+
+  // erroneous references other erroneous
+  if (log2str(c_rof2b)==log2str(c_rof3b))
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+// Text encode negtest
+// in this testcase the erroneous values are compared with corresponding
+// modified types by encoding both ways and comparing the resulting octetstring
+testcase negtest_compare_with_erroneous_types_TEXT() runs on MyComp
+{
+  // sequence values
+  const TEXT_record_modified c_mytextrecord := { f2:="value2" };
+  if (encode_TEXT_Record(c_myrecord_err)==encode_TEXT_RecordModified(c_mytextrecord))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Record(c_myrecord_err)=     "  , encode_TEXT_Record(c_myrecord_err)) ;
+  }
+
+  const TEXT_record_modified2 c_mytextrecord2 := { f1:="value1" };
+  if (encode_TEXT_Record(c_myrecord_err2)==encode_TEXT_RecordModified2(c_mytextrecord2))
+  { setverdict(pass); } else {
+    setverdict(fail); 
+    log ("encode_TEXT_Record(c_myrecord_err2)=     "  , encode_TEXT_Record(c_myrecord_err2)) ; 
+  }
+
+  const TEXT_record_modified3 c_mytextrecord3 := { f1:="ERRORVALUE1", f2:="ERRORVALUE2" };
+  if (encode_TEXT_Record(c_myrecord_err3)==encode_TEXT_RecordModified3(c_mytextrecord3))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Record(c_myrecord_err3)=     "  , encode_TEXT_Record(c_myrecord_err3));
+    log ("encode_TEXT_RecordModified3(c_mytextrecord3)=     "  , encode_TEXT_RecordModified3(c_mytextrecord3));
+  }
+
+  const TEXT_record_comma c_mytextrecord4 := { f1:="ERRORVALUE1", f2:="ERRORVALUE2" };
+  if (encode_TEXT_RecordComma(c_myrecord_err4)==encode_TEXT_RecordModified4(c_mytextrecord4))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_RecordComma(c_myrecord_err4)=     "  , encode_TEXT_RecordComma(c_myrecord_err4));
+    log ("encode_TEXT_RecordModified4(c_mytextrecord4)=     "  , encode_TEXT_RecordModified4(c_mytextrecord4));
+  }
+
+  //const TEXT_record_comma c_mytextrecord5 := { f1:="FEDA", f2:="ADEF" };
+  var charstring vl_encoded:=encode_TEXT_RecordComma(c_myrecord_err5);
+  var charstring vl_expected:=char(0, 0, 0, 254) & char(0, 0, 0, 218) & "," & char(0, 0, 0, 173) & char(0, 0, 0, 239);
+
+  //if (encode_TEXT_RecordComma(c_myrecord_err5)==char(0, 0, 0, 254) & char(0, 0, 0, 218) & "," & char(0, 0, 0, 173) & char(0, 0, 0, 239) )//encode_TEXT_RecordModified4(c_mytextrecord5))
+
+  if(vl_encoded==vl_expected)
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log("encoded :",vl_encoded);
+    log("expected:",vl_expected);
+    //log ("encode_TEXT_RecordComma(c_myrecord_err5)=     "  , encode_TEXT_RecordComma(c_myrecord_err5));
+    //log ("Encode_TEXT_RecordModified4(c_mytextrecord5)=     "  , char(0, 0, 0, 254) & char(0, 0, 0, 218) & "," & char(0, 0, 0, 173) & char(0, 0, 0, 239) );
+  }
+
+  const TEXT_record_int_bool c_mytextrecord6 := { i:=13 , b:=false };
+  if (encode_TEXT_RecordModified5(c_myrecord_err6)==encode_TEXT_RecordModified5(c_mytextrecord6))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_RecordModified5(c_myrecord_err6)=     "  , encode_TEXT_RecordModified5(c_myrecord_err6));
+    log ("encode_TEXT_RecordModified5(c_mytextrecord6)=     "  , encode_TEXT_RecordModified5(c_mytextrecord6));
+  }
+
+  const TEXT_record_int_bool2 c_mytextrecord7 := { i:="ABCD" , b:="BABA" };
+  vl_encoded:=encode_TEXT_RecordModified5(c_myrecord_err7);
+  vl_expected:=char(0, 0, 0, 171) & char(0, 0, 0, 205) & "\n\r" & char(0, 0, 0, 186) & char(0, 0, 0, 186); //'ABCD'O \n\r'BABA'O
+  if (vl_encoded==vl_expected)
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log("encoded :",vl_encoded);
+    log("expected:",vl_expected)
+    //log ("encode_TEXT_RecordModified5(c_myrecord_err7)=     "  , encode_TEXT_RecordModified5(c_myrecord_err7));
+    //log ("encode_TEXT_RecordModified6(c_mytextrecord7)=     "  , encode_TEXT_RecordModified6(c_mytextrecord7));
+  }
+  
+  vl_encoded :=encode_TEXT_RecordModified5(c_myrecord_err8);
+  vl_expected:="12\n\r" & char(0, 0, 0, 171) & char(0, 0, 0, 171) & "\n\r" & char(0, 0, 0, 186) & char(0, 0, 0, 186) & "\n\rtrue"
+  //if (encode_TEXT_RecordModified5(c_myrecord_err8)=="12\n\rABAB\n\rBABA\n\rtrue")
+  if (vl_encoded==vl_expected)
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log("encoded :",vl_encoded);
+    log("expected:",vl_expected);
+    log ("encode_TEXT_RecordModified5(c_myrecord_err8)=     "  , encode_TEXT_RecordModified5(c_myrecord_err8));
+  }
+
+  const TEXT_rofint c_myrofint := {0,1,2,3,4,5,6,7,8};
+  if (encode_TEXT_rofint(c_rofint)==encode_TEXT_rofint(c_myrofint))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_rofint(c_rofint)=     "  , encode_TEXT_rofint(c_rofint));
+    log ("encode_TEXT_rofint(c_myrofint)=     "  , encode_TEXT_rofint(c_myrofint));
+  }
+
+  const TEXT_record_of c_mytextrecord_of := {{f1:="v3",f2:="v4"}};
+  if (encode_TEXT_Record_of(c_myrecord_of_err)==encode_TEXT_Record_of(c_mytextrecord_of))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Record_of(c_myrecord_of_err)=     "  , encode_TEXT_Record_of(c_myrecord_of_err));
+    log ("encode_TEXT_Record_of(c_mytextrecord_of)=     "  , encode_TEXT_Record_of(c_mytextrecord_of));
+  }
+
+  const TEXT_record_of c_mytextrecord_of2 := {{f1:="f1",f2:="v2"},{f1:="v3",f2:="f2"}};
+  if (encode_TEXT_Record_of(c_myrecord_of_err2)==encode_TEXT_Record_of(c_mytextrecord_of2))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Record_of(c_myrecord_of_err2)=     "  , encode_TEXT_Record_of(c_myrecord_of_err2));
+    log ("encode_TEXT_Record_of(c_mytextrecord_of2)=     "  , encode_TEXT_Record_of(c_mytextrecord_of2));
+  }
+
+  const TEXT_record_of c_mytextrecord_of3 := {{f1:="AA",f2:="FF"},{f1:="EE",f2:="BB"}};
+  if (encode_TEXT_Record_of(c_myrecord_of_err3)==encode_TEXT_Record_of(c_mytextrecord_of3))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("Encoded : encode_TEXT_Record_of(c_myrecord_of_err3)=     "  , encode_TEXT_Record_of(c_myrecord_of_err3));
+    log ("Expected: encode_TEXT_Record_of(c_mytextrecord_of3)=     "  , encode_TEXT_Record_of(c_mytextrecord_of3));
+  }
+
+  const TEXT_union c_mytextunion := {f1:="IRON"};
+  if (encode_TEXT_Union(c_mytextunion_err)==encode_TEXT_Union(c_mytextunion))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Union(c_mytextunion_err)=     "  , encode_TEXT_Union(c_mytextunion_err));
+    log ("encode_TEXT_Union(c_mytextunion)=     "  , encode_TEXT_Union(c_mytextunion));
+  }
+
+  const TEXT_union2 c_mytextunion2 := {f1:="ABCD"};
+  if (encode_TEXT_Union2(c_mytextunion_err2)==encode_TEXT_Union2(c_mytextunion2))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Union2(c_mytextunion_err2)=     "  , encode_TEXT_Union2(c_mytextunion_err2));
+    log ("encode_TEXT_Union2(c_mytextunion2)=     "  , encode_TEXT_Union2(c_mytextunion2));
+  }
+
+  // sequence template
+  var template TEXT_record_modified t_mytextrecmod := { f2:="INAL" };
+  if (encode_TEXT_Record(valueof(t_mytextreq_err))==encode_TEXT_RecordModified(valueof(t_mytextrecmod)))
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_Record(valueof(t_mytextreq_err)=     "  , encode_TEXT_Record(c_myrecord_err));
+    log ("encode_TEXT_RecordModified(valueof(t_mytextrecmod))=     "  , encode_TEXT_RecordModified(valueof(t_mytextrecmod))); 
+  }
+
+  if (encode_TEXT_RecordModified7(c_myrecord_err10)=="BEGIN:DD_SEPARATOR_  _SEPARATOR_\"\"_SEPARATOR_UU_SEPARATOR_33_SEPARATOR_ff:END" )
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_RecordModified7(c_myrecord_err10)=     "  , encode_TEXT_RecordModified7(c_myrecord_err10)); 
+  }
+
+  if (encode_TEXT_RecordSingle(c_myrecord_err11)=="BEGIN:DD_SEPARATOR_\"\"_SEPARATOR_33:END")
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_RecordSingle(c_myrecord_err11)=     "  , encode_TEXT_RecordSingle(c_myrecord_err11)); 
+  }
+
+  if (encode_TEXT_RecordModified7(c_myrecord_err12)=="BEGIN:DD_SEPARATOR_true:END" )
+  { setverdict(pass); } else {
+    log ("encode_TEXT_RecordModified7(c_myrecord_err12)=     "  , encode_TEXT_RecordModified7(c_myrecord_err12)); setverdict(fail);
+  }
+
+  if (encode_TEXT_RecordModified8(c_myrecord_err13)=="BEGIN::END" )
+  { setverdict(pass); } else {
+    setverdict(fail);
+    log ("encode_TEXT_RecordModified8(c_myrecord_err13)=     "  , encode_TEXT_RecordModified8(c_myrecord_err13));
+  }
+
+
+}
+
+// **** RAW negtest records/sets **** //
+external function rawenc1(in myrec1 mr)   return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc2(in myset1 ms)   return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc3(in myrec2 mr)   return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc9(in myrec3 mr)   return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc11(in myrec4 mr)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc13(in myrec5 mr)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc15(in myrec6 mr)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc17(in myrec7 mr)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc19(in myrec9 mr)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc21(in myrec11 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc23(in myrec12 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc25(in myrec14 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc27(in myrec15 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc29(in myrec17 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc31(in myrec19 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc33(in myrec21 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc35(in myrec23 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc37(in myrec24 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc39(in myrec25 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc41(in myrec26 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc43(in myrec27 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc45(in myrec28 mr) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc7(in myset2 ms)   return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc10(in myset3 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc12(in myset4 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc14(in myset5 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc16(in myset6 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc18(in myset7 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc20(in myset9 ms)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc22(in myset11 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc24(in myset12 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc26(in myset14 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc28(in myset15 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc30(in myset17 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc32(in myset19 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc34(in myset21 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc36(in myset23 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc38(in myset24 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc40(in myset25 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc42(in myset26 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc44(in myset27 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc46(in myset28 ms) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+
+// **** RAW negtest record ofs/set ofs **** //
+external function rawenc4(in myintlist1 mil) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc5(in myintset1 mis)  return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+// **** RAW negtest unions **** //
+external function rawenc6(in myuni1 mu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+external function rawenc8(in myuni2 mu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(NEGTEST_CONFL:WARNING)" }
+
+type record myrec1 {
+  integer f1,
+  charstring f2
+} with { variant (f1) "FIELDLENGTH(8)" encode "RAW" }
+
+// Same as `myrec1'.
+type set myset1 {
+  integer f1,
+  charstring f2
+} with { variant (f1) "FIELDLENGTH(8)" encode "RAW" }
+
+type record myrec2 {
+  integer f1 optional,
+  charstring f2
+} with {
+  // Same as `dword32'.
+  variant (f1) "PREPADDING(32)"
+  variant (f1) "PADDING_PATTERN('1'B)"
+  variant (f2) "PREPADDING(128)"
+  variant (f2) "PADDING_PATTERN('0'B)"
+  encode "RAW"
+}
+
+type set myset2 {
+  integer f1 optional,
+  charstring f2
+} with {
+  // Same as `dword32'.
+  variant (f1) "PREPADDING(32)"
+  variant (f1) "PADDING_PATTERN('1'B)"
+  variant (f2) "PREPADDING(128)"
+  variant (f2) "PADDING_PATTERN('0'B)"
+  encode "RAW"
+}
+
+type record myrec3 {
+  integer f1,
+  charstring f2
+} with { variant (f1) "LENGTHTO(f2)" encode "RAW" }
+
+type set myset3 {
+  integer f1,
+  charstring f2
+} with { variant (f1) "LENGTHTO(f2)" encode "RAW" }
+
+type record myrec4 {
+  integer f1 optional,
+  charstring f2 optional
+} with { variant (f1) "LENGTHTO(f2)" encode "RAW" }
+
+type set myset4 {
+  integer f1 optional,
+  charstring f2 optional
+} with { variant (f1) "LENGTHTO(f2)" encode "RAW" }
+
+type record myrec5 {
+  integer f1 optional,
+  charstring f2 optional,
+  charstring f3
+} with { variant (f1) "LENGTHTO(f2, f3)" encode "RAW" }
+
+type set myset5 {
+  integer f1 optional,
+  charstring f2 optional,
+  charstring f3
+} with { variant (f1) "LENGTHTO(f2, f3)" encode "RAW" }
+
+type record myrec6 {
+  integer f1,
+  charstring f2,
+  charstring f3
+} with { variant (f1) "POINTERTO(f3)" encode "RAW" }
+
+type set myset6 {
+  integer f1,
+  charstring f2,
+  charstring f3
+} with { variant (f1) "POINTERTO(f3)" encode "RAW" }
+
+type record myrec7 {
+  integer f1 optional,
+  charstring f2 optional,
+  charstring f3 optional
+} with { variant (f1) "POINTERTO(f3)" encode "RAW" }
+
+type set myset7 {
+  integer f1 optional,
+  charstring f2 optional,
+  charstring f3 optional
+} with { variant (f1) "POINTERTO(f3)" encode "RAW" }
+
+type union myuni8_rec9 {
+  integer f1
+} with { variant "" encode "RAW" }
+type record myrec9 {
+  integer f1,
+  myuni8_rec9 f2,
+  charstring f3
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type union myuni8_set9 {
+  integer f1
+} with { variant "" encode "RAW" }
+type set myset9 {
+  integer f1,
+  myuni8_set9 f2,
+  charstring f3
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type union myuni10_rec11 {
+  integer f1
+} with { variant "" encode "RAW" }
+type record myrec11 {
+  integer f1 optional,
+  myuni10_rec11 f2 optional,
+  charstring f3 optional,
+  charstring f4 optional
+} with {
+  variant (f2) "LENGTHTO(f3, f4)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+
+type union myuni10_set11 {
+  integer f1
+} with { variant "" encode "RAW" }
+type set myset11 {
+  integer f1 optional,
+  myuni10_set11 f2 optional,
+  charstring f3 optional,
+  charstring f4 optional
+} with {
+  variant (f2) "LENGTHTO(f3, f4)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type record myrec12 {
+  integer f1,
+  integer f2 optional
+} with { variant (f2) "PRESENCE(f1 = 128)" encode "RAW" }
+
+type set myset12 {
+  integer f1,
+  integer f2 optional
+} with { variant (f2) "PRESENCE(f1 = 128)" encode "RAW" }
+
+type record myrec13 {
+  integer f1
+} with { variant "" encode "RAW" }
+type record myrec14 {
+  integer f1,
+  myrec13 f2,
+  integer f3,
+  integer f4 optional
+} with { variant (f4) "PRESENCE(f1 = 9, f2.f1 = 99, f3 = 1)" encode "RAW" }
+
+type set myset13 {
+  integer f1
+} with { variant "" encode "RAW" }
+type set myset14 {
+  integer f1,
+  myset13 f2,
+  integer f3,
+  integer f4 optional
+} with { variant (f4) "PRESENCE(f1 = 9, f2.f1 = 99, f3 = 1)" encode "RAW" }
+
+type record myrec15 {
+  integer f1,
+  integer f2
+} with { variant  "PRESENCE(f1 = 9, f2 = 2)" encode "RAW" }
+
+type set myset15 {
+  integer f1,
+  integer f2
+} with { variant  "PRESENCE(f1 = 9, f2 = 2)" encode "RAW" }
+
+type record myrec16 {
+  integer f1
+} with { variant "" encode "RAW" }
+type record myrec17 {
+  myrec16 f1,
+  myrec16 f2,
+  myrec16 f3
+} with {
+  variant "TAG(f1, f1 = 1; f2, f1 = 2)"
+  encode "RAW"
+}
+
+type set myset16 {
+  integer f1
+} with { variant "" encode "RAW" }
+type set myset17 {
+  myset16 f1,
+  myset16 f2,
+  myset16 f3
+} with {
+  variant "TAG(f1, f1 = 1; f2, f1 = 2)"
+  encode "RAW"
+}
+
+type record myrec18 {
+  integer f1
+} with { variant "" encode "RAW" }
+type record myrec19 {
+  myrec18 f1 optional,
+  myrec18 f2 optional,
+  myrec18 f3 optional
+} with {
+  variant "TAG(f1, f1 = 1; f2, f1 = 2)"
+  encode "RAW"
+}
+
+type set myset18 {
+  integer f1
+} with { variant "" encode "RAW" }
+type set myset19 {
+  myset18 f1 optional,
+  myset18 f2 optional,
+  myset18 f3 optional
+} with {
+  variant "TAG(f1, f1 = 1; f2, f1 = 2)"
+  encode "RAW"
+}
+
+type record myrec20 {
+  integer f1,
+  integer f2
+} with { variant  "" encode "RAW" }
+type union myuni_1 {
+  myrec20 f1,
+  myrec20 f2
+} with { variant "" encode "RAW" }
+type record myrec21 {
+  integer f1,
+  integer f2,
+  myuni_1 f3
+} with {
+  variant (f3) "CROSSTAG(f1, { f1 = 1, f1 = 11, f2 = 6 }; f2, f1 = 3)" encode "RAW"
+}
+
+type set myset20 {
+  integer f1,
+  integer f2
+} with { variant  "" encode "RAW" }
+type union myuni_2 {
+  myset20 f1,
+  myset20 f2
+} with { variant "" encode "RAW" }
+type set myset21 {
+  integer f1,
+  integer f2,
+  myuni_2 f3
+} with {
+  variant (f3) "CROSSTAG(f1, { f1 = 1, f1 = 11, f2 = 6 }; f2, f1 = 3)" encode "RAW"
+}
+
+type record myrec22 {
+  integer f1 optional,
+  integer f2 optional
+} with { variant  "" encode "RAW" }
+type union myuni_3 {
+  myrec22 f1,
+  myrec22 f2
+} with { variant "" encode "RAW" }
+type record myrec23 {
+  integer f1 optional,
+  integer f2 optional,
+  myuni_3 f3 optional
+} with {
+  variant (f3) "CROSSTAG(f1, { f1 = 1, f1 = 11, f2 = 6 }; f2, f1 = 3)" encode "RAW"
+}
+
+type set myset22 {
+  integer f1 optional,
+  integer f2 optional
+} with { variant  "" encode "RAW" }
+type union myuni_4 {
+  myset22 f1,
+  myset22 f2
+} with { variant "" encode "RAW" }
+type set myset23 {
+  integer f1 optional,
+  integer f2 optional,
+  myuni_4 f3 optional
+} with {
+  variant (f3) "CROSSTAG(f1, { f1 = 1, f1 = 11, f2 = 6 }; f2, f1 = 3)" encode "RAW"
+}
+
+type record myrec24 {
+  integer f1,
+  integer f2
+} with { variant "EXTENSION_BIT(yes)" encode "RAW" }
+
+type set myset24 {
+  integer f1,
+  integer f2
+} with { variant "EXTENSION_BIT(yes)" encode "RAW" }
+
+type record myrec25 {
+  integer f1,
+  integer f2,
+  integer f3,
+  integer f4,
+  integer f5,
+  integer f6
+} with {
+  variant "EXTENSION_BIT_GROUP(yes, f1, f3)"
+  variant "EXTENSION_BIT_GROUP(yes, f5, f6)"
+  encode "RAW"
+}
+
+type set myset25 {
+  integer f1,
+  integer f2,
+  integer f3,
+  integer f4,
+  integer f5,
+  integer f6
+} with {
+  variant "EXTENSION_BIT_GROUP(yes, f1, f3)"
+  variant "EXTENSION_BIT_GROUP(yes, f5, f6)"
+  encode "RAW"
+}
+
+type record myrec26 {
+  integer f1,
+  myrec18 f2 optional
+} with { variant (f2) "TAG(f2, f1 = 1)" encode "RAW" }
+
+type set myset26 {
+  integer f1,
+  myset18 f2 optional
+} with { variant (f2) "TAG(f2, f1 = 1)" encode "RAW" }
+
+type union myuni_5 {
+  integer f1,
+  integer f2
+} with { variant "" encode "RAW" }
+type record myrec27 {
+  integer f1,
+  myuni_5 f2,
+  charstring f3
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type union myuni_6 {
+  integer f1,
+  integer f2
+} with { variant "" encode "RAW" }
+type set myset27 {
+  integer f1,
+  myuni_6 f2,
+  charstring f3
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type record myrec28 {
+  integer f1 optional,
+  myuni_5 f2 optional,
+  charstring f3 optional
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+type set myset28 {
+  integer f1 optional,
+  myuni_6 f2 optional,
+  charstring f3 optional
+} with {
+  variant (f2) "LENGTHTO(f3)"
+  variant (f2) "LENGTHINDEX(f1)"
+  encode "RAW"
+}
+
+const myrec1  cmr1  := { 128, "trabuco" }           with { erroneous(f1) "before := 1" }
+const myrec1  cmr2  := { 128, "wings" }             with { erroneous(f1) "after := 1" }
+const myrec1  cmr3  := { 128, "xodus" }             with { erroneous(f2) "after := 1" }
+const myrec2  cmr4  := { 128, "jazz" }              with { erroneous(f1) "before := 1" erroneous(f1) "value := cmr1" erroneous (f2) "after := 1"}
+const myrec1  cmr5  := { 128, "progrid" }           with { erroneous(f2) "value := omit" }
+const myrec1  cmr6  := { 128, "cascadia" }          with { erroneous(f1) "value(raw) := '1122'O" }
+const myrec1  cmr7  := { 128, "speedcross" }        with { erroneous(f1) "before(raw) := '1122'O" }
+const myrec1  cmr8  := { 128, "trigon" }            with { erroneous(f1) "before(raw) := '1122'O" erroneous(f1) "after(raw) := '3344'O" erroneous(f2) "after(raw) := '5566'O" erroneous(f1) "value(raw) := '9999'O" }
+const myrec1  cmr9  := { 128, "X" }                 with { erroneous(f1) "before(raw) := '1'B" }
+const myrec1  cmr10 := { 128, "X" }                 with { erroneous(f1) "value(raw) := '1'B" }
+const myrec1  cmr11 := { 128, "X" }                 with { erroneous(f1) "after(raw) := '1'B" }
+const myrec1  cmr12 := { 128, "rockridge" }         with { erroneous(f1, f2) "after := 6 * 7" }
+const myrec1  cmr13 := { 128, "roclite" }           with { erroneous(f1) "after := omit all" }
+const myrec3  cmr14 := { 1, "unicorn" }             with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myrec4  cmr15 := { 1, "picnic" }              with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myrec5  cmr16 := { 1, "mock", "turtle" }      with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myrec6  cmr17 := { 1, "dinner", "bell" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+const myrec7  cmr18 := { 1, "tiger", "lily" }       with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+const myrec9  cmr19 := { 1, { f1 := 2 }, "" }       with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myrec11 cmr20 := { 1, { f1 := 2 }, "", "one" } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myrec12 cmr21 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myrec12 cmr22 := { 1, 2 }                     with { erroneous(f1) "value := 1" erroneous(f2) "value := 1" }
+const myrec12 cmr23 := { 1, omit }                  with { erroneous(f1) "value := 1" erroneous(f2) "after := 1" }
+const myrec14 cmr24 := { 1, { 2 }, 3, 4 }           with { erroneous(f1) "after := 1" erroneous(f4) "after := 1" }
+const myrec15 cmr25 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myrec17 cmr26 := { { 1 }, { 2 }, { 3 } }      with { erroneous(f1) "after := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+const myrec19 cmr27 := { { 1 }, { 2 }, { 3 } }      with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+const myrec21 cmr28 := { 1, 2, { f1 := { 3, 4 } } } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+const myrec23 cmr29 := { 1, 2, { f1 := { 3, 4 } } } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+const myrec24 cmr30 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f2) "value := 1" }
+const myrec25 cmr31 := { 1, 2, 3, 4, 5, 6 }         with { erroneous(f1) "before := 1" erroneous(f4) "value := 1" erroneous(f6) "after := 1" }
+const myrec26 cmr32 := { 1, { 2 } }                 with { erroneous(f1) "before := 1" erroneous(f2) "value := 3" }
+const myrec27 cmr33 := { 1, { f1 := 2 }, "X" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+const myrec28 cmr34 := { 1, { f1 := 2 }, "X" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+const myset1  cms1  := { f1 := 128, f2 := "trabuco" }                               with { erroneous(f1) "before := 1" }
+const myset1  cms2  := { f1 := 128, f2 := "wings" }                                 with { erroneous(f1) "after := 1" }
+const myset1  cms3  := { f1 := 128, f2 := "xodus" }                                 with { erroneous(f2) "after := 1" }
+const myset2  cms4  := { f1 := 128, f2 := "jazz" }                                  with { erroneous(f1) "before := 1" erroneous(f1) "value := cmr1" erroneous (f2) "after := 1"}
+const myset1  cms5  := { f1 := 128, f2 := "progrid" }                               with { erroneous(f2) "value := omit" }
+const myset1  cms6  := { f1 := 128, f2 := "cascadia" }                              with { erroneous(f1) "value(raw) := '1122'O" }
+const myset1  cms7  := { f1 := 128, f2 := "speedcross" }                            with { erroneous(f1) "before(raw) := '1122'O" }
+const myset1  cms8  := { f1 := 128, f2 := "trigon" }                                with { erroneous(f1) "before(raw) := '1122'O" erroneous(f1) "after(raw) := '3344'O" erroneous(f2) "after(raw) := '5566'O" erroneous(f1) "value(raw) := '9999'O" }
+const myset1  cms9  := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "before(raw) := '1'B" }  // With ''O and ''B as well.
+const myset1  cms10 := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "value(raw) := '1'B" }
+const myset1  cms11 := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "after(raw) := '1'B" }
+const myset1  cms12 := { f1 := 128, f2 := "rockridge" }                             with { erroneous(f1, f2) "after := 6 * 7" }
+const myset1  cms13 := { f1 := 128, f2 := "roclite" }                               with { erroneous(f1) "after := omit all" }
+const myset3  cms14 := { f1 := 1, f2 := "unicorn" }                                 with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myset4  cms15 := { f1 := 1, f2 := "picnic" }                                  with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myset5  cms16 := { f1 := 1, f2 := "mock",   f3 := "turtle" }                  with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myset6  cms17 := { f1 := 1, f2 := "dinner", f3 := "bell" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+const myset7  cms18 := { f1 := 1, f2 := "tiger",  f3 := "lily" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+const myset9  cms19 := { f1 := 1, f2 := { f1 := 2 }, f3 := "" }                     with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myset11 cms20 := { f1 := 1, f2 := { f1 := 2 }, f3 := "", f4 := "one" }        with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myset12 cms21 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+const myset12 cms22 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "value := 1" erroneous(f2) "value := 1" }
+const myset12 cms23 := { f1 := 1, f2 := omit }                                      with { erroneous(f1) "value := 1" erroneous(f2) "after := 1" }
+const myset14 cms24 := { f1 := 1, f2 := { f1 := 2 }, f3 := 3, f4 := 4 }             with { erroneous(f1) "after := 1" erroneous(f4) "after := 1" }
+const myset15 cms25 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+const myset17 cms26 := { f1 := { f1 := 1 }, f2 := { f1 := 2 }, f3 := { f1 := 3 } }  with { erroneous(f1) "after := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+const myset19 cms27 := { f1 := { f1 := 1 }, f2 := { f1 := 2 }, f3 := { f1 := 3 } }  with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+const myset21 cms28 := { f1 := 1, f2 := 2, f3 := { f1 := { f1 := 3, f2 := 4 } } }   with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+const myset23 cms29 := { f1 := 1, f2 := 2, f3 := { f1 := { f1 := 3, f2 := 4 } } }   with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+const myset24 cms30 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f2) "value := 1" }
+const myset25 cms31 := { f1 := 1, f2 := 2, f3 := 3, f4 := 4, f5 := 5, f6 := 6 }     with { erroneous(f1) "before := 1" erroneous(f4) "value := 1" erroneous(f6) "after := 1" }
+const myset26 cms32 := { f1 := 1, f2 := { f1 := 2 } }                               with { erroneous(f1) "before := 1" erroneous(f2) "value := 3" }
+const myset27 cms33 := { f1 := 1, f2 := { f1 := 2 }, f3 := "X" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+const myset28 cms34 := { f1 := 1, f2 := { f1 := 2 }, f3 := "X" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+template myrec1  tmr1  := { 128, "trabuco" }           with { erroneous(f1) "before := 1" }
+template myrec1  tmr2  := { 128, "wings" }             with { erroneous(f1) "after := 1" }
+template myrec1  tmr3  := { 128, "xodus" }             with { erroneous(f2) "after := 1" }
+template myrec2  tmr4  := { 128, "jazz" }              with { erroneous(f1) "before := 1" erroneous(f1) "value := cmr1" erroneous (f2) "after := 1"}
+template myrec1  tmr5  := { 128, "progrid" }           with { erroneous(f2) "value := omit" }
+template myrec1  tmr6  := { 128, "cascadia" }          with { erroneous(f1) "value(raw) := '1122'O" }
+template myrec1  tmr7  := { 128, "speedcross" }        with { erroneous(f1) "before(raw) := '1122'O" }
+template myrec1  tmr8  := { 128, "trigon" }            with { erroneous(f1) "before(raw) := '1122'O" erroneous(f1) "after(raw) := '3344'O" erroneous(f2) "after(raw) := '5566'O" erroneous(f1) "value(raw) := '9999'O" }
+template myrec1  tmr9  := { 128, "X" }                 with { erroneous(f1) "before(raw) := '1'B" }
+template myrec1  tmr10 := { 128, "X" }                 with { erroneous(f1) "value(raw) := '1'B" }
+template myrec1  tmr11 := { 128, "X" }                 with { erroneous(f1) "after(raw) := '1'B" }
+template myrec1  tmr12 := { 128, "rockridge" }         with { erroneous(f1, f2) "after := 6 * 7" }
+template myrec1  tmr13 := { 128, "roclite" }           with { erroneous(f1) "after := omit all" }
+template myrec3  tmr14 := { 1, "unicorn" }             with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myrec4  tmr15 := { 1, "picnic" }              with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myrec5  tmr16 := { 1, "mock", "turtle" }      with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myrec6  tmr17 := { 1, "dinner", "bell" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+template myrec7  tmr18 := { 1, "tiger",  "lily" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+template myrec9  tmr19 := { 1, { f1 := 2 }, "" }       with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myrec11 tmr20 := { 1, { f1 := 2 }, "", "one" } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myrec12 tmr21 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myrec12 tmr22 := { 1, 2 }                     with { erroneous(f1) "value := 1" erroneous(f2) "value := 1" }
+template myrec12 tmr23 := { 1, omit }                  with { erroneous(f1) "value := 1" erroneous(f2) "after := 1" }
+template myrec14 tmr24 := { 1, { 2 }, 3, 4 }           with { erroneous(f1) "after := 1" erroneous(f4) "after := 1" }
+template myrec15 tmr25 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myrec17 tmr26 := { { 1 }, { 2 }, { 3 } }      with { erroneous(f1) "after := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+template myrec19 tmr27 := { { 1 }, { 2 }, { 3 } }      with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+template myrec21 tmr28 := { 1, 2, { f1 := { 3, 4 } } } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+template myrec23 tmr29 := { 1, 2, { f1 := { 3, 4 } } } with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+template myrec24 tmr30 := { 1, 2 }                     with { erroneous(f1) "before := 1" erroneous(f2) "value := 1" }
+template myrec25 tmr31 := { 1, 2, 3, 4, 5, 6 }         with { erroneous(f1) "before := 1" erroneous(f4) "value := 1" erroneous(f6) "after := 1" }
+template myrec26 tmr32 := { 1, { 2 } }                 with { erroneous(f1) "before := 1" erroneous(f2) "value := 3" }
+template myrec27 tmr33 := { 1, { f1 := 2 }, "X" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+template myrec28 tmr34 := { 1, { f1 := 2 }, "X" }      with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+template myset1  tms1  := { f1 := 128, f2 := "trabuco" }                               with { erroneous(f1) "before := 1" }
+template myset1  tms2  := { f1 := 128, f2 := "wings" }                                 with { erroneous(f1) "after := 1" }
+template myset1  tms3  := { f1 := 128, f2 := "xodus" }                                 with { erroneous(f2) "after := 1" }
+template myset2  tms4  := { f1 := 128, f2 := "jazz" }                                  with { erroneous(f1) "before := 1" erroneous(f1) "value := cmr1" erroneous (f2) "after := 1"}
+template myset1  tms5  := { f1 := 128, f2 := "progrid" }                               with { erroneous(f2) "value := omit" }
+template myset1  tms6  := { f1 := 128, f2 := "cascadia" }                              with { erroneous(f1) "value(raw) := '1122'O" }
+template myset1  tms7  := { f1 := 128, f2 := "speedcross" }                            with { erroneous(f1) "before(raw) := '1122'O" }
+template myset1  tms8  := { f1 := 128, f2 := "trigon" }                                with { erroneous(f1) "before(raw) := '1122'O" erroneous(f1) "after(raw) := '3344'O" erroneous(f2) "after(raw) := '5566'O" erroneous(f1) "value(raw) := '9999'O" }
+template myset1  tms9  := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "before(raw) := '1'B" }
+template myset1  tms10 := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "value(raw) := '1'B" }
+template myset1  tms11 := { f1 := 128, f2 := "X" }                                     with { erroneous(f1) "after(raw) := '1'B" }
+template myset1  tms12 := { f1 := 128, f2 := "rockridge" }                             with { erroneous(f1, f2) "after := 6 * 7" }
+template myset1  tms13 := { f1 := 128, f2 := "roclite" }                               with { erroneous(f1) "after := omit all" }
+template myset3  tms14 := { f1 := 1, f2 := "unicorn" }                                 with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myset4  tms15 := { f1 := 1, f2 := "picnic" }                                  with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myset5  tms16 := { f1 := 1, f2 := "mock",   f3 := "turtle" }                  with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myset6  tms17 := { f1 := 1, f2 := "dinner", f3 := "bell" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+template myset7  tms18 := { f1 := 1, f2 := "tiger",  f3 := "lily" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := 1" }
+template myset9  tms19 := { f1 := 1, f2 := { f1 := 2 }, f3 := "" }                     with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myset11 tms20 := { f1 := 1, f2 := { f1 := 2 }, f3 := "", f4 := "one" }        with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myset12 tms21 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f1) "after := 1" erroneous(f2) "before := 1" erroneous(f2) "after := 1" }
+template myset12 tms22 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "value := 1" erroneous(f2) "value := 1" }
+template myset12 tms23 := { f1 := 1, f2 := omit }                                      with { erroneous(f1) "value := 1" erroneous(f2) "after := 1" }
+template myset14 tms24 := { f1 := 1, f2 := { f1 := 2 }, f3 := 3, f4 := 4 }             with { erroneous(f1) "after := 1" erroneous(f4) "after := 1" }
+template myset15 tms25 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" }
+template myset17 tms26 := { f1 := { f1 := 1 }, f2 := { f1 := 2 }, f3 := { f1 := 3 } }  with { erroneous(f1) "after := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+template myset19 tms27 := { f1 := { f1 := 1 }, f2 := { f1 := 2 }, f3 := { f1 := 3 } }  with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "value := 33" }
+template myset21 tms28 := { f1 := 1, f2 := 2, f3 := { f1 := { f1 := 3, f2 := 4 } } }   with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+template myset23 tms29 := { f1 := 1, f2 := 2, f3 := { f1 := { f1 := 3, f2 := 4 } } }   with { erroneous(f1) "before := 1" erroneous(f2) "after := 1" erroneous(f3) "after := 9" }
+template myset24 tms30 := { f1 := 1, f2 := 2 }                                         with { erroneous(f1) "before := 1" erroneous(f2) "value := 1" }
+template myset25 tms31 := { f1 := 1, f2 := 2, f3 := 3, f4 := 4, f5 := 5, f6 := 6 }     with { erroneous(f1) "before := 1" erroneous(f4) "value := 1" erroneous(f6) "after := 1" }
+template myset26 tms32 := { f1 := 1, f2 := { f1 := 2 } }                               with { erroneous(f1) "before := 1" erroneous(f2) "value := 3" }
+template myset27 tms33 := { f1 := 1, f2 := { f1 := 2 }, f3 := "X" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+template myset28 tms34 := { f1 := 1, f2 := { f1 := 2 }, f3 := "X" }                    with { erroneous(f1) "before := 1" erroneous(f3) "after := ""Y""" }
+
+// Basic encoding of record/set values/templates.
+testcase raw_negtest_records() runs on MyComp
+{
+  if (rawenc1(cmr1)   == '01807472616275636F'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr2)   == '800177696E6773'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr3)   == '80786F64757301'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc3(cmr4)   == '0101807472616275636F0000000000006A617A7A01'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr5)   == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr6)   == '11226361736361646961'O)           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr7)   == '112280737065656463726F7373'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr8)   == '112299993344747269676F6E5566'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr9)   == '01B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr10)  == 'B100'O)                           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr11)  == '80B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr12)  == '802A726F636B72696467652A'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(cmr13)  == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc9(cmr14)  == '01070101756E69636F726E01'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc11(cmr15) == '010601017069636E696301'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc13(cmr16) == '010A01016D6F636B01747572746C65'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc15(cmr17) == '010264696E6E657262656C6C01'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc17(cmr18) == '010274696765726C696C7901'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc19(cmr19) == '01010001'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc21(cmr20) == '010103016F6E65'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc23(cmr21) == '010101010201'O)                   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc23(cmr22) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc23(cmr23) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc25(cmr24) == '090102030401'O)                   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc27(cmr25) == '01010201'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc29(cmr26) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc31(cmr27) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc33(cmr28) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc35(cmr29) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc37(cmr30) == '010181'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc39(cmr31) == '0101028301058601'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc41(cmr32) == '010103'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc43(cmr33) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc45(cmr34) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms1)   == '01807472616275636F'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms2)   == '800177696E6773'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms3)   == '80786F64757301'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc7(cms4)   == '0101807472616275636F0000000000006A617A7A01'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms5)   == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms6)   == '11226361736361646961'O)           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms7)   == '112280737065656463726F7373'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms8)   == '112299993344747269676F6E5566'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms9)   == '01B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms10)  == 'B100'O)                           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms11)  == '80B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms12)  == '802A726F636B72696467652A'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(cms13)  == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc10(cms14) == '01070101756E69636F726E01'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc12(cms15) == '010601017069636E696301'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc14(cms16) == '010A01016D6F636B01747572746C65'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc16(cms17) == '010264696E6E657262656C6C01'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc18(cms18) == '010274696765726C696C7901'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc20(cms19) == '01010001'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc22(cms20) == '010103016F6E65'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc24(cms21) == '010101010201'O)                   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc24(cms22) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc24(cms23) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc26(cms24) == '090102030401'O)                   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc28(cms25) == '01010201'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc30(cms26) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc32(cms27) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc34(cms28) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc36(cms29) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc38(cms30) == '010181'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc40(cms31) == '0101028301058601'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc42(cms32) == '010103'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc44(cms33) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc46(cms34) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr1))   == '01807472616275636F'O)    { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr2))   == '800177696E6773'O)        { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr3))   == '80786F64757301'O)        { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc3(valueof(tmr4))   == '0101807472616275636F0000000000006A617A7A01'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr5))   == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr6))   == '11226361736361646961'O)           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr7))   == '112280737065656463726F7373'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr8))   == '112299993344747269676F6E5566'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr9))   == '01B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr10))  == 'B100'O)                           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr11))  == '80B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr12))  == '802A726F636B72696467652A'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc1(valueof(tmr13))  == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc9(valueof(tmr14))  == '01070101756E69636F726E01'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc11(valueof(tmr15)) == '010601017069636E696301'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc13(valueof(tmr16)) == '010A01016D6F636B01747572746C65'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc15(valueof(tmr17)) == '010264696E6E657262656C6C01'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc17(valueof(tmr18)) == '010274696765726C696C7901'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc19(valueof(tmr19)) == '01010001'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc21(valueof(tmr20)) == '010103016F6E65'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc23(valueof(tmr21)) == '010101010201'O)                   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc23(valueof(tmr22)) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc23(valueof(tmr23)) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc25(valueof(tmr24)) == '090102030401'O)                   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc27(valueof(tmr25)) == '01010201'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc29(valueof(tmr26)) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc31(valueof(tmr27)) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc33(valueof(tmr28)) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc35(valueof(tmr29)) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc37(valueof(tmr30)) == '010181'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc39(valueof(tmr31)) == '0101028301058601'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc41(valueof(tmr32)) == '010103'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc43(valueof(tmr33)) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc45(valueof(tmr34)) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms1))   == '01807472616275636F'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms2))   == '800177696E6773'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms3))   == '80786F64757301'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc7(valueof(tms4))   == '0101807472616275636F0000000000006A617A7A01'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms5))   == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms6))   == '11226361736361646961'O)           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms7))   == '112280737065656463726F7373'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms8))   == '112299993344747269676F6E5566'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms9))   == '01B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms10))  == 'B100'O)                           { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms11))  == '80B100'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms12))  == '802A726F636B72696467652A'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc2(valueof(tms13))  == '80'O)                             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc10(valueof(tms14)) == '01070101756E69636F726E01'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc12(valueof(tms15)) == '010601017069636E696301'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc14(valueof(tms16)) == '010A01016D6F636B01747572746C65'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc16(valueof(tms17)) == '010264696E6E657262656C6C01'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc18(valueof(tms18)) == '010274696765726C696C7901'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc20(valueof(tms19)) == '01010001'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc22(valueof(tms20)) == '010103016F6E65'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc24(valueof(tms21)) == '010101010201'O)                   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc24(valueof(tms22)) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc24(valueof(tms23)) == '0101'O)                           { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc26(valueof(tms24)) == '090102030401'O)                   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc28(valueof(tms25)) == '01010201'O)                       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc30(valueof(tms26)) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc32(valueof(tms27)) == '0101020121'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc34(valueof(tms28)) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc36(valueof(tms29)) == '01010201030409'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc38(valueof(tms30)) == '010181'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc40(valueof(tms31)) == '0101028301058601'O)               { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc42(valueof(tms32)) == '010103'O)                         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc44(valueof(tms33)) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc46(valueof(tms34)) == '0101015859'O)                     { setverdict(pass) } else { setverdict(fail) }
+}
+
+type record of integer myintlist1 with { variant "" encode "RAW" }
+type set of integer myintset1 with { variant "" encode "RAW" }
+
+const myintlist1 cmil1  := { 1, 2, 3 } with { erroneous([0]) "before := 1" }
+const myintlist1 cmil2  := { 1, 2, 3 } with { erroneous([2]) "before := 1" }
+const myintlist1 cmil3  := { 1, 2, 3 } with { erroneous([2]) "after := 1" }
+const myintlist1 cmil4  := { 1, 2, 3 } with { erroneous([0]) "value := 0" }
+const myintlist1 cmil5  := { 1, 2, 3 } with { erroneous([0]) "before := 3" erroneous([0]) "value := 2" erroneous([0]) "after := 1" }
+const myintlist1 cmil6  := { 1, 2, 3 } with { erroneous([2]) "before := omit all" }
+const myintlist1 cmil7  := { 1, 2, 3 } with { erroneous([0]) "value := omit" }
+const myintlist1 cmil8  := { 1, 2, 3 } with { erroneous([0]) "after := omit all" }
+const myintlist1 cmil9  := { 1, 2, 3 } with { erroneous([0]) "after := myrec1 : { 1, \"hulululu\" }" }
+const myintlist1 cmil10 := { 1, 2, 3 } with { erroneous([0], [1], [2]) "after := 6 * 7" }
+const myintlist1 cmil11 := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" }
+const myintlist1 cmil12 := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" erroneous([1]) "after(raw) := '1122'O" erroneous([2]) "before(raw) := '2211'O" }
+const myintset1 cmis1   := { 1, 2, 3 } with { erroneous([0]) "before := 1" }
+const myintset1 cmis2   := { 1, 2, 3 } with { erroneous([2]) "before := 1" }
+const myintset1 cmis3   := { 1, 2, 3 } with { erroneous([2]) "after := 1" }
+const myintset1 cmis4   := { 1, 2, 3 } with { erroneous([0]) "value := 0" }
+const myintset1 cmis5   := { 1, 2, 3 } with { erroneous([0]) "before := 3" erroneous([0]) "value := 2" erroneous([0]) "after := 1" }
+const myintset1 cmis6   := { 1, 2, 3 } with { erroneous([2]) "before := omit all" }
+const myintset1 cmis7   := { 1, 2, 3 } with { erroneous([0]) "value := omit" }
+const myintset1 cmis8   := { 1, 2, 3 } with { erroneous([0]) "after := omit all" }
+const myintset1 cmis9   := { 1, 2, 3 } with { erroneous([0]) "after := myrec1 : { 1, \"hulululu\" }" }
+const myintset1 cmis10  := { 1, 2, 3 } with { erroneous([0], [1], [2]) "after := 6 * 7" }
+const myintset1 cmis11  := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" }
+const myintset1 cmis12  := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" erroneous([1]) "after(raw) := '1122'O" erroneous([2]) "before(raw) := '2211'O" }
+template myintlist1 tmil1  := { 1, 2, 3 } with { erroneous([0]) "before := 1" }
+template myintlist1 tmil2  := { 1, 2, 3 } with { erroneous([2]) "before := 1" }
+template myintlist1 tmil3  := { 1, 2, 3 } with { erroneous([2]) "after := 1" }
+template myintlist1 tmil4  := { 1, 2, 3 } with { erroneous([0]) "value := 0" }
+template myintlist1 tmil5  := { 1, 2, 3 } with { erroneous([0]) "before := 3" erroneous([0]) "value := 2" erroneous([0]) "after := 1" }
+template myintlist1 tmil6  := { 1, 2, 3 } with { erroneous([2]) "before := omit all" }
+template myintlist1 tmil7  := { 1, 2, 3 } with { erroneous([0]) "value := omit" }
+template myintlist1 tmil8  := { 1, 2, 3 } with { erroneous([0]) "after := omit all" }
+template myintlist1 tmil9  := { 1, 2, 3 } with { erroneous([0]) "after := myrec1 : { 1, \"hulululu\" }" }
+template myintlist1 tmil10 := { 1, 2, 3 } with { erroneous([0], [1], [2]) "after := 6 * 7" }
+template myintlist1 tmil11 := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" }
+template myintlist1 tmil12 := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" erroneous([1]) "after(raw) := '1122'O" erroneous([2]) "before(raw) := '2211'O" }
+template myintset1 tmis1   := { 1, 2, 3 } with { erroneous([0]) "before := 1" }
+template myintset1 tmis2   := { 1, 2, 3 } with { erroneous([2]) "before := 1" }
+template myintset1 tmis3   := { 1, 2, 3 } with { erroneous([2]) "after := 1" }
+template myintset1 tmis4   := { 1, 2, 3 } with { erroneous([0]) "value := 0" }
+template myintset1 tmis5   := { 1, 2, 3 } with { erroneous([0]) "before := 3" erroneous([0]) "value := 2" erroneous([0]) "after := 1" }
+template myintset1 tmis6   := { 1, 2, 3 } with { erroneous([2]) "before := omit all" }
+template myintset1 tmis7   := { 1, 2, 3 } with { erroneous([0]) "value := omit" }
+template myintset1 tmis8   := { 1, 2, 3 } with { erroneous([0]) "after := omit all" }
+template myintset1 tmis9   := { 1, 2, 3 } with { erroneous([0]) "after := myrec1 : { 1, \"hulululu\" }" }
+template myintset1 tmis10  := { 1, 2, 3 } with { erroneous([0], [1], [2]) "after := 6 * 7" }
+template myintset1 tmis11  := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" }
+template myintset1 tmis12  := { 1, 2, 3 } with { erroneous([0]) "value(raw) := '1122'O" erroneous([1]) "after(raw) := '1122'O" erroneous([2]) "before(raw) := '2211'O" }
+
+// Basic encoding of record of/set of values/templates.
+testcase raw_negtest_recordofs() runs on MyComp
+{
+  if (rawenc4(cmil1)  == '01010203'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil2)  == '01020103'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil3)  == '01020301'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil4)  == '000203'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil5)  == '0302010203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil6)  == '03'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil7)  == '0203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil8)  == '01'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil9)  == '010168756C756C756C750203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil10) == '012A022A032A'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil11) == '11220203'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(cmil12) == '1122021122221103'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis1)  == '01010203'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis2)  == '01020103'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis3)  == '01020301'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis4)  == '000203'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis5)  == '0302010203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis6)  == '03'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis7)  == '0203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis8)  == '01'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis9)  == '010168756C756C756C750203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis10) == '012A022A032A'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis11) == '11220203'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(cmis12) == '1122021122221103'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil1))  == '01010203'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil2))  == '01020103'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil3))  == '01020301'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil4))  == '000203'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil5))  == '0302010203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil6))  == '03'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil7))  == '0203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil8))  == '01'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil9))  == '010168756C756C756C750203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil10)) == '012A022A032A'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil11)) == '11220203'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc4(valueof(tmil12)) == '1122021122221103'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis1))  == '01010203'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis2))  == '01020103'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis3))  == '01020301'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis4))  == '000203'O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis5))  == '0302010203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis6))  == '03'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis7))  == '0203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis8))  == '01'O)         { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis9))  == '010168756C756C756C750203'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis10)) == '012A022A032A'O)             { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis11)) == '11220203'O)                 { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc5(valueof(tmis12)) == '1122021122221103'O)         { setverdict(pass) } else { setverdict(fail) }
+}
+
+type union myuni1 {
+integer f1,
+float f2,
+charstring f3,
+myintlist1 f4,
+octetstring f5
+} with { variant "" encode "RAW" }
+
+type union myuni2 {
+myrec1 f1,
+myrec1 f2,
+myrec1 f3,
+myrec2 f4
+} with {
+  variant "TAG(f1, f1 = 9;
+               f2, { f1 = 10, f2 = \"kayano\" };
+               f3, OTHERWISE)"
+  variant "" encode "RAW"
+}
+
+// `before/after' is not allowed here, but `omit' is fine.
+const myuni1 cmu1 := { f1 := 0 } with { erroneous(f1) "value := 1" }
+const myuni1 cmu2 := { f1 := 0 } with { erroneous(f1) "value := omit" }
+const myuni1 cmu3 := { f1 := 0 } with { erroneous(f1) "value(raw) := '1122'O" }
+const myuni1 cmu4 := { f1 := 0 } with { erroneous(f1) "value(raw) := ''B" }
+const myuni1 cmu5 := { f4 := { 0, 1, 2, 3 } }   with { erroneous(f4[0]) "value := 100" }
+const myuni1 cmu6 := { f4 := { 0, 1, 2, 3 } }   with { erroneous(f4[0]) "value := omit" erroneous(f4[3]) "after := 99" }
+const myuni2 cmu7 := { f2 := { 10, "nimbus" } } with { erroneous(f2.f1) "value := 11" }  // Expected `erroneous' operation.
+const myuni2 cmu8 := { f2 := { 19, "nimbus" } } with { erroneous(f2.f1) "value := 11" }  // `erroneous' stuff is overwritten by TAGs mechanism (19(13) -> 10(0A)).
+const myuni2 cmu9 := { f2 := { 19, "nimbus" } } with { erroneous(f2.f1) "value := omit" }  // Strange results are possible...
+template myuni1 tmu1 := { f1 := 0 } with { erroneous(f1) "value := 1" }
+template myuni1 tmu2 := { f1 := 0 } with { erroneous(f1) "value := omit" }
+template myuni1 tmu3 := { f1 := 0 } with { erroneous(f1) "value(raw) := '1122'O" }
+template myuni1 tmu4 := { f1 := 0 } with { erroneous(f1) "value(raw) := ''B" }
+template myuni1 tmu5 := { f4 := { 0, 1, 2, 3 } }   with { erroneous(f4[0]) "value := 100" }
+template myuni1 tmu6 := { f4 := { 0, 1, 2, 3 } }   with { erroneous(f4[0]) "value := omit" erroneous(f4[3]) "after := 99" }
+template myuni2 tmu7 := { f2 := { 10, "nimbus" } } with { erroneous(f2.f1) "value := 11" }
+template myuni2 tmu8 := { f2 := { 19, "nimbus" } } with { erroneous(f2.f1) "value := 11" }
+template myuni2 tmu9 := { f2 := { 19, "nimbus" } } with { erroneous(f2.f1) "value := omit" }
+
+// Basic encoding of union values/templates.
+testcase raw_negtest_unions() runs on MyComp
+{
+  if (rawenc6(cmu1) == '01'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(cmu2) == ''O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(cmu3) == '1122'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(cmu4) == ''O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(cmu5) == '64010203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(cmu6) == '01020363'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc8(cmu7) == '0B6E696D627573'O) { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc8(cmu8) == '0B6E696D627573'O) { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc8(cmu9) == '6E696D627573'O)   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc6(valueof(tmu1)) == '01'O)   { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(valueof(tmu2)) == ''O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(valueof(tmu3)) == '1122'O) { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(valueof(tmu4)) == ''O)     { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(valueof(tmu5)) == '64010203'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc6(valueof(tmu6)) == '01020363'O)       { setverdict(pass) } else { setverdict(fail) }
+  if (rawenc8(valueof(tmu7)) == '0B6E696D627573'O) { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc8(valueof(tmu8)) == '0B6E696D627573'O) { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+  if (rawenc8(valueof(tmu9)) == '6E696D627573'O)   { setverdict(pass) } else { setverdict(fail) }  // There will be warnings, but fine.
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// RAW tests for special cases where erroneous and raw attributes can conflict
+
+external function encode_RawSpecTest_Rec_ExtBitGroup(in RawSpecTest_Rec_ExtBitGroup pdu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(ALL:WARNING)" }
+external function encode_RawSpecTest_Rec_ExtBitGroup1(in RawSpecTest_Rec_ExtBitGroup1 pdu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(ALL:WARNING)" }
+external function encode_RawSpecTest_Rec_LengthTo(in RawSpecTest_Rec_LengthTo pdu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(ALL:WARNING)" }
+external function encode_RawSpecTest_Rec_LengthIndex(in RawSpecTest_Rec_LengthIndex pdu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(ALL:WARNING)" }
+external function encode_RawSpecTest_Rec_PointerTo(in RawSpecTest_Rec_PointerTo pdu) return octetstring with { extension "prototype(convert) encode(RAW) errorbehavior(ALL:WARNING)" }
+
+group RawSpecTest {
+type bitstring BIT7 with { variant "BITORDER(lsb), FIELDLENGTH(7)" }
+type bitstring BIT1 with { variant "BITORDER(lsb), FIELDLENGTH(1)" }
+type octetstring OCT1 with { variant "ALIGN(left)"; variant "FIELDLENGTH(1)" }
+
+type record RawSpecTest_Rec_ExtBitGroup {
+   OCT1 header,
+   BIT7 octet2info,
+   BIT1 extbit1,
+   BIT7 octet2ainfo optional,
+   BIT1 extbit2 optional,
+   OCT1 octet3,
+   BIT7 octet4info,
+   BIT1 extbit3,
+   BIT7 octet4ainfo optional,
+   BIT1 extbit4 optional
+}
+with {
+  variant "EXTENSION_BIT_GROUP(yes,octet2info,extbit2)"
+  variant "EXTENSION_BIT_GROUP(yes,octet4info,extbit4)"
+}
+
+type record RawSpecTest_Rec_ExtBitGroup1 {
+   OCT1 header,
+   BIT7 octet2info,
+   BIT1 extbit1,
+   BIT7 octet2ainfo optional,
+   BIT1 extbit2 optional,
+   OCT1 octet3,
+   BIT7 octet4info,
+   BIT1 extbit3,
+   BIT7 octet4ainfo optional,
+   BIT1 extbit4 optional
+}
+with {
+  variant "EXTENSION_BIT_GROUP(yes,octet4info,extbit4)"
+}
+
+const RawSpecTest_Rec_ExtBitGroup c_pdu1:={
+   header:='0F'O,
+   octet2info:='1011011'B,
+   extbit1:= '0'B,
+   octet2ainfo:= omit,
+   extbit2:= omit,
+   octet3:='00'O,
+   octet4info:='0110001'B,
+   extbit3:='1'B,
+   octet4ainfo:='0011100'B,
+   extbit4:='0'B
+}
+
+const RawSpecTest_Rec_ExtBitGroup c_pdu2:= c_pdu1
+with {
+  erroneous (header) "value := OCT1:'0F'O"
+  erroneous (octet3) "value := OCT1:'00'O"
+}
+
+const RawSpecTest_Rec_ExtBitGroup c_pdu3:= c_pdu1
+with {
+  erroneous (extbit2) "value := omit"
+}
+
+const RawSpecTest_Rec_ExtBitGroup1 c_pdu4:= {
+   header:='0F'O,
+   octet2info:='1011011'B,
+   extbit1:= '0'B,
+   octet2ainfo:= omit,
+   extbit2:= omit,
+   octet3:='00'O,
+   octet4info:='0110001'B,
+   extbit3:='1'B,
+   octet4ainfo:='0011100'B,
+   extbit4:='0'B
+}
+
+type record RawSpecTest_Rec_LengthTo {
+   integer len,
+   OCT1 o1,
+   OCT1 o2,
+   OCT1 o3,
+   OCT1 o4,
+   OCT1 o5
+}
+with {
+  variant (len) "LENGTHTO(o1,o3,o5)"
+}
+
+const RawSpecTest_Rec_LengthTo c_lengthto :={
+   len := 0,
+   o1 := '11'O,
+   o2 := '22'O,
+   o3 := '33'O,
+   o4 := '44'O,
+   o5 := '55'O
+}
+
+const RawSpecTest_Rec_LengthTo c_lengthto1 := c_lengthto with { erroneous (o2,o4) "value := 'FF'O" }
+const RawSpecTest_Rec_LengthTo c_lengthto2 := c_lengthto with { erroneous (len) "value := '1234567890'O" }
+const RawSpecTest_Rec_LengthTo c_lengthto3 := c_lengthto with { erroneous (len,o1,o2,o3,o4,o5) "after := 'FF'O"  erroneous (len,o1,o2,o3,o4,o5) "before := 'EE'O" }
+
+type union InnerUni_LengthIndex { integer len } with { variant "" }
+type record RawSpecTest_Rec_LengthIndex {
+   InnerUni_LengthIndex r,
+   OCT1 o1,
+   OCT1 o2,
+   OCT1 o3,
+   OCT1 o4,
+   OCT1 o5
+}
+with {
+  variant (r) "LENGTHTO(o1,o3,o5)"
+  variant (r) "LENGTHINDEX(len)"
+}
+
+const RawSpecTest_Rec_LengthIndex c_lengthindex :={
+   r := { len := 9 },
+   o1 := '11'O,
+   o2 := '22'O,
+   o3 := '33'O,
+   o4 := '44'O,
+   o5 := '55'O
+}
+
+const RawSpecTest_Rec_LengthIndex c_lengthindex1 := c_lengthindex with { erroneous (r.len) "value := 'FF'O" }
+const RawSpecTest_Rec_LengthIndex c_lengthindex3 := c_lengthindex with { erroneous (o4) "before := omit all" }
+const RawSpecTest_Rec_LengthIndex c_lengthindex4 := c_lengthindex with { erroneous (r) "before := InnerUni_LengthIndex:{len:=7*16+7}" }
+const RawSpecTest_Rec_LengthIndex c_lengthindex5 := c_lengthindex with { erroneous (o3) "after := omit all" }
+
+type record RawSpecTest_Rec_PointerTo {
+  integer ptr1,
+  integer ptr2,
+  integer ptr3,
+  octetstring field1,
+  octetstring field2,
+  octetstring field3
+} 
+with {
+  variant (ptr1) "POINTERTO(field1)";
+  variant (ptr2) "POINTERTO(field2)";
+  variant (ptr3) "POINTERTO(field3)"
+} 
+
+const RawSpecTest_Rec_PointerTo c_pointerto := {
+  ptr1 := 0,
+  ptr2 := 0,
+  ptr3 := 0,
+  field1 := 'AABBCC'O,
+  field2 := 'EEEFFF'O,
+  field3 := 'ABCDEF'O
+}
+
+const RawSpecTest_Rec_PointerTo c_pointerto1 := c_pointerto with { erroneous (ptr1) "before := 'FF'O" }
+const RawSpecTest_Rec_PointerTo c_pointerto2 := c_pointerto with { erroneous (ptr1) "value := 'FF'O" }
+const RawSpecTest_Rec_PointerTo c_pointerto3 := c_pointerto with { erroneous (field1) "value := '77'O" }
+const RawSpecTest_Rec_PointerTo c_pointerto4 := c_pointerto with { erroneous (ptr3) "after := omit all" }
+
+} with { encode "RAW" }
+
+
+testcase negtest_compare_with_erroneous_types_RAW_special() runs on MyComp
+{
+  //log(encode_RawSpecTest_Rec_ExtBitGroup(c_pdu1));
+  if (encode_RawSpecTest_Rec_ExtBitGroup(c_pdu1)==encode_RawSpecTest_Rec_ExtBitGroup(c_pdu2)) { setverdict(pass) } else { setverdict(fail) }
+  //log(encode_RawSpecTest_Rec_ExtBitGroup1(c_pdu4));
+  //log(encode_RawSpecTest_Rec_ExtBitGroup(c_pdu3));
+  if (encode_RawSpecTest_Rec_ExtBitGroup1(c_pdu4)==encode_RawSpecTest_Rec_ExtBitGroup(c_pdu3)) { setverdict(pass) } else { setverdict(fail) }
+}
+
+testcase negtest_compare_with_octetstring_RAW_special() runs on MyComp
+{
+  ////////////////////////
+  // LENGTHTO
+  //log(encode_RawSpecTest_Rec_LengthTo(c_lengthto1)); // '0311FF33FF55'O
+  //log(encode_RawSpecTest_Rec_LengthTo(c_lengthto2)); // '12345678901122334455'O
+  //log(encode_RawSpecTest_Rec_LengthTo(c_lengthto3)); // 'EE03FFEE11FFEE22FFEE33FFEE44FFEE55FF'O
+  if (encode_RawSpecTest_Rec_LengthTo(c_lengthto1)=='0311FF33FF55'O) { setverdict(pass) } else { setverdict(fail) }
+  if (encode_RawSpecTest_Rec_LengthTo(c_lengthto2)=='12345678901122334455'O) { setverdict(pass) } else { setverdict(fail) }
+  if (encode_RawSpecTest_Rec_LengthTo(c_lengthto3)=='EE03FFEE11FFEE22FFEE33FFEE44FFEE55FF'O) { setverdict(pass) } else { setverdict(fail) }
+
+  ////////////////////////
+  // LENGTHTO / LENGTHINDEX
+  //log(encode_RawSpecTest_Rec_LengthIndex(c_lengthindex)); //  '031122334455'O
+  //log(encode_RawSpecTest_Rec_LengthIndex(c_lengthindex1)); // 'FF1122334455'O
+  if (encode_RawSpecTest_Rec_LengthIndex(c_lengthindex1)=='FF1122334455'O) { setverdict(pass) } else { setverdict(fail) }
+  //log(encode_RawSpecTest_Rec_LengthIndex(c_lengthindex3)); // '4455'O
+  if (encode_RawSpecTest_Rec_LengthIndex(c_lengthindex3)=='4455'O) { setverdict(pass) } else { setverdict(fail) }
+  //log(encode_RawSpecTest_Rec_LengthIndex(c_lengthindex4)); // '77031122334455'O
+  if (encode_RawSpecTest_Rec_LengthIndex(c_lengthindex4)=='77031122334455'O) { setverdict(pass) } else { setverdict(fail) }
+  ///log(encode_RawSpecTest_Rec_LengthIndex(c_lengthindex5)); // segfault, where? :)
+  if (encode_RawSpecTest_Rec_LengthIndex(c_lengthindex5)=='09112233'O) { setverdict(pass) } else { setverdict(fail) }
+
+  ///////////////////////
+  // POINTERTO
+  //log(encode_RawSpecTest_Rec_PointerTo(c_pointerto)); // '030507AABBCCEEEFFFABCDEF'O
+  //log(encode_RawSpecTest_Rec_PointerTo(c_pointerto1)); // 'FF030305AABBCCEEEFFFABCDEF'O
+  if (encode_RawSpecTest_Rec_PointerTo(c_pointerto1)=='FF030305AABBCCEEEFFFABCDEF'O) { setverdict(pass) } else { setverdict(fail) }
+  //log(encode_RawSpecTest_Rec_PointerTo(c_pointerto2)); // 'FF0507AABBCCEEEFFFABCDEF'O
+  if (encode_RawSpecTest_Rec_PointerTo(c_pointerto2)=='FF0507AABBCCEEEFFFABCDEF'O) { setverdict(pass) } else { setverdict(fail) }
+  ///log(encode_RawSpecTest_Rec_PointerTo(c_pointerto3)); // '77EEEFFFABCDEF'O is this ok???
+  ///if (encode_RawSpecTest_Rec_PointerTo(c_pointerto3)=='77EEEFFFABCDEF'O) { setverdict(pass) } else { setverdict(fail) }
+  ///log(encode_RawSpecTest_Rec_PointerTo(c_pointerto4)); // ''O ok???
+  ///if (encode_RawSpecTest_Rec_PointerTo(c_pointerto4)==''O) { setverdict(pass) } else { setverdict(fail) }
+}
+
+control {
+  execute(negtest_compare_with_erroneous_types_BER());
+  execute(negtest_compare_with_octetstring_BER());
+  execute(erroneous_logging());
+  execute(negtest_compare_with_erroneous_types_TEXT());
+  execute(raw_negtest_recordofs());
+  execute(raw_negtest_records());
+  execute(raw_negtest_unions());
+  execute(negtest_compare_with_erroneous_types_RAW_special());
+  execute(negtest_compare_with_octetstring_RAW_special());
+}
+}

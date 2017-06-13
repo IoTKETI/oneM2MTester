@@ -1,0 +1,323 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+
+module SelectUnion {
+
+type component EmptyCT {};
+
+type union Messages {
+  integer msg1,
+  bitstring msg2,
+  boolean msg3,
+  octetstring msg4,
+  charstring msg5
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+function f_select_union_without_else(in Messages p_msg, out integer result) {
+  select union (p_msg) {
+    case (msg1) { result := 1; }
+    case (msg2) { result := 2; }
+    case (msg3) { result := 3; }
+    case (msg4) { result := 4; }
+    case (msg5) { result := 5; }
+  }
+}
+
+
+testcase tc_SelectUnionWithoutElse() runs on EmptyCT {
+  var integer result;
+  var Messages myMessage;
+
+  myMessage.msg1 := 42;
+  f_select_union_without_else(myMessage, result);
+  if (result != 1) {
+    setverdict(fail);
+  }
+
+  myMessage.msg2 := '0000'B;
+  f_select_union_without_else(myMessage, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myMessage.msg3 := false;
+  f_select_union_without_else(myMessage, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+
+  myMessage.msg4 := 'AAAA'O;
+  f_select_union_without_else(myMessage, result);
+  if (result != 4) {
+    setverdict(fail);
+  }
+
+  myMessage.msg5 := "lorem ipsum";
+  f_select_union_without_else(myMessage, result);
+  if (result != 5) {
+    setverdict(fail);
+  }
+  setverdict(pass);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+function f_select_union_with_else(in Messages p_msg, out integer result) {
+  select union (p_msg) {
+    case (msg1) { result := 1; }
+    case else { result := 0; }
+  }
+}
+
+
+testcase tc_SelectUnionWithElse() runs on EmptyCT {
+  var integer result;
+  var Messages myMessage;
+
+  myMessage.msg1 := 42;
+  f_select_union_with_else(myMessage, result);
+  if (result != 1) {
+    setverdict(fail);
+  }
+
+  myMessage.msg2 := '0000'B;
+  f_select_union_with_else(myMessage, result);
+  if (result != 0) {
+    setverdict(fail);
+  }
+
+  myMessage.msg3 := false;
+  f_select_union_with_else(myMessage, result);
+  if (result != 0) {
+    setverdict(fail);
+  }
+
+  myMessage.msg4 := 'AAAA'O;
+  f_select_union_with_else(myMessage, result);
+  if (result != 0) {
+    setverdict(fail);
+  }
+
+  myMessage.msg5 := "lorem ipsum";
+  f_select_union_with_else(myMessage, result);
+  if (result != 0) {
+    setverdict(fail);
+  }
+  setverdict(pass);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+function f_select_union_anytype(in anytype p_msg, out integer result) {
+  select union (p_msg) {
+    case (integer) { result := 1; }
+    case (bitstring) { result := 2; }
+    case (boolean) { result := 3; }
+    case (octetstring) { result := 4; }
+    case (Messages) { result := 5; }
+    case else { result := 0; }
+  }
+}
+
+
+testcase tc_SelectUnionAnyType() runs on EmptyCT {
+  var integer result;
+  var anytype myAnyType;
+
+  myAnyType.integer := 42;
+  f_select_union_anytype(myAnyType, result);
+  if (result != 1) {
+    setverdict(fail);
+  }
+
+  myAnyType.bitstring := '0000'B;
+  f_select_union_anytype(myAnyType, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myAnyType.boolean := false;
+  f_select_union_anytype(myAnyType, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+
+  myAnyType.octetstring := 'AAAA'O;
+  f_select_union_anytype(myAnyType, result);
+  if (result != 4) {
+    setverdict(fail);
+  }
+
+  myAnyType.Messages.msg4 := 'AAAA'O;
+  f_select_union_anytype(myAnyType, result);
+  if (result != 5) {
+    setverdict(fail);
+  }
+
+  myAnyType.charstring := "lorem ipsum";
+  f_select_union_anytype(myAnyType, result);
+  if (result != 0) {
+    setverdict(fail);
+  }
+  setverdict(pass);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+function f_select_union_multiple_branches(in Messages p_msg, out integer result) {
+  select union (p_msg) {
+    case (msg1) { result := 1; }
+    case (msg2, msg3) { result := 2; }
+    case (msg4, msg5) { result := 3; }
+  }
+}
+
+
+testcase tc_SelectUnionMultipleBranches() runs on EmptyCT {
+  var integer result;
+  var Messages myMessage;
+
+  myMessage.msg1 := 42;
+  f_select_union_multiple_branches(myMessage, result);
+  if (result != 1) {
+    setverdict(fail);
+  }
+
+  myMessage.msg2 := '0000'B;
+  f_select_union_multiple_branches(myMessage, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myMessage.msg3 := false;
+  f_select_union_multiple_branches(myMessage, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myMessage.msg4 := 'AAAA'O;
+  f_select_union_multiple_branches(myMessage, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+
+  myMessage.msg5 := "lorem ipsum";
+  f_select_union_multiple_branches(myMessage, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+  setverdict(pass);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+function f_select_union_multiple_branches_anytype(in anytype p_msg, out integer result) {
+  select union (p_msg) {
+    case (integer) { result := 1; }
+    case (bitstring, boolean) { result := 2; }
+    case (octetstring, charstring) { result := 3; }
+  }
+}
+
+
+testcase tc_SelectUnionMultipleBranchesAnyType() runs on EmptyCT {
+  var integer result;
+  var anytype myMessage;
+
+  myMessage.integer := 42;
+  f_select_union_multiple_branches_anytype(myMessage, result);
+  if (result != 1) {
+    setverdict(fail);
+  }
+
+  myMessage.bitstring := '0000'B;
+  f_select_union_multiple_branches_anytype(myMessage, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myMessage.boolean := false;
+  f_select_union_multiple_branches_anytype(myMessage, result);
+  if (result != 2) {
+    setverdict(fail);
+  }
+
+  myMessage.octetstring := 'AAAA'O;
+  f_select_union_multiple_branches_anytype(myMessage, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+
+  myMessage.charstring := "lorem ipsum";
+  f_select_union_multiple_branches_anytype(myMessage, result);
+  if (result != 3) {
+    setverdict(fail);
+  }
+  setverdict(pass);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+type integer Byte (-128 .. 127) with { variant "8 bit" };
+
+// Just to compile: the head of the select union is a complicated expression
+function f_select_union_different_codegen(in anytype p_msg, out integer result) {
+  var Messages arr[1];
+  var Messages myMessage;
+  myMessage.msg1 := 1;
+  arr := { myMessage };
+  var Byte x := 11;
+  select union (arr[f_return_1(encvalue_unichar(x, "UTF-8"))]) {
+    case (msg1) { result := 1; }
+    case (msg2, msg3) { result := 2; }
+    case (msg4) { result := 3; }
+  }
+}
+
+function f_return_1(in universal charstring str) return integer {
+  return 1;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+control {
+  execute(tc_SelectUnionWithoutElse());
+  execute(tc_SelectUnionWithElse());
+  execute(tc_SelectUnionAnyType());
+  execute(tc_SelectUnionMultipleBranches());
+  execute(tc_SelectUnionMultipleBranchesAnyType());
+}
+}
+
+
+with {
+  extension "anytype integer, bitstring"
+  extension "anytype charstring, boolean, octetstring"
+  extension "anytype Messages"
+  encode "RAW";
+}

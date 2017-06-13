@@ -1,0 +1,77 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module dualnegtest
+{
+import from dual all;
+
+// Testing the behavior of erroneous messages with dual-faced ports
+
+const ControlRequest c_cr := { "howdy" }
+with { erroneous (text) "value := omit" }
+
+const PDUType1 c_pdu1 := { text := "trunk" } // U.S. version
+with { erroneous (text) "value := ""car-boot"" " } // British version
+// Length must be exactly eight to fit FIELDLENGTH(8)
+
+const PDUType2 c_pdu2 := { text := "hello" }
+with { erroneous (text) "value := ""good bye"" " }
+
+testcase tc_DUALFACED_erroneous() runs on MTC_CT system SYSTEM_SCT
+{
+  map(mtc:MTC_PORT, system:SYSTEM_PORT);
+  timer patience := 1.0;
+
+  patience.start;
+  MTC_PORT.send(c_cr);
+  // simple mapping: PT1_PROVIDER for ControlRequest does not encode the sent value,
+  // so the effect of the erroneous attribute can not be seen.
+  // Because the text in the ControlRequest does not start with a 'C',
+  // the port sends back an ErrorSignal... which is discarded by the incoming mapping.
+  alt {
+    [] MTC_PORT.receive /* anything */ {
+      setverdict(fail, "It wasn't supposed to receive anything yet");
+    }
+    [else] /* nothing received */ { setverdict(pass); }
+  }
+  patience.stop;
+
+  patience.start;  
+  MTC_PORT.send(c_pdu1); // function(enc_PDUType1_gen), compiler-generated ext func
+  alt {
+    [] MTC_PORT.receive(PDUType2 : { "car-boot" } ) { // erroneous is taken into account
+      setverdict(pass);
+    }
+    [] MTC_PORT.receive /* anything else */ { setverdict(fail, "got unknown response"); }
+    [] patience.timeout { setverdict(fail, "time-out at ", __LINE__); }
+  }
+  patience.stop;
+
+  patience.start;
+  MTC_PORT.send(c_pdu2); // encode(RAW), built-in encoder function
+  alt {
+    [] MTC_PORT.receive(PDUType2 : { "good bye" } ) { // erroneous is taken into account
+      setverdict(pass);
+    }
+    [] MTC_PORT.receive /* anything else */ { setverdict(fail, "got unknown response"); }
+    [] patience.timeout { setverdict(fail, "time-out at ", __LINE__); }
+  }
+  patience.stop;
+
+  unmap(mtc:MTC_PORT, system:SYSTEM_PORT);
+}
+
+control {
+  execute(tc_DUALFACED_erroneous());
+}
+
+}  // end of module

@@ -1,0 +1,47 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that predefined encvalue_unichar function works properly in case of encoding universal charstring
+ ** @verdict  pass accept, ttcn3verdict:pass
+
+ ***************************************************/
+
+
+/* The following requirements are tested:  
+
+ * this test focuses on the predefined functions encvalue_unichar (utf-16)*/
+
+
+
+module Sem_160102_predefined_functions_064 {
+    
+    type component GeneralComp {
+
+    }
+
+	type charstring CS with { variant "FIELDLENGTH(2), ALIGN(left)" };
+
+    testcase TC_Sem_160102_predefined_functions_064 () runs on GeneralComp {
+
+		var CS v_test := "ab";
+
+		 //Encoding:  
+
+		var universal charstring v_test_enc_16 := encvalue_unichar(v_test,"UTF-16"); 
+		//encode to universal charstring UTF-16
+		setverdict(pass,"Encoded value: ", v_test_enc_16);
+
+    }
+
+
+
+    control{
+
+        execute(TC_Sem_160102_predefined_functions_064());
+
+    }
+
+} with { encode "RAW"}

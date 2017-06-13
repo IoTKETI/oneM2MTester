@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:21.3.3, alive component restart after explicit stop
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+
+// The following requirements are tested:
+// Stopping an alive-type component shall stop the currently running behaviour only 
+// but the component continues to exist and can execute new behaviour (started on 
+// it using the start operation). 
+
+module Sem_210303_Stop_test_component_005 { 
+
+	type component GeneralComp {
+	}
+    
+    function f_ptcBehaviour() runs on GeneralComp {
+    }
+
+    function f_ptcSecondBehaviour() runs on GeneralComp {
+        setverdict(pass);
+    }
+
+    
+	testcase TC_Sem_210303_Stop_test_component_005() runs on GeneralComp system GeneralComp {
+        var GeneralComp v_ptc := GeneralComp.create("PTC") alive;
+        v_ptc.start(f_ptcBehaviour());
+        v_ptc.stop;
+        v_ptc.start(f_ptcSecondBehaviour());
+        v_ptc.done;
+	}
+	
+	control{
+	    execute(TC_Sem_210303_Stop_test_component_005());
+	}
+}

@@ -1,0 +1,86 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnnexB4Template {
+
+//import from XSD language "XML" all;
+import from AnnexB2 language "XML" all;
+import from AnnexB3 language "XML" all;
+import from AnnexB4 all;
+
+modulepar boolean AnnexB4Template_verbose := false;
+#define verbose   AnnexB4Template_verbose
+#include "../macros.ttcnin"
+
+type component ice4 {}
+
+// NewC1 is like AnnexB3.C1 except "name as uncapitalized"
+template NewC1 t_NewC1:= {
+  a1 :=1,
+  a2 :=2,
+  base :="-1000"
+}
+
+const universal charstring bstr_NewC1 :=
+"<NewC1>\n" &
+"\t<a1>1</a1>\n" &
+"\t<a2>2</a2>\n" &
+"\t<base>-1000</base>\n" &
+"</NewC1>\n\n";
+
+const universal charstring estr_NewC1 :=
+"<NA:newC1 xmlns:NA='nsA' A1='1' A2='2'>-1000</NA:newC1>\n\n";
+
+DECLARE_XER_ENCODERS(NewC1, newc1);
+DECLARE_EXER_ENCODERS(NewC1, newc1);
+
+testcase encode_newc1() runs on ice4 {
+  CHECK_METHOD(bxer_enc_newc1, valueof(t_NewC1), bstr_NewC1);
+  CHECK_METHOD(exer_enc_newc1, valueof(t_NewC1), estr_NewC1);
+}
+
+///////////////////////////////////////////////////////////////
+// NewS1 is like AnnexB2.S1 except "name as uncapitalized"
+template NewS1 t_NewS1:=1;
+
+DECLARE_XER_ENCODERS(NewS1, news1)
+DECLARE_EXER_ENCODERS(NewS1, news1)
+
+const universal charstring bstr_NewS1 :=
+"<NewC1>\n" &
+"\t<a1>1</a1>\n" &
+"\t<a2>2</a2>\n" &
+"\t<base>-1000</base>\n" &
+"</NewC1>\n\n";
+
+const universal charstring estr_NewS1 :=
+"<NA:newS1 xmlns:NA='nsA'>1</NA:newS1>\n\n"
+
+testcase encode_news1() runs on ice4
+{
+  CHECK_METHOD(bxer_enc_news1, valueof(t_NewS1), bstr_NewS1);
+  CHECK_METHOD(exer_enc_news1, valueof(t_NewS1), estr_NewS1);
+}
+
+
+control {
+  execute(encode_newc1());
+}
+
+}
+
+/*
+<?xml version="1.0" encoding="UTF-8"?>
+<NA:newC1 xmlns:NA="nsA" A1=1 A2=2>-1000</NA:newC1>
+<?xml version="1.0" encoding="UTF-8"?>
+<NA:newS1 xmlns:NA="nsA">1</NA:newS1>
+*/

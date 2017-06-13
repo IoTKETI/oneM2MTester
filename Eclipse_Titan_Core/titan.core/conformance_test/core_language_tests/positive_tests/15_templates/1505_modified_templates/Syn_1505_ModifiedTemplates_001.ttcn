@@ -1,0 +1,36 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that plain modified template definitions are accepted.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_1505_ModifiedTemplates_001 {
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne := {
+		field1 := 2,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	template MyMessageType m_templateTwo modifies m_templateOne := {
+		field1 := 4
+	}
+
+	type component GeneralComp {}
+
+	testcase TC_Syn_1505_ModifiedTemplates_001() runs on GeneralComp 
+	{ setverdict(pass);	}
+	
+	control
+	{ execute(TC_Syn_1505_ModifiedTemplates_001()); }
+}

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="www.example.org/enumeration/restriction"
+ xmlns:this="www.example.org/enumeration/restriction">
+
+<xs:element name="e21unnamed">
+	<xs:simpleType>
+		<union>
+ 			<xs:simpleType>
+				<restriction base="xs:integer"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:float"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</union>
+	</xs:simpleType>
+</xs:element>
+
+<xs:simpleType name="e22"> 
+	<xs:restriction base="this:e21unnamed">
+		<xs:enumeration value="20.4"/>
+		<xs:enumeration value="50"/>
+		<xs:enumeration value="small"/>
+	</xs:restriction>
+</xs:simpleType>
+
+
+<xs:element name="String_int">
+	<xs:simpleType>
+		<union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:integer"/>
+			</xs:simpleType>
+		</union>
+	</xs:simpleType>
+</xs:element>
+
+<xs:simpleType name="Everything_is_string"> 
+	<xs:restriction base="this:String_int">
+		<xs:enumeration value="20.4"/>
+		<xs:enumeration value="50"/>
+		<xs:enumeration value="small"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="Mixed_Types">
+	<xs:simpleType>
+		<union>
+			<xs:simpleType>
+				<restriction base="xs:gDay"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:gYear"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:gMonth"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:float"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:date"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:time"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:dateTime"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:gMonthDay"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:duration"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<restriction base="xs:gYearMonth"/>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>	
+		</union>
+	</xs:simpleType>
+</xs:element>
+
+<xs:simpleType name="Mixed_Enum"> 
+	<xs:restriction base="this:Mixed_Types">
+		<xs:enumeration value="somestring"/>
+		<xs:enumeration value="2014-01-01"/>
+		<xs:enumeration value="20.4"/>
+		<xs:enumeration value="05:05:00"/>
+		<xs:enumeration value="---30"/>
+		<xs:enumeration value="--05"/>
+		<xs:enumeration value="0085"/>
+		<xs:enumeration value="3.14"/>
+		<xs:enumeration value="small"/>
+                <xs:enumeration value="2013-11-23T17:45:56"/>
+		<xs:enumeration value="--01-03"/>
+		<xs:enumeration value="1999-08"/>
+		<xs:enumeration value="P5Y2M10DT15H"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="Only_int">
+	<xs:simpleType>
+		<union>
+			<xs:simpleType>
+				<restriction base="xs:integer"/>
+			</xs:simpleType>
+		</union>
+	</xs:simpleType>
+</xs:element>
+
+<xs:simpleType name="Ints"> 
+	<xs:restriction base="this:Only_int">
+		<xs:enumeration value="14"/>
+		<xs:enumeration value="somestring"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:element name="UnionWithEnumField">
+	<xs:simpleType>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:normalizedString">
+					<xs:enumeration value=""/>
+					<xs:enumeration value="none"/>
+					<xs:enumeration value="type"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:positiveInteger">
+					<xs:maxExclusive value="1000000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+</xs:element>
+
+</xs:schema>

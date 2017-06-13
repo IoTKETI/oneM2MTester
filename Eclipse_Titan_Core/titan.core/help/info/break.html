@@ -1,0 +1,102 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Feher, Csaba
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>break</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="boolean.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="call.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>break</h1>
+<hr align="left" width="75%">
+<p>The keyword is used in loops and <font face="Courier New"><b>alt</b></font>, <font face="Courier New"><b>interleave</b></font> or <font face="Courier New"><b>call</b></font> statements and <font
+  face="Courier New"><b>altstep</b></font> definitions.</p>
+<p>The <font face="Courier New"><b>break</b></font> statement may only be used inside the body of a loop (<font face="Courier New"><b>for</b></font>, <font face="Courier New"><b>while</b></font>,
+<font face="Courier New"><b>do-while</b></font>) or an alternative of an <font face="Courier New"><b>alt</b></font> or <font face="Courier New"><b>interleave</b></font> statement or response and
+exception handling parts of a <font face="Courier New"><b>call</b></font> statement or the statement block of an alternative of an <font face="Courier New"><b>altstep</b></font> definition.</p>
+<p>When used in loops or <font face="Courier New"><b>alt</b></font>, <font face="Courier New"><b>interleave</b></font> or <font face="Courier New"><b>call</b></font> statements:<br>
+On executing a <font face="Courier New"><b>break</b></font> statement the innermost, currently executed loop, <font face="Courier New"><b>alt</b></font>, <font face="Courier New"><b>interleave</b></font>
+or <font face="Courier New"><b>call</b></font> statement is left. Execution continues with the statement following the construct which is left.</p>
+<p>When used in <font face="Courier New"><b>altstep</b></font> definitions (but not inside a loop or an <font face="Courier New"><b>alt</b></font>, <font face="Courier New"><b>interleave</b></font>
+or <font face="Courier New"><b>call</b></font> statement):<br>
+On executing a <font face="Courier New"><b>break</b></font> statement the <font face="Courier New"><b>altstep</b></font> is left. If the <font face="Courier New"><b>altstep</b></font> was explicitly
+called as an alternative of an <font face="Courier New"><b>alt</b></font> statement or it was called as default for an <font face="Courier New"><b>alt</b></font> statement, then the <font
+  face="Courier New"><b>alt</b></font> statement is also left. If the <font face="Courier New"><b>altstep</b></font> was explicitly called as an alternative with a statement block, then the statement
+block is skipped (and the <font face="Courier New"><b>alt</b></font> statement is left).</p>
+<hr align="left" width="50%">
+<p>Related keyword:</p>
+<ul>
+  <li><a href="for.html"><b><font face="Courier New" color="#003258" size="4">for</font></b></a></li>
+  <li><a href="while.html"><b><font face="Courier New" color="#003258" size="4">while</font></b></a></li>
+  <li><a href="do.html"><b><font face="Courier New" color="#003258" size="4">do-while</font></b></a></li>
+  <li><a href="alt.html"><b><font face="Courier New" color="#003258" size="4">alt</font></b></a></li>
+  <li><a href="interleave.html"><b><font face="Courier New" color="#003258" size="4">interleave</font></b></a></li>
+  <li><a href="call.html"><b><font face="Courier New" color="#003258" size="4">call</font></b></a></li>
+  <li><a href="altstep.html"><b><font face="Courier New" color="#003258" size="4">altstep</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>break;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<hr align="left" width="25%">
+<P>Example 1:
+<p><code> do {<br>
+&nbsp;&nbsp;/* ... */<br>
+&nbsp;&nbsp;if (cond1) { break; /* the do-while loop is left */ }<br>
+&nbsp;&nbsp;/* ... */<br>
+&nbsp;&nbsp;for (var integer j:=1; j<=10; j:= j+1) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/* ... */<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (cond2) { break; /* the for-loop is left but the do-while loop is continued */ }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;/* ... */<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;/* ... */<br>
+}<br></p>
+</code>
+<hr align="left" width="25%">
+<P>Example 2:
+<p><code> interleave {<br>
+&nbsp;&nbsp;[] PCO1.receive(integer:?) { /* do something here */ }<br>
+&nbsp;&nbsp;[] PCO2.receive(integer:?) { /* do something here, too */ }<br>
+&nbsp;&nbsp;[] T.timeout { break; }<br>
+}<br>
+</code></p>
+<p>With the usage of the <font face="Courier New"><b>break</b></font> statement a time limit for the execution of the <font face="Courier New"><b>interleave</b></font> statement is implemented.</p>
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#breakstatement">BNF definition</a> of <font face="Courier New">break</font></p>
+</body>
+</html>

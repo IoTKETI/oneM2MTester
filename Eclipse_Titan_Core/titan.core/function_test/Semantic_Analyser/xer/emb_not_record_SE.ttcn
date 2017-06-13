@@ -1,0 +1,38 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module emb_not_record_SE {	//^In TTCN-3 module `emb_not_record_SE'://
+
+type integer i    //^In type definition// \
+//^error: A type with EMBED-VALUES must be a sequence type\. The first component of the sequence shall be SEQUENCE OF UTF8String and shall not be marked DEFAULT//
+with { variant "embedValues" }
+
+type charstring s //^In type definition// \
+//^error: A type with EMBED-VALUES must be a sequence type\. The first component of the sequence shall be SEQUENCE OF UTF8String and shall not be marked DEFAULT//
+with { variant "embedValues" }
+
+type union u { integer i } //^In type definition// \
+//^error: A type with EMBED-VALUES must be a sequence type\. The first component of the sequence shall be SEQUENCE OF UTF8String and shall not be marked DEFAULT//
+with { variant "embedValues" }
+
+type union u2 { float f }
+
+type set of u2 uset //^In type definition// \
+//^error: A type with EMBED-VALUES must be a sequence type\. The first component of the sequence shall be SEQUENCE OF UTF8String and shall not be marked DEFAULT//
+with { variant "embedValues" }
+
+}
+with {
+encode "XML"
+}
+

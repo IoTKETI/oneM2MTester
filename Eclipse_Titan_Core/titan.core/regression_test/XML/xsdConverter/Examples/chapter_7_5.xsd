@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+		xmlns:ns75="http://www.chapter_7_5.org" 
+		targetNamespace="http://www.chapter_7_5.org">
+
+
+	<simpleType name="e18">
+		<restriction base="string">
+			<pattern value="(aUser|anotherUser)@(i|I)nstitute"/>
+		</restriction>
+	</simpleType>
+
+
+	<simpleType name="e19">
+		<list itemType="float"/>
+	</simpleType>
+
+
+	<simpleType name="e20">
+		<restriction>
+			<simpleType>
+				<list itemType="float"/>
+			</simpleType>
+			<length value="3"/>
+		</restriction>
+	</simpleType>
+
+
+	<!-- Please compare the mapping of the two definitions below -->
+
+
+	<simpleType name="e21named">
+		<union memberTypes="integer boolean"/>
+	</simpleType>
+
+
+	<simpleType name="e21unnamed">
+		<union>				
+			<simpleType>
+				<restriction base="string"/>
+			</simpleType>
+			<simpleType>
+				<restriction base="float"/>
+			</simpleType>
+		</union>
+	</simpleType>
+
+
+	<simpleType name="Time-or-int-or-boolean--or-dateRestricted">
+		<union memberTypes="time ns75:e21named">
+			<simpleType>
+				<restriction base="integer">
+					<minInclusive value="2003"/>
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+	
+	<element name="maxOccurs">
+		<simpleType>
+			<union memberTypes="nonNegativeInteger">
+				<simpleType>
+					<restriction base="token">
+						<enumeration value="unbounded"/>
+					</restriction>
+				</simpleType>
+			</union>
+		</simpleType>
+	</element>
+
+	
+	<simpleType name="e22"> 
+		<restriction base="ns75:e21unnamed">
+			<enumeration value="20"/>
+			<enumeration value="50"/>
+			<enumeration value="small"/>
+		</restriction>
+	</simpleType>
+
+	
+</schema>

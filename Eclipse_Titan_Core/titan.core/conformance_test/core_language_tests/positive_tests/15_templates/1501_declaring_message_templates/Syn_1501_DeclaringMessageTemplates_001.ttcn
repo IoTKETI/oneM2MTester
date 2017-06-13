@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.1, Ensure that a simple record-based message template can be defined.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_1501_DeclaringMessageTemplates_001 {
+
+	type record MyMessageType {
+		integer field1 optional,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_myTemplate := { 
+		field1 := omit,
+		field2 := "My string",
+		field3 := true 
+	}
+
+	type component GeneralComp {}
+
+	testcase TC_Syn_1501_DeclaringMessageTemplates_001() runs on GeneralComp 
+	{ setverdict(pass);	}
+	
+	control
+	{ execute(TC_Syn_1501_DeclaringMessageTemplates_001()); }
+
+}

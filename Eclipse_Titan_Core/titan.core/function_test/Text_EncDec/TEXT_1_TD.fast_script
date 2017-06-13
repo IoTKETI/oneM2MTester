@@ -1,0 +1,1224 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Kovacs, Ferenc
+.*   Szabados, Kristof
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+.*
+:docname.Test Description
+:docno.21/152 91-CRL 113 200/5 Uen
+:rev.A
+:date.2015-04-27
+.*
+:prep.ETH/XZR Ferenc Kovacs (+36 1 439 5511)
+:appr.ETH/XZ (Roland Gecse)
+:checked.ETHPKR
+.*
+:title.Test Description - Text based coding for TTCN-3 Test Executor
+:contents level=3.
+.*---------------------------------------------------------------------*
+:h1.PREREQUISITES AND PREPARATIONS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Scope of the Test Object
+.*---------------------------------------------------------------------*
+:xmp tab=1 nokeep.
+This TD contains unified test cases related to a part of TTCN3 Executor's Text coder function.
+The original test cases can be found in the TEXT_1_TD.script file.
+The reason for the unification was to get a really fast version of the tests.
+
+:exmp.
+
+:p.:us.Revision Information:eus.
+
+:xmp nokeep.
+:us.History:eus.
+
+REV   DATE         PREPARED   CHANGE
+===   ==========   ========   ======
+A     2005-01-10   ETHGHASZ   New document
+B     2005-10-11   EKRISZA    Updated for group support.
+C     2007-03-06   EDMDELI    Implicit message encoding
+D     2008-10-01   EFERKOV    Big integers
+E     2011-01-24   EKRISZA     Restructured to use more efficient script.
+F     2011-10-10   EKRISZA     Updated for release.
+A     2011-12-12   EKRISZA     Updated for release
+PB1   2012-01-31   ETHBAAT     Editorial changes, 
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h1.Test environment
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Hardware
+.*---------------------------------------------------------------------*
+No specific hardware requirement.
+.*---------------------------------------------------------------------*
+:h2.Software
+.*---------------------------------------------------------------------*
+
+.*---------------------------------------------------------------------*
+:h2.Configuration
+.*---------------------------------------------------------------------*
+
+.*---------------------------------------------------------------------*
+:h2.Installation
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h1.REQUIREMENT-BASED TESTS
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC -  Fixed length encoding>
+
+<STATIC>
+type component TempComp {}
+<TTCN_TC:PURE_EXEC>
+
+type charstring TEXT_PDU_1 with { encode "TEXT"; variant "TEXT_CODING(length=5)"};
+external function enc_TEXT_PDU_1(in TEXT_PDU_1 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_1(in charstring oct) return TEXT_PDU_1 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Fixed_length_encoding() runs on TempComp {
+  const TEXT_PDU_1 	i := "HALI"
+  const charstring 	o := " HALI"
+  const TEXT_PDU_1  expected_res:=" HALI"
+
+  if ((enc_TEXT_PDU_1(i) == o)and(dec_TEXT_PDU_1(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_1(i)= ", enc_TEXT_PDU_1(i), "; dec_TEXT_PDU_1(o)= ", dec_TEXT_PDU_1(o));}
+}
+
+
+
+type charstring TEXT_PDU_2 with { encode "TEXT"; variant "TEXT_CODING(convert=lower_case)"};
+external function enc_TEXT_PDU_2(in TEXT_PDU_2 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_2(in charstring oct) return TEXT_PDU_2 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Convert_string_to_lower_case_during_encoding() runs on TempComp {
+  const TEXT_PDU_2 	i := "HALI"
+  const charstring 	o := "hali"
+  const TEXT_PDU_2  expected_res:="hali"
+
+  if ((enc_TEXT_PDU_2(i) == o)and(dec_TEXT_PDU_2(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_2(i)= ", enc_TEXT_PDU_2(i), "; dec_TEXT_PDU_2(o)= ", dec_TEXT_PDU_2(o));}
+}
+
+
+
+type charstring TEXT_PDU_3 with { encode "TEXT"; variant "TEXT_CODING(convert=upper_case)"};
+external function enc_TEXT_PDU_3(in TEXT_PDU_3 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_3(in charstring oct) return TEXT_PDU_3 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Convert_string_to_upper_case_during_encoding() runs on TempComp {
+  const TEXT_PDU_3 	i := "hali"
+  const charstring 	o := "HALI"
+  const TEXT_PDU_3  expected_res:="HALI"
+
+  if ((enc_TEXT_PDU_3(i) == o)and(dec_TEXT_PDU_3(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_3(i)= ", enc_TEXT_PDU_3(i), "; dec_TEXT_PDU_3(o)= ", dec_TEXT_PDU_3(o));}
+}
+
+
+
+type charstring TEXT_PDU_4 with { encode "TEXT"; variant "TEXT_CODING(convert=lower_case,
+                                                     convert=upper_case)"};
+external function enc_TEXT_PDU_4(in TEXT_PDU_4 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_4(in charstring oct) return TEXT_PDU_4 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Convert_string_to_lower_case_during_encoding_and_upper_during_decoding() runs on TempComp {
+  const TEXT_PDU_4 	i := "HALI"
+  const charstring 	o := "hali"
+  const TEXT_PDU_4  expected_res:="HALI"
+
+  if ((enc_TEXT_PDU_4(i) == o)and(dec_TEXT_PDU_4(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_4(i)= ", enc_TEXT_PDU_4(i), "; dec_TEXT_PDU_4(o)= ", dec_TEXT_PDU_4(o));}
+}
+
+
+
+type charstring TEXT_PDU_5 with { encode "TEXT"; variant "TEXT_CODING(convert=upper_case,
+                                                     convert=lower_case)"};
+external function enc_TEXT_PDU_5(in TEXT_PDU_5 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_5(in charstring oct) return TEXT_PDU_5 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Convert_string_to_upper_case_during_encoding_and_lower_during_decoding() runs on TempComp {
+  const TEXT_PDU_5 	i := "hali"
+  const charstring 	o := "HALI"
+  const TEXT_PDU_5  expected_res:="hali"
+
+  if ((enc_TEXT_PDU_5(i) == o)and(dec_TEXT_PDU_5(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_5(i)= ", enc_TEXT_PDU_5(i), "; dec_TEXT_PDU_5(o)= ", dec_TEXT_PDU_5(o));}
+}
+
+
+
+type charstring TEXT_PDU_6 with { encode "TEXT"; variant "TEXT_CODING(just=left;length=5)"};
+external function enc_TEXT_PDU_6(in TEXT_PDU_6 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_6(in charstring oct) return TEXT_PDU_6 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Left_justification() runs on TempComp {
+  const TEXT_PDU_6 	i := "hali"
+  const charstring 	o := "hali "
+  const TEXT_PDU_6  expected_res:="hali "
+
+  if ((enc_TEXT_PDU_6(i) == o)and(dec_TEXT_PDU_6(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_6(i)= ", enc_TEXT_PDU_6(i), "; dec_TEXT_PDU_6(o)= ", dec_TEXT_PDU_6(o));}
+}
+
+
+
+type charstring TEXT_PDU_7 with { encode "TEXT"; variant "TEXT_CODING(just=center;length=6)"};
+external function enc_TEXT_PDU_7(in TEXT_PDU_7 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_7(in charstring oct) return TEXT_PDU_7 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Center_justification() runs on TempComp {
+  const TEXT_PDU_7 	i := "hali"
+  const charstring 	o := " hali "
+  const TEXT_PDU_7  expected_res:=" hali "
+
+  if ((enc_TEXT_PDU_7(i) == o)and(dec_TEXT_PDU_7(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_7(i)= ", enc_TEXT_PDU_7(i), "; dec_TEXT_PDU_7(o)= ", dec_TEXT_PDU_7(o));}
+}
+
+
+
+type charstring TEXT_PDU_8 with { encode "TEXT"; variant "TEXT_CODING(just=right;length=5)"};
+external function enc_TEXT_PDU_8(in TEXT_PDU_8 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_8(in charstring oct) return TEXT_PDU_8 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Right_justification() runs on TempComp {
+  const TEXT_PDU_8 	i := "hali"
+  const charstring 	o := " hali"
+  const TEXT_PDU_8  expected_res:=" hali"
+
+  if ((enc_TEXT_PDU_8(i) == o)and(dec_TEXT_PDU_8(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_8(i)= ", enc_TEXT_PDU_8(i), "; dec_TEXT_PDU_8(o)= ", dec_TEXT_PDU_8(o));}
+}
+
+
+
+type charstring TEXT_PDU_9 with { encode "TEXT"; variant "TEXT_CODING(,,'[\d]#(4)[a-e]#(4)')"};
+external function enc_TEXT_PDU_9(in TEXT_PDU_9 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_9(in charstring oct) return TEXT_PDU_9 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Case_sensitive_selection() runs on TempComp {
+  const TEXT_PDU_9 	i := "1234abcd"
+  const TEXT_PDU_9  expected_res:="1234abcd"
+
+  if (dec_TEXT_PDU_9(enc_TEXT_PDU_9(i)) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_9(i)= ", enc_TEXT_PDU_9(i), "; dec_TEXT_PDU_9(enc_TEXT_PDU_9(i))= ", dec_TEXT_PDU_9(enc_TEXT_PDU_9(i)));}
+}
+
+
+
+type charstring TEXT_PDU_10 with { encode "TEXT"; variant "TEXT_CODING(,convert=lower_case,
+                                       '[\d]#(4)[a-e]#(4)', case_insensitive)"};
+external function enc_TEXT_PDU_10(in TEXT_PDU_10 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_10(in charstring oct) return TEXT_PDU_10 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Case_insensitive_selection() runs on TempComp {
+  const TEXT_PDU_10 	i := "1234abcd"
+  const TEXT_PDU_10  expected_res:="1234abcd"
+
+  if (dec_TEXT_PDU_10(enc_TEXT_PDU_10(i)) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_10(i)= ", enc_TEXT_PDU_10(i), "; dec_TEXT_PDU_10(enc_TEXT_PDU_10(i))= ", dec_TEXT_PDU_10(enc_TEXT_PDU_10(i)));}
+}
+
+
+
+type integer TEXT_PDU_11 with { encode "TEXT"; variant "TEXT_CODING(length=5)"};
+external function enc_TEXT_PDU_11(in TEXT_PDU_11 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_11(in charstring oct) return TEXT_PDU_11 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Fixed_length_integer() runs on TempComp {
+  const TEXT_PDU_11 	i := 249
+  const charstring 	o := "  249"
+  const TEXT_PDU_11  expected_res:= 249
+
+  if ((enc_TEXT_PDU_11(i) == o)and(dec_TEXT_PDU_11(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_11(i)= ", enc_TEXT_PDU_11(i), "; dec_TEXT_PDU_11(o)= ", dec_TEXT_PDU_11(o));}
+}
+
+
+
+type integer TEXT_PDU_12 with { encode "TEXT"; variant "TEXT_CODING()"};
+external function enc_TEXT_PDU_12(in TEXT_PDU_12 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_12(in charstring oct) return TEXT_PDU_12 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Variable_length_integer() runs on TempComp {
+  const TEXT_PDU_12 	i := 12249
+  const charstring 	o := "12249"
+  const TEXT_PDU_12  expected_res:= 12249
+
+  if ((enc_TEXT_PDU_12(i) == o)and(dec_TEXT_PDU_12(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_12(i)= ", enc_TEXT_PDU_12(i), "; dec_TEXT_PDU_12(o)= ", dec_TEXT_PDU_12(o));}
+}
+
+
+
+type integer TEXT_PDU_13 with { encode "TEXT"; variant "TEXT_CODING(length=7)"};
+external function enc_TEXT_PDU_13(in TEXT_PDU_13 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_13(in charstring oct) return TEXT_PDU_13 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_encoding_without_leading_zero() runs on TempComp {
+  const TEXT_PDU_13 	i := 12249
+  const charstring 	o := "  12249"
+  const TEXT_PDU_13  expected_res:= 12249
+
+  if ((enc_TEXT_PDU_13(i) == o)and(dec_TEXT_PDU_13(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_13(i)= ", enc_TEXT_PDU_13(i), "; dec_TEXT_PDU_13(o)= ", dec_TEXT_PDU_13(o));}
+}
+
+
+
+type integer TEXT_PDU_14 with { encode "TEXT"; variant "TEXT_CODING(leading0=true;length=7)"};
+external function enc_TEXT_PDU_14(in TEXT_PDU_14 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_14(in charstring oct) return TEXT_PDU_14 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_encoding_with_leading_zero() runs on TempComp {
+  const TEXT_PDU_14 	i := 12249
+  const charstring 	o := "0012249"
+  const TEXT_PDU_14  expected_res:= 12249
+
+  if ((enc_TEXT_PDU_14(i) == o)and(dec_TEXT_PDU_14(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_14(i)= ", enc_TEXT_PDU_14(i), "; dec_TEXT_PDU_14(o)= ", dec_TEXT_PDU_14(o));}
+}
+
+
+
+type integer TEXT_PDU_15 with { encode "TEXT"; variant "TEXT_CODING(leading0=true;length=7)"};
+external function enc_TEXT_PDU_15(in TEXT_PDU_15 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_15(in charstring oct) return TEXT_PDU_15 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_encoding_negativ_integer_with_leading_zero() runs on TempComp {
+  const TEXT_PDU_15 	i := -12249
+  const charstring 	o := "-012249"
+  const TEXT_PDU_15  expected_res:= -12249
+
+  if ((enc_TEXT_PDU_15(i) == o)and(dec_TEXT_PDU_15(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_15(i)= ", enc_TEXT_PDU_15(i), "; dec_TEXT_PDU_15(o)= ", dec_TEXT_PDU_15(o));}
+}
+
+
+
+type integer TEXT_PDU_16 with { encode "TEXT"; variant "TEXT_CODING(,,
+                                       '[1-4]#(1,)')"};
+external function enc_TEXT_PDU_16(in TEXT_PDU_16 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_16(in charstring oct) return TEXT_PDU_16 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Selection_of_integer_value() runs on TempComp {
+  const TEXT_PDU_16 	i := 123423
+  const charstring 	o := "123423567aBCdfrd"
+  const TEXT_PDU_16  expected_res:= 123423
+
+  if (dec_TEXT_PDU_16(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_16(i)= ", enc_TEXT_PDU_16(i), "; dec_TEXT_PDU_16(o)= ", dec_TEXT_PDU_16(o));}
+}
+
+
+
+type boolean TEXT_PDU_17 with { encode "TEXT"; variant "TEXT_CODING()"};
+external function enc_TEXT_PDU_17(in TEXT_PDU_17 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_17(in charstring oct) return TEXT_PDU_17 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_basic_encoding_of_true_value() runs on TempComp {
+  const TEXT_PDU_17 	i := true
+  const charstring 	o := "true"
+  const TEXT_PDU_17  expected_res:= true
+
+  if ((enc_TEXT_PDU_17(i) == o)and(dec_TEXT_PDU_17(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_17(i)= ", enc_TEXT_PDU_17(i), "; dec_TEXT_PDU_17(o)= ", dec_TEXT_PDU_17(o));}
+}
+
+
+
+testcase TC_basic_encoding_of_false_value() runs on TempComp {
+  const TEXT_PDU_17 	i := false
+  const charstring 	o := "false"
+  const TEXT_PDU_17  expected_res:= false
+
+  if ((enc_TEXT_PDU_17(i) == o)and(dec_TEXT_PDU_17(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_17(i)= ", enc_TEXT_PDU_17(i), "; dec_TEXT_PDU_17(o)= ", dec_TEXT_PDU_17(o));}
+}
+
+
+
+type boolean TEXT_PDU_18 with { encode "TEXT"; variant "TEXT_CODING(true:'YES';false:'NO')"};
+external function enc_TEXT_PDU_18(in TEXT_PDU_18 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_18(in charstring oct) return TEXT_PDU_18 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Encoding_and_decoding_of_given_tokens_1() runs on TempComp {
+  const TEXT_PDU_18 	i := false
+  const charstring 	o := "NO"
+  const TEXT_PDU_18  expected_res:= false
+
+  if ((enc_TEXT_PDU_18(i) == o)and(dec_TEXT_PDU_18(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_18(i)= ", enc_TEXT_PDU_18(i), "; dec_TEXT_PDU_18(o)= ", dec_TEXT_PDU_18(o));}
+}
+
+
+
+type boolean TEXT_PDU_19 with { encode "TEXT"; variant "TEXT_CODING(true:'YES';false:'NO',
+                           true:'good';false:{'bad',case_insensitive})"};
+external function enc_TEXT_PDU_19(in TEXT_PDU_19 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_19(in charstring oct) return TEXT_PDU_19 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Encoding_and_decoding_of_given_tokens_2() runs on TempComp {
+  const TEXT_PDU_19 	i := false
+  const charstring 	o := "NO"
+  const charstring 	o2 := "Bad"
+  const TEXT_PDU_19  expected_res:= false
+
+  if ((enc_TEXT_PDU_19(i) == o)and(dec_TEXT_PDU_19(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_19(i)= ", enc_TEXT_PDU_19(i), "; dec_TEXT_PDU_19(o)= ", dec_TEXT_PDU_19(o));}
+}
+
+
+
+type enumerated TEXT_PDU_20 {egy,ketto,harom}
+    with { encode "TEXT"; variant "TEXT_CODING()"};
+external function enc_TEXT_PDU_20(in TEXT_PDU_20 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_20(in charstring oct) return TEXT_PDU_20 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Basic_encoding_of_enumerated_values() runs on TempComp {
+  const TEXT_PDU_20 	i := egy
+  const charstring 	o := "egy"
+  const TEXT_PDU_20  expected_res:= egy
+
+  if ((enc_TEXT_PDU_20(i) == o)and(dec_TEXT_PDU_20(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_20(i)= ", enc_TEXT_PDU_20(i), "; dec_TEXT_PDU_20(o)= ", dec_TEXT_PDU_20(o));}
+}
+
+
+
+type enumerated TEXT_PDU_21 {egy,ketto,harom}
+    with { encode "TEXT"; variant "TEXT_CODING(egy:'haho';harom:'har',
+                                 egy:'(haho)|(H)';ketto:{,case_insensitive};
+                                 harom:{'hArom',case_insensitive})"};
+external function enc_TEXT_PDU_21(in TEXT_PDU_21 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_21(in charstring oct) return TEXT_PDU_21 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Encoding_of_given_enumerated_values_1() runs on TempComp {
+  const TEXT_PDU_21 	i := egy
+  const charstring 	o := "haho"
+  const TEXT_PDU_21  expected_res:= egy
+
+  if ((enc_TEXT_PDU_21(i) == o)and(dec_TEXT_PDU_21(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_21(i)= ", enc_TEXT_PDU_21(i), "; dec_TEXT_PDU_21(o)= ", dec_TEXT_PDU_21(o));}
+}
+
+
+testcase TC_Encoding_of_given_enumerated_values_2() runs on TempComp {
+  const TEXT_PDU_21 	i := ketto
+  const charstring 	o1 := "ketto"
+  const charstring 	o2 := "Ketto"
+  const TEXT_PDU_21  expected_res:= ketto
+
+  if ((enc_TEXT_PDU_21(i) == o1)and(dec_TEXT_PDU_21(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_21(i)= ", enc_TEXT_PDU_21(i), "; dec_TEXT_PDU_21(o2)= ", dec_TEXT_PDU_21(o2));}
+}
+
+
+testcase TC_Encoding_of_given_enumerated_values_3() runs on TempComp {
+  const TEXT_PDU_21 	i := harom
+  const charstring 	o1 := "har"
+  const charstring 	o2 := "haRoM"
+  const TEXT_PDU_21  expected_res:= harom
+
+  if ((enc_TEXT_PDU_21(i) == o1)and(dec_TEXT_PDU_21(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_21(i)= ", enc_TEXT_PDU_21(i), "; dec_TEXT_PDU_21(o2)= ", dec_TEXT_PDU_21(o2));}
+}
+
+
+
+type charstring TEXT_PDU_22 with { encode "TEXT"; variant "BEGIN('Header:')"};
+external function enc_TEXT_PDU_22(in TEXT_PDU_22 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_22(in charstring oct) return TEXT_PDU_22 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_leading_token() runs on TempComp {
+  const TEXT_PDU_22 	i := "value"
+  const charstring 	o := "Header:value"
+  const TEXT_PDU_22  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_22(i) == o)and(dec_TEXT_PDU_22(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_22(i)= ", enc_TEXT_PDU_22(i), "; dec_TEXT_PDU_22(o)= ", dec_TEXT_PDU_22(o));}
+}
+
+
+
+type charstring TEXT_PDU_23 with { encode "TEXT"; variant "BEGIN('Header:',, case_insensitive)"};
+external function enc_TEXT_PDU_23(in TEXT_PDU_23 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_23(in charstring oct) return TEXT_PDU_23 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_leading_token_case_insensitive_decoding() runs on TempComp {
+  const TEXT_PDU_23 	i := "value"
+  const charstring 	o1 := "Header:value"
+  const charstring 	o2 := "heADer:value"
+  const TEXT_PDU_23  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_23(i) == o1)and(dec_TEXT_PDU_23(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_23(i)= ", enc_TEXT_PDU_23(i), "; dec_TEXT_PDU_23(o2)= ", dec_TEXT_PDU_23(o2));}
+}
+
+
+
+type charstring TEXT_PDU_24 with { encode "TEXT"; variant "BEGIN('Header:','(T:)|(Header:)')"};
+external function enc_TEXT_PDU_24(in TEXT_PDU_24 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_24(in charstring oct) return TEXT_PDU_24 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_leading_token_case_insensitive_decoding_1() runs on TempComp {
+  const TEXT_PDU_24 	i := "value"
+  const charstring 	o := "Header:value"
+  const TEXT_PDU_24  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_24(i) == o)and(dec_TEXT_PDU_24(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_24(i)= ", enc_TEXT_PDU_24(i), "; dec_TEXT_PDU_24(o)= ", dec_TEXT_PDU_24(o));}
+}
+
+
+testcase TC_Coding_with_leading_token_case_insensitive_decoding_2() runs on TempComp {
+  const charstring 	o := "T:value"
+  const TEXT_PDU_24  expected_res:= "value"
+
+  if (dec_TEXT_PDU_24(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"; dec_TEXT_PDU_24(o)= ", dec_TEXT_PDU_24(o));}
+}
+
+
+
+type charstring TEXT_PDU_25 with { encode "TEXT"; variant "END(':close')"};
+external function enc_TEXT_PDU_25(in TEXT_PDU_25 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_25(in charstring oct) return TEXT_PDU_25 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_trailing_token() runs on TempComp {
+  const TEXT_PDU_25 	i := "value"
+  const charstring 	o := "value:close"
+  const TEXT_PDU_25  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_25(i) == o)and(dec_TEXT_PDU_25(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_25(i)= ", enc_TEXT_PDU_25(i), "; dec_TEXT_PDU_25(o)= ", dec_TEXT_PDU_25(o));}
+}
+
+
+
+type charstring TEXT_PDU_26 with { encode "TEXT"; variant "END(':close',, case_insensitive)"};
+external function enc_TEXT_PDU_26(in TEXT_PDU_26 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_26(in charstring oct) return TEXT_PDU_26 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_trailing_token_case_insensitive_decoding() runs on TempComp {
+  const TEXT_PDU_26 	i := "value"
+  const charstring 	o1 := "value:close"
+  const charstring 	o2 := "value:CloSe"
+  const TEXT_PDU_26  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_26(i) == o1)and(dec_TEXT_PDU_26(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_26(i)= ", enc_TEXT_PDU_26(i), "; dec_TEXT_PDU_26(o2)= ", dec_TEXT_PDU_26(o2));}
+}
+
+
+
+type charstring TEXT_PDU_27 with { encode "TEXT"; variant "END(':close','(:T)|(:close)')"};
+external function enc_TEXT_PDU_27(in TEXT_PDU_27 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_27(in charstring oct) return TEXT_PDU_27 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_trailing_token_using_decoding_matching_pattern() runs on TempComp {
+  const TEXT_PDU_27 	i := "value"
+  const charstring 	o1 := "value:close"
+  const charstring 	o2 := "value:T"
+  const TEXT_PDU_27  expected_res:= "value"
+
+  if ((enc_TEXT_PDU_27(i) == o1)and(dec_TEXT_PDU_27(o2) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_27(i)= ", enc_TEXT_PDU_27(i), "; dec_TEXT_PDU_27(o2)= ", dec_TEXT_PDU_27(o2));}
+}
+
+
+
+type record TEXT_PDU_28 {
+  charstring f1,
+  charstring f2
+} with { encode "TEXT"; variant "SEPARATOR('\n\r')"};
+external function enc_TEXT_PDU_28(in TEXT_PDU_28 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_28(in charstring oct) return TEXT_PDU_28 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_separator_token() runs on TempComp {
+  const TEXT_PDU_28 	i := {f1:="value1",f2:="value2"}
+  const charstring 	o := "value1\n\rvalue2"
+  const TEXT_PDU_28  expected_res:= {f1:="value1",f2:="value2"}
+
+  if ((enc_TEXT_PDU_28(i) == o)and(dec_TEXT_PDU_28(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_28(i)= ", enc_TEXT_PDU_28(i), "; dec_TEXT_PDU_28(o)= ", dec_TEXT_PDU_28(o));}
+}
+
+
+
+type record TEXT_PDU_29 {
+  charstring f1,
+  charstring f2
+} with { encode "TEXT"; variant "SEPARATOR(':FieldSep\n\r',,case_insensitive)"};
+external function enc_TEXT_PDU_29(in TEXT_PDU_29 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_29(in charstring oct) return TEXT_PDU_29 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_separator_token_case_insensitive_decoding() runs on TempComp {
+  const charstring 	o := "value1:FiELDsep\n\rvalue2"
+  const TEXT_PDU_29  expected_res:= {f1:="value1",f2:="value2"}
+
+  if (dec_TEXT_PDU_29(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail, "; dec_TEXT_PDU_29(o)= ", dec_TEXT_PDU_29(o));}
+}
+
+
+
+type record TEXT_PDU_30 {
+  charstring f1,
+  charstring f2
+} with { encode "TEXT"; variant "SEPARATOR(':FieldSep\n\r','(\n\r)|(:FieldSep\n\r)')"};
+external function enc_TEXT_PDU_30(in TEXT_PDU_30 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_30(in charstring oct) return TEXT_PDU_30 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Coding_with_separator_token_1() runs on TempComp {
+  const TEXT_PDU_30 	i := {f1:="value1",f2:="value2"}
+  const charstring 	o := "value1:FieldSep\n\rvalue2"
+  const TEXT_PDU_30  expected_res:= {f1:="value1",f2:="value2"}
+
+  if ((enc_TEXT_PDU_30(i) == o)and(dec_TEXT_PDU_30(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_30(i)= ", enc_TEXT_PDU_30(i), "; dec_TEXT_PDU_30(o)= ", dec_TEXT_PDU_30(o));}
+}
+
+
+testcase TC_Coding_with_separator_token_2() runs on TempComp {
+  const charstring 	o := "value1\n\rvalue2"
+  const TEXT_PDU_30  expected_res:= {f1:="value1",f2:="value2"}
+
+  if (dec_TEXT_PDU_30(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"; dec_TEXT_PDU_30(o)= ", dec_TEXT_PDU_30(o));}
+}
+
+
+
+type record TEXT_PDU_31 {
+  charstring f1
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end')"};
+external function enc_TEXT_PDU_31(in TEXT_PDU_31 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_31(in charstring oct) return TEXT_PDU_31 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Record_with_BEGIN_END_token() runs on TempComp {
+  const TEXT_PDU_31 	i := {f1:="value1"}
+  const charstring 	o := "Head:value1:end"
+  const TEXT_PDU_31  expected_res:= {f1:="value1"}
+
+  if ((enc_TEXT_PDU_31(i) == o)and(dec_TEXT_PDU_31(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_31(i)= ", enc_TEXT_PDU_31(i), "; dec_TEXT_PDU_31(o)= ", dec_TEXT_PDU_31(o));}
+}
+
+
+
+type record rec_32{
+  charstring field1,
+  charstring field2
+} with { encode "TEXT";variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+type record TEXT_PDU_32 {
+  rec_32 f1,
+  charstring f2
+} with { encode "TEXT";variant "BEGIN('PDU:'),END(':UDP')"};
+external function enc_TEXT_PDU_32(in TEXT_PDU_32 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_32(in charstring oct) return TEXT_PDU_32 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Record_with_record_fields() runs on TempComp {
+  const TEXT_PDU_32 	i := {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+  const charstring 	o := "PDU:Head:v1,v2:endvalue1:UDP"
+  const TEXT_PDU_32  expected_res:= {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+
+  if ((enc_TEXT_PDU_32(i) == o)and(dec_TEXT_PDU_32(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_32(i)= ", enc_TEXT_PDU_32(i), "; dec_TEXT_PDU_32(o)= ", dec_TEXT_PDU_32(o));}
+}
+
+
+
+type record rec_33{
+  charstring field1,
+  charstring field2
+} with { encode "TEXT";variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+type record TEXT_PDU_33 {
+  rec_33 f1 optional,
+  charstring f2
+} with { encode "TEXT"; variant "BEGIN('PDU:'),END(':UDP')"};
+external function enc_TEXT_PDU_33(in TEXT_PDU_33 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_33(in charstring oct) return TEXT_PDU_33 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Record_with_optional_fields_1() runs on TempComp {
+  const TEXT_PDU_33 	i := {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+  const charstring 	o := "PDU:Head:v1,v2:endvalue1:UDP"
+  const TEXT_PDU_33  expected_res:= {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+
+  if ((enc_TEXT_PDU_33(i) == o)and(dec_TEXT_PDU_33(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_33(i)= ", enc_TEXT_PDU_33(i), "; dec_TEXT_PDU_33(o)= ", dec_TEXT_PDU_33(o));}
+}
+
+
+testcase TC_Record_with_optional_fields_2() runs on TempComp {
+  const TEXT_PDU_33 	i := {f1:=omit,f2:="value1"}
+  const charstring 	o := "PDU:value1:UDP"
+  const TEXT_PDU_33  expected_res:= {f1:=omit,f2:="value1"}
+
+  if ((enc_TEXT_PDU_33(i) == o)and(dec_TEXT_PDU_33(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_33(i)= ", enc_TEXT_PDU_33(i), "; dec_TEXT_PDU_33(o)= ", dec_TEXT_PDU_33(o));}
+}
+
+
+
+type set TEXT_PDU_34 {
+  charstring f1
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end')"};
+external function enc_TEXT_PDU_34(in TEXT_PDU_34 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_34(in charstring oct) return TEXT_PDU_34 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Set_with_BEGIN_END_token() runs on TempComp {
+  const TEXT_PDU_34 	i := {f1:="value1"}
+  const charstring 	o := "Head:value1:end"
+  const TEXT_PDU_34  expected_res:= {f1:="value1"}
+
+  if ((enc_TEXT_PDU_34(i) == o)and(dec_TEXT_PDU_34(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_34(i)= ", enc_TEXT_PDU_34(i), "; dec_TEXT_PDU_34(o)= ", dec_TEXT_PDU_34(o));}
+}
+
+
+
+type set rec_35{
+  charstring field1,
+  charstring field2
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+type set TEXT_PDU_35 {
+  rec_35 f1,
+  charstring f2
+} with { encode "TEXT"; variant "BEGIN('PDU:'),END(':UDP'),SEPARATOR(',')"};
+external function enc_TEXT_PDU_35(in TEXT_PDU_35 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_35(in charstring oct) return TEXT_PDU_35 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Set_with_BEGIN_END_token_1() runs on TempComp {
+  const TEXT_PDU_35 	i := {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+  const charstring 	o := "PDU:Head:v1,v2:end,value1:UDP"
+  const TEXT_PDU_35  expected_res:= {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+
+  if ((enc_TEXT_PDU_35(i) == o)and(dec_TEXT_PDU_35(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_35(i)= ", enc_TEXT_PDU_35(i), "; dec_TEXT_PDU_35(o)= ", dec_TEXT_PDU_35(o));}
+}
+
+
+testcase TC_Set_with_BEGIN_END_token_2() runs on TempComp {
+  const charstring 	o := "PDU:value1,Head:v1,v2:end:UDP"
+  const TEXT_PDU_35  expected_res:= {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+
+  if (dec_TEXT_PDU_35(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"; dec_TEXT_PDU_35(o)= ", dec_TEXT_PDU_35(o));}
+}
+
+
+
+type record rec_36{
+  charstring field1,
+  charstring field2
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+type set TEXT_PDU_36 {
+  rec_36 f1 optional,
+  charstring f2
+} with { encode "TEXT"; variant "BEGIN('PDU:'),END(':UDP')"};
+external function enc_TEXT_PDU_36(in TEXT_PDU_36 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_36(in charstring oct) return TEXT_PDU_36 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Set_with_optional_fields_1() runs on TempComp {
+  const TEXT_PDU_36 	i := {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+  const charstring 	o := "PDU:Head:v1,v2:endvalue1:UDP"
+  const TEXT_PDU_36  expected_res:= {f1:={field1:="v1",field2:="v2"},f2:="value1"}
+
+  if ((enc_TEXT_PDU_36(i) == o)and(dec_TEXT_PDU_36(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_36(i)= ", enc_TEXT_PDU_36(i), "; dec_TEXT_PDU_36(o)= ", dec_TEXT_PDU_36(o));}
+}
+
+
+testcase TC_Set_with_optional_fields_2() runs on TempComp {
+  const TEXT_PDU_36 	i := {f1:=omit,f2:="value1"}
+  const charstring 	o := "PDU:value1:UDP"
+  const TEXT_PDU_36  expected_res:= {f1:=omit,f2:="value1"}
+
+  if ((enc_TEXT_PDU_36(i) == o)and(dec_TEXT_PDU_36(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_36(i)= ", enc_TEXT_PDU_36(i), "; dec_TEXT_PDU_36(o)= ", dec_TEXT_PDU_36(o));}
+}
+
+
+
+type set of charstring sof_37 with {encode "TEXT"; variant "SEPARATOR(',')"}
+
+type set TEXT_PDU_37 {
+  charstring f1,
+  charstring f2 optional,
+  sof_37 f3,
+  sof_37 f4 optional,
+  sof_37 f5,
+  charstring f6
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end')";
+         variant (f1) "BEGIN('f1:')";
+         variant (f2) "BEGIN('f2:')";
+         variant (f3) "BEGIN('f3:')";
+         variant (f4) "BEGIN('f4:'),TEXT_CODING(,repeatable=true)";
+         variant (f5) "BEGIN('f5:'),TEXT_CODING(,repeatable=true)";
+         variant (f6) "BEGIN('f6:')";
+         variant "SEPARATOR(';')" };
+external function enc_TEXT_PDU_37(in TEXT_PDU_37 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_37(in charstring oct) return TEXT_PDU_37 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Set_with_set_of_type_fields_1() runs on TempComp {
+  const TEXT_PDU_37 	i := {f1:="value1",
+                    f2:=omit,
+                    f3:={"sof1","sof1a","sof1b"},
+                    f4:={"sof2","sof2a","sof2b"},
+                    f5:={"sof3","sof3a","sof3b"},
+                    f6:="value6" }
+  const charstring 	o := "Head:f1:value1;f3:sof1,sof1a,sof1b;f4:sof2,sof2a,sof2b;f5:sof3,sof3a,sof3b;f6:value6:end"
+  const TEXT_PDU_37  expected_res:= {f1:="value1",
+                    f2:=omit,
+                    f3:={"sof1","sof1a","sof1b"},
+                    f4:={"sof2","sof2a","sof2b"},
+                    f5:={"sof3","sof3a","sof3b"},
+                    f6:="value6" }
+
+  if ((enc_TEXT_PDU_37(i) == o)and(dec_TEXT_PDU_37(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_37(i)= ", enc_TEXT_PDU_37(i), "; dec_TEXT_PDU_37(o)= ", dec_TEXT_PDU_37(o));}
+}
+
+
+testcase TC_Set_with_set_of_type_fields_2() runs on TempComp {
+  const charstring 	o := "Head:f5:sof3a,sof3b;f3:sof1,sof1a,sof1b;f4:sof2;f1:value1;f4:sof2a,sof2b;f5:sof3;f6:value6:end"
+  const TEXT_PDU_37  expected_res:= {f1:="value1",
+                    f2:=omit,
+                    f3:={"sof1","sof1a","sof1b"},
+                    f4:={"sof2","sof2a","sof2b"},
+                    f5:={"sof3","sof3a","sof3b"},
+                    f6:="value6" }
+
+  if (dec_TEXT_PDU_37(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail, "; dec_TEXT_PDU_37(o)= ", dec_TEXT_PDU_37(o));}
+}
+
+
+testcase TC_Set_with_set_of_type_fields_3() runs on TempComp {
+  const charstring 	o := "Head:f5:sof3a,sof3b;f3:sof1,sof1a,sof1b;f1:value1;f5:sof3;f6:value6:end"
+  const TEXT_PDU_37  expected_res:= {f1:="value1",
+                    f2:=omit,
+                    f3:={"sof1","sof1a","sof1b"},
+                    f4:=omit,
+                    f5:={"sof3","sof3a","sof3b"},
+                    f6:="value6" }
+
+  if (dec_TEXT_PDU_37(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail, "; dec_TEXT_PDU_37(o)= ", dec_TEXT_PDU_37(o));}
+}
+
+
+
+type record of charstring TEXT_PDU_38
+     with { encode "TEXT"; variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+external function enc_TEXT_PDU_38(in TEXT_PDU_38 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_38(in charstring oct) return TEXT_PDU_38 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Record_of_with_BEGIN_END_token() runs on TempComp {
+  const TEXT_PDU_38 	i := {"value1","value2","value3"}
+  const charstring 	o := "Head:value1,value2,value3:end"
+  const TEXT_PDU_38  expected_res:= {"value1","value2","value3"}
+
+  if ((enc_TEXT_PDU_38(i) == o)and(dec_TEXT_PDU_38(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_38(i)= ", enc_TEXT_PDU_38(i), "; dec_TEXT_PDU_38(o)= ", dec_TEXT_PDU_38(o));}
+}
+
+
+
+type record rec_39{
+  charstring field1,
+  charstring field2
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end'),SEPARATOR(',')"};
+
+type record of rec_39 TEXT_PDU_39  with { encode "TEXT"; variant "BEGIN('PDU:'),END(':UDP')"};
+external function enc_TEXT_PDU_39(in TEXT_PDU_39 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_39(in charstring oct) return TEXT_PDU_39 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Record_of_with_record_fields() runs on TempComp {
+  const TEXT_PDU_39 	i := {{field1:="v1",field2:="v2"},{field1:="v3",field2:="v4"}}
+  const charstring 	o := "PDU:Head:v1,v2:endHead:v3,v4:end:UDP"
+  const TEXT_PDU_39  expected_res:= {{field1:="v1",field2:="v2"},{field1:="v3",field2:="v4"}}
+
+  if ((enc_TEXT_PDU_39(i) == o)and(dec_TEXT_PDU_39(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_39(i)= ", enc_TEXT_PDU_39(i), "; dec_TEXT_PDU_39(o)= ", dec_TEXT_PDU_39(o));}
+}
+
+
+testcase TC_Empty_Record_of() runs on TempComp {
+  const TEXT_PDU_39 	i := {}
+  const charstring 	o := "PDU::UDP"
+  const TEXT_PDU_39  expected_res:= {}
+
+  if ((enc_TEXT_PDU_39(i) == o)and(dec_TEXT_PDU_39(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_39(i)= ", enc_TEXT_PDU_39(i), "; dec_TEXT_PDU_39(o)= ", dec_TEXT_PDU_39(o));}
+}
+
+
+
+type union TEXT_PDU_40 {
+  charstring f1,
+  charstring f2
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end')";
+            variant (f1) "BEGIN('f1:'),END(':1f')"
+            variant (f2) "BEGIN('f2:'),END(':2f')" };
+external function enc_TEXT_PDU_40(in TEXT_PDU_40 pdu) return charstring with { extension "prototype(convert) encode(TEXT)" }
+external function dec_TEXT_PDU_40(in charstring oct) return TEXT_PDU_40 with { extension "prototype(convert) decode(TEXT)" }
+
+testcase TC_Union_with_BEGIN_END_token_1() runs on TempComp {
+  const TEXT_PDU_40 	i := {f1:="value1"}
+  const charstring 	o := "Head:f1:value1:1f:end"
+  const TEXT_PDU_40  expected_res:= {f1:="value1"}
+
+  if ((enc_TEXT_PDU_40(i) == o)and(dec_TEXT_PDU_40(o) == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_40(i)= ", enc_TEXT_PDU_40(i), "; dec_TEXT_PDU_40(o)= ", dec_TEXT_PDU_40(o));}
+}
+
+testcase TC_Union_with_BEGIN_END_token_2() runs on TempComp {
+  const charstring 	o := "Head:f2:value2:2f:end"
+  const TEXT_PDU_40  expected_res:= {f2:="value2"}
+
+  if (dec_TEXT_PDU_40(o) == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"; dec_TEXT_PDU_40(o)= ", dec_TEXT_PDU_40(o));}
+}
+
+
+
+type union TEXT_PDU_41 {
+  charstring f1,
+  charstring f2
+} with { encode "TEXT"; variant "BEGIN('Head:'),END(':end')";
+            variant (f1) "BEGIN('f1:'),END(':1f')"
+            variant (f2) "BEGIN('f2:'),END(':2f')" };
+external function enc_TEXT_PDU_41(in TEXT_PDU_41 pdu, out charstring cs) with { extension "prototype(fast) encode(TEXT)" }
+external function dec_TEXT_PDU_41(in charstring cs, out TEXT_PDU_41 pdu) with { extension "prototype(fast) decode(TEXT)" }
+
+testcase TC_implicit_message_encoding_prototype_fast_1() runs on TempComp {
+  const TEXT_PDU_41 	i := {f1:="value1"}
+  const charstring 	o := "Head:f1:value1:1f:end"
+  const TEXT_PDU_41  expected_res:= {f1:="value1"}
+
+  var charstring res;
+  enc_TEXT_PDU_41(i, res);
+  var TEXT_PDU_41 dec_pdu;
+  dec_TEXT_PDU_41(o, dec_pdu);
+
+  if ((res == o)and(dec_pdu == expected_res)) {setverdict(pass);}
+  else {setverdict(fail,"enc_TEXT_PDU_41(i)= ", res, "; dec_TEXT_PDU_41(o)= ", dec_pdu);}
+}
+
+testcase TC_implicit_message_encoding_prototype_fast_2() runs on TempComp {
+  const charstring 	o := "Head:f2:value2:2f:end"
+  const TEXT_PDU_41  expected_res:= {f2:="value2"}
+
+  var TEXT_PDU_41 dec_pdu;
+  dec_TEXT_PDU_41(o, dec_pdu);
+
+  if (dec_pdu == expected_res) {setverdict(pass);}
+  else {setverdict(fail,"; dec_TEXT_PDU_41(o)= ", dec_pdu);}
+}
+
+
+
+type integer TEXT_PDU_42 with { encode "TEXT"; variant "TEXT_CODING()" };
+external function enc_TEXT_PDU_42(in TEXT_PDU_42 pdu, out charstring cs)
+   with { extension "prototype(fast) encode(TEXT)" }
+external function dec_TEXT_PDU_42(in charstring cs, out TEXT_PDU_42 pdu) return integer
+   with { extension "prototype(backtrack) decode(TEXT) errorbehavior(ALL:WARNING)" }
+
+testcase TC_implicit_message_encoding_prototype_backtrack() runs on TempComp {
+  var TEXT_PDU_42 bs := 42;
+  var TEXT_PDU_42 decoded_bs;
+  var charstring enc_bs;
+  var integer ret_val;
+  var charstring invalid_enc_bs := "bruhaha";
+
+  enc_TEXT_PDU_42(bs, enc_bs);
+  ret_val := dec_TEXT_PDU_42(enc_bs, decoded_bs);
+  if (ret_val==0) { setverdict(pass); } else { setverdict(fail); }
+  if (decoded_bs==bs) { setverdict(pass); } else { setverdict(fail); }
+  ret_val := dec_TEXT_PDU_42(invalid_enc_bs, decoded_bs);
+  if (ret_val==1) { setverdict(pass); } else { setverdict(fail); }
+}
+
+
+
+type integer TEXT_PDU_43 with { encode "TEXT"; variant "TEXT_CODING(length=4)" };
+external function dec_TEXT_PDU_43(inout charstring cs, out TEXT_PDU_43 pdu) return integer 
+  with { extension "prototype(sliding) decode(TEXT) errorbehavior(ALL:WARNING)" }
+
+testcase TC_implicit_message_encoding_prototype_sliding() runs on TempComp {
+  var TEXT_PDU_43 out_pdu;
+  var charstring enc_pdu1 := "  42  21";
+  var integer ret_val;  
+
+  ret_val := dec_TEXT_PDU_43(enc_pdu1, out_pdu);
+  if (ret_val==0 and out_pdu==42) { setverdict(pass); } else { setverdict(fail); }
+  ret_val := dec_TEXT_PDU_43(enc_pdu1, out_pdu);
+  if (ret_val==0 and out_pdu==21) { setverdict(pass); } else { setverdict(fail); }  
+  ret_val := dec_TEXT_PDU_43(enc_pdu1, out_pdu);
+}
+
+
+control {
+execute (TC_Fixed_length_encoding());
+execute (TC_Convert_string_to_lower_case_during_encoding());
+execute (TC_Convert_string_to_upper_case_during_encoding());
+execute (TC_Convert_string_to_lower_case_during_encoding_and_upper_during_decoding());
+execute (TC_Convert_string_to_upper_case_during_encoding_and_lower_during_decoding());
+execute (TC_Left_justification());
+execute (TC_Center_justification());
+execute (TC_Right_justification());
+execute (TC_Case_sensitive_selection());
+execute (TC_Case_insensitive_selection());
+execute (TC_Fixed_length_integer());
+execute (TC_Variable_length_integer());
+execute (TC_encoding_without_leading_zero());
+execute (TC_encoding_with_leading_zero());
+execute (TC_encoding_negativ_integer_with_leading_zero());
+execute (TC_Selection_of_integer_value());
+execute (TC_basic_encoding_of_true_value());
+execute (TC_basic_encoding_of_false_value());
+execute (TC_Encoding_and_decoding_of_given_tokens_1());
+execute (TC_Encoding_and_decoding_of_given_tokens_2());
+execute (TC_Basic_encoding_of_enumerated_values());
+execute (TC_Encoding_of_given_enumerated_values_1());
+execute (TC_Encoding_of_given_enumerated_values_2());
+execute (TC_Encoding_of_given_enumerated_values_3());
+execute (TC_Coding_with_leading_token());
+execute (TC_Coding_with_leading_token_case_insensitive_decoding());
+execute (TC_Coding_with_leading_token_case_insensitive_decoding_1());
+execute (TC_Coding_with_leading_token_case_insensitive_decoding_2());
+execute (TC_Coding_with_trailing_token());
+execute (TC_Coding_with_trailing_token_case_insensitive_decoding());
+execute (TC_Coding_with_trailing_token_using_decoding_matching_pattern());
+execute (TC_Coding_with_separator_token());
+execute (TC_Coding_with_separator_token_case_insensitive_decoding());
+execute (TC_Coding_with_separator_token_1());
+execute (TC_Coding_with_separator_token_2());
+execute (TC_Record_with_BEGIN_END_token());
+execute (TC_Record_with_record_fields());
+execute (TC_Record_with_optional_fields_1());
+execute (TC_Record_with_optional_fields_2());
+execute (TC_Set_with_BEGIN_END_token());
+execute (TC_Set_with_BEGIN_END_token_1());
+execute (TC_Set_with_BEGIN_END_token_2());
+execute (TC_Set_with_optional_fields_1());
+execute (TC_Set_with_optional_fields_2());
+execute (TC_Set_with_set_of_type_fields_1());
+execute (TC_Set_with_set_of_type_fields_2());
+execute (TC_Set_with_set_of_type_fields_3());
+execute (TC_Record_of_with_BEGIN_END_token());
+execute (TC_Record_of_with_record_fields());
+execute (TC_Empty_Record_of());
+execute (TC_Union_with_BEGIN_END_token_1());
+execute (TC_Union_with_BEGIN_END_token_2());
+execute (TC_implicit_message_encoding_prototype_fast_1());
+execute (TC_implicit_message_encoding_prototype_fast_2());
+execute (TC_implicit_message_encoding_prototype_backtrack());
+execute (TC_implicit_message_encoding_prototype_sliding());
+}
+
+<RESULT>
+Overall verdict: pass
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2. Encoding/decoding of big integers
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3.Big integer fields
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+
+<TC - big integers: big integer fields>
+<STATIC>
+
+external function enc_text(in rec_text r) return charstring
+  with { extension "encode(TEXT) prototype(convert) errorbehavior(ALL:WARNING)" }
+external function dec_text(in charstring r) return rec_text
+  with { extension "decode(TEXT) prototype(convert) errorbehavior(ALL:WARNING)" }
+
+type integer myint1 with {
+  variant "BEGIN('<myint>')"
+  variant "END('</myint>')"
+  encode "TEXT" }
+
+type integer myint2 with {
+  variant "BEGIN('<myint_dummy>')"
+  variant "END('</myint_dummy>')"
+  variant "TEXT_CODING(length=128;leading0=true)"
+  encode "TEXT" }
+
+type integer myint3 with {
+  variant "BEGIN('<myint_super>')"
+  variant "END('</myint_super>')"
+  encode "TEXT" }
+
+type integer myint4 with {
+  variant "TEXT_CODING(length=256)"
+  variant "BEGIN('<myint_pad>')"
+  variant "END('</myint_pad>')"
+  encode "TEXT" }
+
+type record rec_text {
+  myint1 int1,
+  myint1 int2,
+  myint2 int3 optional,
+  myint3 int4 optional,
+  myint4 int5 optional
+} with {
+  variant "BEGIN('<rec_text>')"
+  // `variant "SEPARATOR(',')"' is not necessary if the fields can be found
+  // unambigously.
+  variant "END('</rec_text>')"
+  encode "TEXT" }
+
+<TTCN_TC:EXEC>
+  const integer a := 214748364799
+  const integer b := 214748364788
+  const integer c := 0
+  // Implicit `omit' would be great.
+  var rec_text myrec1 := {int1 := 214748364799, int2 := 214748364788, int3 := omit, int4 := omit, int5 := omit}
+  var rec_text myrec2 := {214748364799, 214748364788, omit, omit, omit}
+  var rec_text myrec3 := {214748364799, 0, omit, omit, omit}
+  var rec_text myrec4 := {int1 := 214748364799, int2 := 0, int3 := omit, int4 := omit, int5 := omit}
+  var rec_text myrec5 := {int1 := 0, int2 := 214748364788, int3 := omit, int4 := omit, int5 := omit}
+  var rec_text myrec6 := {0, 214748364788, omit, omit, omit}
+  var rec_text myrec7 := {0, 0, omit, omit, omit}
+  var rec_text myrec8 := {int1 := 0, int2 := 0, int3 := omit, int4 := omit, int5 := omit}
+  var rec_text myrec9 := {int1 := a, int2 := b, int3 := omit, int4 := omit, int5 := omit}
+  var rec_text myrec10 := {a, b, omit, omit, omit}  
+  // The original `sprintf' encoder encodes negative values `-' <padding>
+  // `0123456'.  We should work similarly.
+  var rec_text myrec11 := {
+    int1 := -11111111111111111111111111111,
+    int2 := 22222222222222222222222222222, 
+    int3 := -33333333333333333333333333333,
+    int4 := 2147483648,
+    int5 := -2147483648 }
+  var rec_text myrec12 := {int1 := 0, int2 := 0, int3 := 0, int4 := -1111111111111111111111111111111, int5 := -1234567891011121314151617181920}
+  var rec_text myrec13 := {-0, -0, -0, -0, -0}
+  var rec_text myrec14 := {-0, -1, 1234567891011121314151617181920, -1111111111111111111111111111111, -0}
+  var rec_text myrec15 := {int1 := 1111111111111111111111111111111, int2 := -1234567891011121314151617181920, int3 := 0, int4 := -0, int5 := -111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111}  
+  var charstring ret_val
+  ret_val := enc_text(myrec1)
+  if (dec_text(ret_val) == myrec1) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 214748364799, int2 := 214748364788, int3 := omit, int4 := omit, int5 := omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec2)
+  if (dec_text(ret_val) == myrec2) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {214748364799, 214748364788, omit, omit, omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec3)
+  if (dec_text(ret_val) == myrec3) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {214748364799, 0, omit, omit, omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec4)
+  if (dec_text(ret_val) == myrec4) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 214748364799, int2 := 0, int3 := omit, int4 := omit, int5 := omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec5)
+  if (dec_text(ret_val) == myrec5) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 0, int2 := 214748364788, int3 := omit, int4 := omit, int5 := omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec6)
+  if (dec_text(ret_val) == myrec6) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {0, 214748364788, omit, omit, omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec7)
+  if (dec_text(ret_val) == myrec7) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {0, 0, omit, omit, omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec8)
+  if (dec_text(ret_val) == myrec8) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 0, int2 := 0, int3 := omit, int4 := omit, int5 := omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec9)
+  if (dec_text(ret_val) == myrec9) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := a, int2 := b, int3 := omit, int4 := omit, int5 := omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec10)
+  if (dec_text(ret_val) == myrec10) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {a, b, omit, omit, omit}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec11)
+  if (dec_text(ret_val) == myrec11) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := -11111111111111111111111111111, int2 := 22222222222222222222222222222, int3 := -33333333333333333333333333333, int4 := 2147483648, int5 := -2147483648}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec12)
+  if (dec_text(ret_val) == myrec12) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 0, int2 := 0, int3 := 0, int4 := -1111111111111111111111111111111, int5 := -1234567891011121314151617181920}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec13)
+  if (dec_text(ret_val) == myrec13) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {-0, -0, -0, -0, -0}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec14)
+  if (dec_text(ret_val) == myrec14) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {-0, -1, 1234567891011121314151617181920, -1111111111111111111111111111111, -0}) { setverdict(pass) } else { setverdict(fail) }
+  ret_val := enc_text(myrec15)
+  if (dec_text(ret_val) == myrec15) { setverdict(pass) } else { setverdict(fail) }
+  if (dec_text(ret_val) == {int1 := 1111111111111111111111111111111, int2 := -1234567891011121314151617181920, int3 := 0, int4 := -0, int5 := -111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111}) { setverdict(pass) } else { setverdict(fail) }
+
+<RESULT>
+Overall verdict: pass
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Sliding encoding/decoding of big integers
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+
+<TC - big integers: sliding encoding/decoding of big integers>
+<STATIC>
+
+external function dec_text_sliding(inout charstring r, out myint5 s) return integer 
+  with { extension "prototype(sliding) decode(TEXT) errorbehavior(ALL:WARNING)" }
+
+type integer myint5 with { encode "TEXT"; variant "TEXT_CODING(length=25)" }
+
+<TTCN_TC:EXEC>
+  var myint5 decoded
+  var charstring encoded := "  12345678910111213141516    -11111111111111111111"
+  var integer ret_val
+  var template integer intt := 12345678910111213141516
+  ret_val := dec_text_sliding(encoded, decoded)
+  if (ret_val == 0 and decoded == 12345678910111213141516) {setverdict(pass)}
+  else {setverdict(fail)}
+  ret_val := dec_text_sliding(encoded, decoded)
+  if (ret_val == 0 and decoded == -11111111111111111111) {setverdict(pass)}
+  else {setverdict(fail)}
+  ret_val := dec_text_sliding(encoded, decoded)
+  if (match(12345678910111213141516, intt)) {setverdict(pass)}
+  else {setverdict(fail)}
+
+<RESULT>
+Overall verdict: pass
+<END_TC>
+
+:exmp.
+.*---------------------------------------------------------------------*
+:h1.REFERENCES
+.*---------------------------------------------------------------------*
+:nl. Requirement specification(s):
+:nl.-------------------------------
+:list.
+:li. 3/ETH/RUS-2003:0087 Uen - Requirement Specification for TITAN's TTCN-3 Semantic Analyser
+:elist.
+
+:etext.

@@ -1,0 +1,740 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module TanytypeOper {
+// ********** Type definitions  *********************
+type component anytypeOper_mycomp {};
+type enumerated anytypeOper_myenum {xx1,xx2,xx3};
+type record anytypeOper_trecord {
+	integer x1 optional,
+	float x2 };
+type record of octetstring anytypeOper_trecof;
+type set anytypeOper_tset {
+	integer x1,
+	float x2 optional };
+type set of charstring anytypeOper_tsetof;
+
+type union anytypeOper_tunion {
+	integer x1,
+	float x2 };
+
+type integer int;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// *************** Constanst ***********************
+//const anytypeOper_trecord anytypeOper_temp1:={ x1:=omit, x2:=3.4 };
+//const anytypeOper_trecof anytypeOper_temp2:={ 'AF12'O };
+//const anytypeOper_tset anytypeOper_temp3:={ x1:=234, x2:=1.9};
+//const anytypeOper_tsetof anytypeOper_temp4:={"f","8"};
+//const anytypeOper_tunion anytypeOper_temp5:={ x2:=1.3 };
+const anytype anytypeOper_const1:=
+{ integer := 1 }; 	//union with basic types
+
+const anytype anytypeOper_const2:= { 	//union with enum
+  anytypeOper_myenum := xx1 };
+
+const anytype anytypeOper_const3:= {    //union from record
+  anytypeOper_trecord := { x1:=1, x2:=1.2 } } ;
+
+const anytype anytypeOper_const4:={   //union from record of
+  anytypeOper_trecof := { '12AB'O, 'CD12'O } };
+
+const anytype anytypeOper_const5:={   //union from set
+  anytypeOper_tset :={ x1:=2, x2:=1.3} };
+
+const anytype anytypeOper_const6:={   //union from set of
+ anytypeOper_tsetof := {"a","b"} };
+
+const anytype anytypeOper_const7:={   //union from union
+ anytypeOper_tunion :={ x1 :=3 } } ;
+
+testcase anytypeAssign() runs on anytypeOper_mycomp{
+var anytype x1:={	//union with basic types
+  integer:=1 };
+var anytype x2,x3;
+x2:={ float:=1.2 };
+if (x1.integer==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.float))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.float==1.2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.float)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignEnum() runs on anytypeOper_mycomp{
+var anytype x1:={	//union with enum
+  anytypeOper_myenum:=xx1};
+var anytype x2;
+x2:={ anytypeOper_myenum:=xx2 };
+if (x1.anytypeOper_myenum==xx1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_myenum)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_myenum==xx2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_myenum)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignRec() runs on anytypeOper_mycomp{
+//var anytypeOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytype x1:={   //union from record
+ anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+var anytype x2;
+x2:={ anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+if (x1.anytypeOper_trecord.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.anytypeOper_trecord.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_trecord)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_trecord.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.anytypeOper_trecord.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_trecord)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignRecof() runs on anytypeOper_mycomp{
+//var anytypeOper_trecof temp2:={'AF12'O};
+var anytype x1:={   //union from record of
+ anytypeOper_trecof := { '12AB'O, 'CD12'O } };
+var anytype x2;
+x2:={  anytypeOper_trecof:={ '12AB'O, 'CD12'O } };
+if (x1.anytypeOper_trecof[0]=='12AB'O) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.anytypeOper_trecof[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_trecof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_trecof[0]=='12AB'O) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.anytypeOper_trecof[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_trecof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeAssignSet() runs on anytypeOper_mycomp{
+//var anytypeOper_tset temp1:={ x1:=2, x2:=omit };
+var anytype x1:={   //union from record
+ anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+var anytype x2;
+x2:={   anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+if (x1.anytypeOper_tset.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.anytypeOper_tset.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tset)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_tset.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.anytypeOper_tset.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tset)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignSetof() runs on anytypeOper_mycomp{
+//var anytypeOper_tsetof temp2:={"a","7"};
+var anytype x1:={   //union from set of
+ anytypeOper_tsetof:={ "1", "a" } };
+var anytype x2;
+x2:={  anytypeOper_tsetof:={ "1", "a" } };
+if (x1.anytypeOper_tsetof[0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.anytypeOper_tsetof[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_tsetof[0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.anytypeOper_tsetof[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignUnion() runs on anytypeOper_mycomp{
+//var anytypeOper_tunion temp5 := {x2:=1.3}
+var anytype x1:={   //union from union
+ anytypeOper_tunion:={ x1 :=3 } };
+var anytype x2;
+x2:={ anytypeOper_tunion:={ x1 :=3 } };
+if (x1.anytypeOper_tunion.x1==3) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tunion.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.anytypeOper_tunion.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_tunion.x1==3) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tunion.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_tunion.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElem() runs on anytypeOper_mycomp{
+var anytype x1, x2;	//union with basic types
+x1:={ integer:=1 };
+x2:= {integer:=2}
+x1.integer:=3;		// change value
+x2.float:=3.2;		//choose other
+if (x1.integer==3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.float))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.float==3.2) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.float)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElemEnum() runs on anytypeOper_mycomp{
+var anytype x1, x2;	//union with enum
+x1:={ anytypeOper_myenum:=xx1 };
+x2:= {anytypeOper_myenum:=xx2}
+x1.anytypeOper_myenum:=xx3;		// change value
+x2.integer:=3;		//choose other
+if (x1.anytypeOper_myenum==xx3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_myenum)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.integer==3) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_myenum))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElemRec() runs on anytypeOper_mycomp{
+//var anytypeOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytype x1,x2;	//union from record
+x1:={   anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+x2:={   anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+x1.anytypeOper_trecord.x1:=2;		//change value
+x2.integer:=2;		//change selection
+if (x1.anytypeOper_trecord.x1==2) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.anytypeOper_trecord.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_trecord)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.integer==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_trecord))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElemRecof() runs on anytypeOper_mycomp{
+//var anytypeOper_trecof temp2:={'AF12'O};
+var anytype x1,x2;    //union from record of
+x1:={ anytypeOper_trecof:={ '12AB'O, 'CD12'O } };
+x2:={ anytypeOper_trecof:={ '12AB'O, 'CD12'O } };
+x1.anytypeOper_trecof[1]:='34AB'O;	//change value
+x2.integer:=2;		//change selection
+if (x1.anytypeOper_trecof[0]=='12AB'O) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.anytypeOper_trecof[1]=='34AB'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_trecof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.integer==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_trecof))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeAssignElemSet() runs on anytypeOper_mycomp{
+//var anytypeOper_tset temp1:={ x1:=2, x2:=omit };
+var anytype x1,x2;   //union from record
+x1:= { anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+x2:= { anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+x1.anytypeOper_tset.x2:=3.4;			//change value
+x2.integer:=3;			//change selection
+if (x1.anytypeOper_tset.x1==1) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.anytypeOper_tset.x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tset)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.integer==3) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_tset))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElemSetof() runs on anytypeOper_mycomp{
+//var anytypeOper_tsetof temp2:={"a","7"};
+var anytype x1,x2;   //union from record of
+x1:={ anytypeOper_tsetof:={ "1", "a" } };
+x2:={ integer:=1 };
+x1.anytypeOper_tsetof[0]:="h";		//change value
+x2.anytypeOper_tsetof:={ "1", "a" };		//change selection
+if (x1.anytypeOper_tsetof[0]=="h") {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.anytypeOper_tsetof[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_tsetof[0]=="1") {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (x2.anytypeOper_tsetof[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeAssignElemUnion() runs on anytypeOper_mycomp{
+//var anytypeOper_tunion temp5 := {x2:=1.3}
+var anytype x1,x2;   //union from union
+x1:={ anytypeOper_tunion:={ x1 :=3 } };
+x2:={ integer:=2 };
+x1.anytypeOper_tunion.x2:=3.4;			//change value
+x2.anytypeOper_tunion:={ x2 :=3.4 };		//change selection
+if (x1.anytypeOper_tunion.x2==3.4) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tunion.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.anytypeOper_tunion.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.anytypeOper_tunion.x2==3.4) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tunion.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.anytypeOper_tunion.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeConst() runs on anytypeOper_mycomp{
+const anytype const1:={	//union with basic types
+ integer:=1 };
+if (anytypeOper_const1.integer==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const1.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const1.float))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1.integer==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const1.integer)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const1.float))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeConstEnum() runs on anytypeOper_mycomp{
+const anytype const2:={	//union with enum
+ anytypeOper_myenum:=xx1} ;
+if (anytypeOper_const2.anytypeOper_myenum==xx1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const2.anytypeOper_myenum)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const2.anytypeOper_myenum==xx1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const2.anytypeOper_myenum)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const2.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeConstRec() runs on anytypeOper_mycomp{
+const anytype const3:={   //union from record
+  anytypeOper_trecord:={ x1:=1, x2:=1.2 } } ;
+if (anytypeOper_const3.anytypeOper_trecord.x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeOper_const3.anytypeOper_trecord.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const3.anytypeOper_trecord)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const3.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const3.anytypeOper_trecord.x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const3.anytypeOper_trecord.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const3.anytypeOper_trecord)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const3.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeConstRecof() runs on anytypeOper_mycomp{
+const anytype const4:={   //union from record of
+ anytypeOper_trecof :={ '12AB'O, 'CD12'O } } ;
+if (anytypeOper_const4.anytypeOper_trecof[0]=='12AB'O) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeOper_const4.anytypeOper_trecof[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const4.anytypeOper_trecof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const4.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4.anytypeOper_trecof[0]=='12AB'O) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const4.anytypeOper_trecof[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const4.anytypeOper_trecof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const4.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeConstSet() runs on anytypeOper_mycomp{
+const anytype const5:={   //union from set
+  anytypeOper_tset :={ x1:=2, x2:=1.3} };
+if (anytypeOper_const5.anytypeOper_tset.x1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeOper_const5.anytypeOper_tset.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const5.anytypeOper_tset)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const5.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const5.anytypeOper_tset.x1==2) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const5.anytypeOper_tset.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const5.anytypeOper_tset)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const5.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeConstSetof() runs on anytypeOper_mycomp{
+const anytype const6:={   //union from set of
+  anytypeOper_tsetof :={"a","b"} };
+if (anytypeOper_const6.anytypeOper_tsetof[0]=="a") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeOper_const6.anytypeOper_tsetof[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const6.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const6.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6.anytypeOper_tsetof[0]=="a") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const6.anytypeOper_tsetof[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const6.anytypeOper_tsetof)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const6.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeConstUnion() runs on anytypeOper_mycomp{
+const anytype const7:={   //union from union
+ anytypeOper_tunion:={ x1 :=3 } };
+if (anytypeOper_const7.anytypeOper_tunion.x1==3) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const7.anytypeOper_tunion.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const7.anytypeOper_tunion.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeOper_const7.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeOper_const7.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const7.anytypeOper_tunion.x1==3) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const7.anytypeOper_tunion.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const7.anytypeOper_tunion.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const7.anytypeOper_tunion)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const7.integer))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeComp() runs on anytypeOper_mycomp{
+var anytype x1,x2,x3,x4;
+x1:={ integer:=1  };
+x2:={ integer:=1 };
+x3:={ integer:=2 };		// different value
+x4:={ float:=1.2 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypeCompSame() runs on anytypeOper_mycomp{
+var anytype x1,x2;
+x1:={ integer:=1  };			// same value, different selection
+x2:={ int:=1 };
+if (x1!=x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypeCompEnum() runs on anytypeOper_mycomp{
+var anytype x1,x2,x3,x4;
+x1:={ anytypeOper_myenum:=xx1  };
+x2:={ anytypeOper_myenum:=xx1 };
+x3:={ anytypeOper_myenum:=xx2 };		// different value
+x4:={ integer:=1 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeCompRec() runs on anytypeOper_mycomp{
+//var anytypeOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytype x1,x2,x3,x4;
+x1 :={  anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+x2 :={  anytypeOper_trecord:={ x1:=1, x2:=1.2 } };
+x3 :={  anytypeOper_trecord:={ x1:=2, x2:=1.2 } }; // different value
+x4 :={  integer:=1 }; // different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeCompRecof() runs on anytypeOper_mycomp{
+//var anytypeOper_trecof temp2:={'AF12'O};
+var anytype x1,x2,x3,x4;	//union from record of
+x1:={  anytypeOper_trecof:={ '12AB'O, 'CD12'O } };
+x2:={  anytypeOper_trecof:={ '12AB'O, 'CD12'O } };
+x3:={  anytypeOper_trecof:={ '12AB'O } };		//different value
+x4:={  integer:=12 };		//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypeCompSet() runs on anytypeOper_mycomp{
+//var anytypeOper_tset temp1:={ x1:=2, x2:=omit };
+var anytype x1,x2,x3,x4; // union from set
+x1:={ anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+x2:={ anytypeOper_tset:={ x1:=1, x2:=1.2 } };
+x3:={ anytypeOper_tset:={ x1:=4, x2:=1.2 } }; // different value
+x4:={ integer:=4 }; 			// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypeCompSetof() runs on anytypeOper_mycomp{
+//var anytypeOper_tsetof temp2:={"a","7"};
+var anytype x1,x2,x3,x4;	//union from record of
+x1:={ anytypeOper_tsetof:={ "1", "a" } };
+x2:={ anytypeOper_tsetof:={ "1", "a" } };
+x3:={ anytypeOper_tsetof:={ "1", "a", "k" } };	//different value
+x4:={ integer:=2 };			//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypeCompUnion() runs on anytypeOper_mycomp{
+//var anytypeOper_tunion temp5 := {x2:=1.3}
+var anytype x1,x2,x3,x4;	// union form union
+x1:={  anytypeOper_tunion:={ x1 :=3 } };
+x2:={  anytypeOper_tunion:={ x1 :=3 } };
+x3:={  anytypeOper_tunion:={ x2 :=3.9 } };		//different value
+x4:={  integer:=3 };				//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+control {
+ execute(anytypeAssign());
+ execute(anytypeAssignEnum());
+ execute(anytypeAssignRec());
+ execute(anytypeAssignRecof());
+ execute(anytypeAssignSet());
+ execute(anytypeAssignSetof());
+ execute(anytypeAssignUnion());
+ execute(anytypeAssignElem());
+ execute(anytypeAssignElemEnum());
+ execute(anytypeAssignElemRec());
+ execute(anytypeAssignElemRecof());
+ execute(anytypeAssignElemSet());
+ execute(anytypeAssignElemSetof());
+ execute(anytypeAssignElemUnion());
+ execute(anytypeConst());
+ execute(anytypeConstEnum());
+ execute(anytypeConstRec());
+ execute(anytypeConstRecof());
+ execute(anytypeConstSet());
+ execute(anytypeConstSetof());
+ execute(anytypeConstUnion())
+ execute(anytypeComp());
+ execute(anytypeCompSame());
+ execute(anytypeCompEnum());
+ execute(anytypeCompRec());
+ execute(anytypeCompRecof());
+ execute(anytypeCompSet());
+ execute(anytypeCompSetof());
+ execute(anytypeCompUnion())
+}
+}
+with {
+extension "anytype int, integer, float, anytypeOper_tunion, anytypeOper_myenum"
+extension "anytype anytypeOper_trecord, anytypeOper_trecof"
+extension "anytype anytypeOper_tset,    anytypeOper_tsetof"
+}
+

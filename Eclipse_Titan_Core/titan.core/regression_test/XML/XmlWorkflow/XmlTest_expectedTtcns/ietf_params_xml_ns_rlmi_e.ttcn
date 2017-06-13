@@ -1,0 +1,132 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          ietf_params_xml_ns_rlmi.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- rlmi.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "urn:ietf:params:xml:ns:rlmi" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module ietf_params_xml_ns_rlmi {
+
+
+import from XSD all;
+
+
+import from www_w3_org_XML_1998_namespace_e all;
+
+
+type record List
+{
+	record of XSD.String attr,
+	XSD.String cid optional,
+	XSD.Boolean fullState,
+	XSD.AnyURI uri,
+	XSD.UnsignedInt version,
+	record of XSD.Name name_list,
+	record of Resource resource_list
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (attr) "anyAttributes";
+  variant (cid) "attribute";
+  variant (fullState) "attribute";
+  variant (uri) "attribute";
+  variant (version) "attribute";
+  variant (name_list) "untagged";
+  variant (resource_list) "untagged";
+};
+
+
+type record Resource
+{
+	record of XSD.String attr,
+	XSD.AnyURI uri,
+	record of XSD.Name name_list,
+	record of Instance instance_list
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (attr) "anyAttributes";
+  variant (uri) "attribute";
+  variant (name_list) "untagged";
+  variant (instance_list) "untagged";
+};
+
+
+type record Instance
+{
+	record of XSD.String attr,
+	XSD.String cid optional,
+	XSD.String id,
+	XSD.String reason optional,
+	enumerated {
+		active,
+		pending,
+		terminated
+	} state,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (attr) "anyAttributes";
+  variant (cid) "attribute";
+  variant (id) "attribute";
+  variant (reason) "attribute";
+  variant (state) "attribute";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement";
+};
+
+
+type record Name
+{
+	Lang lang optional,
+	XSD.String base
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (lang) "attribute";
+  variant (base) "untagged";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'urn:ietf:params:xml:ns:rlmi'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

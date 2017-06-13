@@ -1,0 +1,2207 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Delic, Adam
+.*   Kovacs, Ferenc
+.*   Palugyai, Sandor
+.*   Pandi, Krisztian
+.*   Szabados, Kristof
+.*   Szabo, Janos Zoltan – initial implementation
+.*   Szalai, Endre
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+
+.* EDML webpage:       http://cpi.ericsson.se/dwaxe/
+.* EDML2PDF converter: http://dwaxe.ericsson.se/x2pdf
+.* EDML user guide:    http://www.lmc.ericsson.se/~lmcmarg/isit/edml_ug.html
+
+.* Document header information
+:docname.Test Description
+:docno.18/152 91-CRL 113 200/5 Uen
+:rev.A
+:date.2015-04-27
+
+:prep.ETH/XZR Krisztian Pandi
+:appr.ETH/XZ (Gyula Koos)
+:checked.ETHGRY
+
+:title.Test description of the TTCN-3 Semantic Analyzer: Location of Language Elements
+:contents level=2.
+.*---------------------------------------------------------------------*
+:h1.Introduction
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Revision history
+.*---------------------------------------------------------------------*
+:xmp tab=2.
+REV   DATE         PREPARED   CHANGE
+__________________________________________________
+PA1   2005-02-17   ESNDPAL    New document for TITAN R6
+A     2005-03-18   ESNDPAL    Approved after review
+B     2006-07-31   EKRISZA    Updates for TITAN R6E
+C     2007-03-06   EJNOSZA    Updates for TITAN R7A (expected error messages)
+D     2009-06-11   EKRISZA    Name correction
+A     2011-12-12   EKRISZA     Updated for release
+A     2012-06-27   EFERKOV     Updated for release
+A     2013-01-17   EKRIPND     Updated for release
+:exmp.
+.*---------------------------------------------------------------------*
+:h2.Purpose
+.*---------------------------------------------------------------------*
+The purpose of this Test Description is to define and describe the function
+test activity for the Semantic Analyser functionality of the TTCN-3 compiler:
+:nl.SA-7/x: Location of Language Elements
+:p.The specification of the test cases can be found in this document.
+.*---------------------------------------------------------------------*
+:h1.Test environment
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Hardware
+.*---------------------------------------------------------------------*
+No specific hardware requirement.
+.*---------------------------------------------------------------------*
+:h2.Software
+.*---------------------------------------------------------------------*
+Tests shall be carried out on the following platforms:
+:list.
+:li D='1.'.Solaris 8 (Sun OS 5.8) (gcc 3.0.4)
+:li D='2.'.SUSE Linux Enterprise server 8 (2.4.19-4GB) (gcc 3.2)
+:li D='3.'.CYGWIN_NT-5.0 (Cygwin DLL: 1.5.12) on Windows 2000 (gcc 3.3.3)
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Configuration
+.*---------------------------------------------------------------------*
+The test environment had been setup in CVS. The tester program is stored in:
+:nl.TTCNv3/function_test/Tools/SAtester.pl
+:nl.Test cases are stored with extension .script in the directory:
+:nl.TTCNv3/function_test/Semantic_Analyser/
+.*---------------------------------------------------------------------*
+:h2.Installation
+.*---------------------------------------------------------------------*
+Install proper TITAN binaries on the used platforms and make sure that
+your environment settings are correct:
+:list.
+:li D='1.'.TTCN3_DIR is set
+:li D='2.'.$TTCN3_DIR/bin is added to the PATH variable
+:li D='3.'.$TTCN3_DIR/lib is added to the LD_LIBRARY_PATH variable
+:li D='4.'.Perl 5.6.0 or higher is available on the platform
+:li D='5.'.Create a symlink to your Perl binary into the directory where the
+test cases are stored:
+:nl.ln -s <your Perl> perl
+:elist.
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+A tester program had been written in Perl especially for the Semantic Analyser
+tests. For the list of command line parameters, type 'SAtester.pl -help', for the
+complete documentation, type 'SAtester.pl -doc'.
+:p.Test cases are specified in the Test Description documents in EDML format.
+The tester program parses these files and generates the TTCN-3/ASN.1 modules, then
+calls the compiler to compile them. The result printout is then matched against
+different patterns to be able to set the verdict. Test cases contain not only
+the source modules, but the patterns as well.
+:p.The tester program allows one-by-one execution of test cases and batched
+execution as well.
+:p.NOTE: the tester program requires Perl 5.6.0 or higher.
+.*---------------------------------------------------------------------*
+:h1.Test cases
+.*---------------------------------------------------------------------*
+Ref [1]: SA-7/x: Values, Location of Language Elements
+.*---------------------------------------------------------------------*
+:h2.Location of language elements
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3.A declaration/statement/operation is used where it is not supposed to be used
+.*---------------------------------------------------------------------*
+
+This test case group covers the requirement SA-7/1.
+
+Strategy: See table 'Overview of TTCN-3 statements and operations' (table 11 on page 84).
+	We also test the "port" and "component" keywords.
+	Return can be used only in functions.
+
+NOTE:
+:list.
+:li D='-'.the "repeat" cannot be tested, because other errors hide its error
+:li D='-'.the "interleave" structure is not supported in the TITAN
+:li D='-'."deactivate" cannot be tested, because the error of the "activate" covers its error
+:li D='-'."mtc" and "system" are integers in TITAN, so we won't negative test it
+:elist.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - alt (receive)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - alt (receive)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component comp {
+	port portT myPort;
+}
+
+control {
+
+	timer T1 := 5.0;
+	T1.start;
+
+	alt{
+	[] T1.timeout{
+		repeat
+	    }
+	[] myPort.receive(?){
+
+	    }
+	}
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Port.+?operation.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?no.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - return (in control part)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - return (in control part) >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	timer T1 := 5.0;
+	T1.start;
+
+	return
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Return.+?statement.+?not.+?used.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - return (in altstep)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - return (in altstep) >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+altstep myAltStep ( timer T1) runs on myComp{
+
+	[] T1.timeout{
+		// TR 643: return statement in altsteps
+		return
+}	}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 0>
+(?im)error.+?Return.+?statement.+?not.+?used.+?in.+?altstep
+<END_RESULT>
+<RESULT IF_PASS COUNT 0>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - return (in testcase)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - return (in testcase) >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+testcase myTestCase() runs on myComp{
+
+	timer T1 := 5.0;
+	T1.start;
+
+	return
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Return.+?statement.+?not.+?used.+?in.+?testcase
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - activate
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - activate >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+
+altstep myAltStep ( ) runs on myComp{
+	[] myPort.receive(?){
+		log("YY");
+	}
+}
+
+
+
+control {
+
+	timer T1 := 5.0;
+	T1.start;
+	timer T2 := 3.0;
+	T2.start;
+
+	var default myDefVar := activate(myAltStep( ));
+
+	alt{
+	[] T1.timeout{
+		log("XX");
+	}
+	}
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?definition.+?without.+?runs.+?on.+?clause.+?cannot.+?activate.+?altstep
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - create
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - create >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+	myPTC := myComp.create;
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Operation.+?create.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - connect
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - connect >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	connect( myPTC:Port1, mtc:Port2);
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?connect
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - disconnect
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - disconnect >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	disconnect( myPTC:Port1, mtc:Port2);
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?disconnect
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - map
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - map >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	map( myPTC:Port1, system:Port2);
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?map
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - unmap
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - unmap >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	unmap( myPTC:Port1, system:Port2);
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?unmap
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - self
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - self >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+	myPTC := self;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Operation.+?self.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - component start
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - component start >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+function myFunct() runs on myComp{
+
+	log("PFF");
+}
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	myPTC.start( myFunct());
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?component.+?operation.+?not.+?allowed.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - component stop
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - component stop >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	myPTC.stop;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Component.+?operation.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - running
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - running >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	if ( myPTC.running){
+		log("JEAH");
+	}
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Operation.+?component.+?running.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - done
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - done >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	var myComp myPTC;
+
+	myPTC.done;
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?done
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - send
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - send >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	inout integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.send( 12);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?send
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - receive
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - receive >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.receive;
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?receive
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - trigger
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - trigger >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.trigger;
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?trigger
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - call
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - call >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.call( myP1: 12);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?call
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - getcall
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - getcall >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.getcall( myP1: ?);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?getcall
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - reply
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - reply >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.reply( myP1: 5);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?reply
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - getreply
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - getreply >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.getreply( myP1: 5);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?getreply
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - raise
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - raise >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.raise( myP1, integer:5);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?raise
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - catch
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - catch >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1) exception( boolean);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.catch( myP1, 5>3);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?catch
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - check
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - check >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+signature myP1( inout integer my1);
+
+type port portT procedure {
+	inout myP1
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.check( catch( myP1, 5>3));
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?check
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - clear
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - clear >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.clear;
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?clear
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - port start
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - port start >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.start;
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - port stop
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - port stop >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+control {
+
+	myPort.stop;
+
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - setverdict
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - setverdict >
+
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	setverdict(pass);
+}
+
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?setverdict
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - getverdict
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - getverdict >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	// TR 685: getverdict in control part
+	var verdicttype veri:= getverdict;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Operation.+?getverdict().+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - port
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - port >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component comp {
+	port portT myPort;
+}
+
+control {
+
+	timer T1 := 5.0;
+	T1.start;
+
+	alt{
+	[] T1.timeout{
+		repeat
+	    }
+	[] any port.receive{
+
+	    }
+	}
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Port.+?operation.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.A declaration/statement/operation is used where it is not supposed to be used - component
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - A declaration/statement/operation is used where it is not supposed to be used - component >
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component comp {
+	port portT myPort;
+}
+
+control {
+
+	timer T1 := 5.0;
+	T1.start;
+
+	alt{
+	[] T1.timeout{
+		repeat
+	    }
+	[] all component.done{
+
+	    }
+	}
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Component.+?operation.+?not.+?allowed.+?in.+?control.+?part
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Forward references
+.*---------------------------------------------------------------------*
+
+This test case group covers the requirement SA-7/2.
+
+Strategy: Declaration in the module definition part may be made in any order. Howerver inside the module control part, test
+case definitions, functions and alt steps, all required declarations must be given beforehand. This means in particulat, local
+variables, local timers, and local constants shall never be used before they are declared. The only exception to this rule
+are labels.
+Forward references for local definitions, except variables are allowed within component type.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - constant (in component type)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - constant (in component type)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type component myComp {
+
+
+	const integer c1:= c2;
+	const integer c2:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS NEGATIVE>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - variable (in component type)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - variable (in component type)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type component myComp {
+
+
+	var integer c1:= c2;
+	var integer c2:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?Reference.+?to.+?static.+?value.+?expected
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - variable (in control part)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - variable (in control part)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	var integer i:= c;
+	var integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - constant (in control part)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - constant (in control part)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	const integer i:= c;
+	const integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - timer (in control part)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - timer (in control part)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+control {
+
+	timer T1;
+
+	T1.start( T2.read)
+
+	timer T2:= 6.0;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition.+?T2
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - variable (in testcase)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - variable (in testcase)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type component myComp {}
+
+testcase myTestCase() runs on myComp{
+
+	var integer i:= c;
+	var integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - constant (in testcase)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - constant (in testcase)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type component myComp {}
+
+testcase myTestCase() runs on myComp{
+
+	const integer i:= c;
+	const integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - timer (in testcase)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - timer (in testcase)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type component myComp {}
+
+testcase myTestCase() runs on myComp{
+
+	timer T1;
+
+	T1.start( T2.read)
+
+	timer T2:= 6.0;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - variable (in function)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - variable (in function)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+function myFunct(){
+
+	var integer i:= c;
+	var integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - constant (in function)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - constant (in function)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+function myFunct(){
+
+	const integer i:= c;
+	const integer c:= 5;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - timer (in function)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - timer (in function)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+function myFunct(){
+
+	timer T1;
+
+	T1.start( T2.read)
+
+	timer T2:= 6.0;
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - variable (in altstep)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - variable (in altstep)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+altstep myAltStep() runs on myComp{
+
+    [] myPort.receive(?){
+
+	var integer i:= c;
+	var integer c:= 5;
+    }
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - constant (in altstep)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - constant (in altstep)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+altstep myAltStep() runs on myComp{
+
+    [] myPort.receive(?){
+
+	const integer i:= c;
+	const integer c:= 5;
+    }
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Forward references - timer (in altstep)
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Forward references - timer (in altstep)>
+
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+
+type port portT message {
+	in integer
+} with {extension "internal"}
+
+type component myComp {
+	port portT myPort;
+}
+
+altstep myAltStep() runs on myComp{
+
+    [] myPort.receive(?){
+
+	timer T1;
+
+	T1.start( T2.read)
+
+	timer T2:= 6.0;
+    }
+}
+
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)error.+?There.+?is.+?no.+?local.+?or.+?imported.+?definition
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+
+:exmp.
+
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - record
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - record>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+   type record myrec {
+     integer i1,
+     group grp1 {
+       integer i2
+     }
+     charstring c1
+   }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - component
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - component>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+   type component comp {
+     group grp
+     {
+       integer i1
+     }
+   }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - port
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - port>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+  type port portT message {
+	  group grp
+    {
+      in integer
+    }
+  } with {extension "internal"}
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - function
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - function>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+  function f_testfn()
+  {
+    group grp
+    {
+      var integer i1;
+    }
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - control part
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - control part>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+  control
+  {
+    group grp
+    {
+      var integer i1;
+    }
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. A group is used where it is not supposed to be used - template
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - A group is used where it is not supposed to be used - template>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN ModuleA ModuleA.ttcn>
+module ModuleA {
+  type record myrec
+  {
+    integer i,
+    charstring c
+  }
+  template myrec tmpl :=
+  {
+    i := ?,
+    group grp
+    {
+      c := ?
+    }
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+syntax error, unexpected GroupKeyword
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Function reference - derefers used where it is not supposed to be used - function
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - Function reference - derefers used where it is not supposed to be used - function>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+  type function ft();
+  function f() { }
+  function ff()
+  {
+    var ft vf := refers(f);
+    derefers(vf)();
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_FAIL POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Function reference - derefers used where it is not supposed to be used - testcase
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - Function reference - derefers used where it is not supposed to be used - testcase>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+  type function ft();
+  function f() { }
+  type component ct { }
+  testcase tc() runs on ct
+  {
+    var ft vf := refers(f);
+    derefers(vf)();
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_FAIL POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.Function reference - refers().apply()
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - Function reference - refers().apply()>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE TTCN x x.ttcn>
+module x {
+  type function ft();
+  function f() { }
+  type component ct { }
+  testcase tc() runs on ct
+  {
+    refers(f).apply();
+  }
+}
+<END_MODULE>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_FAIL POSITIVE>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.non-Mandatory parameters - function call used where it is not supposed to be used - function non-mandatory paramter
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - non-Mandatory parameters - function call used where it is not supposed to be used - function non-mandatory paramter>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+  function f1(in integer i := f1()) { }
+  function f2(inout integer i := f1()) {}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?im)\berror\b.+?Reference.+?value.+?expected.+?instead.+?function
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4.non-Mandatory parameters - function call used where it is not supposed to be used - testcase non-mandatory paramter
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - non-Mandatory parameters - function call used where it is not supposed to be used - testcase non-mandatory paramter>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE TTCN x x.ttcn>
+module x {
+  type component ct { }
+  function f(){}
+  testcase f1(in integer i := f()) runs on ct{ }
+  testcase f2(inout integer i := f()) runs on ct{}
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 2>
+(?im)\berror\b.+?Reference.+?value.+?expected.+?instead.+?function
+<END_RESULT>
+<RESULT IF_PASS COUNT 2>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.Misplaced local variable, constant, timer declaration in statement block
+.*---------------------------------------------------------------------*
+
+This test case group covers the requirement SA-7/3.
+
+Strategy: All local variable, constant or timer declaration must stay in the beginning of the statement block.
+
+NOTE:	In TITAN this opportunity is a feature, so we won't negative test it.
+
+.*---------------------------------------------------------------------*
+:h1.Abbreviations
+.*---------------------------------------------------------------------*
+:list.
+:li D='ASN.1'.Abstract Syntax Notation 1
+:li D='EDML'.Ericsson Document Markup Language
+:li D='SA'.Semantic Analyser
+:li D='TTCN-3'.Test and Test Control Notation version 3
+:elist.
+
+.*---------------------------------------------------------------------*
+:h1.References
+.*---------------------------------------------------------------------*
+:list.
+:li D='[1]'.3/ETH/RUS-2003:0087 Uen
+:nl.Requirement Specification for TITAN's TTCN-3 Semantic Analyser
+:li D='[2]'.1/174 02-FCPCA 101 22 Uen
+:nl.Statement of Compliance for TITAN project
+:li D='[3]'.ETSI ES 201 873-1, v3.0.0 Mockup v1 (2004-03):
+:nl.Testing and Test Control Notation version 3.,
+:nl.Part 1: TTCN-3 Core Language
+:elist.
+
+.*---------------------------------------------------------------------*
+:h1.Terminology
+.*---------------------------------------------------------------------*
+:list.
+:li D='TITAN'.Ericsson's TTCN-3 Test Environment
+:elist.
+
+:etext.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/substitutiongroup/neg"
+ targetNamespace="www.example.org/substitutiongroup/neg"
+ blockDefault="extension">
+
+<xsd:element name="head" type="string" />
+
+<xsd:element name="complexEnum" substitutionGroup="this:not_head">
+	<xsd:complexType>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="foo" type="xsd:float"/>
+				<xsd:attribute name="bar" type="xsd:integer"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name="ize">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref="this:head" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

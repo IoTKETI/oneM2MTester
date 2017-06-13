@@ -1,0 +1,904 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Godar, Marton
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *   Pandi, Krisztian
+ *
+ ******************************************************************************/
+module TtemplateCharstr {
+type component templateCharstr_mycomp {};
+type record templateCharstr_rec {
+ charstring x1,
+ charstring x2,
+ charstring x3 optional
+}
+with {
+  encode "JSON";
+  variant(x1) "JSON: name as first";
+  variant(x2) "JSON: name as second";
+  variant(x3) "JSON: name as third";
+}
+
+type record decmatch_rec {
+  integer i,
+  charstring s
+}
+with {
+  encode "JSON";
+}
+
+type record of integer decmatch_list
+with {
+  encode "XML";
+  variant "list";
+}
+
+type union decmatch_uni {
+  integer i,
+  charstring s
+}
+with {
+  encode "RAW";
+  variant(i) "FIELDLENGTH(16)";
+}
+
+
+template templateCharstr_rec templateCharstr_tSpec :={ //specific values
+ x1:="00AA",
+ x2:="01AA",
+ x3:="10AA" };
+template templateCharstr_rec templateCharstr_tList :={ //specific value and value list
+ x1:="00AA",
+ x2:=("01AA","01AB","11AC"),
+ x3:="10AA" };
+template templateCharstr_rec templateCharstr_tComp :={ //specific value and compl. list
+ x1:="00AA",
+ x2:=complement ("11","0A","1BC0"),
+ x3:="10AA" };
+template templateCharstr_rec templateCharstr_tOmit :={ //omitting values
+ x1:="00AA",
+ x2:="01AA",
+ x3:=omit } ;
+template templateCharstr_rec templateCharstr_tAny :={ //specific and any value
+ x1:="00AA",
+ x2:="01AA",
+ x3:=? } ;
+template templateCharstr_rec templateCharstr_tAnyorNone :={ //specific and AnyorNone value
+ x1:="00AA",
+ x2:="01AA",
+ x3:=* };
+template templateCharstr_rec templateCharstr_tLength1 :={ //specific value and fix length
+ x1:="00AA",
+ x2:="01AA",
+ x3:=* length(3) };
+template templateCharstr_rec templateCharstr_tLength2 :={ //specific value and length (range)
+ x1:="00AA",
+ x2:="01AA",
+ x3:=? length(2..4) };
+template templateCharstr_rec templateCharstr_tLength3 :={ //specific value and length (range, infinity)
+ x1:="00AA",
+ x2:="01AA",
+ x3:=? length(2..infinity) };
+template templateCharstr_rec templateCharstr_tIfpresent :={ //specific value and ifpresent
+ x1:="00AA",
+ x2:="01AA",
+ x3:="10AA" ifpresent };
+ template templateCharstr_rec templateCharstr_tLengthIfp :={ //specific value and fix length and ifpresent
+ x1:="00AA",
+ x2:="01AA",
+ x3:=? length(3) ifpresent};
+template templateCharstr_rec templateCharstr_tAnyEl :={ //specific value and any element inside value
+ x1:="00AA",
+ x2:="01AA",
+ x3:= pattern "10?" } ;
+template templateCharstr_rec templateCharstr_tAnyorNoneEl :={ //specific value and Any number of elements or none inside value
+ x1:="00AA",
+ x2:="01AA",
+ x3:= pattern "10*" };
+template templateCharstr_rec templateCharstr_tRange1 :={ //specific value and Range
+ x1:="1",
+ x2:=("2" .."4"),
+ x3:="3" };
+template templateCharstr_rec templateCharstr_tRange2 :={ //specific value and Range
+ x1:="1",
+ x2:=("2" .. "4"),
+ x3:="3" };
+template templateCharstr_rec templateCharstr_tRange3 :={ //specific value and Range
+ x1:="1",
+ x2:=("3" .. int2char(127)),
+ x3:="3" };
+template templateCharstr_rec templateCharstr_tRange4 :={ //specific value and Range
+ x1:="1",
+ x2:=(int2char(0) .. "4"),
+ x3:="3" };
+template templateCharstr_rec templateCharstr_tRepeat := {
+ x1:= pattern "6#3", // precisely 3
+ x2:= pattern "6#(,)", // any number
+ x3:= pattern "6#(3)" }; // precisely 3
+template templateCharstr_rec templateCharstr_tRepeatFull := {
+ x1:= pattern "6#(3,)", // at least 3
+ x2:= pattern "6#(,3)", // at most  3
+ x3:= pattern "6#(3,3)" }; // precisely 3
+template templateCharstr_rec templateCharstr_tPattern := {
+  x1 := pattern "abc?xyz",
+  x2 := pattern @nocase "abc?xyz",
+  x3 := pattern @nocase "abc*xyz" };
+  
+template decmatch_uni decmatch_tUnion := { i := ? };
+
+template decmatch_rec decmatch_tRecord := { i := (0..infinity), s := ? };
+
+template templateCharstr_rec templateCharstr_tDecmatch := { // decoded content match
+  x1 := decmatch decmatch_list: { (1..10), (11..20), (21..30) },
+  x2 := decmatch decmatch_tUnion,
+  x3 := decmatch modifies decmatch_tRecord := { s := "abc" }
+};
+
+template templateCharstr_rec templateCharstr_tDecmatchSelfRef := { // decoded content match with self-reference
+  x1 := "a",
+  x2 := decmatch templateCharstr_tDecmatchSelfRef.x1,
+  x3 := decmatch templateCharstr_rec: { x1 := templateCharstr_tDecmatchSelfRef.x1, x2 := ?, x3 := * }
+};
+
+testcase templateCharstrSpec() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2;		//specific value
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10AA" };
+x2:={ x1:="00BC",  x2:="01AA",  x3:="10AA" };
+//match
+if (match(x1,templateCharstr_tSpec)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x2,templateCharstr_tSpec))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrList() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//value list
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10AA" };
+x2:={ x1:="00AA",  x2:="00",  x3:="10AA" };
+x3:={ x1:="1D",  x2:="01AA",  x3:="10AA" };
+//match
+if (match(x1,templateCharstr_tList)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of list
+if (not(match(x2,templateCharstr_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrComp() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//complemented list
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10AA" };
+x2:={ x1:="00AA",  x2:="0A",  x3:="10AA" };
+x3:={ x1:="11AA",  x2:="01AA",  x3:="10AA" };
+//match
+if (match(x1,templateCharstr_tComp)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: in the list
+if (not(match(x2,templateCharstr_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrOmit() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//omitting value
+x1:={ x1:="00AA",  x2:="01AA",  x3:=omit };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="AB" };
+x3:={ x1:="00DE",  x2:="01AA",  x3:=omit };
+//match
+if (match(x1,templateCharstr_tOmit)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: not omitted
+if (not(match(x2,templateCharstr_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrAny() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//any value
+x1:={ x1:="00AA",  x2:="01AA",  x3:="ABCD" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:=omit };
+x3:={ x1:="0A",  x2:="01AA",  x3:="ABCD" };
+//match
+if (match(x1,templateCharstr_tAny)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: field omitted
+if (not(match(x2,templateCharstr_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrAnyorNone() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//AnyorNone value
+x1:={ x1:="00AA",  x2:="01AA",  x3:=omit };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="10AB" };
+x3:={ x1:="1C",  x2:="01AA",  x3:=omit };
+//match: omitted
+if (match(x1,templateCharstr_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: value
+if (match(x2,templateCharstr_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tAnyorNone))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrLength1() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4;		//length (fix)
+x1:={ x1:="00AA",  x2:="01AA",  x3:="abc" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="abc" };
+x3:={ x1:="00AA",  x2:="01AA",  x3:="1D" };
+x4:={ x1:="001A",  x2:="01AA",  x3:="abc" };
+//match: proper length
+if (match(x1,templateCharstr_tLength1)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: omitted
+if (match(x2,templateCharstr_tLength1)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x3,templateCharstr_tLength1))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateCharstr_tLength1))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrLength2() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//length (range)
+x1:={ x1:="00AA",  x2:="01AA",  x3:="abcd" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="a" };
+x3:={ x1:="001A",  x2:="01AA",  x3:="abc" };
+//match
+if (match(x1,templateCharstr_tLength2)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x2,templateCharstr_tLength2))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tLength2))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrLength3() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;		//length (range, infinity)
+x1:={ x1:="00AA",  x2:="01AA",  x3:="abcd" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="a" };
+x3:={ x1:="001A",  x2:="01AA",  x3:="abc" };
+//match
+if (match(x1,templateCharstr_tLength3)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x2,templateCharstr_tLength3))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tLength3))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+testcase templateCharstrIfpresent() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4;		//ifpresent
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10AA" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:=omit };
+x3:={ x1:="00AA",  x2:="01AA",  x3:="00AA" };
+x4:={ x1:="00",  x2:="01AA",  x3:=omit };
+//match: present and match
+if (match(x1,templateCharstr_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: not present
+if (match(x2,templateCharstr_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: present and not match
+if (not(match(x3,templateCharstr_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateCharstr_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrLengthIfp() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4;	      //length (fix), ifpresent
+x1:={ x1:="00AA",  x2:="01AA",  x3:="abc" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="abc" };
+x3:={ x1:="00AA",  x2:="01AA",  x3:="1D" };
+x4:={ x1:="001A",  x2:="01AA",  x3:="abc" };
+//match: proper length
+if (match(x1,templateCharstr_tLengthIfp)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: omitted
+if (match(x2,templateCharstr_tLengthIfp)) {setverdict(pass);}
+ else {setverdict(fail);}
+// no match: not proper length
+if (not(match(x3,templateCharstr_tLengthIfp))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateCharstr_tLengthIfp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrAnyEl() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4,x5; 	      //any element
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10a" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="10" };
+x3:={ x1:="00AA",  x2:="01AA",  x3:="10Aa" };
+x4:={ x1:="00AA",  x2:="01AA",  x3:="12A" };
+x5:={ x1:="0A",  x2:="01AA",  x3:="10a" };
+//match
+if (match(x1,templateCharstr_tAnyEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: no element
+if (not(match(x2,templateCharstr_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: two element
+if (not(match(x3,templateCharstr_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: wrong element
+if (not(match(x4,templateCharstr_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x5,templateCharstr_tAnyEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrAnyorNoneEl() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4,x5; 	      //Any number of elements or none
+x1:={ x1:="00AA",  x2:="01AA",  x3:="10" };
+x2:={ x1:="00AA",  x2:="01AA",  x3:="10k" };
+x3:={ x1:="00AA",  x2:="01AA",  x3:="10Aa" };
+x4:={ x1:="00AA",  x2:="01AA",  x3:="11a" };
+x5:={ x1:="1A",  x2:="01AA",  x3:="10a" };
+//match: no element
+if (match(x1,templateCharstr_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: one element
+if (match(x2,templateCharstr_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: two element
+if (match(x3,templateCharstr_tAnyorNoneEl)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: wrong element
+if (not(match(x4,templateCharstr_tAnyorNoneEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x5,templateCharstr_tAnyorNoneEl))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+
+testcase templateCharstrRange1() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;	      //Range ( .. )
+x1:={ x1:="1",  x2:="2",  x3:="3" };
+x2:={ x1:="1",  x2:="5",  x3:="3" };
+x3:={ x1:="2",  x2:="2",  x3:="3" };
+//match
+if (match(x1,templateCharstr_tRange1)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateCharstr_tRange1))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tRange1))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrRange2() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;	      //Range ( to )
+x1:={ x1:="1",  x2:="2",  x3:="3" };
+x2:={ x1:="1",  x2:="5",  x3:="3"};
+x3:={ x1:="2",  x2:="2",  x3:="3" };
+//match
+if (match(x1,templateCharstr_tRange2)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateCharstr_tRange2))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tRange2))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrRange3() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;	      //Range, with infinity
+x1:={ x1:="1",  x2:="8",  x3:="3" };
+x2:={ x1:="1",  x2:="2",  x3:="3" };
+x3:={ x1:="2",  x2:="2",  x3:="3" };
+//match
+if (match(x1,templateCharstr_tRange3)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateCharstr_tRange3))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tRange3))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrRange4() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3;	      //Range with - infinity
+x1:={ x1:="1",  x2:="2",  x3:="3" };
+x2:={ x1:="1",  x2:="5",  x3:="3" };
+x3:={ x1:="2",  x2:="2",  x3:="3" };
+//match
+if (match(x1,templateCharstr_tRange4)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateCharstr_tRange4))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateCharstr_tRange4))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+
+type record  templateCharstr_myrec {
+  charstring f1 optional,
+  charstring f2 optional
+}
+
+const templateCharstr_myrec mr := {
+  f1 := "b",
+  f2 := "a"
+}
+
+type component templateCharstr_mycomp2 {
+  const charstring x1 := "";
+  var charstring x2 := "";
+  const charstring x3 := "x";
+  var charstring x4 := "x";
+}
+
+function tryPatternReferenceWithOptionalField(in templateCharstr_myrec p) runs on templateCharstr_mycomp2
+{ // regression test for TR 909
+  template charstring piecemeal := pattern "{p.f1}{p.f2}r";
+  if (match("bar", piecemeal)) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match("r", piecemeal)) { setverdict(fail); }
+  else { setverdict(pass); }
+
+  var template charstring piecemealv := pattern "{p.f1}{p.f2}r";
+  if (match("bar", piecemealv)) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match("r", piecemealv)) { setverdict(fail); }
+  else { setverdict(pass); }
+}
+
+testcase templateCharstrEmptyPattern() runs on templateCharstr_mycomp2
+{
+  if (match("", pattern "")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (not match("x", pattern "{x1}{x2}")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match("xxx", pattern "{x3}x{x4}")) { setverdict(pass); }
+  else { setverdict(fail); }
+
+  tryPatternReferenceWithOptionalField(mr);
+}
+
+testcase templateCharstrRepeat() runs on templateCharstr_mycomp {
+var templateCharstr_rec x1,x2,x3,x4;		//repeat
+x1:={ x1:="666",  x2:="",  x3:="666" };
+x2:={ x1:="6"  ,  x2:="",  x3:="666" };
+x3:={ x1:="666",  x2:="",  x3:="6666" };
+x4:={ x1:="666",  x2:="6 6 6",  x3:="666" };
+//match
+if (match(x1,templateCharstr_tRepeat)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x2,templateCharstr_tRepeat))) {setverdict(pass);}
+ else {setverdict(fail);}
+if (not(match(x3,templateCharstr_tRepeat))) {setverdict(pass);}
+ else {setverdict(fail);}
+if (not(match(x4,templateCharstr_tRepeat))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrRepeatFull() runs on templateCharstr_mycomp {
+var templateCharstr_rec x0,x1,x2,x3,x4;		//repeat
+x0:={ x1:="666",  x2:="",  x3:="666" }; // shortest possible
+x1:={ x1:="6666", x2:="666",  x3:="666" }; // just over
+x2:={ x1:="6"  ,  x2:="",  x3:="666" }; // fail first
+x3:={ x1:="666",  x2:="6666",  x3:="6666" }; // fail second
+x4:={ x1:="666",  x2:="",  x3:="6" }; // fail third
+//match
+if (match(x0,templateCharstr_tRepeatFull)) {setverdict(pass);}
+ else {setverdict(fail);}
+if (match(x1,templateCharstr_tRepeatFull)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x2,templateCharstr_tRepeatFull))) {setverdict(pass);}
+ else {setverdict(fail);}
+if (not(match(x3,templateCharstr_tRepeatFull))) {setverdict(pass);}
+ else {setverdict(fail);}
+if (not(match(x4,templateCharstr_tRepeatFull))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharstrPattern() runs on templateCharstr_mycomp {
+  var templateCharstr_rec x0, x1, x2, x3, x4; // pattern
+  x0 := { x1 := "abc,xyz",  x2 := "abc1xyz",   x3 := "abcxyz" };
+  x1 := { x1 := "abcpxyz",  x2 := "abcPxyz",   x3 := "abc123abcJKL.? \txyz" };
+  x2 := { x1 := "abcxyz",   x2 := "abcPxyz",   x3 := "abc123xyz" };  // fail first
+  x3 := { x1 := "abcpxyz",  x2 := "abc123xyz", x3 := "abc123xyz" };  // fail second
+  x4 := { x1 := "abcpxyz",  x2 := "abcPxyz",   x3 := "abc123xy z" }; // fail third
+
+  // match
+  if (match(x0, templateCharstr_tPattern)) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match(x1, templateCharstr_tPattern)) { setverdict(pass); }
+  else { setverdict(fail); }
+
+  // not match
+  if (not match(x2, templateCharstr_tPattern)) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (not match(x3, templateCharstr_tPattern)) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (not match(x4, templateCharstr_tPattern)) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase TR920() runs on templateCharstr_mycomp {
+  var template charstring temp := pattern "[0-9]|[0-9][0-9]";
+  const charstring x := "10a";
+
+  if(match(x, temp)){
+    setverdict(fail);
+  }else{
+    setverdict(pass);
+  }
+}
+
+// http://t-ort.etsi.org/view.php?id=3761
+testcase templateCharstrPatternCat() runs on templateCharstr_mycomp
+{
+  if (match("aazz", pattern "a" & "*z")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match("AAZZ", pattern "a*" & "z|" & "A*Z")) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (match("AAZZ0123456789", pattern "(a*" & "z|" & "A*Z)" & "[0-9]+")) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase CatBasic() runs on templateCharstr_mycomp {
+  var charstring cs1 := "xyz"
+  var charstring cs2 := "(xyz)*[abc]+"
+  var charstring cs3 := "{xyz}"  // No run-time references.
+  var template charstring t1, t2, t3, t4, t5, t6, t7
+  t1 := pattern cs1
+  t2 := pattern cs2
+  t3 := pattern cs1 & "utoljara"
+  t4 := pattern cs1 & "utoljar(a)+" & cs1
+  t5 := pattern "utoljara" & cs1
+  t6 := pattern "valami" & cs1 & "megegyszer" & "utoljara"
+  t7 := pattern "valami" & cs3 & "megegyszer" & "utoljara"
+  if (match("xyz", t1)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzxyzxyza", t2)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzabcaabbccac", t2)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzutoljara", t3)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzutoljaraaaaaaaaaaaxyz", t4)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("utoljaraxyz", t5)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("valamixyzmegegyszerutoljara", t6)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("valami{xyz}megegyszerutoljara", t7)) { setverdict(pass) } else { setverdict(fail) }
+}
+
+template srec pt1(in charstring sp) := { s := pattern sp }
+template srec pt2(in charstring sp) := { s := pattern sp & "megvalami" }
+template srec pt3(in charstring sp) := { s := pattern "valami" & sp }
+template srec pt4(in charstring sp) := { s := pattern "valami" & sp & "megvalami" }
+template srec pt5(in charstring sp) := { s := pattern sp & "valami" & sp }
+
+testcase CatParametrized() runs on templateCharstr_mycomp
+{
+  var srec r1, r2, r3, r4, r5
+  r1 := { "xyz" }
+  r2 := { "xyzmegvalami" }
+  r3 := { "valamixyz" }
+  r4 := { "valamixyzmegvalami" }
+  r5 := { "xyzvalamixyz" }
+  if (match(r1, pt1("xyz"))) { setverdict(pass) } else { setverdict(fail) }
+  if (match(r2, pt2("xyz"))) { setverdict(pass) } else { setverdict(fail) }
+  if (match(r3, pt3("xyz"))) { setverdict(pass) } else { setverdict(fail) }
+  if (match(r4, pt4("xyz"))) { setverdict(pass) } else { setverdict(fail) }
+  if (match(r5, pt5("xyz"))) { setverdict(pass) } else { setverdict(fail) }
+}
+
+function f1(in charstring s) return integer {
+  var template charstring t := pattern s; if (match(s, t)) { return 0 } else { return 1 }
+}
+
+function f2(in charstring s) return integer {
+  var template charstring t := pattern s & "megvalami"; if (match(s & "megvalami", t)) { return 0 } else { return 1 }
+}
+
+function f3(in charstring s) return integer {
+  var template charstring t := pattern "valami" & s; if (match("valami" & s, t)) { return 0 } else { return 1 }
+}
+
+function f4(in charstring s) return integer {
+  var template charstring t := pattern "valami" & s & "megvalami"; if (match("valami" & s & "megvalami", t)) { return 0 } else { return 1 }
+}
+
+function f5(in charstring s) return integer {
+  var template charstring t := pattern s & "valami" & s; if (match(s & "valami" & s, t)) { return 0 } else { return 1 }
+}
+
+type record srec { charstring s }
+
+testcase CatFunctions() runs on templateCharstr_mycomp
+{
+  if (f1("xyz") == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (f2("xyz") == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (f3("xyz") == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (f4("xyz") == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (f5("xyz") == 0) { setverdict(pass) } else { setverdict(fail) }
+}
+
+testcase CatStructured() runs on templateCharstr_mycomp
+{
+  var srec r1 := { "xyz" }
+  var template charstring t1, t2, t3, t4, t5
+  t1 := pattern r1.s
+  t2 := pattern r1.s & "megvalami"
+  t3 := pattern "valami" & r1.s
+  t4 := pattern "valami" & r1.s & "megvalami"
+  t5 := pattern r1.s & "valami" & r1.s
+  if (match("xyz", t1)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzmegvalami", t2)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("valamixyz", t3)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("valamixyzmegvalami", t4)) { setverdict(pass) } else { setverdict(fail) }
+  if (match("xyzvalamixyz", t5)) { setverdict(pass) } else { setverdict(fail) }
+}
+
+
+const charstring base_1:= "ab?";
+const charstring base_2 := "ab*";
+
+template charstring p1:= pattern "{base_1}";
+template charstring p2:= pattern base_1;
+
+template charstring p3 := pattern "{base_2}";
+template charstring p4 := pattern base_2;
+
+template charstring p5 := pattern "{p3}{p3}";
+template charstring p6 := pattern "{p3}" & "{p3}";
+template charstring p7 := pattern p3 & p3;
+template charstring p8 := pattern "c{p4}d";
+
+
+testcase pattern_reference() runs on templateCharstr_mycomp {
+
+  var charstring string_1 := "abc";
+  var charstring string_2 := "ab"
+
+  if (match(string_1, p1)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match(base_1, p1)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match(base_1, p2)) 	{setverdict(pass);} else {setverdict(fail);}
+
+  if (match(string_2, p3))	{setverdict(pass);} else {setverdict(fail);}
+  if (match(base_2, p3)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match(base_2, p4)) 	{setverdict(pass);} else {setverdict(fail);}
+
+  if (match("abnabn", p5)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match("abnabn", p6)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match("abnabn", p7)) 	{setverdict(pass);} else {setverdict(fail);}
+  if (match("cabxd", p8)) 	{setverdict(pass);} else {setverdict(fail);}
+
+}
+
+type record of charstring Ss;
+
+type record ss_x 
+{
+  //integer a;
+    charstring a,
+    integer b
+};
+
+
+type record ss_x2 
+{
+  //integer a;
+    ss_x a,
+    integer b
+};
+
+
+testcase HO30913_reference() runs on templateCharstr_mycomp {
+  //test to check [1] reference
+  
+  var Ss ss;
+  var charstring s;
+  
+  s := "s";
+  ss[0] := "0";
+  ss[1] := "1";
+  log(match(ss[0], pattern s)); // this compiles
+  log(match(ss[0], pattern ss[1])); // this does not compile
+  
+  var ss_x xx;
+  var ss_x2 xx2;
+  
+  xx.a := "a";
+    
+  //log(match(ss[0], pattern x.a)); // this does not compile segmentation fault
+  log(match(ss[0], pattern xx.a )); // this does not compile
+  setverdict(pass);
+}
+
+testcase CR_TR00018474() runs on templateCharstr_mycomp {
+  // Indexing of string template variables.
+  var template charstring vtc1 := "fisherman"
+  var template charstring vtc2 := "?*?****"  // It's still a plain charstring.
+  vtc1[0] := "F"  // Normal usage.
+  if (match("Fisherman", vtc1)) { setverdict(pass) } else { setverdict(fail) }
+  vtc1[0] := "*"  // Just an ASCII character.
+  if (match("*isherman", vtc1)) { setverdict(pass) } else { setverdict(fail) }
+  vtc1[1] := "?"  // Just an ASCII character.
+  if (match("*?sherman", vtc1)) { setverdict(pass) } else { setverdict(fail) }
+  vtc1[0] := "F"  // Indexed assignment notation cannot be used here.
+  vtc1[1] := "i"  // Still works, nothing special.
+  if (match("Fisherman", vtc1)) { setverdict(pass) } else { setverdict(fail) }
+  vtc2[0] := "*"
+  if (match("**?****", vtc2)) { setverdict(pass) } else { setverdict(fail) }
+}
+
+testcase templateCharstrDecmatch() runs on templateCharstr_mycomp {
+  var decmatch_rec bad_rec, good_rec;
+  bad_rec := { i := 11, s := "xyz" };
+  good_rec := { i := 3, s := "abc" };
+  var decmatch_list bad_list, good_list;
+  bad_list := { 4, 7, 10 };
+  good_list := { 2, 15, 28 };
+  var decmatch_uni bad_uni, good_uni;
+  bad_uni := { s := "five" };
+  good_uni := { i := 5 };
+  var charstring bad_rec_enc, good_rec_enc, bad_list_enc, good_list_enc, bad_uni_enc, good_uni_enc;
+  bad_rec_enc := oct2char(bit2oct(encvalue(bad_rec)));
+  good_rec_enc := oct2char(bit2oct(encvalue(good_rec)));
+  bad_list_enc := oct2char(bit2oct(encvalue(bad_list)));
+  good_list_enc := oct2char(bit2oct(encvalue(good_list)));
+  bad_uni_enc := oct2char(bit2oct(encvalue(bad_uni)));
+  good_uni_enc := oct2char(bit2oct(encvalue(good_uni)));
+  var templateCharstr_rec r1, r2, r3, r4, r5;
+  r1 := { x1 := good_list_enc, x2 := good_uni_enc, x3 := good_rec_enc };
+  r2 := { x1 := bad_list_enc,  x2 := good_uni_enc, x3 := good_rec_enc };
+  r3 := { x1 := good_list_enc, x2 := bad_uni_enc,  x3 := good_rec_enc };
+  r4 := { x1 := good_list_enc, x2 := good_uni_enc, x3 := bad_rec_enc  };
+  r5 := { x1 := good_list_enc, x2 := good_uni_enc, x3 := "xyz"        };
+  // match: all 3 are good
+  if (match(r1, templateCharstr_tDecmatch)) { setverdict(pass); }
+  else { setverdict(fail, 1); }
+  // no match: decoded list does not match
+  if (not match(r2, templateCharstr_tDecmatch)) { setverdict(pass); }
+  else { setverdict(fail, 2); }
+  // no match: decoded union does not match
+  if (not match(r3, templateCharstr_tDecmatch)) { setverdict(pass); }
+  else { setverdict(fail, 3); }
+  // no match: decoded record does not match
+  if (not match(r4, templateCharstr_tDecmatch)) { setverdict(pass); }
+  else { setverdict(fail, 4); }
+  // no match: x3 is not a valid encoded record value
+  if (not match(r5, templateCharstr_tDecmatch)) { setverdict(pass); }
+  else { setverdict(fail, 5); }
+  // match r1 with the same template declared as an in-line template
+  if (match(r1, templateCharstr_rec: {
+    x1 := decmatch decmatch_list: { (1..10), (11..20), (21..30) },
+    x2 := decmatch decmatch_tUnion,
+    x3 := decmatch modifies decmatch_tRecord := { s := "abc" }
+  })) { setverdict(pass); }
+  else { setverdict(fail, 6); }
+}
+
+external function ef_enc_rec_x1(in templateCharstr_rec.x1 x) return octetstring
+with { extension "prototype(convert) encode(JSON)" }
+
+testcase templateCharstrDecmatchSelfRef() runs on templateCharstr_mycomp {
+  // global self-referencing template
+  var templateCharstr_rec.x1 bad_cs, good_cs;
+  bad_cs := "x";
+  good_cs := "a";
+  var templateCharstr_rec bad_rec, good_rec;
+  bad_rec := { x1 := "x1", x2 := "x2", x3 := "x3" };
+  good_rec := { x1 := "a", x2 := "x2", x3 := "x3" };
+  var charstring bad_cs_enc, good_cs_enc, bad_rec_enc, good_rec_enc;
+  bad_cs_enc := oct2char(ef_enc_rec_x1(bad_cs));
+  good_cs_enc := oct2char(ef_enc_rec_x1(good_cs));
+  bad_rec_enc := oct2char(bit2oct(encvalue(bad_rec)));
+  good_rec_enc := oct2char(bit2oct(encvalue(good_rec)));
+  var templateCharstr_rec r1, r2, r3;
+  r1 := { x1 := "a", x2 := good_cs_enc, x3 := good_rec_enc };
+  r2 := { x1 := "a", x2 := bad_cs_enc,  x3 := good_rec_enc };
+  r3 := { x1 := "a", x2 := good_cs_enc, x3 := bad_rec_enc  };
+  // match: all 2 are good
+  if (match(r1, templateCharstr_tDecmatchSelfRef)) { setverdict(pass); }
+  else { setverdict(fail, 1); }
+  // no match: decoded octetstring does not match
+  if (not match(r2, templateCharstr_tDecmatchSelfRef)) { setverdict(pass); }
+  else { setverdict(fail, 2); }
+  // no match: decoded record does not match
+  if (not match(r3, templateCharstr_tDecmatchSelfRef)) { setverdict(pass); }
+  else { setverdict(fail, 3); }
+  
+  // local self-referencing template
+  var template templateCharstr_rec t := { x1 := "a", x2 := ?, x3 := ? };
+  t.x1 := decmatch t;
+  var templateCharstr_rec r4, r5;
+  r4 := { x1 := good_rec_enc, x2 := "x", x3 := "y" };
+  r5 := { x1 := bad_rec_enc,  x2 := "x", x3 := "y" };
+  if (match(r4, t)) { setverdict(pass); }
+  else { setverdict(fail, 4); }
+  if (not match(r5, t)) { setverdict(pass); }
+  else { setverdict(fail, 5); }
+}
+
+modulepar template charstring mpt_cs;
+  
+// case-insensitive pattern
+testcase templateCharstrPatternNocase() runs on templateCharstr_mycomp {
+  // pattern in template variable
+  var template charstring vt_cs := pattern @nocase "ab[A-e]?xyz";
+  var charstring val := "aBE5XYz";
+  if (not match(val, vt_cs)) {
+    setverdict(fail, "Var template pattern failed: ", match(val, vt_cs));
+  }
+  
+  // pattern in template module parameter
+  if (not match(val, mpt_cs)) {
+    setverdict(fail, "Var template pattern failed: ", match(val, mpt_cs));
+  }
+  setverdict(pass);
+}
+
+control {
+ execute(templateCharstrSpec());
+ execute(templateCharstrList());
+ execute(templateCharstrComp());
+ execute(templateCharstrOmit());
+ execute(templateCharstrAny());
+ execute(templateCharstrAnyorNone());
+ execute(templateCharstrLength1());
+ execute(templateCharstrLength2());
+ execute(templateCharstrLength3());
+ execute(templateCharstrIfpresent());
+ execute(templateCharstrLengthIfp());
+ execute(templateCharstrAnyEl());
+ execute(templateCharstrAnyorNoneEl());
+ execute(templateCharstrRange1());
+ execute(templateCharstrRange2());
+ execute(templateCharstrRange3());
+ execute(templateCharstrRange4());
+ execute(templateCharstrEmptyPattern());
+ execute(templateCharstrRepeat());
+ execute(templateCharstrRepeatFull());
+ execute(templateCharstrPattern());
+ execute(TR920());
+ execute(templateCharstrPatternCat());
+ execute(CatBasic())
+ execute(CatParametrized())
+ execute(CatFunctions())
+ execute(CatStructured())
+ execute(pattern_reference());
+ execute(HO30913_reference());
+ execute(CR_TR00018474());
+ execute(templateCharstrDecmatch());
+ execute(templateCharstrDecmatchSelfRef());
+ execute(templateCharstrPatternNocase());
+}
+}

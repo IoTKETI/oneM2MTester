@@ -1,0 +1,2738 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module  NegTest_XML_Testcases {
+
+// Test for NegativeTest of XER encoding
+// Last modified: 2011-04-13 (SET, UNION added)
+
+modulepar {
+  integer tsp_maxInt := 1000000;
+  integer tsp_step := -10;
+}
+
+import from www_XmlTest_org_negativeTest_XML_Types all;
+import from XSD all;
+
+type component MyComp {};
+
+//seq
+//external function encode_myInteger10( in MyInteger10 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqEmpty(in MySeqEmpty pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" };
+external function encode_mySeqBool(in MySeqBool pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqNull(in MySeqNull pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqInt(in MySeqInt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqMyEnum(in MySeqMyEnum pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqInt2( in MySeqInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqInt2( in MySeqIntSeqInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqInt2opt( in MySeqIntSeqInt2opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqInt2optopt( in MySeqIntSeqInt2optopt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqInt3( in MySeqInt3 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqInt3opt( in MySeqInt3opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqInt4( in MySeqInt4 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqOJKL( in MySeqOJKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIOKL( in MySeqIOKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqReal(in MySeqReal pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqStr(in MySeqStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqBitStr(in float pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqOctStr(in MySeqOctStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntReal( in MySeqIntReal pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntStr( in MySeqIntStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntBitStr( in MySeqIntBitStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqISKL( in MySeqISKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqIntSeqInt2( in MySeqIntSeqIntSeqInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqIntSeqInt2SeqReal2( in MySeqIntSeqIntSeqInt2SeqReal2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqReal2( in MySeqIntSeqReal2  pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqSeqIntSeqInt2SeqReal2( in MySeqSeqIntSeqInt2SeqReal2  pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeqIntSeqIntSeqInt2optoptSeqReal2( in MySeqIntSeqIntSeqInt2optoptSeqReal2  pdu) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2( in MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2 pdu) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+external function encode_mySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2(
+  in MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 pdu) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+//seq of
+ external function encode_mySeqOfBool(in MySeqOfBool pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfNull(in MySeqOfNull pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfInt(in MySeqOfInt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfMyEnum(in MySeqOfMyEnum pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfEnum(in MySeqOfEnum pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfReal( in MySeqOfReal pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfBitStr(in MySeqOfBitStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfOctStr(in MySeqOfOctStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfObjId(in MySeqOfObjId pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfMyUnionBT(in MySeqOfMyUnionBT pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(in  MySeqOfSeqSeqIntSeqInt2SeqReal2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+//set
+
+// external function encode_mySetEmpty(in MySetEmpty pdu) return octetstring with { extension "prototype(convert) //encode(XER:XER_EXTENDED)" }
+
+external function encode_mySetBool(in MySetBool pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetNull(in MySetNull pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt(in MySetInt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetMyEnum(in MySetMyEnum pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt2( in MySetInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt2opt( in MySetInt2opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSetInt2( in MySetIntSetInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSetInt2opt( in MySetIntSetInt2opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSetInt2optopt( in MySetIntSetInt2optopt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt3( in MySetInt3 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt3opt( in MySetInt3opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt4( in MySetInt4 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetInt4opt( in MySetInt4opt pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetOJKL( in MySetOJKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIOKL( in MySetIOKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetReal(in MySetReal pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetStr(in MySetStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetBitStr(in MySetBitStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetOctStr(in MySetOctStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntReal( in MySetIntReal pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntStr( in MySetIntStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntBitStr( in MySetIntBitStr pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetISKL( in MySetISKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+// external function encode_mySetISKLopt( in MySetISKLopt pdu) return octetstring with { extension "prototype(convert) //encode(XER:XER_EXTENDED)" }
+// external function encode_mySetIS2KLopt( in MySetIS2KLopt pdu) return octetstring with { extension "prototype(convert) //encode(XER:XER_EXTENDED)" }
+ external function encode_mySetISOKL( in MySetISOKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+// external function encode_mySetISOKLopt( in MySetISOKLopt pdu) return octetstring with { extension "prototype(convert) //encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIOSKL( in MySetIOSKL pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+// external function encode_mySetIOSKLopt( in MySetIOSKLopt pdu) return octetstring with { extension "prototype(convert) //encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSeqIntSeqInt2( in MySetIntSeqIntSeqInt2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSetIntSetInt2SetReal2( in MySetIntSetIntSetInt2SetReal2 pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSeqReal2( in MySetIntSeqReal2  pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_MySetSetIntSetInt2SetReal2( in MySetSetIntSetInt2SetReal2  pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_mySetIntSeqIntSeqInt2optoptSeqReal2( in MySetIntSeqIntSeqInt2optoptSeqReal2  pdu) return octetstring
+ with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2( in MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2 pdu) return octetstring
+ with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+// external function encode_mySet_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2(
+//   in MySet_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 pdu) return octetstring
+// with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+
+
+ //union
+ external function encode_myUnionBasicTypes( in MyUnionBasicTypes pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function encode_myUnionComplexTypes( in MyUnionComplexTypes pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+ external function decode_myUnionComplexTypes( in octetstring o) return MyUnionComplexTypes with { extension "prototype(convert) decode(XER:XER_EXTENDED)" }
+
+//Attribute test
+external function encode_InternationalPrice(in InternationalPrice pdu) return octetstring with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+
+group Sequences {
+  template MySeqInt2opt t_msi2opt := { i:= 1, j := 2 }
+  template MySeqInt2opt t_msi2optomit := { i:= 1, j := omit }
+  const MySeqInt2 c_msi2 := { i:= 1, j := 2 }
+  const MySeqInt2opt c_msi2opt := { i:= 1, j := 2 }
+  const MySeqInt2opt c_msi2optomit := { i:= 1, j := omit }
+
+  template MySeqEmpty t_seqEmpty :={}
+  template MySeqBool t_msb(template boolean p_b) := {b:= p_b}
+  template MySeqNull t_msn := { n:= nULL }
+
+  template MySeqInt t_msi(template integer p_i) := {i:= p_i}
+  template MySeqInt t_msi_omit(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= omit" }
+  template MySeqInt t_msi_valueSameTypeE(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= I:5" }
+  template MySeqInt t_msi_valueSameTypeI(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= 5" }  //implicit type
+  template MySeqInt t_msi_valueDiffTypeExplicitString(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= charstring:\"subidubi\"" }
+
+  template MySeqInt t_msi_valueDiffTypeExplicitBoolean(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= B:true" }
+  template MySeqInt t_msi_valueDiffTypeImplicitBoolean(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= true" }
+  template MySeqInt t_msi_valueDiffTypeExplicitOctStr(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= octetstring:'BABA'O" }
+  template MySeqInt t_msi_valueDiffTypeImplicitOctStr(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= 'BABA'O" }
+  template MySeqInt t_msi_valueDiffTypeExplicitEnum(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= E:second" }
+  //template MySeqInt t_msi_valueDiffTypeImplicitEnum(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= second" }
+  template MySeqInt t_msi_valueDiffTypeExplicitFloat(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= X:5.0" }
+  template MySeqInt t_msi_valueDiffTypeImplicitFloat(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= 5.0" }
+  //template MySeqInt t_msi_valueDiffTypeExplicitBitString(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= bitstring:'01011000'B" }
+  //template MySeqInt t_msi_valueDiffTypeImplicitBitString(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= '01011000'B" }
+  template MySeqInt t_msi_valueDiffTypeRaw(template integer p_i) := {i:= p_i} with { erroneous (i) "value(raw):= char2oct(\"<MYRAW/>\")" }
+
+  template MySeqInt2 t_msi2(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j}
+  template MySeqInt2 t_msi2_omiti(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (i) "value:= omit" }
+  template MySeqInt2 t_msi2_omitj(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "value:= omit" }
+  template MySeqInt2 t_msi2_beforeomitj(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "before:= omit all" }
+  template MySeqInt2 t_msi2_afteromiti(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (i) "after:= omit all" }
+  template MySeqInt2 t_msi2_valueSameTypeE(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "value:= I:5" }
+  template MySeqInt2 t_msi2_valueSameTypeI(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "value := 5" }
+  template MySeqInt2 t_msi2_valueDiffTypeExplicitFloat(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "value:= X:5.0" }
+  template MySeqInt2 t_msi2_valueDiffTypeImplicitFloat(template integer p_i, template integer p_j) := {i:= p_i, j:=p_j} with { erroneous (j) "value:= 5.0" }
+  template MySeqInt2 t_msi2_valueDiffTypeExplicitString(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:= charstring:\"subidubi\"" }
+  template MySeqInt2 t_msi2_valueDiffTypeExplicitBitString(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:= bitstring:\'00001111\'B" }
+  template MySeqInt2 t_msi2_valueDiffTypeImplicitBitString(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:=\'00001111\'B " }
+  //variable related values:
+  template MySeqInt2 t_msi2_valueSeqInt2V(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2:{1,2}" }
+  template MySeqInt2 t_msi2_valueSeqInt2OptV(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2opt:{1,2}" } //t_msi2opt
+  template MySeqInt2 t_msi2_valueSeqIntC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2:c_msi2" }
+  template MySeqInt2 t_msi2_valueSeqIntOptC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2opt:c_msi2opt" }
+  template MySeqInt2 t_msi2_valueSeqInt2OptOmitC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:= c_msi2optomit" }
+  template MySeqInt2 t_msi2_valueSeqInt2iiC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (i) "value:=c_msi2.i" }
+  template MySeqInt2 t_msi2_valueSeqInt2ijC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (i) "value:=integer:c_msi2.j" }
+  template MySeqInt2 t_msi2_valueSeqInt2jiC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:=c_msi2.i" }
+  template MySeqInt2 t_msi2_valueSeqInt2jjC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:=c_msi2.j" }
+  template MySeqInt2 t_msi2_valueSeqIntOptFieldC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:=c_msi2opt.j" } ;//2
+
+  template MySeqIntSeqInt2 t_msisi2_trial(template integer p_i, template integer p_j, template integer p_k) := { p_i, {  p_j,  p_k} } //not used yet
+  template MySeqIntSeqInt2 t_msisi2(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} };
+  template MySeqIntSeqInt2 t_msisi2_omiti(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with { erroneous (i) "value:= omit" };
+  template MySeqIntSeqInt2 t_msisi2_omitjki(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with { erroneous (jk.i) "value:= omit" };
+  template MySeqIntSeqInt2 t_msisi2_omitjkj(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with { erroneous (jk.j) "value:= omit" };
+  template MySeqIntSeqInt2 t_msisi2_rawjki(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with {
+    erroneous (jk.i) "value(raw):= char2oct(\"<MYRAW/>\")" };
+  template MySeqIntSeqInt2 t_msisi2_rawjkj(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with {
+    erroneous (jk.j) "value(raw):= char2oct(\"<MYRAW/>\")" };
+  template MySeqIntSeqInt2 t_msisi2_afteribeforej(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} } with {
+    erroneous(i) "after:=charstring:\"AFTER\"";
+    erroneous(jk.i) "before:= 'ABBA'O"
+  };
+
+  //
+  template MySeqInt3 t_msi3(template integer p_i, template integer p_j, template integer p_k) := {i:= p_i, j:=p_j, k:=p_k}
+
+  template MySeqInt4 t_msi4(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {i:= p_i, j:=p_j, k:=p_k, l:=p_l}
+  template MySeqInt4 t_msi4_omiti(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (i) "value:= omit" }
+  template MySeqInt4 t_msi4_omitj(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (j) "value:= omit" }
+  template MySeqInt4 t_msi4_omitk(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (k) "value:= omit" }
+  template MySeqInt4 t_msi4_omitl(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {i:= p_i, j:=p_j, k:=p_k, l:=p_l}
+  with { erroneous (l) "value:= omit" }
+  template MySeqInt4 t_msi4_valueiOctetStr(template integer p_i, template integer p_j, template integer p_k, template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (i) "value:= 'FEDCBA98'O" }
+  template MySeqInt4 t_msi4_valuejOctetStr(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (j) "value:= 'FEDCBA98'O" }
+
+  template MySeqInt4 t_msi4_valueiRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (i) "value(raw):= \"<MYRAW/>\"" }
+
+  template MySeqInt4 t_msi4_valuejRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (j) "value(raw):= \"<MYRAW/>\"" }
+
+  template MySeqInt4 t_msi4_valuekRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (k) "value(raw):= \"<MYRAW/>\"" }
+
+  template MySeqInt4 t_msi4_valuelRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+  with { erroneous (l) "value(raw):= \"<MYRAW/>\"" }
+
+  template MySeqOJKL t_msojkl(template charstring p_o, template integer p_j, template integer p_k,template integer p_l ) := {o:= p_o, j:=p_j, k:=p_k, l:=p_l}
+  template MySeqIOKL t_msiokl(template integer p_i, template charstring p_o, template integer p_k,template integer p_l ) := {i:=p_i,  o:=p_o, k:=p_k, l:=p_l}
+
+  template MySeqISKL t_msiskl(template integer p_i, template MySeqInt4 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l}
+  template MySeqISKL t_msiskl_valueSomit(template integer p_i, template MySeqInt4 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with { erroneous (s)  "value:= omit" }
+  template MySeqISKL t_msiskl_valueSIomit(template integer p_i, template MySeqInt4 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with { erroneous (s.i)  "value:= omit" }
+  template MySeqISKL t_msiskl_valueSISJomit(template integer p_i, template MySeqInt4 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with { erroneous (s.i)  "value:= omit"
+    erroneous (s.j)  "value:= omit"}
+  template MySeqISKL t_msiskl_valueSraw(template integer p_i, template MySeqInt4 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with { erroneous (s)  "value(raw):= \"<MYRAW/>\" " }
+  //===seq of seq of seq:==
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_omiti(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(i) "value:=omit"}
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_omitjkl(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(jkl) "value:=omit"}
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_omitxy(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(xy) "value:=omit"}
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_valuexy(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(xy) "value:=MySeqReal2:{15.0,16.0}"}
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_valuex_y(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+    erroneous(xy.x) "value:=float:15.0";
+    erroneous(xy.y) "value:=float:16.0"
+  }
+
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_valuex_y_expr1(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+    erroneous(xy.x) "value:=float:15.0*3.0";
+    erroneous(xy.y) "value:=float:16.0*4.0"
+  }
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_valuex_y_expr2(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+    erroneous(xy.x) "value:=float:(1.0+10.0*(2.0+10.0*(3.0+10.0*(4.0+10.0*(5.0+10.0*6.0)))))"; //Horner
+    erroneous(xy.y) "value:=float:16.32/5.1"
+  }
+  template MySeqIntSeqIntSeqInt2SeqReal2 t_msisisi2r2_omitjkll(template integer p_i,template MySeqIntSeqInt2 p_jkl, template MySeqReal2 p_xy) :=
+  { i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(jkl.jk.j) "value:=omit"}
+
+  //Sequence of depth 3:
+
+  template MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2 t_msssi2sr2ssi2sr2_omit(template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2)
+  :={ s1:=p_s1,s2:=p_s2} with { erroneous(s1.jkl.jk.j) "value:=omit" }
+
+  //real (float)
+  //template MySeqReal t_msr(template float p_x) := { x:=p_x }
+  //template MySeqReal2 t_mr2(template float p_x, template float p_y):={x:=p_x, y:=p_y}
+
+  //charstring->VisibleString
+  //template MySeqStr t_msstr(template charstring p_s) := { s := p_s }
+
+  //bitstring:
+  //template MySeqBitStr t_msbitstr(template float p_b) := { b := p_b };
+  //template MySeqOctStr t_msos(template charstring p_o) := { o := p_o };
+  //template MySeqIntReal t_msir(template integer p_i, template float p_x ) := { i:=p_i, x:=p_x };
+
+  //template MySeqIntStr t_msistr(template integer p_i, template charstring p_s ) := { i:=p_i, s:=p_s };
+
+  //template MySeqIntBitStr t_msibitstr(template integer p_i, template float p_b ) := { i:=p_i, b:=p_b };
+
+
+  //====set of related templates ========
+
+   //==== union related templates ========
+   // It caused Seg fault - earlier :)
+   template MyUnionBasicTypes t_mubt_boolean1( template boolean p_b) := { choice:={b:= p_b} } with { erroneous(choice.b) "value:=omit" }
+   //   template MyUnionBasicTypes t_mubt_boolean2( template boolean p_b) := { b:= p_b } with {
+   //        erroneous(b) "value:=omit";
+   //        erroneous(b) "before(raw):='ABBA'O"
+   //    }
+
+   template MyUnionBasicTypes t_mubt_boolean3( template boolean p_b) := {choice:={ b:= p_b }} with { erroneous(choice.b) "value:=B:false" }
+   template MyUnionBasicTypes t_mubt_booleanRaw( template boolean p_b) := {choice:={ b:= p_b }} with { erroneous(choice.b) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_nullRaw := { choice:={n:= nULL} } with { erroneous(choice.n) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_integerRaw( template integer p_i) := { choice:={i:= p_i} } with { erroneous(choice.i) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_enumRaw( template MyEnum p_e) := { choice:={e:= p_e} } with { erroneous(choice.e) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_realRaw( template float p_r) := { choice:={r:= p_r} } with { erroneous(choice.r) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_bitstrRaw( template float p_bs) := {choice:={bs:= p_bs }} with { erroneous(choice.bs) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_octetstrRaw( template charstring p_os) := { choice:={os:= p_os} } with { erroneous(choice.os) "value(raw):=\"\\t<MYRAW/>\\n\"" }
+   template MyUnionBasicTypes t_mubt_objidRaw( template universal charstring p_oi) := { choice:={oi:= p_oi} } with { erroneous(choice.oi) "value(raw):=\"\\t<MYRAAW/>\\n\"" }
+
+   template MyUnionComplexTypes t_muct_0_1( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={{p_f1,p_f2,p_f3}} }} with { erroneous(choice.sofreal.r_list[0], choice.sofreal.r_list[1]) "value :=omit" }
+   template MyUnionComplexTypes t_muct_0_2( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={{p_f1,p_f2,p_f3}} }} with { erroneous(choice.sofreal.r_list[0], choice.sofreal.r_list[2]) "value :=omit" }
+   template MyUnionComplexTypes t_muct_1_2( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={{p_f1,p_f2,p_f3}}} } with { erroneous(choice.sofreal.r_list[1], choice.sofreal.r_list[2]) "value :=omit" }
+   template MyUnionComplexTypes t_muct_2_1( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={{p_f1,p_f2,p_f3}}} } with { erroneous(choice.sofreal.r_list[2], choice.sofreal.r_list[1]) "value :=omit" }
+   template MyUnionComplexTypes t_muct_0_1_2( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={{p_f1,p_f2,p_f3}}} } with { erroneous(choice.sofreal.r_list[0], choice.sofreal.r_list[1], choice.sofreal.r_list[2]) "value :=omit" }
+
+   template MyUnionComplexTypes t_muct_0_2_1( template float p_f1, template float p_f2, template float p_f3) := { choice:={sofreal:={r_list:={p_f1,p_f2,p_f3}}} } with { erroneous(choice.sofreal.r_list[0], choice.sofreal.r_list[2], choice.sofreal.r_list[1]) "value :=omit" }
+  //=== INTEGER related? ===
+
+  //================================================
+  //======== Functions==============================
+  //================================================
+  function f_compareAndVerdict(in octetstring pl_encoded, in octetstring pl_expected) {
+    log("Encoded value:  ", pl_encoded); //DO not delete it, please. I'm working with this!
+    log("Expected value: ", pl_expected);//Later it will be removed
+    if( pl_encoded == pl_expected ) {
+      setverdict(pass);
+    } else {
+      setverdict(fail, "encoded value: ", pl_encoded, ";expected value: ", pl_expected );
+    }
+  }
+  //================================================
+  //======== Testcases==============================
+  //================================================
+
+  //======== {integer}===================
+  //omit
+  testcase tc_mySeqIntOmit() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_omit(i))),
+        char2oct("<MySeqInt/>\n\n") );
+    }
+  }
+
+  testcase tc_mySeqIntValueSameTypeE() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueSameTypeE(i))),
+        encode_mySeqInt(valueof(t_msi(5)))  );
+    }
+  }
+
+  testcase tc_mySeqIntValueSameTypeI() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueSameTypeI(i))),
+        char2oct("<MySeqInt>\n\t<INTEGER>5</INTEGER>\n</MySeqInt>\n\n") );
+    }
+  }
+
+  //Basic ASN.1 types (eq ttcn types): boolean, integer, octetstring, bitstring, null, objid, ext. objid, enum, embedded pdv, float (real), UTFSTR, seq, seq of
+  testcase tc_mySeqIntValueDiffTypeExplicitBool() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeExplicitBoolean(i))),
+        char2oct("<MySeqInt>\n\t<b>true</b>\n</MySeqInt>\n\n") );
+    }
+  }
+  testcase tc_mySeqIntValueDiffTypeImplicitBool() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeImplicitBoolean(i))),
+        char2oct("<MySeqInt>\n\t<BOOLEAN>true</BOOLEAN>\n</MySeqInt>\n\n"));
+      //encode_mySeqBool(valueof(t_msb(true)))  );
+    }
+  }
+
+  testcase tc_mySeqIntValueDiffTypeExplicitOctStr() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeExplicitOctStr(i))),
+        char2oct("<MySeqInt>\n\t<OCTET_STRING>BABA</OCTET_STRING>\n</MySeqInt>\n\n"));
+      //encode_mySeqOctStr(valueof(t_msos(oct2str('BABA'O))))) ;
+    }
+  }
+  testcase tc_mySeqIntValueDiffTypeImplicitOctStr() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeImplicitOctStr(i))),
+        char2oct("<MySeqInt>\n\t<OCTET_STRING>BABA</OCTET_STRING>\n</MySeqInt>\n\n"));
+      //encode_mySeqOctStr(valueof(t_msos(oct2str('BABA'O))))) ;
+    }
+  }
+
+  testcase tc_mySeqIntValueDiffTypeExplicitEnum() runs on MyComp {
+    var MySeqMyEnum vl_msme;
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      vl_msme.e:=second;
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeExplicitEnum(i))),
+        char2oct("<MySeqInt>\n\t<e>second</e>\n</MySeqInt>\n\n"));
+      //encode_mySeqMyEnum(vl_msme) );
+    }
+  }
+  testcase tc_mySeqIntValueDiffTypeExplicitFloat() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeExplicitFloat(i))),
+        char2oct("<MySeqInt>\n\t<x>5.000000</x>\n</MySeqInt>\n\n"));
+      //encode_mySeqReal(valueof(t_msr(5.0)))  );
+    }
+  }
+
+  testcase tc_mySeqIntValueDiffTypeImplicitFloat() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof(t_msi_valueDiffTypeImplicitFloat(i))),
+        char2oct("<MySeqInt>\n\t<REAL>5.000000</REAL>\n</MySeqInt>\n\n"));
+    }
+  }
+
+  testcase tc_mySeqIntValueDiffTypeExplicitStr() runs on MyComp {
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt(valueof( t_msi_valueDiffTypeExplicitString(i))),
+        char2oct("<MySeqInt>\n\t<CHARSTRING>subidubi</CHARSTRING>\n</MySeqInt>\n\n"));
+      //encode_mySeqStr(valueof(t_msstr("subidubi"))) );
+    }
+  }
+
+  //   testcase tc_mySeqIntValueDiffTypeExplicitBitStr() runs on MyComp {
+  //     for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+  //       f_compareAndVerdict(
+  //         encode_mySeqInt(valueof( t_msi_valueDiffTypeExplicitBitString(i))),
+  //         encode_mySeqBitStr(valueof(t_msbitstr('01011000'B))) );
+  //     }
+  //   }
+
+  //   testcase tc_mySeqIntValueDiffTypeImplicitBitStr() runs on MyComp {
+  //     log("encoded msbstr :",encode_mySeqBitStr(valueof(t_msbitstr('01011000'B))) );
+  //     for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+  //       f_compareAndVerdict(
+  //         encode_mySeqInt(valueof(t_msi_valueDiffTypeImplicitBitString(i))),
+  //         encode_mySeqBitStr(valueof(t_msbitstr('01011000'B)))  )
+  //     }
+  //   }
+
+  //RAW
+  testcase tc_mySeqIntValueDiffTypeRawOctStr() runs on MyComp {
+    var octetstring vl_expectedValue:= char2oct("<MySeqInt>\n<MYRAW/></MySeqInt>\n\n");
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict( encode_mySeqInt(valueof(t_msi_valueDiffTypeRaw(i))), vl_expectedValue)
+    }
+  }
+  // ============{integer, integer }==============
+  //omit
+  testcase tc_mySeqInt2Omiti() runs on MyComp {
+    var integer j:= 255;
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt2(valueof(t_msi2_omiti(i,j))), //encoded
+        char2oct("<MySeqInt2>\n\t<j>255</j>\n</MySeqInt2>\n\n"));
+      //encode_mySeqInt(valueof(t_msi(j))) );        //expected
+    }
+  }
+
+  testcase tc_mySeqInt2Omitj() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_omitj(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n</MySeqInt2>\n\n"));
+  }
+
+  //before omit j
+  testcase tc_mySeqInt2BeforeOmitj() runs on MyComp {
+    var integer j:= 255;
+    for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+      f_compareAndVerdict(
+        encode_mySeqInt2(valueof(t_msi2_beforeomitj(i,j))),//encoded
+        char2oct("<MySeqInt2>\n\t<j>255</j>\n</MySeqInt2>\n\n"));
+    }
+  }
+
+  //after omit i
+  testcase tc_mySeqInt2AfterOmiti() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_afteromiti(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n</MySeqInt2>\n\n"));
+
+  }
+
+  testcase tc_mySeqInt2ValueSameTypeE() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_valueSameTypeE(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<i>5</i>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueSameTypeI() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_valueSameTypeI(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<INTEGER>5</INTEGER>\n</MySeqInt2>\n\n"));
+
+  }
+
+  testcase tc_mySeqInt2ValueDiffTypeExplicitFloat() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_valueDiffTypeExplicitFloat(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<x>5.000000</x>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueDiffTypeImplicitFloat() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof(t_msi2_valueDiffTypeImplicitFloat(1,j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<REAL>5.000000</REAL>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueDiffTypeExplicitStr() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof( t_msi2_valueDiffTypeExplicitString(1, j))),//encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<CHARSTRING>subidubi</CHARSTRING>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueDiffTypeExplicitBitStr() runs on MyComp {
+    var integer j:= 255;
+    f_compareAndVerdict(
+      encode_mySeqInt2(valueof( t_msi2_valueDiffTypeExplicitBitString(1, j))), //encoded
+      char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<BIT_STRING>00001111</BIT_STRING>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueDiffTypeImplicitBitStr() runs on MyComp {
+    var integer j:= 255;
+      f_compareAndVerdict(
+        encode_mySeqInt2(valueof( t_msi2_valueDiffTypeImplicitBitString(1,j))), //encoded
+        char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<BIT_STRING>00001111</BIT_STRING>\n</MySeqInt2>\n\n"));
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2V() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded :=  encode_mySeqInt2(valueof(t_msi2_valueSeqInt2V(i,j)))
+    var octetstring vl_expected:=  char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<MySeqInt2>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2OptV() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded :=  encode_mySeqInt2(valueof(t_msi2_valueSeqInt2OptV(i,j)))
+    var octetstring vl_expected:=  char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2opt>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqIntC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded :=  encode_mySeqInt2(valueof(t_msi2_valueSeqIntC(i,j)))
+    var octetstring vl_expected:=  char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<MySeqInt2>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2OptC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded :=  encode_mySeqInt2(valueof(t_msi2_valueSeqIntOptC(i,j)));
+    var octetstring vl_expected:=  char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2opt>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2OptOmitC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded := encode_mySeqInt2(valueof(t_msi2_valueSeqInt2OptOmitC(i,j)));
+    var octetstring vl_expected:= char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t</MySeqInt2opt>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_mySeqInt2ValueSeqInt2iiC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded := encode_mySeqInt2(valueof(t_msi2_valueSeqInt2iiC(i,j)));
+    var octetstring vl_expected:= char2oct("<MySeqInt2>\n\t<i>1</i>\n\t<j>15</j>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2ijC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded := encode_mySeqInt2(valueof(t_msi2_valueSeqInt2ijC(i,j)));
+    var octetstring vl_expected:= char2oct("<MySeqInt2>\n\t<INTEGER>2</INTEGER>\n\t<j>15</j>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_mySeqInt2ValueSeqInt2jiC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded := encode_mySeqInt2(valueof(t_msi2_valueSeqInt2jiC(i,j)));
+    var octetstring vl_expected:= char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<i>1</i>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt2ValueSeqInt2jjC() runs on MyComp {
+    var integer i:= 10, j:= 15;
+    var octetstring vl_encoded := encode_mySeqInt2(valueof(t_msi2_valueSeqInt2jjC(i,j)));
+    var octetstring vl_expected:= char2oct("<MySeqInt2>\n\t<i>10</i>\n\t<j>2</j>\n</MySeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  //=== Sequence { integer, {integer, integer} )
+  testcase tc_mySeqIntSeqInt2ValueOmiti() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded :=encode_mySeqIntSeqInt2(valueof(t_msisi2_omiti(i,j,k)))
+    var octetstring vl_expected:=char2oct("<MySeqIntSeqInt2>\n\t<jk>\n\t\t<i>15</i>\n\t\t<j>16</j>\n\t</jk>\n</MySeqIntSeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqIntSeqInt2ValueOmitjki() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded:=encode_mySeqIntSeqInt2(valueof(t_msisi2_omitjki(i,j,k)));
+    var octetstring vl_expected:=char2oct("<MySeqIntSeqInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<j>16</j>\n\t</jk>\n</MySeqIntSeqInt2>\n\n")
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqIntSeqInt2ValueOmitjkj() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded := encode_mySeqIntSeqInt2(valueof(t_msisi2_omitjkj(i,j,k)))
+    var octetstring vl_expected:= char2oct("<MySeqIntSeqInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<i>15</i>\n\t</jk>\n</MySeqIntSeqInt2>\n\n");
+    f_compareAndVerdict( vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqIntSeqInt2ValueRawjki() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded := encode_mySeqIntSeqInt2(valueof(t_msisi2_rawjki(i,j,k)));
+    var octetstring vl_expected:=char2oct("<MySeqIntSeqInt2>\n\t<i>10</i>\n\t<jk>\n<MYRAW/>\t\t<j>16</j>\n\t</jk>\n</MySeqIntSeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqIntSeqInt2ValueRawjkj() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded:=encode_mySeqIntSeqInt2(valueof(t_msisi2_rawjkj(i,j,k)));
+    var octetstring vl_expected:=char2oct("<MySeqIntSeqInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<i>15</i>\n<MYRAW/>\t</jk>\n</MySeqIntSeqInt2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  //After-before:
+  testcase tc_mySeqIntSeqInt2AfteriBeforej() runs on MyComp {
+    var integer i:= 10, j:= 15, k:=16;
+    var octetstring vl_encoded:=encode_mySeqIntSeqInt2(valueof(t_msisi2_afteribeforej(i,j,k)));
+    var octetstring vl_expected:= char2oct( "<MySeqIntSeqInt2>\n\t<i>10</i>\n\t<CHARSTRING>AFTER</CHARSTRING>\n\t<jk>\n\t\t<OCTET_STRING>ABBA</OCTET_STRING>\n\t\t<i>15</i>\n\t\t<j>16</j>\n\t</jk>\n</MySeqIntSeqInt2>\n\n");  //TODO: CHECK!!!!!
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  //==== {integer, integer, integer, integer} ==============
+  //omit
+  testcase tc_mySeqInt4Omiti() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_omiti(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt4Omitj() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_omitj(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt4Omitk() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_omitk(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt4Omitl() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_omitl(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<k>3</k>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt4ValueiOctetStr() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_valueiOctetStr(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<OCTET_STRING>FEDCBA98</OCTET_STRING>\n\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_mySeqInt4ValuejOctetStr() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_valuejOctetStr(1,2,3,4)));
+    var octetstring vl_expected:=char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<OCTET_STRING>FEDCBA98</OCTET_STRING>\n\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  type record of octetstring RoO;
+  type record of integer RoI;
+  testcase tc_mySeqInt4ValueiRaw() runs on MyComp {
+    var RoO vl_expectedValue:= {
+      char2oct("<MySeqInt4>\n<MYRAW/>\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n"),
+      char2oct("<MySeqInt4>\n<MYRAW/>\t<j>20</j>\n\t<k>30</k>\n\t<l>40</l>\n</MySeqInt4>\n\n"),
+      char2oct("<MySeqInt4>\n<MYRAW/>\t<j>200</j>\n\t<k>300</k>\n\t<l>400</l>\n</MySeqInt4>\n\n"),
+      char2oct("<MySeqInt4>\n<MYRAW/>\t<j>2000</j>\n\t<k>3000</k>\n\t<l>4000</l>\n</MySeqInt4>\n\n"),
+      char2oct("<MySeqInt4>\n<MYRAW/>\t<j>-20</j>\n\t<k>-30</k>\n\t<l>-40</l>\n</MySeqInt4>\n\n")
+    }
+    var RoI vl_roi := { 1, 10, 100, 1000,-10};
+
+    var integer i:=0;
+    for(var integer index:=0; index<5;index:=index+1) {
+      i:=vl_roi[index];
+      f_compareAndVerdict( encode_mySeqInt4(valueof(t_msi4_valueiRaw(i,2*i,3*i,4*i))),vl_expectedValue[index] )
+    }
+  }
+
+  testcase tc_mySeqInt4ValuejRaw() runs on MyComp {
+    var octetstring vl_encoded:= encode_mySeqInt4(valueof(t_msi4_valuejRaw(1,2,3,4)));
+    var octetstring vl_expectedValue:=char2oct("<MySeqInt4>\n\t<i>1</i>\n<MYRAW/>\t<k>3</k>\n\t<l>4</l>\n</MySeqInt4>\n\n") ;
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_mySeqInt4ValuekRaw() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_valuekRaw(1,2,3,4)));
+    var octetstring vl_expectedValue:= char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<j>2</j>\n<MYRAW/>\t<l>4</l>\n</MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue)
+  }
+
+  testcase tc_mySeqInt4ValuelRaw() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqInt4(valueof(t_msi4_valuelRaw(1,2,3,4)));
+    var octetstring vl_expectedValue:= char2oct("<MySeqInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<k>3</k>\n<MYRAW/></MySeqInt4>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue ) ;
+  }
+
+  //To test if a mandatory structure omitted
+  testcase tc_mySeqISKL_ValueSomit() runs on MyComp {
+    var MySeqInt4 vl_msi4:={5,6,7,8};
+    var octetstring vl_encoded:=encode_mySeqISKL(valueof(t_msiskl_valueSomit(10,vl_msi4,30,40)));
+    var octetstring vl_expectedValue:= char2oct("<MySeqISKL>\n\t<i>10</i>\n\t<k>30</k>\n\t<l>40</l>\n</MySeqISKL>\n\n");
+    f_compareAndVerdict( vl_encoded, vl_expectedValue );
+  }
+
+  testcase tc_mySeqISKL_ValueSIomit() runs on MyComp {
+    var MySeqInt4 vl_msi4:={5,6,7,8};
+    var octetstring vl_encoded:= encode_mySeqISKL(valueof(t_msiskl_valueSIomit(10,vl_msi4,30,40)));
+    var octetstring vl_expectedValue := char2oct( "<MySeqISKL>\n\t<i>10</i>\n\t<s>\n\t\t<j>6</j>\n\t\t<k>7</k>\n\t\t<l>8</l>\n\t</s>\n\t<k>30</k>\n\t<l>40</l>\n</MySeqISKL>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_mySeqISKL_ValueSISJomit() runs on MyComp {
+    var MySeqInt4 vl_msi4:={5,6,7,8};
+    var octetstring vl_encoded:=  encode_mySeqISKL(valueof(t_msiskl_valueSISJomit(10,vl_msi4,30,40)));
+    var octetstring vl_expectedValue := char2oct( "<MySeqISKL>\n\t<i>10</i>\n\t<s>\n\t\t<k>7</k>\n\t\t<l>8</l>\n\t</s>\n\t<k>30</k>\n\t<l>40</l>\n</MySeqISKL>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_mySeqISKL_ValueSraw() runs on MyComp {
+    var MySeqInt4 vl_msi4:={5,6,7,8};
+    var octetstring vl_encoded:= encode_mySeqISKL(valueof(t_msiskl_valueSraw(10,vl_msi4,30,40)));
+    var octetstring vl_expectedValue:=  char2oct( "<MySeqISKL>\n\t<i>10</i>\n<MYRAW/>\t<k>30</k>\n\t<l>40</l>\n</MySeqISKL>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  //===== sequence of sequence of sequence ====
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_omiti() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_omiti(1, {2,{3,4}}, {5.0,6.0} )))
+    var octetstring vl_expectedValue:=  char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_omitjkl() runs on MyComp {
+    //var MySeqIntSeqReal2 vl_expected:= { 1, {5.0,6.0}};
+    log(">>>",t_msisisi2r2_omitjkl(1, {2,{3,4}}, {5.0,6.0} ));
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_omitjkl(1, {2,{3,4}}, {5.0,6.0} )));
+    var octetstring vl_expectedValue:=  char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict( vl_encoded,vl_expectedValue);
+
+  }
+
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_omitxy() runs on MyComp {
+    //var MySeqIntSeqIntSeqInt2 vl_expected:= { 1, {2,{3,4}} };
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_omitxy(1, {2,{3,4}}, {5.0,6.0} )));
+    var octetstring vl_expectedValue:=  char2oct("<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  //...with { erroneous(jkl.jk.j) "value:=omit"}
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_omitjkll() runs on MyComp {
+    //var MySeqIntSeqIntSeqInt2optoptSeqReal2 vl_expected:= {1,{2,{3,omit}}, {5.0,6.0}};
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_omitjkll(1, {2,{3,4}}, {5.0,6.0} )));
+    var octetstring vl_expectedValue:=  char2oct("<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_valuexy() runs on MyComp {
+    //var MySeqIntSeqIntSeqInt2SeqReal2 vl_msisisi2r2;
+    //var MySeqIntSeqIntSeqInt2SeqReal2 vl_expected:= {1,{2,{3,4}}, {15.0,16.0}};
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_valuexy(1, {2,{3,4}}, {5.0,6.0} )));
+    var octetstring vl_expectedValue:=char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<MySeqReal2>\n\t\t<x>15.000000</x>\n\t\t<y>16.000000</y>\n\t</MySeqReal2>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_valuex_y(1, {2,{3,4}}, {5.0,6.0} )));
+    //var MySeqIntSeqIntSeqInt2SeqReal2 vl_expected:= {1,{2,{3,4}}, {15.0,16.0}};
+    var octetstring vl_expectedValue:=char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<REAL>15.000000</REAL>\n\t\t<REAL>16.000000</REAL>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  //expression evaluation in attribue section:
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y_expr1() runs on MyComp {
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_valuex_y_expr1(1, {2,{3,4}}, {5.0,6.0} )));
+    //var MySeqIntSeqIntSeqInt2SeqReal2 vl_expected:= {1,{2,{3,4}}, {45.0,64.0}};
+    var octetstring vl_expectedValue:=char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<REAL>45.000000</REAL>\n\t\t<REAL>64.000000</REAL>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y_expr2() runs on MyComp {
+    //var MySeqIntSeqIntSeqInt2SeqReal2 vl_expected:= {1,{2,{3,4}}, {654321.0, 3.2}};
+    var octetstring vl_encoded:=encode_mySeqIntSeqIntSeqInt2SeqReal2(valueof(t_msisisi2r2_valuex_y_expr2(1, {2,{3,4}}, {5.0,6.0} )));
+    var octetstring vl_expectedValue:=char2oct( "<MySeqIntSeqIntSeqInt2SeqReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<REAL>654321.000000</REAL>\n\t\t<REAL>3.200000</REAL>\n\t</xy>\n</MySeqIntSeqIntSeqInt2SeqReal2>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+  testcase tc_MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2_omit() runs on MyComp {
+    var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}};
+    var octetstring vl_encoded:=encode_mySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2(valueof(t_msssi2sr2ssi2sr2_omit(vl_s1, vl_s2)))
+    var octetstring vl_expectedValue:=char2oct( "<MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2>\n\t<s1>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<i>2</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>3.000000</x>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s1>\n\t<s2>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t\t<j>7</j>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t\t<y>8.000000</y>\n\t\t</xy>\n\t</s2>\n</MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2>\n\n");
+    //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{1,{2, omit}}, {3.0,4.0} }, { omit,{5,{6,7}}, {7.0, 8.0}} }
+    f_compareAndVerdict(vl_encoded,vl_expectedValue);
+  }
+
+}//group Sequences
+
+group SequenceOf  {
+//   //====sequence of related templates====
+   template MySeqOfBool  t_msob(template boolean p_b1, template boolean p_b2, template boolean p_b3) := { {p_b1, p_b2, p_b3 }};
+   template MySeqOfNull  t_mson := {{ nULL, nULL, nULL }};
+   template MySeqOfInt   t_msoi(template integer p_i1, template integer p_i2, template integer p_i3):={{p_i1,p_i2,p_i3}};
+   template MySeqOfMyEnum t_msome(template MyEnum p_e1, template MyEnum p_e2,template MyEnum p_e3) := {{p_e1,p_e2,p_e3}};
+   //template MySeqOfEnum  t_msoe(template MyEnum p_e1, template MyEnum p_e2,template MyEnum p_e3):= {{p_e1,p_e2,p_e3}};
+   template MySeqOfReal  t_msor(template  float p_f1, template float p_f2, template float p_f3, template float p_f4):= {{p_f1, p_f2,p_f3,p_f4}}
+   template MySeqOfBitStr t_msobs(template Bitstring p_bs1, template Bitstring p_bs2, template Bitstring p_bs3):={{p_bs1, p_bs2, p_bs3}}
+   template MySeqOfOctStr t_msoos(template Octetstring p_os1, template Octetstring p_os2, template Octetstring p_os3):={{p_os1, p_os2, p_os3}}
+   //template MySeqOfObjId
+
+   template MySeqOfBool  t_msobValueSameType(template boolean p_b1, template boolean p_b2, template boolean p_b3) := { {p_b1, p_b2, p_b3} }
+   with {  erroneous (b_list[0]) "value:= B:true"; erroneous (b_list[2]) "value:= B:true" };
+
+   template MySeqOfBool  t_msobValueDiffType(template boolean p_b1, template boolean p_b2, template boolean p_b3) := { {p_b1, p_b2, p_b3} }
+   with {  erroneous (b_list[0]) "value:= 1.414"; erroneous (b_list[2]) "value:= 2011" };
+
+   template MySeqOfBool  t_msobValueDiffTypeRaw(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[0]) "value(raw):=\"<MYRAW</>\""; erroneous (b_list[2]) "value:= I:2011" };
+
+   template MySeqOfBool  t_msobValueOmit(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[0]) "value:=omit"; erroneous (b_list[1]) "value:= omit" };
+
+   template MySeqOfBool  t_msobAfterOmit(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[0]) "after:=omit all" };
+
+   template MySeqOfBool  t_msobValueAfterOmit(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[0]) "after:=omit all"; erroneous (b_list[0]) "value:=B:true" };
+
+   template MySeqOfBool  t_msobBeforeOmit2(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[2]) "before:=omit all" };
+
+   template MySeqOfBool  t_msobValueBeforeOmit2(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[2]) "before:=omit all"; erroneous (b_list[2]) "value:=B:true" };
+
+   template MySeqOfBool  t_msobBeforeOmit1(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[1]) "before:=omit all" };
+
+   template MySeqOfBool  t_msobValueBeforeOmit1(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }}
+   with {  erroneous (b_list[1]) "before:=omit all"; erroneous (b_list[1]) "value:=B:true" };
+   // This would cause compilation error - correct behavior:
+   //template MySeqOfBool  t_msobAfterOmit(template boolean p_b1, template boolean p_b2, template boolean p_b3) := {{ p_b1, p_b2, p_b3 }  }
+   // with {  erroneous ([0]) "after:=omit all"; erroneous ([1]) "value:= 4" };
+
+  //NULL:
+  template MySeqOfNull  t_msonValueDiffType := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[0]) "value:= F:1.414"; erroneous (n_list[2]) "value:= I:2011" };
+
+   template MySeqOfNull  t_msonValueDiffTypeRaw := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[0]) "value(raw):=\"<MYRAW/>\""; erroneous (n_list[2]) "value:= I:2011" };
+
+   template MySeqOfNull  t_msonBeforeOmit2 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[2]) "before:= omit all" };
+   template MySeqOfNull  t_msonIntValueBeforeOmit2 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[2]) "before:= omit all"; erroneous (n_list[2]) "value:= I:2011"};
+   template MySeqOfNull  t_msonFloatValueBeforeOmit2 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[2]) "before:= omit all"; erroneous (n_list[2]) "value:= F:0.1"};
+   template MySeqOfNull  t_msonBeforeOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "before:= omit all" };
+   template MySeqOfNull  t_msonIntValueBeforeOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "before:= omit all"; erroneous (n_list[1]) "value:= I:2011"};
+   template MySeqOfNull  t_msonFloatValueBeforeOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "before:= omit all"; erroneous (n_list[1]) "value:= F:0.1"};
+   template MySeqOfNull  t_msonFloatValueBeforeOmit1_2 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "before:= omit all"; erroneous (n_list[2]) "value:= F:0.1"};
+
+   template MySeqOfNull  t_msonAfterOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "after:= omit all" };
+   template MySeqOfNull  t_msonIntValueAfterOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "after:= omit all"; erroneous (n_list[1]) "value:= I:2011"};
+   template MySeqOfNull  t_msonFloatValueAfterOmit1 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "after:= omit all"; erroneous (n_list[1]) "value:= F:0.1"};
+   template MySeqOfNull  t_msonFloatValueAfterOmit1_2 := {{ nULL, nULL, nULL }}
+   with {  erroneous (n_list[1]) "after:= omit all"; erroneous (n_list[0]) "value:= F:0.1"};
+   //INTEGER
+   template MySeqOfInt  t_msoiValueDiffType(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[0]) "value:= F:1.414"; erroneous (i_list[2]) "value:= B:true" };
+   template MySeqOfInt  t_msoiValueDiffTypeRaw(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[0]) "value(raw):=\"<MYRAW/>\" "; erroneous (i_list[2]) "value:= true" };
+   template MySeqOfInt  t_msoiBeforeOmit2(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[2]) "before:= omit all" };
+   template MySeqOfInt  t_msoiIntValueBeforeOmit2(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[2]) "before:= omit all"; erroneous (i_list[2]) "value:= I:2011"};
+   template MySeqOfInt  t_msoiFloatValueBeforeOmit2(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[2]) "before:= omit all"; erroneous (i_list[2]) "value:= F:0.1"};
+   template MySeqOfInt  t_msoiBeforeOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "before:= omit all" };
+   template MySeqOfInt  t_msoiIntValueBeforeOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "before:= omit all"; erroneous (i_list[1]) "value:= I:2011"};
+   template MySeqOfInt  t_msoiFloatValueBeforeOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "before:= omit all"; erroneous (i_list[1]) "value:= R:0.1"};
+   template MySeqOfInt  t_msoiFloatValueBeforeOmit1_2(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "before:= omit all"; erroneous (i_list[2]) "value:= F:0.1"};
+
+   template MySeqOfInt  t_msoiAfterOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "after:= omit all" };
+   template MySeqOfInt  t_msoiIntValueAfterOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "after:= omit all"; erroneous (i_list[1]) "value:= I:2011"};
+   template MySeqOfInt  t_msoiFloatValueAfterOmit1(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "after:= omit all"; erroneous (i_list[1]) "value:= F:0.1"};
+   template MySeqOfInt  t_msoiFloatValueAfterOmit1_2(integer p_i, integer p_j, integer p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (i_list[1]) "after:= omit all"; erroneous (i_list[0]) "value:= 0.1"};
+   //MyEnum
+   template MySeqOfMyEnum  t_msoeValueDiffType(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[0]) "value:= F:1.414"; erroneous (e_list[2]) "value:= B:true" };
+   template MySeqOfMyEnum  t_msoeValueDiffTypeRaw(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[0]) "value(raw):= \"<MYRAW/>\""; erroneous (e_list[2]) "value:= true" };
+   template MySeqOfMyEnum  t_msoeBeforeOmit2(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[2]) "before:= omit all" };
+   template MySeqOfMyEnum  t_msoeIntValueBeforeOmit2(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[2]) "before:= omit all"; erroneous (e_list[2]) "value:= 2011"};
+   template MySeqOfMyEnum  t_msoeFloatValueBeforeOmit2(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[2]) "before:= omit all"; erroneous (e_list[2]) "value:= 0.1"};
+   template MySeqOfMyEnum  t_msoeBeforeOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "before:= omit all" };
+   template MySeqOfMyEnum  t_msoeIntValueBeforeOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "before:= omit all"; erroneous (e_list[1]) "value:= 2011"};
+   template MySeqOfMyEnum  t_msoeFloatValueBeforeOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "before:= omit all"; erroneous (e_list[1]) "value:= 0.1"};
+   template MySeqOfMyEnum  t_msoeFloatValueBeforeOmit1_2(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "before:= omit all"; erroneous (e_list[2]) "value:= 0.1"};
+
+   template MySeqOfMyEnum  t_msoeAfterOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "after:= omit all" };
+   template MySeqOfMyEnum  t_msoeIntValueAfterOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "after:= omit all"; erroneous (e_list[1]) "value:= 2011"};
+   template MySeqOfMyEnum  t_msoeFloatValueAfterOmit1(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "after:= omit all"; erroneous (e_list[1]) "value:= R:0.1"};
+   template MySeqOfMyEnum  t_msoeFloatValueAfterOmit1_2(MyEnum p_i, MyEnum p_j, MyEnum p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (e_list[1]) "after:= omit all"; erroneous (e_list[0]) "value:= R:0.1"};
+   //Real (float):
+   template MySeqOfReal  t_msorValueDiffType(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[0]) "value:= 1.414"; erroneous (r_list[2]) "value:= true" };
+   template MySeqOfReal  t_msorValueDiffTypeRaw(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[0]) "value(raw):= \"<MYRAW/>\""; erroneous (r_list[2]) "value:=B:true" };
+   template MySeqOfReal  t_msorBeforeOmit2(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[2]) "before:= omit all" };
+   template MySeqOfReal  t_msorIntValueBeforeOmit2(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[2]) "before:= omit all"; erroneous (r_list[2]) "value:= I:2011"};
+   template MySeqOfReal  t_msorFloatValueBeforeOmit2(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[2]) "before:= omit all"; erroneous (r_list[2]) "value:= R:0.1"};
+   template MySeqOfReal  t_msorBeforeOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "before:= omit all" };
+   template MySeqOfReal  t_msorIntValueBeforeOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "before:= omit all"; erroneous (r_list[1]) "value:= I:2011"};
+   template MySeqOfReal  t_msorFloatValueBeforeOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "before:= omit all"; erroneous (r_list[1]) "value:=R:0.1"};
+   template MySeqOfReal  t_msorFloatValueBeforeOmit1_2(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "before:= omit all"; erroneous (r_list[2]) "value:= R:0.1"};
+
+   template MySeqOfReal  t_msorAfterOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "after:= omit all" };
+   template MySeqOfReal  t_msorIntValueAfterOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "after:= omit all"; erroneous (r_list[1]) "value:= I:2011"};
+   template MySeqOfReal  t_msorFloatValueAfterOmit1(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "after:= omit all"; erroneous (r_list[1]) "value:=R:0.1"};
+   template MySeqOfReal  t_msorFloatValueAfterOmit1_2(float p_i, float p_j, float p_k) := {{ p_i, p_j, p_k }}
+   with {  erroneous (r_list[1]) "after:= omit all"; erroneous (r_list[0]) "value:=R:0.1"};
+   //more complex:
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_omitj(template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.jk.j) "value:=omit" }
+
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_beforeomitj(template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.jk.j) "before:=omit all"  erroneous(s_list[1].jkl.jk.i) "after:=omit all"}
+
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_beforeafteromit(
+       template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.jk.j) "before:=omit all"  erroneous(s_list[1].jkl.jk.i) "after:=omit all"}
+
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_arglist_omit(
+       template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.i, s_list[0].jkl.jk.j, s_list[0].xy.x) "value:=omit"  erroneous(s_list[1].jkl.jk.i, s_list[1].xy.x) "after:=omit all"}
+
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_arglist_afteromit(
+       template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.jk.i, s_list[0].xy.x) "after:=omit all"  erroneous(s_list[1].jkl.jk.i, s_list[1].xy.x) "after:=omit all"}
+
+   template MySeqOfSeqSeqIntSeqInt2SeqReal2 t_msossisi2sr2_arglist_beforeomit(
+       template MySeqSeqIntSeqInt2SeqReal2 p_s1,template MySeqSeqIntSeqInt2SeqReal2 p_s2) :={{ p_s1, p_s2}}
+   with { erroneous(s_list[0].jkl.jk.j, s_list[0].xy.y) "before:=omit all"  erroneous(s_list[1].jkl.jk.i, s_list[1].xy.x) "after:=omit all"}
+   //============ Testcases====================
+   //Testcase of same type
+   testcase tc_MySeqOfBoolValueSameType1() runs on MyComp {
+     f_compareAndVerdict(
+       encode_mySeqOfBool(valueof(t_msobValueSameType(false, false,false))),
+       encode_mySeqOfBool(valueof(t_msob(true, false, true))));
+   }
+
+   testcase tc_MySeqOfBoolValueSameType2() runs on MyComp {
+     f_compareAndVerdict(
+       encode_mySeqOfBool(valueof(t_msobValueSameType(true, true,true))),
+       encode_mySeqOfBool(valueof(t_msob(true, true, true))));
+   }
+
+   testcase tc_MySeqOfBoolValueDiffType() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueDiffType(true, true,true)));
+     var octetstring vl_expected:=char2oct("<MySeqOfBool>\n\t<REAL>1.414000</REAL>\n\t<b>true</b>\n\t<INTEGER>2011</INTEGER>\n</MySeqOfBool>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={u_list:={ {{r:=1.414}}, {{b:=true}}, {{i:=2011}} }};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolValueRaw() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueDiffTypeRaw(true, true,true)));
+     var octetstring vl_expected:=char2oct("<MySeqOfBool>\n<MYRAW</>\t<b>true</b>\n\t<i>2011</i>\n</MySeqOfBool>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={u_list:={  {{i:=10}}, {{b:=true}}, {{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolValueOmit() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueOmit(false, false,true)));
+     //var octetstring vl_expected:=char2oct("<MySeqOfBool>\n\t<b>true</b>\n</MySeqOfBool>\n\n");
+     var octetstring vl_expected:=encode_mySeqOfBool( {{true}} );
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolAfterOmit() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobAfterOmit(false, true,true)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{false}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolValueAfterOmit() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueAfterOmit(false, false,false)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{true}});
+     //var MySeqOfMyUnionBT vl_expected :={{{{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobBeforeOmit2(false, false,true)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{true}});
+     //var MySeqOfMyUnionBT vl_expected :={{{{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueBeforeOmit2(false, false,false)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{true}});
+     //var MySeqOfMyUnionBT vl_expected :={{{{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobBeforeOmit1(true, false,true)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{false,true}});
+     //var MySeqOfMyUnionBT vl_expected :={{ {{b:=false}},{{b:=true}}  }};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfBoolValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfBool(valueof(t_msobValueBeforeOmit1(true, false,true)));
+     var octetstring vl_expected:=encode_mySeqOfBool({{true,true}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   //NULL
+   testcase tc_MySeqOfNullValueDiffType() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonValueDiffType));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<f>1.414000</f>\n\t<n>NULL</n>\n\t<i>2011</i>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=1.414}}, {{n:=nULL}}, {{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullValueDiffTypeRaw() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonValueDiffTypeRaw));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n<MYRAW/>\t<n>NULL</n>\n\t<i>2011</i>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=10}}, {{n:=nULL}}, {{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonBeforeOmit2));
+     var octetstring vl_expected:=encode_mySeqOfNull({{nULL}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullIntValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonIntValueBeforeOmit2));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<i>2011</i>\n</MySeqOfNull>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullFloatValueBeforeOmit2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{{ {r:=0.1}}}};
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonFloatValueBeforeOmit2));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<f>0.100000</f>\n</MySeqOfNull>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonBeforeOmit1));
+     var octetstring vl_expected:=encode_mySeqOfNull({{nULL, nULL}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullIntValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonIntValueBeforeOmit1));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<i>2011</i>\n\t<n>NULL</n>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{i:=2011}}, {{n:=nULL}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullFloatValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonFloatValueBeforeOmit1));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<f>0.100000</f>\n\t<n>NULL</n>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{r:=0.1}},{{n:=nULL}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullFloatValueBeforeOmit1_2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonFloatValueBeforeOmit1_2));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<n>NULL</n>\n\t<f>0.100000</f>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{n:=nULL}},{{r:=0.1}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfNullAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonAfterOmit1));
+     var octetstring vl_expected:=encode_mySeqOfNull({{nULL, nULL}});
+     //var MySeqOfMyUnionBT vl_expected :={{{{n:=nULL}}, {{n:=nULL}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfNullIntValueAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonIntValueAfterOmit1));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<n>NULL</n>\n\t<i>2011</i>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{n:=nULL}},{{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullFloatValueAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonFloatValueAfterOmit1));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<n>NULL</n>\n\t<f>0.100000</f>\n</MySeqOfNull>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfNullFloatValueAfterOmit1_2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfNull(valueof(t_msonFloatValueAfterOmit1));
+     var octetstring vl_expected:=char2oct("<MySeqOfNull>\n\t<f>0.100000</f>\n\t<n>NULL</n>\n</MySeqOfNull>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{r:=0.1}},{{n:=nULL}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //INTEGER
+   testcase tc_MySeqOfIntValueDiffType() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiValueDiffType(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<f>1.414000</f>\n\t<i>2</i>\n\t<b>true</b>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{r:=1.414}}, {{i:=2}}, {{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntValueDiffTypeRaw() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiValueDiffTypeRaw(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n<MYRAW/>\t<i>2</i>\n\t<BOOLEAN>true</BOOLEAN>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{b:=true}}, {{i:=2}}, {{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiBeforeOmit2(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<i>3</i>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{{{i:=3}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntIntValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiIntValueBeforeOmit2(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<i>2011</i>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntFloatValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiFloatValueBeforeOmit2(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<f>0.100000</f>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiBeforeOmit1(1,2,3)));
+     var octetstring vl_expected:=encode_mySeqOfInt({{2,3}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntIntValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiIntValueBeforeOmit1(1,2,3)));
+     var octetstring vl_expected:=encode_mySeqOfInt({{2011,3}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfIntFloatValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiFloatValueBeforeOmit1(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<r>0.100000</r>\n\t<i>3</i>\n</MySeqOfInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfIntFloatValueBeforeOmit1_2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiFloatValueBeforeOmit1_2(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<i>2</i>\n\t<f>0.100000</f>\n</MySeqOfInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfIntAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiAfterOmit1(1,2,3)));
+     var octetstring vl_expected:=encode_mySeqOfInt({{1,2}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+   }
+
+   testcase tc_MySeqOfIntIntValueAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfInt(valueof(t_msoiIntValueAfterOmit1(1,2,3)));
+     var octetstring vl_expected:=encode_mySeqOfInt({{1,2011}});
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=1}},{{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfIntFloatValueAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySeqOfInt(valueof(t_msoiFloatValueAfterOmit1(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<i>1</i>\n\t<f>0.100000</f>\n</MySeqOfInt>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=1}},{{r:=0.1}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfIntFloatValueAfterOmit1_2() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySeqOfInt(valueof(t_msoiFloatValueAfterOmit1_2(1,2,3)));
+     var octetstring vl_expected:=char2oct("<MySeqOfInt>\n\t<REAL>0.100000</REAL>\n\t<i>2</i>\n</MySeqOfInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   //MyEnum
+   testcase tc_MySeqOfMyEnumValueDiffType() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySeqOfMyEnum(valueof(t_msoeValueDiffType(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<f>1.414000</f>\n\t<e>second</e>\n\t<b>true</b>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=1.414}}, {{e:=second}}, {{b:=true}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumValueDiffTypeRaw() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeValueDiffTypeRaw(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n<MYRAW/>\t<e>second</e>\n\t<BOOLEAN>true</BOOLEAN>\n</MySeqOfMyEnum>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //var MySeqOfMyUnionBT vl_expected :={{ {{b:=true}}, {{e:=second}}, {{b:=true}}}};
+   }
+   testcase tc_MySeqOfMyEnumBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeBeforeOmit2(first, second, third)));
+     var octetstring vl_expected:=encode_mySeqOfMyEnum({{third}});
+     //var MySeqOfMyUnionBT vl_expected :={{ {{e:=third}} }};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfMyEnumIntValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeIntValueBeforeOmit2(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<INTEGER>2011</INTEGER>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=2011}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumFloatValueBeforeOmit2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeFloatValueBeforeOmit2(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<REAL>0.100000</REAL>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeBeforeOmit1(first, second, third)));
+     var octetstring vl_expected:=encode_mySeqOfMyEnum({{second,third}});
+     //var MySeqOfMyUnionBT vl_expected :={{ {{e:=second}},{{e:=third}} }};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumIntValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeIntValueBeforeOmit1(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<INTEGER>2011</INTEGER>\n\t<e>third</e>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=2011}}, {{e:=third}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumFloatValueBeforeOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeFloatValueBeforeOmit1(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<REAL>0.100000</REAL>\n\t<e>third</e>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}},{{e:=third}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumFloatValueBeforeOmit1_2() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeFloatValueBeforeOmit1_2(first, second, third)))
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<e>second</e>\n\t<REAL>0.100000</REAL>\n</MySeqOfMyEnum>\n\n");
+     //var MySeqOfMyUnionBT vl_expected :={{ {{e:=second}},{{r:=0.1}}}};
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfMyEnumAfterOmit1() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeAfterOmit1(first, second, third)));
+     var octetstring vl_expected:=encode_mySeqOfMyEnum({{first,second}});
+     //var MySeqOfMyUnionBT vl_expected :={{  {{e:=first}}, {{e:=second}} }} ;
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumIntValueAfterOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{e:=first}},{{i:=2011}}}};
+     var octetstring vl_encoded:= encode_mySeqOfMyEnum(valueof(t_msoeIntValueAfterOmit1(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<e>first</e>\n\t<INTEGER>2011</INTEGER>\n</MySeqOfMyEnum>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumFloatValueAfterOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{e:=first}},{{r:=0.1}}}};
+     var octetstring vl_encoded:=  encode_mySeqOfMyEnum(valueof(t_msoeFloatValueAfterOmit1(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<e>first</e>\n\t<r>0.100000</r>\n</MySeqOfMyEnum>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfMyEnumFloatValueAfterOmit1_2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}},{{e:=second}}}};
+     var octetstring vl_encoded:=encode_mySeqOfMyEnum(valueof(t_msoeFloatValueAfterOmit1_2(first, second, third)));
+     var octetstring vl_expected:=char2oct("<MySeqOfMyEnum>\n\t<r>0.100000</r>\n\t<e>second</e>\n</MySeqOfMyEnum>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //Real (Float)
+   testcase tc_MySeqOfRealValueDiffType() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=1.414}}, {{r:=2.0}}, {{b:=true}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorValueDiffType(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=char2oct("<MySeqOfReal>\n\t<REAL>1.414000</REAL>\n\t<r>2.000000</r>\n\t<BOOLEAN>true</BOOLEAN>\n</MySeqOfReal>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealValueDiffTypeRaw() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{b:=true}}, {{r:=2.0}}, {{b:=true}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorValueDiffTypeRaw(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=char2oct("<MySeqOfReal>\n<MYRAW/>\t<r>2.000000</r>\n\t<b>true</b>\n</MySeqOfReal>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealBeforeOmit2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=3.0}} }};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorBeforeOmit2(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=encode_mySeqOfReal( {{3.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealIntValueBeforeOmit2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=2011}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorIntValueBeforeOmit2(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=char2oct("<MySeqOfReal>\n\t<i>2011</i>\n</MySeqOfReal>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealFloatValueBeforeOmit2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorFloatValueBeforeOmit2(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{0.1}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealBeforeOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=2.0}},{{r:=3.0}} }};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorBeforeOmit1(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{ 2.0, 3.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealIntValueBeforeOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{i:=2011}}, {{r:=3.0}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorIntValueBeforeOmit1(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=char2oct("<MySeqOfReal>\n\t<i>2011</i>\n\t<r>3.000000</r>\n</MySeqOfReal>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealFloatValueBeforeOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}},{{r:=3.0}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorFloatValueBeforeOmit1(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{0.1,3.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealFloatValueBeforeOmit1_2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=2.0}},{{r:=0.1}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorFloatValueBeforeOmit1_2(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{2.0,0.1}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealAfterOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{  {{r:=1.0}}, {{r:=2.0}} }} ;
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorAfterOmit1(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{1.0,2.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOfRealIntValueAfterOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=1.0}},{{i:=2011}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorIntValueAfterOmit1(1.0, 2.0, 3.0)))
+     var octetstring vl_expected:=char2oct("<MySeqOfReal>\n\t<r>1.000000</r>\n\t<i>2011</i>\n</MySeqOfReal>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealFloatValueAfterOmit1() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=1.0}},{{r:=0.1}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorFloatValueAfterOmit1(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:= encode_mySeqOfReal({{1.0,0.1}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOfRealFloatValueAfterOmit1_2() runs on MyComp {
+     //var MySeqOfMyUnionBT vl_expected :={{ {{r:=0.1}},{{r:=2.0}}}};
+     var octetstring vl_encoded:=encode_mySeqOfReal(valueof(t_msorFloatValueAfterOmit1_2(1.0, 2.0, 3.0)));
+     var octetstring vl_expected:=encode_mySeqOfReal({{0.1,2.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   //BIT STRING
+   //OCTET STRING
+
+   //More complex:
+
+   testcase tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_omitj() runs on MyComp {
+     var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}}; //CONT HERE
+     var octetstring vl_encoded:=encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(valueof(t_msossisi2sr2_omitj(vl_s1, vl_s2)));
+     //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{1,{2, omit}}, {3.0,4.0} }, { omit,{5,{6,7}}, {7.0, 8.0}} }
+     var octetstring vl_expected:= char2oct( "<MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<i>2</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>3.000000</x>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t\t<j>7</j>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t\t<y>8.000000</y>\n\t\t</xy>\n\t</s>\n</MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_beforeafteromit() runs on MyComp {
+     var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}};
+     var octetstring vl_encoded:=encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(valueof(t_msossisi2sr2_beforeafteromit(vl_s1, vl_s2)));
+     var octetstring vl_expected:=char2oct( "<MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<j>3</j>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>3.000000</x>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t\t<y>8.000000</y>\n\t\t</xy>\n\t</s>\n</MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\n");
+     //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{1,{3,omit}}, {3.0,4.0} }, { omit,{5,{6,omit}}, {7.0, 8.0}} }
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_omit() runs on MyComp {
+     var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}};
+     var octetstring vl_encoded:=encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(valueof(t_msossisi2sr2_arglist_omit(vl_s1, vl_s2)));
+     var octetstring vl_expected:=char2oct("<MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\t<s>\n\t\t<jkl>\n\t\t\t<jk>\n\t\t\t\t<i>2</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t</xy>\n\t</s>\n</MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\n");
+     //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{omit,{2,omit}}, {4.0,omit} }, { omit,{5,{6,omit}}, {7.0,omit}} }
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_afteromit() runs on MyComp {
+     var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}};
+     var octetstring vl_encoded:=encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(valueof(t_msossisi2sr2_arglist_afteromit(vl_s1, vl_s2)));
+     var octetstring vl_expected:= char2oct( "<MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<i>2</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>3.000000</x>\n\t\t</xy>\n\t</s>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t</xy>\n\t</s>\n</MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\n");
+     //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{1,{2,omit}}, {3.0,omit} }, { omit,{5,{6,omit}}, {7.0,omit}} }
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_beforeomit() runs on MyComp {
+    //var MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected := { { omit,{1,{3,omit}}, {4.0,omit} }, { omit,{5,{6,omit}}, {7.0,omit}} }
+     var MySeqSeqIntSeqInt2SeqReal2 vl_s1:={ {1,{2,3}}, {3.0,4.0} }, vl_s2:= {{5,{6,7}}, {7.0, 8.0}};
+     var octetstring vl_encoded:=encode_mySeqOfSeqSeqIntSeqInt2SeqReal2(valueof(t_msossisi2sr2_arglist_beforeomit(vl_s1, vl_s2)))
+     var octetstring vl_expected:=char2oct( "<MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<j>3</j>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s>\n\t<s>\n\t\t<jkl>\n\t\t\t<i>5</i>\n\t\t\t<jk>\n\t\t\t\t<i>6</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>7.000000</x>\n\t\t</xy>\n\t</s>\n</MySeqOfSeqSeqIntSeqInt2SeqReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+} //SequenceOf
+
+group Set {
+   template MySetInt2opt t_mseti2opt := { i:= 1, j := 2 }
+   template MySetInt2opt t_mseti2optomit := { i:= 1, j := omit }
+   const MySetInt2 c_mseti2 := { i:= 1, j := 2 }
+   const MySetInt2opt c_mseti2opt := { i:= 1, j := 2 }
+   const MySetInt2opt c_mseti2optomit := { i:= 1, j := omit }
+
+   //template MySetEmpty t_setEmpty :={}
+   template MySetBool t_msetb(template boolean p_b) := {b:= p_b}
+   template MySetNull t_msetn := { order:={n},n:= nULL }
+
+   template MySetInt t_mseti(template integer p_i) := {order:={i},i:= p_i}
+   template MySetInt t_mseti_omit(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= omit" }
+   //template MySetInt t_mseti_before(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "before:= omit all" }
+   //template MySetInt t_mseti_after(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "after:= omit all" }
+   template MySetInt t_mseti_valueSameTypeE(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= I:5" }
+   template MySetInt t_mseti_valueSameTypeI(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= 5" }  //implicit type
+   template MySetInt t_mseti_valueDiffTypeExplicitString(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= charstring:\"subidubi\"" }
+   //template MySetInt t_mseti_valueDiffTypeImplicitString(template integer p_i) := {i:= p_i} with { erroneous (i) "value:= \"subidubi\"" }  <=Impossible, there is no 1:1 mapping
+
+   //Basic ASN.1 types (eq ttcn types): boolean, integer, octetstring, bitstring, null, objid, ext. objid, enum, embedded pdv, float (real), UTFSTR, seq, seq of
+   template MySetInt t_mseti_valueDiffTypeExplicitBoolean(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= boolean:true" }
+   template MySetInt t_mseti_valueDiffTypeImplicitBoolean(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= true" }
+   //integer: See t_mseti_valueSameTypeE/I
+   //template MySetInt t_mseti_valueDiffTypeExplicitNull(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= NULL:NULL" } <<==Cannot be compiled !!!
+   //template MySetInt t_mseti_valueDiffTypeImplicitNull(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= NULL" } <<==Cannot be compiled !!!
+   //NegTestTestcases.ttcn:74.3-86: error: Type `NULL' and type `@NegTestTypes.MySetInt' have no common encoding
+   template MySetInt t_mseti_valueDiffTypeExplicitOctStr(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= octetstring:'BABA'O" }
+   template MySetInt t_mseti_valueDiffTypeImplicitOctStr(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= 'BABA'O" }
+   template MySetInt t_mseti_valueDiffTypeExplicitEnum(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= E:second" }
+   template MySetInt t_mseti_valueDiffTypeExplicitFloat(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= R:5.0" }
+   template MySetInt t_mseti_valueDiffTypeImplicitFloat(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= 5.0" }
+   template MySetInt t_mseti_valueDiffTypeExplicitBitString(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= bitstring:'01011000'B" }
+   template MySetInt t_mseti_valueDiffTypeImplicitBitString(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value:= '01011000'B" }
+   template MySetInt t_mseti_valueDiffTypeRaw(template integer p_i) := {order:={i},i:= p_i} with { erroneous (i) "value(raw):= \"<MYRAW/>\"" }
+
+   template MySetInt2opt t_mseti2(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j}
+   template MySetInt2 t_mseti2_omiti(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (i) "value:= omit" }
+   template MySetInt2 t_mseti2_omitj(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value:= omit" }
+   //template MySetInt2 t_mseti2_beforeomiti(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (i) "before:= omit all" }
+   template MySetInt2 t_mseti2_beforeomitj(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (i) "value:= omit" }
+   template MySetInt2 t_mseti2_afteromiti(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (i) "after:= omit all" }
+   //template MySetInt2 t_mseti2_afteromitj(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "after:= omit all" }
+   template MySetInt2 t_mseti2_valueSameTypeE(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value:= MySetInt2.j:5" }
+template MySetInt2 t_mseti2_valueSameTypeE2(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value:= MySetInt2.i:5" }
+   template MySetInt2 t_mseti2_valueSameTypeI(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value := 5" }
+   template MySetInt2 t_mseti2_valueDiffTypeExplicitFloat(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value:= F:5.0" }
+   template MySetInt2 t_mseti2_valueDiffTypeImplicitFloat(template integer p_i, template integer p_j) := {order:={j,i},i:= p_i, j:=p_j} with { erroneous (j) "value:= 5.0" }
+   template MySetInt2 t_mseti2_valueDiffTypeExplicitString(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= charstring:\"subidubi\"" }
+   template MySetInt2 t_mseti2_valueDiffTypeExplicitBitString(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= bitstring:\'01011000\'B" }
+   template MySetInt2 t_mseti2_valueDiffTypeImplicitBitString(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= '01011000'B" }
+   //variable related values:
+   template MySetInt2 t_mseti2_valueSeqInt2V(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2:{i:=1,j:=2}" }
+   template MySetInt2 t_mseti2_valueSeqIntOptV(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2opt:{i:=1,j:=2}" }
+   //TODO: Not supported yet:
+   //template MySetInt2 t_mseti2_valueSeqIntOptT(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value := valueof(MySetInt2opt:t_mseti2opt)" }
+   template MySetInt2 t_mseti2_valueSeqIntC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2:c_msi2" }
+   template MySetInt2 t_mseti2_valueSeqIntOptC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value := MySeqInt2opt:c_msi2opt" }
+   //TODO: Not supported yet:
+   //template MySetInt2 t_mseti2_valueSeqIntOptOmitT(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= valueof(t_mseti2optomit)" }
+   template MySetInt2 t_mseti2_valueSeqInt2OptOmitC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= c_msi2optomit" }
+   template MySetInt2 t_mseti2_valueSeqInt2iiC(template integer p_i, template integer p_j):={order:={i,j}, i:=p_i, j:=p_j} with { erroneous (i) "value:=c_mseti2.i" }
+   //template MySetInt2 t_mseti2_valueSeqInt2ijC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (i) "value:=c_mseti2.j" }
+   //template MySetInt2 t_mseti2_valueSeqInt2jiC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:=c_mseti2.i" }
+   template MySetInt2 t_mseti2_valueSeqInt2jjC(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:=c_mseti2.j" }
+
+   template MySetInt2 t_mseti2_valueSeqIntOptFieldC(template integer p_i, template integer p_j):={i:=p_i, j:=p_j} with { erroneous (j) "value:=c_msi2opt.j" } ;//2
+   //TODO: Not supported yet:
+   //template MySetInt2 t_mseti2_valueSeqIntOptFieldOmitT(template integer p_i, template integer p_j):={order:={j,i},i:=p_i, j:=p_j} with { erroneous (j) "value:= integer:t_mseti2optomit.j" }
+
+   template MySetIntSetInt2 t_msetisi2_trial(template integer p_i, template integer p_j, template integer p_k) := { i:=p_i, jk:={ i:= p_j,j:= p_k} } //not used yet
+   template MySetIntSetInt2 t_msetisi2(template integer p_i, template integer p_j, template integer p_k) := { i:= p_i, jk:= { i:=p_j, j:=p_k} };
+   template MySetIntSetInt2 t_msetisi2_omiti(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with { erroneous (i) "value:= omit" };
+   template MySetIntSetInt2 t_msetisi2_omitjki(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with { erroneous (jk.i) "value:= omit" };
+   template MySetIntSetInt2 t_msetisi2_omitjkj(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with { erroneous (jk.j) "value:= omit" };
+   template MySetIntSetInt2 t_msetisi2_rawjki(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with {
+     erroneous (jk.i) "value(raw):= \"<MYRAW/>\"" };
+   template MySetIntSetInt2 t_msetisi2_rawjkj(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with {
+     erroneous (jk.j) "value(raw):= \"<MYRAW/>\"" };
+   template MySetIntSetInt2 t_msetisi2_afteribeforej(template integer p_i, template integer p_j, template integer p_k) := {order:={i,jk}, i:= p_i, jk:= {order:={i,j}, i:=p_j, j:=p_k} } with {
+     erroneous(i) "after:= 'ABBA'O";
+     erroneous(jk.i) "before:='BABA'O"
+   };
+
+   //
+   template MySetInt3 t_mseti3(template integer p_i, template integer p_j, template integer p_k) := {order:={i,j,k},i:= p_i, j:=p_j, k:=p_k}
+
+   template MySetInt4 t_mseti4(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l}
+   template MySetInt4opt t_mseti4opt(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l}
+   template MySetInt4 t_mseti4_omiti(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (i) "value:= omit" }
+   template MySetInt4 t_mseti4_omitj(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (j) "value:= omit" }
+   template MySetInt4 t_mseti4_omitk(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l} with { erroneous (k) "value:= omit" }
+   template MySetInt4 t_mseti4_omitl(template integer p_i, template integer p_j, template integer p_k,template integer p_l ) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k, l:=p_l}
+   with { erroneous (l) "value:= omit" }
+   template MySetInt4 t_mseti4_valueiOctetStr(template integer p_i, template integer p_j, template integer p_k, template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(i) "value:= 'FEDCBA98'O" }
+   template MySetInt4 t_mseti4_valuejOctetStr(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(j) "value:= 'FEDCBA98'O" }
+
+   template MySetInt4 t_mseti4_valueiRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(i) "value(raw):= \"\\t<MYRAW/>\\n\"" }
+
+   template MySetInt4 t_mseti4_valuejRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(j) "value(raw):= \"\\t<MYRAW/>\\n\"" }
+
+   template MySetInt4 t_mseti4_valuekRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(k) "value(raw):= \"\\t<MYRAW/>\\n\"" }
+  template MySetInt4 t_mseti4_valuekRawPerm(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,k,j,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(k) "value(raw):= \"\\t<MYRAW/>\\n\"" }
+   template MySetInt4 t_mseti4_valuelRaw(template integer p_i, template integer p_j, template integer p_k,template integer p_l) := {order:={i,j,k,l},i:= p_i, j:=p_j, k:=p_k,l:=p_l}
+   with { erroneous(l) "value(raw):= \"\\t<MYRAW/>\\n\"" }
+
+   template MySetOJKL t_msetojkl(template Octetstring p_o, template integer p_j, template integer p_k,template integer p_l ) := {order:={o,j,k,l},o:= p_o, j:=p_j, k:=p_k, l:=p_l}
+   template MySetIOKL t_msetiokl(template integer p_i, template Octetstring p_o, template integer p_k,template integer p_l ) := {order:={i,o,k,l},i:=p_i,  o:=p_o, k:=p_k, l:=p_l}
+
+   template MySetISKL t_msetiskl(template integer p_i, template MySetInt4 p_s, template integer p_k,template integer p_l ) := {order:={i,s,k,l},i:=p_i,  s:=p_s, k:=p_k, l:=p_l}
+ //  template MySetISKLopt t_msetisklopt(template integer p_i, template MySeqInt4opt p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l}
+//   template MySetIS2KLopt t_msetis2klopt(template integer p_i, template MySeqInt2 p_s, template integer p_k,template integer p_l ) := {i:=p_i,  s:=p_s, k:=p_k, l:=p_l}
+   template MySetISKL t_msetiskl_valueSomit(template integer p_i, template MySetInt4 p_s, template integer p_k,template integer p_l ) := {order:={i,s,k,l},i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with {
+     erroneous(s)  "value:= omit" }
+   template MySetISKL t_msetiskl_valueSIomit(template integer p_i, template MySetInt4 p_s, template integer p_k,template integer p_l ) := {order:={i,s,k,l},i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with {
+     erroneous(s.i)  "value:= omit" }
+   template MySetISKL t_msetiskl_valueSISJomit(template integer p_i, template MySetInt4 p_s, template integer p_k,template integer p_l ) := {order:={i,s,k,l},i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with {
+     erroneous(s.i)  "value:= omit"
+     erroneous(s.j)  "value:= omit"}
+   template MySetISKL t_msetiskl_valueSraw(template integer p_i, template MySetInt4 p_s, template integer p_k,template integer p_l ) := {order:={i,s,k,l},i:=p_i,  s:=p_s, k:=p_k, l:=p_l} with { erroneous (s)  "value(raw):= \"\\t<MYRAW/>\\n\"" }
+
+   template MySetISOKL t_msetisokl(template integer p_i, template MySetInt4 p_s, template Octetstring p_o, template integer p_k, template integer p_l ) :=
+     {order:={i,s,o,k,l},i:=p_i,  s:=p_s, o:=p_o, k:=p_k, l:=p_l}
+//   template MySetISOKLopt t_msetisoklopt(template integer p_i, template MySeqInt4opt p_s,template octetstring p_o, template integer p_k, template integer p_l ) :=
+//     {i:=p_i,  s:=p_s, o:=p_o, k:=p_k, l:=p_l}
+   template MySetISOKL t_msetisokl_valueSomit(template integer p_i, template MySetInt4 p_s, template Octetstring p_o, template integer p_k,template integer p_l ) :=
+     {order:={i,s,o,k,l},i:=p_i,  s:=p_s, o:=p_o, k:=p_k, l:=p_l} with {
+     erroneous(s)  "value:= omit" }
+//   template MySetIOSKLopt t_msetiosklopt(template integer p_i, template octetstring p_o,template MySeqInt4opt p_s, template integer p_k, template integer p_l ) :=
+//     {i:=p_i, o:=p_o, s:=p_s,  k:=p_k, l:=p_l}
+   template MySetIOSKL t_msetioskl_valueSomit(template integer p_i, template Octetstring p_o, template MySetInt4 p_s,  template integer p_k,template integer p_l ) :=
+     {order:={i,o,s,k,l},i:=p_i,  o:=p_o,  s:=p_s,k:=p_k, l:=p_l} with {
+     erroneous(s)  "value:= omit" }
+   //===seq of seq of seq:==
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_omiti(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   {order:={i,jkl,xy}, i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(i) "value:=omit"}
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_omitjkl(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={i,jkl,xy},i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(jkl) "value:=omit"}
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_omitxy(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={i,jkl,xy},i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(xy) "value:=omit"}
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_valuexy(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={xy,jkl,i}, i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(xy) "value:=MySetReal2:{order:={y,x},x:=15.0,y:=16.0}"}
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_valuex_y(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={xy,jkl,i},i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+     erroneous(xy.x) "value:=float:15.0";
+     erroneous(xy.y) "value:=float:16.0"
+   }
+
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_valuex_y_expr1(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={xy,jkl,i},i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+     erroneous(xy.x) "value:=float:15.0*3.0";
+     erroneous(xy.y) "value:=float:16.0*4.0"
+   }
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_valuex_y_expr2(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={xy,jkl,i},i:=p_i, jkl:=p_jkl, xy:=p_xy} with {
+     erroneous(xy.x) "value:=float:(1.0+10.0*(2.0+10.0*(3.0+10.0*(4.0+10.0*(5.0+10.0*6.0)))))"; //Horner
+     erroneous(xy.y) "value:=float:16.32/5.1"
+   }
+   template MySetIntSetIntSetInt2SetReal2 t_msetisisi2r2_omitjkll(template integer p_i,template MySetIntSetInt2 p_jkl, template MySetReal2 p_xy) :=
+   { order:={xy,jkl,i},i:=p_i, jkl:=p_jkl, xy:=p_xy} with { erroneous(jkl.jk.j) "value:=omit"}
+
+   //Set of depth 3:
+
+   template MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2 t_msetssi2sr2ssi2sr2_omit(template MySetSetIntSetInt2SetReal2 p_s1,template MySetSetIntSetInt2SetReal2 p_s2)
+   :={ order:={s1,s2},s1:=p_s1,s2:=p_s2} with { erroneous(s1.jkl.jk.j) "value:=omit" }
+
+   //real (float)
+   template MySetReal t_msetr(template float p_x) := { x:=p_x }
+   template MySetReal2 t_msetr2(template float p_x, template float p_y):={x:=p_x, y:=p_y}
+
+   //charstring->VisibleString
+   template MySetStr t_msetstr(template charstring p_s) := { s := p_s }
+
+   //bitstring:
+   template MySetBitStr t_msetbitstr(template Bitstring p_b) := { b := p_b };
+   template MySetOctStr t_msetos(template Octetstring p_o) := { o := p_o };
+   template MySetIntReal t_msetir(template integer p_i, template float p_x ) := { i:=p_i, x:=p_x };
+
+   template MySetIntStr t_msetistr(template integer p_i, template charstring p_s ) := { i:=p_i, s:=p_s };
+
+   template MySetIntBitStr t_msetibitstr(template integer p_i, template Bitstring p_b ) := {order:={b,i}, i:=p_i, b:=p_b };
+
+
+   //================================================
+   //======== Testcases==============================
+   //================================================
+
+   //======== {integer}===================
+   //omit
+   testcase tc_MySetIntOmit() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySetInt(valueof(t_mseti_omit(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt/>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueSameTypeE() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySetInt(valueof(t_mseti_valueSameTypeE(1)))
+     //var octetstring vl_expected:=char2oct("<MySetInt>\n\t<i>5</i>\n</MySetInt>\n\n");
+     var octetstring vl_expected:=encode_mySetInt( {{i},5} );
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueSameTypeI() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySetInt(valueof(t_mseti_valueSameTypeI(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<INTEGER>5</INTEGER>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeExplicitBool() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySetInt(valueof(t_mseti_valueDiffTypeExplicitBoolean(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<BOOLEAN>true</BOOLEAN>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySetIntValueDiffTypeImplicitBool() runs on MyComp {
+     var octetstring vl_encoded:=encode_mySetInt(valueof(t_mseti_valueDiffTypeImplicitBoolean(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<BOOLEAN>true</BOOLEAN>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //   testcase tc_MySetIntValueDiffTypeExplicitNull() runs on MyComp {
+   //     for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+   //       log("i: ",i );
+   //       f_compareAndVerdict(
+   //         encode_mySetInt(valueof(t_mseti_valueDiffTypeExplicitNull(i))),
+   //         encode_mySetNull(valueof(t_msetn))  );
+   //     }
+   //   }
+   //   testcase tc_MySetIntValueDiffTypeImplicitNull() runs on MyComp {
+   //     for(var integer i:=1; i<tsp_maxInt;i:=i*tsp_step) {
+   //       log("i: ",i );
+   //       f_compareAndVerdict(
+   //         encode_mySetInt(valueof(t_mseti_valueDiffTypeImplicitNull(i))),
+   //         encode_mySetNull(valueof(t_msetn))) ;
+   //     }
+   //   }
+
+   testcase tc_MySetIntValueDiffTypeExplicitOctStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt(valueof(t_mseti_valueDiffTypeExplicitOctStr(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<OCTET_STRING>BABA</OCTET_STRING>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeImplicitOctStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt(valueof(t_mseti_valueDiffTypeImplicitOctStr(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<OCTET_STRING>BABA</OCTET_STRING>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeExplicitBitStr() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetInt(valueof( t_mseti_valueDiffTypeExplicitBitString(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<BIT_STRING>01011000</BIT_STRING>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeImplicitBitStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt(valueof(t_mseti_valueDiffTypeImplicitBitString(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<BIT_STRING>01011000</BIT_STRING>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeExplicitEnum() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetInt(valueof(t_mseti_valueDiffTypeExplicitEnum(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<e>second</e>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySetIntValueDiffTypeExplicitFloat() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetInt(valueof(t_mseti_valueDiffTypeExplicitFloat(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<r>5.000000</r>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeImplicitFloat() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetInt(valueof(t_mseti_valueDiffTypeImplicitFloat(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<REAL>5.000000</REAL>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntValueDiffTypeExplicitStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt(valueof( t_mseti_valueDiffTypeExplicitString(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n\t<CHARSTRING>subidubi</CHARSTRING>\n</MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //RAW
+   testcase tc_MySetIntValueDiffTypeRawOctStr() runs on MyComp {
+     var octetstring vl_encoded :=  encode_mySetInt(valueof(t_mseti_valueDiffTypeRaw(1)));
+     var octetstring vl_expected:=char2oct("<MySetInt>\n<MYRAW/></MySetInt>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   // ============{integer, integer }==============
+   //omit
+   testcase tc_MySetInt2Omiti() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_omiti(1,255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<j>255</j>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2Omitj() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_omitj(1,255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+
+   //before omit j
+   testcase tc_MySetInt2BeforeOmitj() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_beforeomitj(1,255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<j>255</j>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //after omit i
+   testcase tc_MySetInt2AfterOmiti() runs on MyComp {
+     var octetstring vl_encoded :=  encode_mySetInt2(valueof(t_mseti2_afteromiti(1,255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSameTypeE() runs on MyComp {
+     var octetstring vl_encoded :=   encode_mySetInt2(valueof(t_mseti2_valueSameTypeE(1,255)));
+     //var octetstring vl_expected :=   encode_mySetInt2({order:={j,i}, i:=1,j:=5});
+     var octetstring vl_expected :=   encode_mySetInt2({{j,i},1,5});
+     //var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<j>5</j>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSameTypeE2() runs on MyComp {
+     var octetstring vl_encoded :=   encode_mySetInt2(valueof(t_mseti2_valueSameTypeE2(1,255)));
+     //var octetstring vl_encoded :=   encode_mySetInt2({{j,i}, 5,1});
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<i>5</i>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   testcase tc_MySetInt2ValueSameTypeI() runs on MyComp {
+     var octetstring vl_encoded :=   encode_mySetInt2(valueof(t_mseti2_valueSameTypeI(1,255)));
+     //var octetstring vl_encoded :=   encode_mySetInt2({{j,i}, 5,1});
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<INTEGER>5</INTEGER>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueDiffTypeExplicitFloat() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySetInt2(valueof(t_mseti2_valueDiffTypeExplicitFloat(1,255)));
+     var octetstring vl_expected:= char2oct("<MySetInt2>\n\t<f>5.000000</f>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueDiffTypeImplicitFloat() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySetInt2(valueof(t_mseti2_valueDiffTypeImplicitFloat(1,255)));
+     var octetstring vl_expected:= char2oct("<MySetInt2>\n\t<REAL>5.000000</REAL>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueDiffTypeExplicitStr() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySetInt2(valueof( t_mseti2_valueDiffTypeExplicitString(1,255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<CHARSTRING>subidubi</CHARSTRING>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueDiffTypeExplicitBitStr() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySetInt2(valueof( t_mseti2_valueDiffTypeExplicitBitString(1, 255)));
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<BIT_STRING>01011000</BIT_STRING>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueDiffTypeImplicitBitStr() runs on MyComp {
+     var octetstring vl_encoded:= encode_mySetInt2(valueof( t_mseti2_valueDiffTypeImplicitBitString(1,255)))
+     var octetstring vl_expected:=char2oct("<MySetInt2>\n\t<BIT_STRING>01011000</BIT_STRING>\n\t<i>1</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqInt2V() runs on MyComp {
+     var integer i:= 10, j:= 15;
+     //var MySetIntSetInt2T vl_expectedT:={jk:={1,2}, i:=10};
+     var octetstring vl_encoded :=  encode_mySetInt2(valueof(t_mseti2_valueSeqInt2V(i,j)))
+     var octetstring vl_expected:=  char2oct("<MySetInt2>\n\t<MySeqInt2>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2>\n\t<i>10</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqIntOptV() runs on MyComp {
+     var octetstring vl_encoded :=  encode_mySetInt2(valueof(t_mseti2_valueSeqIntOptV(10,15)));
+     var octetstring vl_expected:=  char2oct("<MySetInt2>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2opt>\n\t<i>10</i>\n</MySetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqIntC() runs on MyComp {
+     var octetstring vl_encoded :=  encode_mySetInt2(valueof(t_mseti2_valueSeqIntC(10,15)))
+     var octetstring vl_expected:=  char2oct("<MySetInt2>\n\t<MySeqInt2>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2>\n\t<i>10</i>\n</MySetInt2>\n\n");
+     //encode_mySetIntSetInt2T({i:=10,jk:={1,2}})
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqInt2OptC() runs on MyComp {
+     var integer i:= 10, j:= 15;
+     var octetstring vl_encoded :=  encode_mySetInt2(valueof(t_mseti2_valueSeqIntOptC(i,j)));
+     var octetstring vl_expected:=  char2oct("<MySetInt2>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t\t<j>2</j>\n\t</MySeqInt2opt>\n\t<i>10</i>\n</MySetInt2>\n\n");
+     //encode_mySetIntSetInt2T({jk:={1,2},i:=10});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqInt2OptOmitC() runs on MyComp {
+     var integer i:= 10, j:= 15;
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_valueSeqInt2OptOmitC(i,j)));
+     var octetstring vl_expected:= char2oct("<MySetInt2>\n\t<MySeqInt2opt>\n\t\t<i>1</i>\n\t</MySeqInt2opt>\n\t<i>10</i>\n</MySetInt2>\n\n");
+     //encode_mySetIntSetInt2Toptopt({i:=10,jk:={1,omit}})
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt2ValueSeqInt2iiC() runs on MyComp {
+     var integer i:= 10, j:= 15;
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_valueSeqInt2iiC(i,j)));
+     var octetstring vl_expected:= char2oct("<MySetInt2>\n\t<i>1</i>\n\t<j>15</j>\n</MySetInt2>\n\n");
+//encode_mySetInt2({i:=1,j:=15})
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+ //not possible - two field with the same tag:
+ //   testcase tc_MySetInt2ValueSeqInt2ijC() runs on MyComp {
+ //     var integer i:= 10, j:= 15;
+ //     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_valueSeqInt2ijC(i,j)));
+ //     var octetstring vl_expected:= encode_mySetInt2({i:=2,j:=15})
+ //     f_compareAndVerdict(vl_encoded,vl_expected);
+ //   }
+ //   testcase tc_MySetInt2ValueSeqInt2jiC() runs on MyComp {
+ //     var integer i:= 10, j:= 15;
+ //     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_valueSeqInt2jiC(i,j)));
+ //     var octetstring vl_expected:= encode_mySetInt2({i:=10,j:=1})
+ //     f_compareAndVerdict(vl_encoded,vl_expected);
+ //   }
+
+   testcase tc_MySetInt2ValueSeqInt2jjC() runs on MyComp {
+     var integer i:= 10, j:= 15;
+     var octetstring vl_encoded := encode_mySetInt2(valueof(t_mseti2_valueSeqInt2jjC(i,j)));
+     var octetstring vl_expected:= char2oct("<MySetInt2>\n\t<j>2</j>\n\t<i>10</i>\n</MySetInt2>\n\n");
+       //encode_mySetInt2({i:=10,j:=2})
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+   //=== Set { integer, {integer, integer} )
+   testcase tc_MySetIntSetInt2ValueOmiti() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded :=encode_mySetIntSetInt2(valueof(t_msetisi2_omiti(i,j,k)))
+     var octetstring vl_expected:=char2oct("<MySetIntSetInt2>\n\t<jk>\n\t\t<i>15</i>\n\t\t<j>16</j>\n\t</jk>\n</MySetIntSetInt2>\n\n");
+//encode_mySetIntSetInt2opt({i:=omit,jk:={15,16}})
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetInt2ValueOmitjki() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded := encode_mySetIntSetInt2(valueof(t_msetisi2_omitjki(i,j,k)));
+     var octetstring vl_expected:=char2oct("<MySetIntSetInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<j>16</j>\n\t</jk>\n</MySetIntSetInt2>\n\n");
+     //   encode_mySetIntSetInt2optopt({i:=10,jk:={16,omit}}) );
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetInt2ValueOmitjkj() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded :=encode_mySetIntSetInt2(valueof(t_msetisi2_omitjkj(i,j,k)))
+     var octetstring vl_expected:=char2oct("<MySetIntSetInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<i>15</i>\n\t</jk>\n</MySetIntSetInt2>\n\n");
+      // encode_mySetIntSetInt2optopt({i:=10,jk:={15,omit}})  );
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetInt2ValueRawjki() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded :=encode_mySetIntSetInt2(valueof(t_msetisi2_rawjki(i,j,k)));
+     var octetstring vl_expected:=char2oct("<MySetIntSetInt2>\n\t<i>10</i>\n\t<jk>\n<MYRAW/>\t\t<j>16</j>\n\t</jk>\n</MySetIntSetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetInt2ValueRawjkj() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded :=encode_mySetIntSetInt2(valueof(t_msetisi2_rawjkj(i,j,k)));
+     var octetstring vl_expected:=char2oct("<MySetIntSetInt2>\n\t<i>10</i>\n\t<jk>\n\t\t<i>15</i>\n<MYRAW/>\t</jk>\n</MySetIntSetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //After-before:
+   testcase tc_MySetIntSetInt2AfteriBeforej() runs on MyComp {
+     var integer i:= 10, j:= 15, k:=16;
+     var octetstring vl_encoded :=encode_mySetIntSetInt2(valueof(t_msetisi2_afteribeforej(i,j,k)));
+     var octetstring vl_expected:=char2oct( "<MySetIntSetInt2>\n\t<i>10</i>\n\t<OCTET_STRING>ABBA</OCTET_STRING>\n\t<jk>\n\t\t<OCTET_STRING>BABA</OCTET_STRING>\n\t\t<i>15</i>\n\t\t<j>16</j>\n\t</jk>\n</MySetIntSetInt2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //==== {integer, integer, integer, integer} ==============
+   //omit
+   testcase tc_MySetInt4Omiti() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetInt4(valueof(t_mseti4_omiti(1,2,3,4)));
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt4Omitj() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_omitj(1,2,3,4)))
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<i>1</i>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt4Omitk() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_omitk(1,2,3,4)))
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt4Omitl() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_omitl(1,2,3,4)))
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<k>3</k>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt4ValueiOctetStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valueiOctetStr(1,2,3,4)));
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<OCTET_STRING>FEDCBA98</OCTET_STRING>\n\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetInt4ValuejOctetStr() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valuejOctetStr(1,2,3,4)));
+     var octetstring vl_expected:=char2oct("<MySetInt4>\n\t<i>1</i>\n\t<OCTET_STRING>FEDCBA98</OCTET_STRING>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //type record of octetstring RoO;
+   //type record of integer RoI;
+   testcase tc_MySetInt4ValueiRaw() runs on MyComp {
+
+     var RoO vl_expectedValue:= {
+       char2oct("<MySetInt4>\n\t<MYRAW/>\n\t<j>2</j>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n"),
+       char2oct("<MySetInt4>\n\t<MYRAW/>\n\t<j>20</j>\n\t<k>30</k>\n\t<l>40</l>\n</MySetInt4>\n\n"),
+       char2oct("<MySetInt4>\n\t<MYRAW/>\n\t<j>200</j>\n\t<k>300</k>\n\t<l>400</l>\n</MySetInt4>\n\n"),
+       char2oct("<MySetInt4>\n\t<MYRAW/>\n\t<j>2000</j>\n\t<k>3000</k>\n\t<l>4000</l>\n</MySetInt4>\n\n"),
+       char2oct("<MySetInt4>\n\t<MYRAW/>\n\t<j>-20</j>\n\t<k>-30</k>\n\t<l>-40</l>\n</MySetInt4>\n\n")
+     }
+     var RoI vl_roi := { 1, 10, 100, 1000,-10};
+
+     var integer i:=0;
+     for(var integer index:=0; index<5;index:=index+1) {
+       i:=vl_roi[index];
+       f_compareAndVerdict( encode_mySetInt4(valueof(t_mseti4_valueiRaw(i,2*i,3*i,4*i))),vl_expectedValue[index])
+     }
+   }
+
+   testcase tc_MySetInt4ValuejRaw() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valuejRaw(1,2,3,4)));
+     var octetstring vl_expectedValue:= char2oct("<MySetInt4>\n\t<i>1</i>\n\t<MYRAW/>\n\t<k>3</k>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expectedValue);
+   }
+
+   testcase tc_MySetInt4ValuekRaw() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valuekRaw(1,2,3,4)));
+     var octetstring vl_expectedValue:= char2oct("<MySetInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<MYRAW/>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expectedValue);
+   }
+
+//permutation- the order has been changed:
+   testcase tc_MySetInt4ValuekRawPerm() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valuekRawPerm(1,2,3,4)));
+     var octetstring vl_expectedValue:= char2oct("<MySetInt4>\n\t<i>1</i>\n\t<MYRAW/>\n\t<j>2</j>\n\t<l>4</l>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expectedValue);
+   }
+   testcase tc_MySetInt4ValuelRaw() runs on MyComp {
+     var octetstring vl_encoded := encode_mySetInt4(valueof(t_mseti4_valuelRaw(1,2,3,4)));
+     var octetstring vl_expectedValue:= char2oct("<MySetInt4>\n\t<i>1</i>\n\t<j>2</j>\n\t<k>3</k>\n\t<MYRAW/>\n</MySetInt4>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expectedValue);
+   }
+
+   //To test if a mandatory structure omitted
+   testcase tc_MySetISKL_ValueSomit() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded:=encode_mySetISKL(valueof(t_msetiskl_valueSomit(10,vl_msi4,30,40)));
+     var octetstring vl_expected:= char2oct("<MySetISKL>\n\t<i>10</i>\n\t<k>30</k>\n\t<l>40</l>\n</MySetISKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetISKL_ValueSIomit() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded:=encode_mySetISKL(valueof(t_msetiskl_valueSIomit(10,vl_msi4,30,40)));
+     var octetstring vl_expected:=char2oct( "<MySetISKL>\n\t<i>10</i>\n\t<s>\n\t\t<j>6</j>\n\t\t<k>7</k>\n\t\t<l>8</l>\n\t</s>\n\t<k>30</k>\n\t<l>40</l>\n</MySetISKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetISKL_ValueSISJomit() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded := encode_mySetISKL(valueof(t_msetiskl_valueSISJomit(10,vl_msi4,30,40)));
+     var octetstring vl_expected:=char2oct("<MySetISKL>\n\t<i>10</i>\n\t<s>\n\t\t<k>7</k>\n\t\t<l>8</l>\n\t</s>\n\t<k>30</k>\n\t<l>40</l>\n</MySetISKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //f_compareAndVerdict( encode_mySetISKL(valueof(t_msetiskl_valueSISJomit(10,vl_msi4,30,40))),
+     //''O);
+   }
+
+   testcase tc_MySetISKL_ValueSraw() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded := encode_mySetISKL(valueof(t_msetiskl_valueSraw(10,vl_msi4,30,40)));
+     var octetstring vl_expected:=char2oct("<MySetISKL>\n\t<i>10</i>\n\t<MYRAW/>\n\t<k>30</k>\n\t<l>40</l>\n</MySetISKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetISOKL_ValueSomit() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded := encode_mySetISOKL(valueof(t_msetisokl_valueSomit(10,vl_msi4,"2011-04-11",30,40)));
+     var octetstring vl_expected:=char2oct("<MySetISOKL xmlns:n='www.XmlTest.org/negativeTest_XML_Types'>\n\t<i>10</i>\n\t<n:o>2011-04-11</n:o>\n\t<k>30</k>\n\t<l>40</l>\n</MySetISOKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+
+   testcase tc_MySetIOSKL_ValueSomit() runs on MyComp {
+     var MySetInt4 vl_msi4:={{i,j,k,l},5,6,7,8};
+     var octetstring vl_encoded := encode_mySetIOSKL(valueof(t_msetioskl_valueSomit(10,"2011-04-11",vl_msi4,30,40)));
+     var octetstring vl_expected := char2oct( "<MySetIOSKL xmlns:n='www.XmlTest.org/negativeTest_XML_Types'>\n\t<i>10</i>\n\t<n:o>2011-04-11</n:o>\n\t<k>30</k>\n\t<l>40</l>\n</MySetIOSKL>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   //===== sequence of sequence of sequence ====
+   testcase tc_MySetIntSetIntSetInt2SetReal2_omiti() runs on MyComp {
+     var MySetIntSetInt2 vl_2nd:={{i,jk},2,{{i,j},3,4}};
+     var octetstring vl_encoded:=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_omiti(1, {{i,jk}, 2 ,{{i,j},3,4}} , {{x,y},5.0,6.0} )));
+     //var MySetSetIntSetInt2SetReal2 vl_expected:= {jkl:={2,{3,4}},xy:={5.0,6.0}};
+     var octetstring vl_expected:=char2oct( "<MySetIntSetIntSetInt2SetReal2>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     //encode_MySetSetIntSetInt2SetReal2({order:={jkl,xy},jkl:=vl_2nd,xy:={{x,y},5.0,6.0}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetIntSetInt2SetReal2_omitjkl() runs on MyComp {
+     //var MySetIntSeqReal2 vl_expected:= {i:= 1, xy:={5.0,6.0}};
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2( valueof(t_msetisisi2r2_omitjkl(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct( "<MySetIntSetIntSetInt2SetReal2>\n\t<i>1</i>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }
+
+   testcase tc_MySetIntSetIntSetInt2SetReal2_omitxy() runs on MyComp {
+     //var MySetIntSetIntSetInt2 vl_expected:= { i:=1, jkl:={2,{3,4}} };
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_omitxy(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct("<MySetIntSetIntSetInt2SetReal2>\n\t<i>1</i>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //f_compareAndVerdict(
+     //  encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_omitxy(1, {2,{3,4}}, {5.0,6.0} ))),
+     //  encode_mySetIntSeqIntSeqInt2(vl_expected))
+   }
+
+   //...with { erroneous(jkl.jk.j) "value:=omit"}
+   testcase tc_MySetIntSetIntSetInt2SetReal2_omitjkll() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_omitjkll(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct(
+"<MySetIntSetIntSetInt2SetReal2>\n\t<xy>\n\t\t<x>5.000000</x>\n\t\t<y>6.000000</y>\n\t</xy>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t</jk>\n\t</jkl>\n\t<i>1</i>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //var MySetIntSeqIntSeqInt2optoptSeqReal2 vl_expected:= {i:=1,jkl:={2,{3,omit}},xy:= {5.0,6.0}};
+
+   }
+
+   testcase tc_MySetIntSetIntSetInt2SetReal2_valuexy() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuexy(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct("<MySetIntSetIntSetInt2SetReal2>\n\t<MySetReal2>\n\t\t<y>16.000000</y>\n\t\t<x>15.000000</x>\n\t</MySetReal2>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<i>1</i>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+     //var MySetIntSetIntSetInt2SetReal2 vl_expected:= {i:=1,jkl:={2,{3,4}}, xy:={15.0,16.0}};
+
+   }
+
+   testcase tc_MySetIntSetIntSetInt2SetReal2_valuex_y() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuex_y(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct( "<MySetIntSetIntSetInt2SetReal2>\n\t<xy>\n\t\t<REAL>15.000000</REAL>\n\t\t<REAL>16.000000</REAL>\n\t</xy>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<i>1</i>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+     //var MySetIntSetIntSetInt2SetReal2 vl_expected:= {i:=1,jkl:={2,{3,4}},xy:= {15.0,16.0}};
+     //f_compareAndVerdict(  encode_mySetIntSetIntSetInt2SetReal2(
+     //    valueof(t_msetisisi2r2_valuex_y(1, {2,{3,4}}, {5.0,6.0} ))),
+     //  encode_mySetIntSetIntSetInt2SetReal2(vl_expected));
+   }
+
+   //expression evaluation in attribue section:
+   testcase tc_MySetIntSetIntSetInt2SetReal2_valuex_y_expr1() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuex_y(1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     var octetstring vl_expected:=char2oct( "<MySetIntSetIntSetInt2SetReal2>\n\t<xy>\n\t\t<REAL>15.000000</REAL>\n\t\t<REAL>16.000000</REAL>\n\t</xy>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<i>1</i>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     //encode_mySetIntSetIntSetInt2SetReal2({{i,jkl,xy},1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} });
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+     //var MySetIntSetIntSetInt2SetReal2 vl_expected:= {i:=1,jkl:={2,{3,4}},xy:= {45.0,64.0}};
+     //f_compareAndVerdict(
+     //  encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuex_y_expr1(1, {2,{3,4}}, {5.0,6.0} ))),
+     //  encode_mySetIntSetIntSetInt2SetReal2(vl_expected))
+   }
+
+   testcase tc_MySetIntSetIntSetInt2SetReal2_valuex_y_expr2() runs on MyComp {
+     var octetstring vl_encoded :=encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuex_y_expr2( 1, {{i,jk},2,{{i,j},3,4}}, {{x,y},5.0,6.0} )));
+     //var MySetIntSetIntSetInt2SetReal2 vl_expected:= {i:=1,jkl:={2,{3,4}}, xy:={654321.0, 3.2}};
+     var octetstring vl_expected:=char2oct( "<MySetIntSetIntSetInt2SetReal2>\n\t<xy>\n\t\t<REAL>654321.000000</REAL>\n\t\t<REAL>3.200000</REAL>\n\t</xy>\n\t<jkl>\n\t\t<i>2</i>\n\t\t<jk>\n\t\t\t<i>3</i>\n\t\t\t<j>4</j>\n\t\t</jk>\n\t</jkl>\n\t<i>1</i>\n</MySetIntSetIntSetInt2SetReal2>\n\n");
+     //encode_mySetIntSetIntSetInt2SetReal2({order:={i,jkl,xy}, i:=1,jkl:={{i,jk},2,{{i,j},3,4}}, xy:={{x,y},654321.0, 3.2}});
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+
+     //f_compareAndVerdict(
+     //  encode_mySetIntSetIntSetInt2SetReal2(valueof(t_msetisisi2r2_valuex_y_expr2(1, {2,{3,4}}, {5.0,6.0} ))),
+     //  encode_mySetIntSetIntSetInt2SetReal2(vl_expected))
+   }
+
+   testcase tc_MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2_omit() runs on MyComp {
+     var MySetSetIntSetInt2SetReal2
+       vl_s1:={order:={jkl,xy},jkl:={{i,jk},1,{{i,j},2,3}},xy:={{x,y},3.0,4.0} },
+       vl_s2:= {order:={xy,jkl},jkl:={{jk,i},5,{{j,i},6,7}},xy:={{y,x},7.0, 8.0}};
+     var octetstring vl_encoded :=encode_MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2(valueof(t_msetssi2sr2ssi2sr2_omit(vl_s1, vl_s2)));
+     var octetstring vl_expected:=char2oct("<MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2>\n\t<s1>\n\t\t<jkl>\n\t\t\t<i>1</i>\n\t\t\t<jk>\n\t\t\t\t<i>2</i>\n\t\t\t</jk>\n\t\t</jkl>\n\t\t<xy>\n\t\t\t<x>3.000000</x>\n\t\t\t<y>4.000000</y>\n\t\t</xy>\n\t</s1>\n\t<s2>\n\t\t<xy>\n\t\t\t<y>8.000000</y>\n\t\t\t<x>7.000000</x>\n\t\t</xy>\n\t\t<jkl>\n\t\t\t<jk>\n\t\t\t\t<j>7</j>\n\t\t\t\t<i>6</i>\n\t\t\t</jk>\n\t\t\t<i>5</i>\n\t\t</jkl>\n\t</s2>\n</MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //var MySet_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2 vl_expected :=
+     //{ s1:={ omit,{1,{2, omit}}, {3.0,4.0} },s2:= { omit,{5,{6,7}}, {7.0, 8.0}} };
+   }
+
+} //group Set
+
+
+//****************************** SET OF ****************************************************
+
+//****************************** UNION ****************************************************
+group Union {
+
+   testcase tc_myUnionBasicTypes_boolean3() runs on MyComp {
+     //0. just for fun:
+     var MyUnionBasicTypes vl_mubt:= {choice:={b:=true}}
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(vl_mubt);
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<b>true</b>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+
+     //Compilation fault (ok):
+     //log( "encoded value:  ", encode_myUnionBasicTypes( valueof(t_mubt_boolean2( true ))));
+
+     vl_mubt:={choice:={b:=false}};
+     vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_boolean3(true)));
+     f_compareAndVerdict(
+       encode_myUnionBasicTypes(valueof(t_mubt_boolean3(true))),
+       encode_myUnionBasicTypes( vl_mubt ) );
+   }
+
+   testcase tc_myUnionBasicTypes_booleanRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_booleanRaw(true)));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+
+   testcase tc_myUnionBasicTypes_nullRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_nullRaw));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_integerRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_integerRaw(129)));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //f_compareAndVerdict(encode_myUnionBasicTypes(valueof(t_mubt_integerRaw(129))),'ABBA'O)
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_enumRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_enumRaw(second)));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_realRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_realRaw(3.8)));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_bitstrRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_bitstrRaw(123.45)));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes xmlns:n='www.XmlTest.org/negativeTest_XML_Types'>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_octetstrRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_octetstrRaw("\\t<MYRAW/>\\n")));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes xmlns:n='www.XmlTest.org/negativeTest_XML_Types'>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //f_compareAndVerdict(encode_myUnionBasicTypes(valueof(t_mubt_octetstrRaw('BABAB0B0'O))), 'ABBA'O )
+   }//tc_
+
+   testcase tc_myUnionBasicTypes_objidRaw() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionBasicTypes(valueof(t_mubt_objidRaw("\\t<MYRAW/>\\n")));
+     var octetstring vl_expected:=char2oct("<MyUnionBasicTypes>\n\t<MYRAW/>\n</MyUnionBasicTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+     //f_compareAndVerdict(encode_myUnionBasicTypes(valueof(t_mubt_objidRaw(objid{ itu_t identified_organization etsi(0) inDomain(1)}))), 'ABBA'O )
+   }//tc_
+
+   testcase tc_myUnionComplexTypes_omit_0_1() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_0_1( 1.0 , 2.0 , 3.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal>\n\t\t<r>3.000000</r>\n\t</sofreal>\n</MyUnionComplexTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionComplexTypes_omit_0_2() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_0_2( 1.0,2.0,3.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal>\n\t\t<r>2.000000</r>\n\t</sofreal>\n</MyUnionComplexTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionComplexTypes_omit_1_2() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_1_2( 1.0,2.0,3.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal>\n\t\t<r>1.000000</r>\n\t</sofreal>\n</MyUnionComplexTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+   testcase tc_myUnionComplexTypes_omit_2_1() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_2_1( 1.0,2.0,3.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal>\n\t\t<r>1.000000</r>\n\t</sofreal>\n</MyUnionComplexTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+   testcase tc_myUnionComplexTypes_omit_0_1_2() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_0_1_2 ( 10.0,11.0,12.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal/>\n</MyUnionComplexTypes>\n\n");// !!!! :))))
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+   testcase tc_myUnionComplexTypes_omit_0_2_1() runs on MyComp {
+     var octetstring vl_encoded :=encode_myUnionComplexTypes(valueof(t_muct_0_2_1 ( 1.0,2.0,3.0 )));
+     var octetstring vl_expected:=char2oct("<MyUnionComplexTypes>\n\t<sofreal/>\n</MyUnionComplexTypes>\n\n");
+     f_compareAndVerdict(vl_encoded,vl_expected);
+   }//tc_
+
+} //group Union
+
+
+
+group Attribute {
+
+  type XSD.Integer MyAttr
+  with {
+  variant "name as uncapitalized";
+  variant "attribute";
+  };
+
+  const InternationalPrice c_intPrice_C_omit:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "value:=omit" }
+  const InternationalPrice c_intPrice_C_raw:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "value(raw):= \" myAttr=true \" " }
+  const InternationalPrice c_intPrice_C_omitafter:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "after:=omit all" }
+  const InternationalPrice c_intPrice_C_after:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "after:=MyAttr:12345" }
+  const InternationalPrice c_intPrice_C_before:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "before:=MyAttr:12345" }
+  //const InternationalPrice c_intPrice_omitbeforeFalse:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "before:=omit all" }
+  const InternationalPrice c_intPrice_V_omitbefore:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(value_) "before:=omit all" }
+  const InternationalPrice c_intPrice_V_before:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(value_) "before:= \" myAttr=true \" " }
+  const InternationalPrice c_intPrice_V_omitafter :={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(value_) "after :=omit all" }
+  const InternationalPrice c_intPrice_V_after :={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(value_) "after := \" myAttr=true \" " }
+  //element is not empty:
+  const InternationalPrice c_intPrice_EC_omit:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={b:=true}}} with { erroneous(currency) "value:=omit" }
+  const InternationalPrice c_intPrice_EC_raw:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={b:=true}}} with { erroneous(currency) "value(raw):=\" myAttr=true\"" }
+  const InternationalPrice c_intPrice_EC_omitafter:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={i:=1}}} with { erroneous(currency) "after:=omit all" }
+  const InternationalPrice c_intPrice_EC_after:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={i:=1}}} with { erroneous(currency) "after:=\" myAttr=true\" " }
+  const InternationalPrice c_intPrice_EC_before:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={i:=1}}} with { erroneous(currency) "before:= \" myAttr=true\" " }
+  //const InternationalPrice c_intPrice_omitbeforeFalse:={currency:="USD", value_ :=125.3, myUnionValue:=omit} with { erroneous(currency) "before:=omit all" }
+  const InternationalPrice c_intPrice_EV_omitbefore:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(value_) "before:=omit all" }
+  const InternationalPrice c_intPrice_EV_before:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(value_) "before:=MyAttr:12345" }
+  const InternationalPrice c_intPrice_EV_omitafter:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(value_) "after:=omit all" }
+  const InternationalPrice c_intPrice_EV_after:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(value_) "after:=MyAttr:12345" }
+  const InternationalPrice c_intPrice_EE_omitbefore:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue) "before:=omit all" }
+  const InternationalPrice c_intPrice_EE_before:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue) "before := MyAttr:12345" }
+  const InternationalPrice c_intPrice_EE_after:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue) "after   := MyAttr:12345" }
+  //attribute element: before union/after union
+  const InternationalPrice c_intPrice_EU_before1:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue.choice) "before := MyAttr:12345" }
+  const InternationalPrice c_intPrice_EU_after1:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue.choice) "after   := MyAttr:12345" }
+  //not attribute element before/after union
+  const InternationalPrice c_intPrice_EU_before2:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue.choice) "before := I:12345" }
+  const InternationalPrice c_intPrice_EU_after2:={currency:="USD", value_ :=125.3, myUnionValue:={choice:={r:=1.2345}}} with { erroneous(myUnionValue.choice) "after   := 12345" }
+
+
+  testcase tc_attribute_emptyElement_C_omit() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_C_omit);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_emptyElement_C_raw() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_C_omit);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_emptyElement_C_omitafter() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_C_omitafter);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_emptyElement_C_after() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_C_after);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' myAttr='12345' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_emptyElement_C_before() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_C_before);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' myAttr='12345' currency='USD' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_emptyElement_V_omitbefore() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_V_omitbefore);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_emptyElement_V_before() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_V_before);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD'\t<CHARSTRING> myAttr=true </CHARSTRING>\n value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_emptyElement_V_omitafter() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_V_omitafter);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_emptyElement_V_after() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_V_after);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'\t<CHARSTRING> myAttr=true </CHARSTRING>\n/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  //=============== Not empty element with attribute ================
+  testcase tc_attribute_element_C_omit() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EC_omit);
+    var octetstring vl_expected:=
+     char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' value='125.300000'>\n\t<myUnionValue>\n\t\t<b>true</b>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_C_omitafter() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EC_omitafter);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_C_after() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EC_after);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD'\t<CHARSTRING> myAttr=true</CHARSTRING>\n value='125.300000'>\n\t<myUnionValue>\n\t\t<i>1</i>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_C_before() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EC_before);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types'\t<CHARSTRING> myAttr=true</CHARSTRING>\n currency='USD' value='125.300000'>\n\t<myUnionValue>\n\t\t<i>1</i>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_V_omitbefore() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EV_omitbefore);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' value='125.300000'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_V_before() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EV_before);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' myAttr='12345' value='125.300000'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_V_omitafter() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EV_omitafter);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'/>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_V_after() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EV_after);
+    var octetstring vl_expected:=char2oct("<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000' myAttr='12345'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_E_omitbefore() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EE_omitbefore);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+  testcase tc_attribute_element_E_before() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EE_before);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n myAttr='12345'\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_E_after() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EE_after);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n myAttr='12345'</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_EU_before1() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EU_before1);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n\t<myUnionValue>\n myAttr='12345'\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_EU_after1() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EU_after1);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n myAttr='12345'\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_EU_before2() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EU_before2);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n\t<myUnionValue>\n\t\t<i>12345</i>\n\t\t<r>1.234500</r>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+
+  testcase tc_attribute_element_EU_after2() runs on MyComp {
+    var octetstring vl_encoded :=encode_InternationalPrice(c_intPrice_EU_after2);
+    var octetstring vl_expected:= char2oct( "<n:internationalPrice xmlns:n='www.XmlTest.org/negativeTest_XML_Types' currency='USD' value='125.300000'>\n\t<myUnionValue>\n\t\t<r>1.234500</r>\n\t\t<INTEGER>12345</INTEGER>\n\t</myUnionValue>\n</n:internationalPrice>\n\n");
+    f_compareAndVerdict(vl_encoded,vl_expected);
+  }
+}
+control {
+  //SEQUENCE:
+  execute(tc_mySeqIntOmit()); // <========{ integer }
+  //execute(tc_mySeqIntBeforeOmit());
+  //execute(tc_mySeqIntAfterOmit());
+  execute(tc_mySeqIntValueSameTypeE());
+  execute(tc_mySeqIntValueSameTypeI());
+  execute(tc_mySeqIntValueDiffTypeExplicitBool());
+  execute(tc_mySeqIntValueDiffTypeImplicitBool());
+  //execute(tc_mySeqIntValueDiffTypeExplicitNull());
+  //execute(tc_mySeqIntValueDiffTypeImplicitNull());
+  execute(tc_mySeqIntValueDiffTypeExplicitOctStr());
+  execute(tc_mySeqIntValueDiffTypeImplicitOctStr());
+  //execute(tc_mySeqIntValueDiffTypeExplicitBitStr());
+  //execute(tc_mySeqIntValueDiffTypeImplicitBitStr());
+  execute(tc_mySeqIntValueDiffTypeExplicitEnum());
+  execute(tc_mySeqIntValueDiffTypeExplicitFloat());
+  execute(tc_mySeqIntValueDiffTypeImplicitFloat());
+  execute(tc_mySeqIntValueDiffTypeExplicitStr());
+  //execute(tc_mySeqIntValueDiffTypeImplicitStr());
+
+  execute(tc_mySeqIntValueDiffTypeRawOctStr());
+  execute(tc_mySeqInt2Omiti());//<===== {integer, integer}
+  execute(tc_mySeqInt2Omitj());
+  //execute(tc_mySeqInt2BeforeOmiti());
+  execute(tc_mySeqInt2BeforeOmitj());
+  execute(tc_mySeqInt2AfterOmiti());
+  //execute(tc_mySeqInt2AfterOmitj());
+  execute(tc_mySeqInt2ValueSameTypeE());
+  execute(tc_mySeqInt2ValueSameTypeI());
+  execute(tc_mySeqInt2ValueDiffTypeExplicitFloat());
+  execute(tc_mySeqInt2ValueDiffTypeImplicitFloat());
+  execute(tc_mySeqInt2ValueDiffTypeExplicitStr());
+  execute(tc_mySeqInt2ValueDiffTypeExplicitBitStr());
+  execute(tc_mySeqInt2ValueDiffTypeImplicitBitStr());
+  execute(tc_mySeqInt2ValueSeqInt2V());
+  execute(tc_mySeqInt2ValueSeqInt2OptV());
+  execute(tc_mySeqInt2ValueSeqIntC());
+  execute(tc_mySeqInt2ValueSeqInt2OptC());
+  execute(tc_mySeqInt2ValueSeqInt2OptOmitC());
+  execute(tc_mySeqInt2ValueSeqInt2iiC());
+  execute(tc_mySeqInt2ValueSeqInt2ijC());
+  execute(tc_mySeqInt2ValueSeqInt2jiC());
+  execute(tc_mySeqInt2ValueSeqInt2jjC());
+
+  execute(tc_mySeqIntSeqInt2ValueOmiti()); //=== Sequence { integer, {integer, integer} )
+  execute(tc_mySeqIntSeqInt2ValueOmitjki());
+  execute(tc_mySeqIntSeqInt2ValueOmitjkj());
+
+  execute(tc_mySeqIntSeqInt2ValueRawjki());
+  execute(tc_mySeqIntSeqInt2ValueRawjkj());
+  execute(tc_mySeqIntSeqInt2AfteriBeforej());
+  //<===== {integer, integer,integer, integer}
+  execute(tc_mySeqInt4Omiti());
+  execute(tc_mySeqInt4Omitj());
+  execute(tc_mySeqInt4Omitk());
+  execute(tc_mySeqInt4Omitl());
+  execute(tc_mySeqInt4ValueiOctetStr());
+  execute(tc_mySeqInt4ValuejOctetStr());
+  execute(tc_mySeqInt4ValueiRaw());
+  execute(tc_mySeqInt4ValuejRaw());
+  execute(tc_mySeqInt4ValuekRaw());
+  execute(tc_mySeqInt4ValuelRaw());
+  execute(tc_mySeqISKL_ValueSomit());
+  execute(tc_mySeqISKL_ValueSIomit());
+  execute(tc_mySeqISKL_ValueSISJomit());
+  execute(tc_mySeqISKL_ValueSraw());
+
+  //===== sequence of sequence of sequence ====
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_omiti());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_omitjkl());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_omitxy() );
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_omitjkll());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_valuexy());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y());//47.
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y_expr1());
+  execute(tc_MySeqIntSeqIntSeqInt2SeqReal2_valuex_y_expr2());//50
+  execute(tc_MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2_omit());
+  //======= { boolean, integer, octetstring,enumeration, real }
+
+  //Deeper encapsulation: -
+   //========= SEQUENCE OF=====================
+   //Bool:
+   execute(tc_MySeqOfBoolValueSameType1());
+   execute(tc_MySeqOfBoolValueSameType2());
+   execute(tc_MySeqOfBoolValueDiffType());
+   execute(tc_MySeqOfBoolValueRaw());
+   execute(tc_MySeqOfBoolValueOmit());
+   execute(tc_MySeqOfBoolAfterOmit());
+   execute(tc_MySeqOfBoolValueAfterOmit());
+   execute(tc_MySeqOfBoolBeforeOmit2());
+   execute(tc_MySeqOfBoolValueBeforeOmit2());
+   execute(tc_MySeqOfBoolBeforeOmit1());
+   execute(tc_MySeqOfBoolValueBeforeOmit1());
+   //NULL:
+   execute(tc_MySeqOfNullValueDiffType());
+   execute(tc_MySeqOfNullValueDiffTypeRaw());
+   execute(tc_MySeqOfNullBeforeOmit2());
+   execute(tc_MySeqOfNullIntValueBeforeOmit2());
+   execute(tc_MySeqOfNullFloatValueBeforeOmit2());
+   execute(tc_MySeqOfNullBeforeOmit1());
+   execute(tc_MySeqOfNullIntValueBeforeOmit1());
+   execute(tc_MySeqOfNullFloatValueBeforeOmit1() );
+   execute(tc_MySeqOfNullFloatValueBeforeOmit1_2());
+   execute(tc_MySeqOfNullAfterOmit1());
+   execute(tc_MySeqOfNullIntValueAfterOmit1());
+   execute(tc_MySeqOfNullFloatValueAfterOmit1() );
+   execute(tc_MySeqOfNullFloatValueBeforeOmit1_2());
+   //INTEGER:
+   execute(tc_MySeqOfIntValueDiffType());
+   execute(tc_MySeqOfIntValueDiffTypeRaw());
+   execute(tc_MySeqOfIntBeforeOmit2());
+   execute(tc_MySeqOfIntIntValueBeforeOmit2());
+   execute(tc_MySeqOfIntFloatValueBeforeOmit2());
+   execute(tc_MySeqOfIntBeforeOmit1());
+   execute(tc_MySeqOfIntIntValueBeforeOmit1());
+   execute(tc_MySeqOfIntFloatValueBeforeOmit1() );
+   execute(tc_MySeqOfIntFloatValueBeforeOmit1_2());
+   execute(tc_MySeqOfIntAfterOmit1());
+   execute(tc_MySeqOfIntIntValueAfterOmit1());
+   execute(tc_MySeqOfIntFloatValueAfterOmit1() );
+   execute(tc_MySeqOfIntFloatValueAfterOmit1_2());
+   //MyEnum
+   execute(tc_MySeqOfMyEnumValueDiffType());
+   execute(tc_MySeqOfMyEnumValueDiffTypeRaw());
+   execute(tc_MySeqOfMyEnumBeforeOmit2());
+   execute(tc_MySeqOfMyEnumIntValueBeforeOmit2());
+   execute(tc_MySeqOfMyEnumFloatValueBeforeOmit2());
+   execute(tc_MySeqOfMyEnumBeforeOmit1());
+   execute(tc_MySeqOfMyEnumIntValueBeforeOmit1());
+   execute(tc_MySeqOfMyEnumFloatValueBeforeOmit1() );
+   execute(tc_MySeqOfMyEnumFloatValueBeforeOmit1_2());
+   execute(tc_MySeqOfMyEnumAfterOmit1());
+   execute(tc_MySeqOfMyEnumIntValueAfterOmit1());
+   execute(tc_MySeqOfMyEnumFloatValueAfterOmit1() );
+   execute(tc_MySeqOfMyEnumFloatValueAfterOmit1_2());
+   //REAL (float)
+   execute(tc_MySeqOfRealValueDiffType());
+   execute(tc_MySeqOfRealValueDiffTypeRaw());
+   execute(tc_MySeqOfRealBeforeOmit2());
+   execute(tc_MySeqOfRealIntValueBeforeOmit2());
+   execute(tc_MySeqOfRealFloatValueBeforeOmit2());
+   execute(tc_MySeqOfRealBeforeOmit1());
+   execute(tc_MySeqOfRealIntValueBeforeOmit1());
+   execute(tc_MySeqOfRealFloatValueBeforeOmit1() );
+   execute(tc_MySeqOfRealFloatValueBeforeOmit1_2());
+   execute(tc_MySeqOfRealAfterOmit1());
+   execute(tc_MySeqOfRealIntValueAfterOmit1());
+   execute(tc_MySeqOfRealFloatValueAfterOmit1() );
+   execute(tc_MySeqOfRealFloatValueAfterOmit1_2());
+   //Depth 3-4:
+   execute(tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_omitj());
+   execute(tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_beforeafteromit());
+   execute(tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_omit());
+   execute(tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_afteromit());
+   execute(tc_MySeqOf_SeqSeqIntSeqInt2SeqReal2_arglist_beforeomit());
+
+   //========= SET ============================
+   log(">>>>>>>>>>>>Testcases for SET<<<<<<<<<<<<<<<<<<<<");
+
+   execute(tc_MySetIntOmit()); // <========{ integer }
+   //execute(tc_MySetIntBeforeOmit());
+   //execute(tc_MySetIntAfterOmit());
+   execute(tc_MySetIntValueSameTypeE());
+   execute(tc_MySetIntValueSameTypeI());
+   execute(tc_MySetIntValueDiffTypeExplicitBool());
+   execute(tc_MySetIntValueDiffTypeImplicitBool());
+   //execute(tc_MySetIntValueDiffTypeExplicitNull());
+   //execute(tc_MySetIntValueDiffTypeImplicitNull());
+   execute(tc_MySetIntValueDiffTypeExplicitOctStr());
+   execute(tc_MySetIntValueDiffTypeImplicitOctStr());
+   execute(tc_MySetIntValueDiffTypeExplicitBitStr());
+   execute(tc_MySetIntValueDiffTypeImplicitBitStr());
+   execute(tc_MySetIntValueDiffTypeExplicitEnum());
+   execute(tc_MySetIntValueDiffTypeExplicitFloat());
+   execute(tc_MySetIntValueDiffTypeImplicitFloat());
+   execute(tc_MySetIntValueDiffTypeExplicitStr());
+   //execute(tc_MySetIntValueDiffTypeImplicitStr());
+
+   execute(tc_MySetIntValueDiffTypeRawOctStr());
+   execute(tc_MySetInt2Omiti());//<===== {integer, integer}
+   execute(tc_MySetInt2Omitj());
+   //execute(tc_MySetInt2BeforeOmiti());
+   execute(tc_MySetInt2BeforeOmitj());
+   execute(tc_MySetInt2AfterOmiti());
+   //execute(tc_MySetInt2AfterOmitj());
+   execute(tc_MySetInt2ValueSameTypeE()); //<<<==== FAILED, wrong encode!!!
+   execute(tc_MySetInt2ValueSameTypeE2());
+   execute(tc_MySetInt2ValueSameTypeI());
+   //execute(tc_MySetInt2ValueSameTypeI());
+   execute(tc_MySetInt2ValueDiffTypeExplicitFloat());
+   execute(tc_MySetInt2ValueDiffTypeImplicitFloat());
+   execute(tc_MySetInt2ValueDiffTypeExplicitStr());
+   execute(tc_MySetInt2ValueDiffTypeExplicitBitStr());
+   execute(tc_MySetInt2ValueDiffTypeImplicitBitStr());
+   execute(tc_MySetInt2ValueSeqInt2V());
+   execute(tc_MySetInt2ValueSeqIntOptV());
+   execute(tc_MySetInt2ValueSeqIntC());
+   execute(tc_MySetInt2ValueSeqInt2OptC());
+   execute(tc_MySetInt2ValueSeqInt2OptOmitC());
+   execute(tc_MySetInt2ValueSeqInt2iiC());
+   //execute(tc_MySetInt2ValueSeqInt2ijC());
+   //execute(tc_MySetInt2ValueSeqInt2jiC());
+   execute(tc_MySetInt2ValueSeqInt2jjC());
+
+   execute(tc_MySetIntSetInt2ValueOmiti()); //=== Set { integer, {integer, integer} )
+   execute(tc_MySetIntSetInt2ValueOmitjki());
+   execute(tc_MySetIntSetInt2ValueOmitjkj());
+
+   execute(tc_MySetIntSetInt2ValueRawjki());
+   execute(tc_MySetIntSetInt2ValueRawjkj());
+   execute(tc_MySetIntSetInt2AfteriBeforej());
+   //<===== {integer, integer,integer, integer}
+   execute(tc_MySetInt4Omiti());
+   execute(tc_MySetInt4Omitj());
+   execute(tc_MySetInt4Omitk());
+   execute(tc_MySetInt4Omitl());
+   execute(tc_MySetInt4ValueiOctetStr());
+   execute(tc_MySetInt4ValuejOctetStr());
+   execute(tc_MySetInt4ValueiRaw());
+   execute(tc_MySetInt4ValuejRaw());
+   execute(tc_MySetInt4ValuekRaw());
+   execute(tc_MySetInt4ValuekRawPerm());
+   execute(tc_MySetInt4ValuelRaw());
+   execute(tc_MySetISKL_ValueSomit());
+   execute(tc_MySetISKL_ValueSIomit());
+   execute(tc_MySetISKL_ValueSISJomit());
+   execute(tc_MySetISKL_ValueSraw());
+   execute(tc_MySetISOKL_ValueSomit()); //pass
+   execute(tc_MySetIOSKL_ValueSomit());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_omiti());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_omitjkl());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_omitxy());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_omitjkll());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_valuexy());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_valuex_y());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_valuex_y_expr1());
+   execute(tc_MySetIntSetIntSetInt2SetReal2_valuex_y_expr2());
+   execute(tc_MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2_omit());
+  //========= UNION ==========================
+   execute(tc_myUnionBasicTypes_boolean3());
+   execute(tc_myUnionBasicTypes_booleanRaw());
+   execute(tc_myUnionBasicTypes_nullRaw());
+   execute(tc_myUnionBasicTypes_integerRaw());
+   execute(tc_myUnionBasicTypes_enumRaw());
+   execute(tc_myUnionBasicTypes_realRaw());
+   execute(tc_myUnionBasicTypes_bitstrRaw());
+   execute(tc_myUnionBasicTypes_octetstrRaw());
+   execute(tc_myUnionComplexTypes_omit_0_1());
+   execute(tc_myUnionComplexTypes_omit_0_2());
+   execute(tc_myUnionComplexTypes_omit_1_2());
+   execute(tc_myUnionComplexTypes_omit_2_1());
+   execute(tc_myUnionComplexTypes_omit_0_1_2());
+   execute(tc_myUnionComplexTypes_omit_0_2_1());
+   //===========ATTRIBUTE======================
+   execute(tc_attribute_emptyElement_C_omit());
+   execute(tc_attribute_emptyElement_C_raw());
+   execute(tc_attribute_emptyElement_C_omitafter());
+   execute(tc_attribute_emptyElement_C_after());
+   execute(tc_attribute_emptyElement_C_before());
+   execute(tc_attribute_emptyElement_V_omitbefore());
+   execute(tc_attribute_emptyElement_V_before());
+   execute(tc_attribute_emptyElement_V_omitafter());
+   execute(tc_attribute_emptyElement_V_after());
+   //not empty element:
+   execute(tc_attribute_element_C_omit());
+   execute(tc_attribute_element_C_omitafter());
+   execute(tc_attribute_element_C_after());
+   execute(tc_attribute_element_C_before());
+   execute(tc_attribute_element_C_before());
+   execute(tc_attribute_element_V_omitbefore());
+   execute(tc_attribute_element_V_before());
+   execute(tc_attribute_element_V_omitafter());
+   execute(tc_attribute_element_V_after());
+   execute(tc_attribute_element_E_omitbefore());
+   execute(tc_attribute_element_E_before());
+   execute(tc_attribute_element_E_after());
+   execute(tc_attribute_element_EU_before1());
+   execute(tc_attribute_element_EU_after1());
+   execute(tc_attribute_element_EU_before2());
+   execute(tc_attribute_element_EU_after2());
+}
+
+} with {
+  encode "XML"
+  variant "namespace as 'www.XmlTest.org/negativeTest_XML_Testcases' prefix 'm'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

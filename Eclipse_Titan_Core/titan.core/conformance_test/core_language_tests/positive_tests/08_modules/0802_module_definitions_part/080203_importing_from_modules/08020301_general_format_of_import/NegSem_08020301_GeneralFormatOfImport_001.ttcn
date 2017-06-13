@@ -1,0 +1,36 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:8.2.3.1, Ensure that name handling of imported enumerations is properly handled
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_08020301_GeneralFormatOfImport_001 {
+	import from NegSem_08020301_GeneralFormatOfImport_001_import all;
+
+
+	//according to CR5607 the following definitions are not allowed, name conflict must be detected
+	const EnumType2 enumX := enumX;		
+	const EnumType  enumY := enumX;
+
+	type component GeneralComp {}
+
+	testcase TC_NegSem_08020301_GeneralFormatOfImport_001() runs on GeneralComp {	
+		var EnumType valami := enumX;
+
+		if(enumX == valami)
+		{ setverdict(pass); }
+		else 
+		{ setverdict(fail); }	
+	}
+
+	control{
+    	execute(TC_NegSem_08020301_GeneralFormatOfImport_001());
+	}		
+	
+}
+

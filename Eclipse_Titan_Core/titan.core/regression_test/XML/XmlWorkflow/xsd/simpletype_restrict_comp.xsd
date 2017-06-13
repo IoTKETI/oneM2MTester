@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="www.example.org/simpletype/restrict/comp"
+ xmlns:ns10="www.example.org/simpletype/restrict/comp"> 
+
+
+<xsd:simpleType name='HlrIdInfo'>
+	<xsd:annotation>
+		<xsd:documentation>Home Location Register Id</xsd:documentation>
+	</xsd:annotation>
+	<xsd:restriction base='xsd:string'>
+		<xsd:minLength value="10"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<complexType name="Restricted">
+	<sequence>
+		<xsd:element minOccurs="0" name="hlrId">
+			<xsd:annotation>
+				<xsd:documentation>HLR Id</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="ns10:HlrIdInfo">
+					  <xsd:maxLength value="30"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:element>
+	</sequence>
+</complexType>
+
+<xsd:element name='ipV6Address'>
+	<xsd:annotation>
+		<xsd:documentation>Static IP Address</xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleType>
+		<xsd:restriction base='ns10:IpV6AddressInfo'/>
+	</xsd:simpleType>
+</xsd:element>
+
+<xsd:simpleType name='IpV6AddressInfo'>
+	<xsd:annotation>
+		<xsd:documentation>IP V6 Address</xsd:documentation>
+	</xsd:annotation>
+	<xsd:restriction base='xsd:string'>
+		<xsd:pattern value='[0-9A-Fa-f]{1,4}(:[0-9A-Fa-f]{0,4}){7}'/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+</xsd:schema>

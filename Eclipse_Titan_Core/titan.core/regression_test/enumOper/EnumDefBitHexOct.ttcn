@@ -1,0 +1,303 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos – initial implementation
+ *
+ ******************************************************************************/
+module EnumDefBitHexOct {
+
+type component EmptyCT {}
+
+const integer c_int := 45;
+const bitstring c_bit := '10101111'B;
+
+type enumerated MyEnum {
+  e_num (1),
+  e_bin ('10'B),
+  e_oct ('12'O),
+  e_hex ('AB'H),
+  e_bin_conv (bit2int('0111'B)),
+  e_oct_conv (oct2int('34'O)),
+  e_hex_conv (hex2int('AC'H)),
+  e_num_const (c_int),
+  e_bin_const (c_bit)
+} with {
+  encode "RAW"
+}
+
+const MyEnum c_num := e_num;
+const MyEnum c_bin := e_bin;
+const MyEnum c_oct := e_oct;
+const MyEnum c_hex := e_hex;
+const MyEnum c_bin_conv := e_bin_conv;
+const MyEnum c_oct_conv := e_oct_conv;
+const MyEnum c_hex_conv := e_hex_conv;
+const MyEnum c_num_const := e_num_const;
+const MyEnum c_bin_const := e_bin_const;
+
+testcase tc_basic_const_test() runs on EmptyCT {
+  if (c_num != e_num) {
+    setverdict(fail);
+  }
+
+  if (c_bin != e_bin) {
+    setverdict(fail);
+  }
+
+  if (c_oct != e_oct) {
+    setverdict(fail);
+  }
+
+  if (c_hex != e_hex) {
+    setverdict(fail);
+  }
+
+  if (c_bin_conv != e_bin_conv) {
+    setverdict(fail);
+  }
+
+  if (c_oct_conv != e_oct_conv) {
+    setverdict(fail);
+  }
+
+  if (c_hex_conv != e_hex_conv) {
+    setverdict(fail);
+  }
+
+  if (c_num_const != e_num_const) {
+    setverdict(fail);
+  }
+
+  if (c_bin_const != e_bin_const) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_num) != 1) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_bin) != bit2int('10'B)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_oct) != oct2int('12'O)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_hex) != hex2int('AB'H)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_bin_conv) != bit2int('0111'B)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_oct_conv) != oct2int('34'O)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_hex_conv) != hex2int('AC'H)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_num_const) != c_int) {
+    setverdict(fail);
+  }
+
+  if (enum2int(c_bin_const) != bit2int(c_bit)) {
+    setverdict(fail);
+  }
+
+  var MyEnum loc;
+  int2enum(enum2int(c_num), loc);
+  if (loc != e_num) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_bin), loc);
+  if (loc != e_bin) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_oct), loc);
+  if (loc != e_oct) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_hex), loc);
+  if (loc != e_hex) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_bin_conv), loc);
+  if (loc != e_bin_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_oct_conv), loc);
+  if (loc != e_oct_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_hex_conv), loc);
+  if (loc != e_hex_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_num_const), loc);
+  if (loc != e_num_const) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(c_bin_const), loc);
+  if (loc != e_bin_const) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+}
+
+testcase tc_basic_local_test() runs on EmptyCT {
+  var MyEnum l_num := e_num;
+  var MyEnum l_bin := e_bin;
+  var MyEnum l_oct := e_oct;
+  var MyEnum l_hex := e_hex;
+  var MyEnum l_bin_conv := e_bin_conv;
+  var MyEnum l_oct_conv := e_oct_conv;
+  var MyEnum l_hex_conv := e_hex_conv;
+  var MyEnum l_num_const := e_num_const;
+  var MyEnum l_bin_const := e_bin_const;
+
+  if (l_num != e_num) {
+    setverdict(fail);
+  }
+
+  if (l_bin != e_bin) {
+    setverdict(fail);
+  }
+
+  if (l_oct != e_oct) {
+    setverdict(fail);
+  }
+
+  if (l_hex != e_hex) {
+    setverdict(fail);
+  }
+
+  if (l_bin_conv != e_bin_conv) {
+    setverdict(fail);
+  }
+
+  if (l_oct_conv != e_oct_conv) {
+    setverdict(fail);
+  }
+
+  if (l_hex_conv != e_hex_conv) {
+    setverdict(fail);
+  }
+
+  if (l_num_const != e_num_const) {
+    setverdict(fail);
+  }
+
+  if (l_bin_const != e_bin_const) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_num) != 1) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_bin) != bit2int('10'B)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_oct) != oct2int('12'O)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_hex) != hex2int('AB'H)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_bin_conv) != bit2int('0111'B)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_oct_conv) != oct2int('34'O)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_hex_conv) != hex2int('AC'H)) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_num_const) != c_int) {
+    setverdict(fail);
+  }
+
+  if (enum2int(l_bin_const) != bit2int(c_bit)) {
+    setverdict(fail);
+  }
+
+  var MyEnum loc;
+  int2enum(enum2int(l_num), loc);
+  if (loc != e_num) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_bin), loc);
+  if (loc != e_bin) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_oct), loc);
+  if (loc != e_oct) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_hex), loc);
+  if (loc != e_hex) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_bin_conv), loc);
+  if (loc != e_bin_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_oct_conv), loc);
+  if (loc != e_oct_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_hex_conv), loc);
+  if (loc != e_hex_conv) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_num_const), loc);
+  if (loc != e_num_const) {
+    setverdict(fail);
+  }
+
+  int2enum(enum2int(l_bin_const), loc);
+  if (loc != e_bin_const) {
+    setverdict(fail);
+  }
+
+  setverdict(pass);
+}
+
+control {
+  execute(tc_basic_const_test());
+  execute(tc_basic_local_test());
+}
+
+
+}

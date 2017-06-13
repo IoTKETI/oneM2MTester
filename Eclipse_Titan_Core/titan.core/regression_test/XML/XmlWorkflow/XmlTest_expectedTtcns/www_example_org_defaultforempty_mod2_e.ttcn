@@ -1,0 +1,101 @@
+/*******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator                    
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Szabo, Bence Janos
+*
+*******************************************************************************/
+//
+//  File:          www_example_org_defaultforempty_mod2.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Thu Jan 19 13:28:24 2017
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- defaultforempty_mod2.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/defaultforempty/mod2" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_defaultforempty_mod2 {
+
+
+import from XSD all;
+
+
+import from www_example_org_defaultforempty_mod1 all;
+
+
+const XSD.String c_defaultForEmpty_1 := "fix2";
+
+
+const XSD.Integer c_defaultForEmpty_2 := 10;
+
+
+const XSD.String c_defaultForEmpty_3 := "fixext2";
+
+
+const XSD.Integer c_defaultForEmpty_4 := 11;
+
+
+type record MyComplex
+{
+	XSD.Integer fixed2 (c_defaultForEmpty_2) optional,
+	XSD.String fixed1 (c_defaultForEmpty_1)
+}
+with {
+  variant (fixed2) "defaultForEmpty as c_defaultForEmpty_2";
+  variant (fixed2) "name as capitalized";
+  variant (fixed2) "attribute";
+  variant (fixed1) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (fixed1) "name as capitalized";
+};
+
+
+type record ComplexExt
+{
+	XSD.Integer attrfixedInteger (www_example_org_defaultforempty_mod1.c_defaultForEmpty_2) optional,
+	XSD.Integer attrfixedIntegerExt2 (c_defaultForEmpty_4) optional,
+	XSD.String myStringFixed (www_example_org_defaultforempty_mod1.c_defaultForEmpty_1),
+	XSD.String myStringFixedExt2 (c_defaultForEmpty_3)
+}
+with {
+  variant (attrfixedInteger) "defaultForEmpty as www_example_org_defaultforempty_mod1.c_defaultForEmpty_2";
+  variant (attrfixedInteger) "name as capitalized";
+  variant (attrfixedInteger) "attribute";
+  variant (attrfixedIntegerExt2) "defaultForEmpty as c_defaultForEmpty_4";
+  variant (attrfixedIntegerExt2) "name as capitalized";
+  variant (attrfixedIntegerExt2) "attribute";
+  variant (myStringFixed) "defaultForEmpty as www_example_org_defaultforempty_mod1.c_defaultForEmpty_1";
+  variant (myStringFixed) "name as capitalized";
+  variant (myStringFixedExt2) "defaultForEmpty as c_defaultForEmpty_3";
+  variant (myStringFixedExt2) "name as capitalized";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/defaultforempty/mod2' prefix 'dfe2'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

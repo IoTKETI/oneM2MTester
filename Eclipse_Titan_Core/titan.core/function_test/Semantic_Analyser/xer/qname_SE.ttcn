@@ -1,0 +1,83 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module qname_SE {	//^In TTCN-3 module `qname_SE'://
+
+type union u { //^In type definition// \
+               //^error: A type with USE-QNAME must be a sequence type with exactly two components\.//
+  float f
+}
+with {
+  variant "XSD:QName"
+}
+
+type record of integer a  //^In type definition// \
+               //^error: A type with USE-QNAME must be a sequence type with exactly two components\.//
+with {
+  variant "XSD:QName"
+}
+
+type record boring {  //^In type definition// \
+               //^error: A type with USE-QNAME must be a sequence type with exactly two components\.//
+}
+with {
+  variant "XSD:QName"
+}
+
+type record unos {   //^In type definition// \
+               //^error: A type with USE-QNAME must be a sequence type with exactly two components\.//
+  boolean b
+}
+with {
+  variant "XSD:QName"
+}
+
+type record dos {     //^In type definition//
+  integer i optional, //^error: Both components must be UTF8String or universal charstring//
+  boolean b           //^error: Both components must be UTF8String or universal charstring//
+}
+with {
+  variant "XSD:QName"
+}
+  
+
+type record tres{   //^In type definition// \
+               //^error: A type with USE-QNAME must be a sequence type with exactly two components\.//
+  boolean b,
+  charstring s,
+  float f
+}
+with {
+  variant "XSD:QName"
+}
+
+type record almost {      //^In type definition//
+  universal charstring u, //^error: The first component of a type with USE-QNAME must be optional//
+  universal charstring n
+}
+with {
+  variant "XSD:QName"
+}
+
+type record eager_beaver {        //^In type definition// 
+  universal charstring u optional,
+  universal charstring n optional //^error: The second component of a type with USE-QNAME must NOT be optional//
+}
+with {
+  variant "XSD:QName"
+}
+  
+
+}
+with {
+  encode "XML";
+}

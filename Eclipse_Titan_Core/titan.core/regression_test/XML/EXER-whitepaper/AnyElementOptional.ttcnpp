@@ -1,0 +1,207 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnyElementOptional
+{
+modulepar boolean AnyElement_verbose := false;
+#define verbose AnyElement_verbose
+#include "../macros.ttcnin"
+
+type component AE {}
+
+type record AEProduct {
+  charstring name,
+  integer    price,
+  universal charstring info optional
+}
+with {
+  variant (info) "anyElement from 'http://www.example.com/A', "
+  "'http://www.example.com/B', unqualified"
+}
+
+DECLARE_XER_ENCODERS(AEProduct, ae);
+DECLARE_EXER_ENCODERS(AEProduct, ae);
+
+const AEProduct aep := {
+  name  := "Trousers",
+  price := 20,
+  info  := "<xyz:color xmlns:xyz=""http://www.example.com/A"" available=""true"">red</xyz:color>"
+}
+
+const universal charstring str_ae_e :=
+"<AEProduct>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"\t<xyz:color xmlns:xyz=\"http://www.example.com/A\" available=\"true\">red</xyz:color>\n" &
+"</AEProduct>\n\n";
+
+const universal charstring str_ae_b :=
+"<AEProduct>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"\t<info>&lt;xyz:color xmlns:xyz=&quot;http://www.example.com/A&quot; available=&quot;true&quot;&gt;red&lt;/xyz:color&gt;</info>\n" &
+"</AEProduct>\n\n";
+
+testcase encode_aeopt() runs on AE
+{
+  CHECK_METHOD(bxer_enc_ae, aep, str_ae_b);
+  CHECK_METHOD(exer_enc_ae, aep, str_ae_e);
+}
+
+testcase decode_aeopt() runs on AE
+{
+  CHECK_DECODE(bxer_dec_ae, str_ae_b, AEProduct, aep);
+  CHECK_DECODE(exer_dec_ae, str_ae_e, AEProduct, aep);
+}
+
+// .- -. -.. /  -. --- .-- /  ..-. --- .-. /  ... --- -- . - .... .. -. --. 
+//  -.-. --- -- .--. .-.. . - . .-.. -.-- /  -.. .. ..-. ..-. . .-. . -. -
+
+type record AFProduct {
+  charstring name,
+  integer    price,
+  universal charstring info optional
+}
+with {
+  variant (info) "anyElement except 'http://www.example.com/A', 'http://www.example.com/B', unqualified"
+}
+
+DECLARE_XER_ENCODERS(AFProduct, af);
+DECLARE_EXER_ENCODERS(AFProduct, af);
+
+const AFProduct afp := {
+  name  := "Trousers",
+  price := 20,
+  info  := "<xyz:color xmlns:xyz=""http://www.example.com/C"" available=""true"">red</xyz:color>"
+}
+
+const universal charstring str_af_e :=
+"<AFProduct>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"\t<xyz:color xmlns:xyz=\"http://www.example.com/C\" available=\"true\">red</xyz:color>\n" &
+"</AFProduct>\n\n";
+
+const universal charstring str_af_b :=
+"<AFProduct>\n" &
+"\t<name>Trousers</name>\n" &
+"\t<price>20</price>\n" &
+"\t<info>&lt;xyz:color xmlns:xyz=&quot;http://www.example.com/C&quot; available=&quot;true&quot;&gt;red&lt;/xyz:color&gt;</info>\n" &
+"</AFProduct>\n\n";
+
+testcase encode_afopt() runs on AE
+{
+  CHECK_METHOD(bxer_enc_af, afp, str_af_b);
+  CHECK_METHOD(exer_enc_af, afp, str_af_e);
+}
+
+testcase decode_afopt() runs on AE
+{
+  CHECK_DECODE(bxer_dec_af, str_af_b, AFProduct, afp);
+  CHECK_DECODE(exer_dec_af, str_af_e, AFProduct, afp);
+}
+
+// .- -. -.. /  -. --- .-- /  ..-. --- .-. /  ... --- -- . - .... .. -. --. 
+//  -.-. --- -- .--. .-.. . - . .-.. -.-- /  -.. .. ..-. ..-. . .-. . -. -
+
+// ANY-ELEMENT as the only member of a record is a corner case
+type record anys_and_only_anys {
+  record of universal charstring elements optional
+}
+with {
+  variant (elements) "anyElement"
+}
+
+DECLARE_XER_ENCODERS(anys_and_only_anys, aaoa);
+DECLARE_EXER_ENCODERS(anys_and_only_anys, aaoa);
+
+const anys_and_only_anys noanys_empty := { elements := {} }
+const anys_and_only_anys noanys_omit := { elements := omit }
+
+// the empty array is encoded into this in basic XER
+const universal charstring bstr_noanys :=
+"<anys_and_only_anys>\n" &
+"\t<elements/>\n" &
+"</anys_and_only_anys>\n\n";
+
+// both the empty array and the omitted field are encoded into this in extended XER
+// this is always decoded into an omitted field
+const universal charstring estr_noanys :=
+"<anys_and_only_anys/>\n\n";
+
+const anys_and_only_anys marx := {
+  elements := {"<chico/>", "<groucho/>", "<karl></karl>"}
+}
+const universal charstring estr_marx :=
+"<anys_and_only_anys>\n" &
+"\t<chico/>\n" &
+"\t<groucho/>\n" &
+"\t<karl></karl>\n" &
+"</anys_and_only_anys>\n\n";
+
+const universal charstring bstr_marx :=
+"<anys_and_only_anys>\n" &
+"\t<elements>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;chico/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;groucho/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;karl&gt;&lt;/karl&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t</elements>\n" &
+"</anys_and_only_anys>\n\n";
+
+// When decoding EXER, karl becomes an empty element too (?)
+const anys_and_only_anys marx_dec := {
+  elements := {"<chico/>", "<groucho/>", "<karl/>"}
+}
+
+testcase encode_only_opt() runs on AE
+{
+  CHECK_METHOD(bxer_enc_aaoa, noanys_empty, bstr_noanys);
+  CHECK_METHOD(exer_enc_aaoa, noanys_empty, estr_noanys);
+  CHECK_METHOD(exer_enc_aaoa, noanys_omit, estr_noanys);
+
+  CHECK_METHOD(bxer_enc_aaoa, marx, bstr_marx);
+  CHECK_METHOD(exer_enc_aaoa, marx, estr_marx);
+}
+
+testcase decode_only_opt() runs on AE
+{
+  CHECK_DECODE(bxer_dec_aaoa, bstr_noanys, anys_and_only_anys, noanys_empty);
+  CHECK_DECODE(exer_dec_aaoa, estr_noanys, anys_and_only_anys, noanys_omit);
+
+  CHECK_DECODE(bxer_dec_aaoa, bstr_marx, anys_and_only_anys, marx);
+  CHECK_DECODE(exer_dec_aaoa, estr_marx, anys_and_only_anys, marx_dec);
+}
+
+control
+{
+  execute(encode_aeopt())
+  execute(decode_aeopt())
+
+  execute(encode_afopt())
+  execute(decode_afopt())
+
+//  execute(encode_anys())
+//  execute(decode_anys())
+
+//  execute(encode_utanys())
+//  execute(decode_utanys())
+  
+  execute(encode_only_opt())
+  execute(decode_only_opt())
+}
+
+}
+with {
+encode "XML"
+}
+

@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for clashes between record/set/union field names
+// and the name of its type (or another field's type in the same record/set/union).
+// These cases used to cause C++ compilation errors.
+
+module nameClash {
+
+type record of integer il;
+type record of integer il2;
+
+// in this record both fields' names clash with each other's type names
+type record R {
+  il il2,
+  il2 il
+}
+
+// in this set the field's name clashes with its own type name
+type set S {
+  il2 il2
+}
+
+// in this union the first field's name clashes with the 3rd field's type name
+type union U {
+  integer il,
+  R x,
+  il y
+}
+
+}

@@ -1,0 +1,89 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Forstner, Matyas
+ *
+ ******************************************************************************/
+module X
+{
+  import from x682 language "ASN.1:1997" all
+
+  type port MyPort1 message
+  {
+    out ErrorReturn;
+    in octetstring;
+  }
+
+  type port MyPort2 message
+  {
+    out octetstring;
+    in ErrorReturn;
+  }
+
+  type component MyComponent
+  {
+    timer T := 1.0;
+    port MyPort1 P1;
+    port MyPort2 P2;
+  }
+
+  type component MySystemType
+  {
+    port MyPort1 S1;
+    port MyPort2 S2;
+  }
+
+  altstep MyAltstep() runs on MyComponent
+  {
+    [] P1.receive { setverdict(fail); }
+    [] P2.receive { setverdict(fail); }
+    [] T.timeout { setverdict(inconc); T.start; }
+  }
+
+  testcase TC0a() runs on MyComponent system MySystemType
+  {
+    var default d := activate(MyAltstep());
+    map(mtc:P1, system:S2);
+    map(mtc:P2, system:S1);
+
+    P1.send(errorReturn1);
+    T.start;
+    P1.receive(ber_errorReturn1);
+    setverdict(pass);
+    T.stop;
+
+    deactivate(d);
+    unmap(mtc:P1, system:S2);
+    unmap(mtc:P2, system:S1);
+  }
+
+  testcase TC0b() runs on MyComponent system MySystemType
+  {
+    var default d := activate(MyAltstep());
+    map(mtc:P1, system:S2);
+    map(mtc:P2, system:S1);
+
+    P2.send(ber_errorReturn1);
+    T.start;
+    P2.receive(errorReturn1);
+    setverdict(pass);
+    T.stop;
+
+    deactivate(d);
+    unmap(mtc:P1, system:S2);
+    unmap(mtc:P2, system:S1);
+  }
+
+  control
+  {
+    execute(TC0a());
+    execute(TC0b());
+  }
+
+}

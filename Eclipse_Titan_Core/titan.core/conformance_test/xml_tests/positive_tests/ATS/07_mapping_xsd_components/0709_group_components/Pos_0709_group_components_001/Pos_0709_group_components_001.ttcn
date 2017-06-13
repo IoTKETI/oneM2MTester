@@ -1,0 +1,90 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:7.9, Verify conversion of group definition with sequence compositor
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// [XSD group definition with a sequence compositor] shall be mapped to TTCN-3 
+// type definitions the same way as their child components would be mapped 
+// inside a complexType with one difference: the "untagged" encoding instruction 
+// shall be attached to the generated TTCN-3 component, corresponding to the 
+// group element.
+
+module Pos_0709_group_components_001 {
+
+   import from schema_Pos_0709_group_components_001 language "XSD" all;
+
+   template ShipAndBill m_groupContent := {
+       shipTo := "New York",
+       billTo := "SuperMegaCorp Inc."
+   }
+
+   template MyType m_msg := {
+       shipAndBill_list := { m_groupContent }
+   };
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+	}
+
+    testcase TC_Pos_0709_group_components_001() runs on C system C {
+        var Raw v_rcv;
+        
+		var Raw  v_Raw:= "<ns221:MyType xmlns:ns221='schema:Pos_0709_group_components_001'>\n\t<shipTo>New York</shipTo>\n\t<billTo>SuperMegaCorp Inc.</billTo>\n</ns221:MyType>\n\n";
+
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_0709_group_components_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

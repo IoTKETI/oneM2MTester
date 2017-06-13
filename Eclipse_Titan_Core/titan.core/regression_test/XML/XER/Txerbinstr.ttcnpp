@@ -1,0 +1,267 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txerbinstr {
+
+modulepar boolean Txerbinstr_verbose := false;
+#define   verbose Txerbinstr_verbose
+
+#include "../macros.ttcnin"
+type component Binstr {}
+
+
+type octetstring oct64
+with {
+  variant "XSD:base64Binary"
+}
+
+type record r_ostr {
+  octetstring s
+}
+
+type union u_ostr {
+  octetstring s
+}
+
+type record of oct64 rof_ostr
+
+DECLARE_XER_ENCODERS (oct64, ostr);
+DECLARE_EXER_ENCODERS(oct64, ostr);
+DECLARE_XER_ENCODERS (r_ostr, rostr);
+DECLARE_EXER_ENCODERS(r_ostr, rostr);
+DECLARE_XER_ENCODERS (u_ostr, uostr);
+DECLARE_EXER_ENCODERS(u_ostr, uostr);
+DECLARE_XER_ENCODERS (rof_ostr, rofostr);
+DECLARE_EXER_ENCODERS(rof_ostr, rofostr);
+
+const octetstring babe := 'BABEFACE'O
+const universal charstring  xer_babe := "<oct64>BABEFACE</oct64>\n"; // Basic XER ignores Base64
+const universal charstring exer_babe := "<oct64>ur76zg==</oct64>\n"
+const universal charstring plain_babe:= "BABEFACE";
+
+const oct64 rbabe := '040044140084'O
+
+testcase enc_ostr() runs on Binstr
+{
+  CHECK_METHOD(bxer_enc_ostr, babe,    xer_babe);
+  CHECK_METHOD(exer_enc_ostr, babe,   exer_babe);
+  //boring CHECK_METHOD(bxer_enc_ostr, rbabe, plain_babe);
+  CHECK_METHOD(exer_enc_ostr, rbabe, xer_babe);
+}
+
+testcase dec_ostr() runs on Binstr
+{
+  CHECK_DECODE(bxer_dec_ostr,  xer_babe, octetstring, babe);
+  CHECK_DECODE(exer_dec_ostr, exer_babe, octetstring, babe);
+  //CHECK_DECODE(exer_enc_ostr,plain_babe, octetstring, rbabe);
+}
+
+//TODO r_ostr
+//TODO u_ostr
+
+const rof_ostr strings := {
+  char2oct("pleasure."),
+  char2oct("leasure."),
+  char2oct("easure."),
+  char2oct("asure."),
+  char2oct("sure."),
+  char2oct("ure."),
+  char2oct("re."),
+  char2oct("e."),
+  char2oct("."),
+  char2oct("")
+}
+
+const integer numstrings := lengthof(strings)
+
+const universal charstring base64s[numstrings] := {
+  "<oct64>cGxlYXN1cmUu</oct64>\n", // encoded values from the Wikipedia page
+  "<oct64>bGVhc3VyZS4=</oct64>\n", // of Base64
+  "<oct64>ZWFzdXJlLg==</oct64>\n",
+  "<oct64>YXN1cmUu</oct64>\n",
+  "<oct64>c3VyZS4=</oct64>\n",
+  "<oct64>dXJlLg==</oct64>\n",
+  "<oct64>cmUu</oct64>\n",
+  "<oct64>ZS4=</oct64>\n",
+  "<oct64>Lg==</oct64>\n",
+  "<oct64/>\n"
+}
+
+testcase enc_rof_ostr() runs on Binstr
+{
+  var universal charstring everything := "<rof_ostr>\n";
+
+  for (var integer i := 0; i < numstrings; i := i + 1) {
+    //CHECK_METHOD(bxer_enc_ostr, strings[i], base64s[i]);
+
+    CHECK_METHOD(exer_enc_ostr, strings[i], base64s[i]);
+    // test encoding of individual strings
+
+    everything := everything & "\t" & base64s[i];
+    // also prepare the test string for the entire record-of
+  }
+  everything := everything & "</rof_ostr>\n\n";
+
+  CHECK_METHOD(exer_enc_rofostr, strings, everything);
+}
+
+testcase dec_rof_ostr() runs on Binstr
+{
+  var universal charstring everything := "<rof_ostr>\n";
+
+  for (var integer i := 0; i < numstrings; i := i + 1) {
+    //CHECK_METHOD(bxer_enc_ostr, strings[i], base64s[i]);
+
+    CHECK_DECODE(exer_dec_ostr, base64s[i], octetstring, strings[i]);
+    // test encoding of individual strings
+
+    everything := everything & "\t" & base64s[i];
+    // also prepare the test string for the entire record-of
+  }
+  everything := everything & "</rof_ostr>\n\n";
+
+  CHECK_DECODE(exer_dec_rofostr, everything, rof_ostr, strings);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+type hexstring hex64
+with {
+  variant "XSD:base64Binary"
+}
+
+type record r_hstr {
+  hexstring h
+}
+
+type union u_hstr {
+  hexstring h
+}
+
+type record of hex64 rof_hstr
+
+DECLARE_XER_ENCODERS (hex64, hstr);
+DECLARE_EXER_ENCODERS(hex64, hstr);
+DECLARE_XER_ENCODERS (r_hstr, rhstr);
+DECLARE_EXER_ENCODERS(r_hstr, rhstr);
+DECLARE_XER_ENCODERS (u_hstr, uhstr);
+DECLARE_EXER_ENCODERS(u_hstr, uhstr);
+DECLARE_XER_ENCODERS (rof_hstr, rofhstr);
+DECLARE_EXER_ENCODERS(rof_hstr, rofhstr);
+
+const hexstring coffee := 'DECAFBAD'H
+const universal charstring  xer_coffee := "<hex64>DECAFBAD</hex64>\n";
+const universal charstring exer_coffee := "<hex64>3sr7rQ==</hex64>\n"
+
+testcase enc_hstr() runs on Binstr
+{
+  CHECK_METHOD(bxer_enc_hstr, coffee,  xer_coffee);
+  CHECK_METHOD(exer_enc_hstr, coffee, exer_coffee);
+}
+
+testcase dec_hstr() runs on Binstr
+{
+  CHECK_DECODE(bxer_dec_hstr,  xer_coffee, hexstring, coffee);
+  CHECK_DECODE(exer_dec_hstr, exer_coffee, hexstring, coffee);
+}
+
+//TODO r_hstr
+//TODO u_hstr
+
+const rof_hstr hstrings := {
+  oct2hex(char2oct("pleasure.")),
+  oct2hex(char2oct("leasure.")),
+  oct2hex(char2oct("easure.")),
+  oct2hex(char2oct("asure.")),
+  oct2hex(char2oct("sure.")),
+  oct2hex(char2oct("ure.")),
+  oct2hex(char2oct("re.")),
+  oct2hex(char2oct("e.")),
+  oct2hex(char2oct(".")),
+  oct2hex(char2oct(""))
+}
+
+const integer numhstrings := lengthof(hstrings)
+
+const universal charstring base64hs[numstrings] := {
+  "<hex64>cGxlYXN1cmUu</hex64>\n", // encoded values from the Wikipedia page
+  "<hex64>bGVhc3VyZS4=</hex64>\n", // of Base64
+  "<hex64>ZWFzdXJlLg==</hex64>\n",
+  "<hex64>YXN1cmUu</hex64>\n",
+  "<hex64>c3VyZS4=</hex64>\n",
+  "<hex64>dXJlLg==</hex64>\n",
+  "<hex64>cmUu</hex64>\n",
+  "<hex64>ZS4=</hex64>\n",
+  "<hex64>Lg==</hex64>\n",
+  "<hex64/>\n"
+}
+
+testcase enc_rof_hstr() runs on Binstr
+{
+  var universal charstring everything := "<rof_hstr>\n";
+
+  for (var integer i := 0; i < numhstrings; i := i + 1) {
+    //CHECK_METHOD(bxer_enc_hstr, strings[i], base64s[i]);
+
+    CHECK_METHOD(exer_enc_hstr, hstrings[i], base64hs[i]);
+    // test encoding of individual strings
+
+    everything := everything & "\t" & base64hs[i];
+    // also prepare the test string for the entire record-of
+  }
+  everything := everything & "</rof_hstr>\n\n";
+
+  CHECK_METHOD(exer_enc_rofhstr, hstrings, everything);
+
+}
+
+testcase dec_rof_hstr() runs on Binstr
+{
+  var universal charstring everything := "<rof_hstr>\n";
+
+  for (var integer i := 0; i < numhstrings; i := i + 1) {
+    //CHECK_METHOD(bxer_enc_hstr, strings[i], base64s[i]);
+
+    CHECK_DECODE(exer_dec_hstr, base64hs[i], hexstring, hstrings[i]);
+    // test encoding of individual strings
+
+    everything := everything & "\t" & base64hs[i];
+    // also prepare the test string for the entire record-of
+  }
+  everything := everything & "</rof_hstr>\n\n";
+
+  CHECK_DECODE(exer_dec_rofhstr, everything, rof_hstr, hstrings);
+}
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+control
+{
+  execute(enc_ostr());
+  execute(dec_ostr());
+
+  execute(enc_rof_ostr());
+  execute(dec_rof_ostr());
+
+  execute(enc_hstr());
+  execute(dec_hstr());
+
+  execute(enc_rof_hstr());
+  execute(dec_rof_hstr());
+}
+
+
+}
+with {
+  encode "XML"
+  extension "version R99999A";
+}

@@ -1,0 +1,30 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module bogus_SY
+{
+    type record length (10) of integer int10;
+    type record length (2..infinity) of integer int2up;
+    //type address aaa;
+    type component C1
+    {
+    }
+
+    testcase tc2() runs on C1
+    {
+        var integer i1 := 1, i2 := 2;
+        var boolean b1 := true, b := i1 > i2 and b1;
+        if ( isvalue i1 ) { // syntax error here
+            setverdict(pass);
+        }
+    }
+}

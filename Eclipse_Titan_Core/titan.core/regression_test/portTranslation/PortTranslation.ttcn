@@ -1,0 +1,693 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module PortTranslation {
+
+/* Converter functions */
+
+	function MyRec_to_oct(in MyRec i, out octetstring j) {
+		if (i.types == Oct) {
+			j := i.val;
+			port.setstate(0, "Translated"); // translated
+		} else {
+			port.setstate(1, "Not translated"); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function MyRec_to_int(in MyRec i, out integer j) {
+		if (i.types == Int) {
+			j := oct2int(i.val);
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function MyRec_to_MyRec(in MyRec i, out MyRec j) {
+		if (i.types == MyRec) {
+			j := i;
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function MyRec_to_char(in MyRec i, out charstring j) {
+		if (i.types == Char) {
+			j := oct2str(i.val);
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function char_to_hex(in charstring i, out hexstring j) {
+		if (i == "0001") {
+			j := str2hex(i);
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function char_to_hex2(in charstring i, out hexstring j) {
+		if (i == "0002") {
+			j := str2hex(i);
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function char_to_char(in charstring i, out charstring j) {
+		if (i == oct2char('010203'O)) {
+			j := "";
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function MyRec_to_hex(in MyRec i, out hexstring j) {
+		if (i.types == Hex) {
+			j := oct2hex(i.val);
+			port.setstate(0); // translated
+		} else {
+			port.setstate(1); // not translated
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function hex_to_hex(in hexstring i, out hexstring j) port PT2 {
+		log("asdf");
+		if (lengthof(i) != 14) {
+			port.setstate(1, "hex_to_hex");
+		} else {
+			if (lengthof(i) > index + 4) {
+				j := substr(i, index, 4);
+				index := index + 4;
+				port.setstate(3, "hex_to_hex"); // partially translated, more messages to decode
+			} else {
+				j := substr(i, index, lengthof(i) - index);
+				port.setstate(0); // translated
+			}
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function hex_to_bit_buffer(in hexstring i, out bitstring j) port PT2 {
+		log("asdf2");
+		if (lengthof(i) == 12 or lengthof(i) == 10) {
+			port.setstate(1);
+		} else {
+			if (lengthof(buffer) != 14) {
+				buffer := buffer & i;
+				port.setstate(2, "hex_to_bit_buffer");
+			}
+			if (lengthof(buffer) == 14) {
+				j := hex2bit(buffer);
+				port.setstate(0, "hex_to_bit_buffer");
+				buffer := ''H;
+			}
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function hex_to_bit2(in hexstring i, out bitstring j) {
+		log("ff");
+		j := hex2bit(i);
+		port.setstate(0, "hex_to_bit2");
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function bit_to_bit_buffer(in bitstring i, out bitstring j) port PT2 {
+		if (lengthof(i) != 1) {
+			port.setstate(1);
+		} else {
+			if (lengthof(bit_buffer) != 48) {
+				bit_buffer := bit_buffer & i;
+				port.setstate(2);
+			}
+			if (lengthof(bit_buffer) == 48) {
+				j := bit_buffer;
+				port.setstate(0);
+				bit_buffer := ''B;
+			}
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function bit_to_bit_fragmented(in bitstring i, out bitstring j) port PT2 {
+		log("a");
+		if (lengthof(i) != 40) {
+			port.setstate(1);
+		} else {
+			if (lengthof(i) > index2 + 16) {
+				j := substr(i, index2, 16);
+				index2 := index2 + 16;
+				port.setstate(3); // partially translated, more messages to decode
+			} else {
+				j := substr(i, index2, lengthof(i) - index2);
+				port.setstate(0, "bit_to_bit_fragmented"); // translated
+			}
+		}
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function bit_to_bit(in bitstring i, out bitstring j) port PT2 {
+		j := i;
+		port.setstate(0, "bit_to_bit");
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function hex_to_char(in hexstring i, out charstring j) {
+		// dummy
+	} with {
+		extension "prototype(fast)";
+	}
+
+	function int_to_bit_bad(in integer i, out bitstring j) {
+		// do nothing.
+		// Will generate error because the state of the port stays unset.
+	} with {
+		extension "prototype(fast)";
+	}
+
+///////////////////////////////////////////////////////////////////////////////
+
+	/* Types */
+
+	type enumerated Types {
+		Int, Char, Oct, Hex, Bit, MyRec, None
+	}
+
+	type record MyRec {
+		octetstring val,
+		Types types
+	}
+
+	type port P1 message {
+		in bitstring, octetstring, charstring, hexstring
+		out MyRec, octetstring, bitstring, charstring, hexstring
+		inout integer
+	} with {
+		extension "provider"
+	}
+
+	type port P2 message {
+		in integer, bitstring, octetstring, charstring
+		out octetstring, MyRec, bitstring, charstring, integer
+	} with {
+		extension "provider"
+	}
+
+	type port P3 message {
+		out MyRec
+		out bitstring, hexstring, integer
+		inout octetstring
+	}
+
+	type port PT2 message map to P1, P2 {
+		in charstring from charstring with char_to_char()
+		in integer, octetstring, hexstring from charstring with char_to_hex() : charstring with char_to_hex2()
+		out MyRec to octetstring with MyRec_to_oct() : integer with MyRec_to_int() : MyRec with MyRec_to_MyRec() : charstring with MyRec_to_char() : hexstring with MyRec_to_hex()
+		out octetstring
+		out bitstring
+		in bitstring from bitstring with bit_to_bit_buffer() : bitstring with bit_to_bit_fragmented() : bitstring with bit_to_bit()
+		out hexstring to hexstring with hex_to_hex() : bitstring with hex_to_bit_buffer() : bitstring with hex_to_bit2() : charstring with hex_to_char()
+
+		var integer index := 0;
+		var integer index2 := 0;
+		var hexstring buffer := ''H;
+		var bitstring bit_buffer := ''B;
+	}
+
+
+	type component MyComp {
+		port PT2 p;
+	}
+
+	type component System {
+		port P1 p1
+		port P2 p2
+		port P3 p3
+
+	}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+	testcase tc_send() runs on MyComp system System {
+		map(self:p, system:p1);
+		var MyRec v_rec := { 'ABCDEF'O, Oct };
+
+		// Send octetstring with Oct, so the first mapping function will be successful
+		p.send(v_rec);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive(3) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with Int so the second mapping function will be successfull
+		v_rec := { '12'O, Int };
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(18) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with MyRec so the second mapping function will be successfull
+		v_rec := { '123456'O, MyRec };
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive('123456'O) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with None so it will be generate an error because no mapping can handle the message
+		v_rec := { '123456'O, None };
+		@try{
+			p.send(v_rec);
+		} @catch (e) {
+			if (match(e, "Dynamic test case error: Outgoing message of type @PortTranslation.MyRec could not be handled by the type mapping rules on port p.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		// This should be sent too and the implementation of PT2 will send back the length of it.
+		var octetstring os := '12345678'O;
+		p.send(os);
+		t.start;
+		alt {
+			[] p.receive(4) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send back the bitstring
+		var bitstring bs := '010101'B;
+		p.send(bs);
+		t.start;
+		alt {
+			[] p.receive(bs) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		unmap(self:p, system:p1);
+	}
+
+///////////////////////////////////////////////////////////////////////////////
+
+    testcase tc_receive() runs on MyComp system System {
+		map(self:p, system:p1);
+		var MyRec v_rec := { str2oct("0001"), Char };
+
+		// Send octetstring with Char, so the it will receive the str2hex("0001") hexstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will be mapped to hexstring using: char_to_hex
+		p.send(v_rec);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive(str2hex("0001")) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		v_rec := { str2oct("0002"), Char };
+
+		// Send octetstring with Char, so the it will receive the str2hex("0002") hexstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will be mapped to hexstring using: char_to_hex2
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(str2hex("0002")) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		v_rec := { str2oct("0003"), Char };
+
+		// Send octetstring with Char, so the it will receive the "0003" charstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will not be mapped
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(charstring:"0003") { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+	}
+
+///////////////////////////////////////////////////////////////////////////////
+
+	testcase tc_send2() runs on MyComp system System {
+		map(self:p, system:p2);
+		var MyRec v_rec := { 'ABCDEF'O, Oct };
+
+		// Send octetstring with Oct, so the first mapping function will be successful
+		p.send(v_rec);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive(3) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with Int so the second mapping function will be successfull
+		v_rec := { '12'O, Int };
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(18) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with MyRec so the second mapping function will be successfull
+		v_rec := { '123456'O, MyRec };
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive('123456'O) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		// Send octetstring with None so it will be generate an error because no mapping can handle the message
+		v_rec := { '123456'O, None };
+		@try{
+			p.send(v_rec);
+		} @catch (e) {
+			if (match(e, "Dynamic test case error: Outgoing message of type @PortTranslation.MyRec could not be handled by the type mapping rules on port p.")) {
+				setverdict(pass);
+			} else {
+				setverdict(fail);
+			}
+		}
+
+		// This should be sent too and the implementation of PT2 will send back the length of it.
+		var octetstring os := '12345678'O;
+		p.send(os);
+		t.start;
+		alt {
+			[] p.receive(4) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		var bitstring bs := '010101'B;
+		p.send(bs);
+		t.start;
+		alt {
+			[] p.receive(bs) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		unmap(self:p, system:p2);
+	}
+
+	testcase tc_receive2() runs on MyComp system System {
+		map(self:p, system:p2);
+		var MyRec v_rec := { str2oct("0001"), Char };
+
+		// Send octetstring with Char, so the it will receive the str2hex("0001") hexstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will be mapped to hexstring using: char_to_hex
+		p.send(v_rec);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive(str2hex("0001")) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		v_rec := { str2oct("0002"), Char };
+
+		// Send octetstring with Char, so the it will receive the str2hex("0002") hexstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will be mapped to hexstring using: char_to_hex2
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(str2hex("0002")) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		v_rec := { str2oct("0003"), Char };
+
+		// Send octetstring with Char, so the it will receive the "0003" charstring because first it it will be mapped to
+		// charstring with the sending mapping, and it will send back to the port and the charstring will not be mapped
+		p.send(v_rec);
+		t.start;
+		alt {
+			[] p.receive(charstring:"0003") { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+	}
+
+
+	testcase tc_send_and_receive_without_mapping() runs on MyComp system System {
+		map(self:p, system:p3);
+		var MyRec v_rec := { '010203'O, Oct };
+
+		// Send octetstring with Oct, the PT2 port will send it back as charstring without going through char_to_char().
+		p.send(v_rec);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive(oct2char('010203'O)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+	}
+
+	testcase tc_send_partially_translated() runs on MyComp system System {
+		map(self:p, system:p1);
+		var hexstring hs := '12345678ABCDEF'H;
+		p.send(hs);
+		timer t := 1.0;
+		t.start;
+		alt {
+			[] p.receive('1234'H) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		t.start;
+		alt {
+			[] p.receive('5678'H) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		t.start;
+		alt {
+			[] p.receive('ABCD'H) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		t.start;
+		alt {
+			[] p.receive('EF'H) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+	}
+
+	testcase tc_send_fragmented() runs on MyComp system System {
+		map(self:p, system:p1);
+
+		p.send('1234'H);
+		timer t := 0.5;
+		t.start;
+		alt {
+			[] p.receive(bitstring:?) { setverdict(fail); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(pass); }
+		}
+		t.stop;
+
+		p.send('5678'H);
+		t.start;
+		alt {
+			[] p.receive(bitstring:?) { setverdict(fail); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(pass); }
+		}
+		t.stop;
+
+		p.send('ABCD'H);
+		t.start;
+		alt {
+			[] p.receive(bitstring:?) { setverdict(fail); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(pass); }
+		}
+		t.stop;
+
+		p.send('EF'H);
+		t.start;
+		alt {
+			[] p.receive(hex2bit('12345678ABCDEF'H)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+	}
+
+	testcase tc_receive_fragmented() runs on MyComp system System {
+		map(self:p, system:p1);
+
+		p.send('12345678ABCD'H);
+		timer t := 0.5;
+		t.start;
+		alt {
+			[] p.receive(hex2bit('12345678ABCD'H)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+	}
+
+	testcase tc_receive_partially_translated() runs on MyComp system System {
+		map(self:p, system:p1);
+
+		p.send('12345678AB'H);
+		timer t := 0.5;
+		t.start;
+		alt {
+			[] p.receive(hex2bit('1234'H)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		t.start;
+		alt {
+			[] p.receive(hex2bit('5678'H)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+
+		t.start;
+		alt {
+			[] p.receive(hex2bit('AB'H)) { setverdict(pass); }
+			[] p.receive(integer:?) { setverdict(fail); }
+			[] p.receive(octetstring:?) { setverdict(fail); }
+			[] t.timeout    { setverdict(fail); }
+		}
+		t.stop;
+	}
+
+	control {
+		execute(tc_send())
+		execute(tc_receive())
+
+		execute(tc_send2());
+		execute(tc_receive2());
+
+		execute(tc_send_and_receive_without_mapping());
+
+		execute(tc_send_partially_translated());
+		execute(tc_send_fragmented());
+
+		execute(tc_receive_partially_translated());
+		execute(tc_receive_fragmented());
+	}
+
+}

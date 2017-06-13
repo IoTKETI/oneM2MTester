@@ -1,0 +1,254 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module types {
+
+type component MC {}
+
+
+
+group g_boolean {
+  type record of boolean RoB;
+}//g_boolean
+
+group g_integer {
+
+  type record of integer RoI;
+  type integer int_1_3 (1..3)
+
+} //g_integer
+
+group g_float{
+  type record of float RoF
+
+} //g_float
+
+group g_bitstring {
+  type bitstring BitStrings1 ('0'B, '1'B );
+  type bitstring BitStrings2 ('00'B, '01'B, '10'B, '11'B);
+  type bitstring BitStrings_1_2 (BitStrings1, BitStrings2);
+
+  type record of hexstring RoBS;  
+  //wrapper to test charstring in record:
+  type record RBS {
+    bitstring bs optional
+  }
+
+  type record of RBS RoRBS;
+
+  template RBS t_rbs(template bitstring pl_bs) := { bs:=pl_bs }
+
+}//g_bitstring
+
+group g_octetstring {
+  type record of octetstring RoOS;  
+  //wrapper to test charstring in record:
+  type record ROS {
+    octetstring os optional
+  }
+
+  type record of ROS RoROS;
+
+  template ROS t_ros(template octetstring pl_os) := { os:=pl_os }
+
+}//g_octetstring
+
+group g_hexstring {
+  type record of hexstring RoHS;  
+  //wrapper to test charstring in record:
+  type record RHS {
+    hexstring hs optional
+  }
+
+  type record of RHS RoRHS;
+
+  template RHS t_rhs(template hexstring pl_hs) := { hs:=pl_hs }
+
+}//g_hexstring
+
+group g_charstring {
+
+  type record of charstring RoCS;  
+  //wrapper to test charstring in record:
+  type record RCS {
+    charstring cs optional
+  }
+
+  type record of RCS RoRCS;
+
+  template RCS t_rcs(template charstring pl_cs) := { cs:=pl_cs }
+
+}//g_charstring
+
+group g_universal_charstring {
+
+  type record of universal charstring RoUCS;  
+  //wrapper to test charstring in record:
+  type record RUCS {
+    universal charstring ucs optional
+  }
+
+  type record of RUCS RoRUCS;
+
+  template RUCS t_rucs(template universal charstring pl_ucs) := { ucs:=pl_ucs }
+
+}//g_charstring
+
+group g_record {
+
+  //REC
+  type record REC {
+    integer    i optional,
+    float      f optional,
+    charstring cs optional,
+    bitstring  bs optional
+  }
+  type record of REC RoREC;
+
+  type record RREC { REC rec optional };
+  
+  template RoREC t_rorec(template REC pl_rec) := { pl_rec }
+  template RREC t_rrec( template REC pl_rec) := { rec := pl_rec }
+  //REC2
+  type record REC2 {
+    boolean b optional,
+    charstring cs optional,
+    int_1_3    i optional
+  }
+  type record of REC2 RoREC2;
+
+  //record of boolean, octetstring, hexstring:
+  type record REC_BOH {
+    boolean     b optional,
+    octetstring o optional,
+    hexstring   h optional
+  }
+
+  type record REC_BAI3 {
+    boolean     b optional,
+    AI3         ai3 optional
+  }
+
+  template REC t_rec(template integer pl_i, template float pl_f, template charstring pl_cs, template bitstring pl_bs) := {
+    i:= pl_i,
+    f:= pl_f,
+    cs:=pl_cs,
+    bs:=pl_bs
+  }
+
+  
+}//g_record
+
+group g_recordof {
+  // see earlier: type record of integer RoI
+  type record of RoI RoRoI;
+  type record of RoB RoRoB;
+  //type record of float RoF;
+  type record of RoF RoRoF;
+
+}//g_recordof
+
+group g_array {
+  //array of boolean;
+  //array of integers;
+  type integer AI3[3];
+  type integer AI2x3[2][3];
+
+  type record of AI3 RoAI3;
+  type record of AI2x3 RoAI2x3;
+
+  type record RAI3 {
+    AI3 ai3 optional
+  }
+
+  type record of RAI3 RoRAI3;
+  template RAI3 t_rai3(template AI3 pl_ai3) := { ai3 := pl_ai3 };
+
+  //array of floats
+  //array of bitstrings
+  //array of octetstrings
+  //array of hexstrings
+  //array of charstrings
+  //array of records
+  //arrays of sets
+  //arrays of set of
+  //array of enum
+  //array of union
+  //array of anytype
+  //array of user type
+
+  //see also REC_BAI3
+}//g_array
+
+
+group g_set {
+
+  type set SET {
+    boolean    b  optional,
+    integer    i  optional,
+    float      f  optional,
+    bitstring  bs optional,
+    octetstring os optional,
+    hexstring  hs optional,
+    charstring cs optional    
+  }
+  type record of SET RoSET;
+  //template RoSET t_roset(template SET pl_set) := { pl_set };
+
+  type record RSET { SET s optional }
+  template RSET t_rset(template SET pl_set) := {s:= pl_set };
+  type record of RSET RoRSET;
+
+}//g_set
+
+group g_setof {
+  type set of charstring SoCS;
+  type record of SoCS RoSoCS;
+  type record RSoCS { SoCS s optional }
+  template RSoCS t_rsocs(template SoCS pl_s) := { s := pl_s } 
+  type record of RSoCS RoRSoCS
+
+}//g_setof
+
+group g_enumerated {
+  type enumerated MyEnum { first, second, third }
+
+  type record REnum { MyEnum e optional }
+  template REnum t_renum(template MyEnum pl_e) := { e := pl_e }
+}//g_enumerated
+
+group g_union {
+  type union U {
+    boolean    b,
+    integer    i,
+    float      f,
+    bitstring  bs,
+    octetstring os,
+    hexstring  hs,
+    charstring cs,
+    REC        r,
+    RoI        roi,
+    SET        s,
+    SoCS       socs,
+    MyEnum	   e,
+    U		   u
+  }
+
+  type record RU  { U u optional }
+  template RU t_ru(template U pl_u) := { u := pl_u }
+
+}//g_union
+
+group g_anytype {
+
+}//g_anytype
+
+}//module

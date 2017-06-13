@@ -1,0 +1,468 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txernested
+{
+modulepar boolean Txernested_verbose := false;
+#define verbose Txernested_verbose
+#include "../macros.ttcnin"
+
+external function flatten(inout universal charstring par) ;
+
+import from Asntypes all;
+import from AsnValues all;
+
+type set of record {
+  set {
+    integer ts1,
+    boolean ts2
+  } f1 optional,
+  deep f2
+} nestor; // TTCNv3 equivalent of Nestor
+
+//   SEQ    OF SET OF SEQ    OF SET OF SEQUENCE {
+type record of set of record of set of record  {
+  //   your CHOICE { only REAL } OPTIONAL
+  union { float only } your optional
+} deep
+
+/*
+  type record nested_inner {
+    set {
+      integer ts1,
+      boolean ts2
+    } f1 optional,
+    deep f2
+  } ;
+
+  const nested_inner ni := {
+    f1 := omit,
+    f2 := {{{{}}}}
+  }
+
+  const nested_inner eki_eki :=
+  {
+
+      { ts1 := 17, ts2 := true }
+    , {}
+  }
+  */
+const nestor n3 :=
+{
+  { omit, {} },
+  { omit, {{}} },
+  { omit, {{{}}} }
+}
+
+type component Tnested {}
+
+ DECLARE_XER_ENCODERS(nestor, nst);
+DECLARE_EXER_ENCODERS(nestor, nst)
+ DECLARE_XER_ENCODERS(Nestor, Nst);
+DECLARE_EXER_ENCODERS(Nestor, Nst)
+ DECLARE_XER_ENCODERS(NestorEx, Nstx);
+DECLARE_EXER_ENCODERS(NestorEx, Nstx)
+
+//const charstring oftype := "oftype";
+
+const deep d_empty := {{{{}}}}
+const Deep D_empty := {{{{}}}}
+const nestor  n_empty := {
+}
+const nestor n2 := {
+  { omit, {} }
+}
+const charstring s_empty := "<nestor/>\n\n";
+
+const charstring s_2 :=
+"<nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<f2/>\n" &
+"\t</SEQUENCE>\n" &
+"</nestor>\n\n";
+
+const charstring s_3 :=
+"<nestor>\n" &
+
+"\t<SEQUENCE>\n" &
+"\t\t<f2/>\n" &
+"\t</SEQUENCE>\n" &
+
+"\t<SEQUENCE>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF/>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+
+"\t<SEQUENCE>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF>\n" &
+"\t\t\t\t<SEQUENCE_OF/>\n" &
+"\t\t\t</SET_OF>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+
+"</nestor>\n\n";
+
+/////////////////////////////////////////////////////////////////////
+testcase encode_nest() runs on Tnested {
+  var universal charstring expected := s_empty;
+  CHECK_METHOD(bxer_enc_nst, n_empty, expected);
+  CHECK_METHOD(exer_enc_nst, n_empty, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_nst, n_empty, expected & lf);
+  
+  expected := s_2;
+  CHECK_METHOD(bxer_enc_nst, n2, expected);
+  CHECK_METHOD(exer_enc_nst, n2, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_nst, n2, expected & lf);
+  
+  expected := s_3;
+  CHECK_METHOD(bxer_enc_nst, n3, expected);
+  CHECK_METHOD(exer_enc_nst, n3, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_nst, n3, expected & lf);
+}
+
+testcase decode_nest() runs on Tnested {
+  var nestor expected;
+  
+  expected := n_empty;
+  CHECK_DECODE2(nst, s_empty, nestor, expected);
+  
+  expected := n2;
+  CHECK_DECODE2(nst, s_2, nestor, expected);
+  
+  expected := n3;
+  CHECK_DECODE2(nst, s_3, nestor, expected);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+const charstring nstr_nixtor :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>nixtor</name>\n" &
+"\t\t<f2/>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstr_nixtor2 :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>nixtor2</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF/>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstr_nixtor3 :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>nixtor3</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF>\n" &
+"\t\t\t\t<SEQUENCE_OF/>\n" &
+"\t\t\t</SET_OF>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstr_nixtor4 :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>nixtor4</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF>\n" &
+"\t\t\t\t<SEQUENCE_OF/>\n" &
+"\t\t\t</SET_OF>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstr_an3 :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>an3[0]</name>\n" &
+"\t\t<f2/>\n" &
+"\t</SEQUENCE>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>an3[1]</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF/>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>an3[2]</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF>\n" &
+"\t\t\t\t<SEQUENCE_OF/>\n" &
+"\t\t\t</SET_OF>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstr_nn :=
+"<Nestor>\n" &
+"\t<SEQUENCE>\n" &
+"\t\t<name>nn</name>\n" &
+"\t\t<f1>\n" &
+"\t\t\t<ts1>10</ts1>\n" &
+"\t\t\t<ts2><true/></ts2>\n" &
+"\t\t</f1>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<SET_OF>\n" &
+"\t\t\t\t<SEQUENCE_OF>\n" &
+"\t\t\t\t\t<SET_OF>\n" &
+"\t\t\t\t\t\t<SEQUENCE>\n" &
+"\t\t\t\t\t\t\t<your>\n" &
+"\t\t\t\t\t\t\t\t<only>5.000000</only>\n" &
+"\t\t\t\t\t\t\t</your>\n" &
+"\t\t\t\t\t\t</SEQUENCE>\n" &
+"\t\t\t\t\t</SET_OF>\n" &
+"\t\t\t\t</SEQUENCE_OF>\n" &
+"\t\t\t</SET_OF>\n" &
+"\t\t</f2>\n" &
+"\t</SEQUENCE>\n" &
+"</Nestor>\n\n";
+
+const charstring nstrx_nixtorex :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>nixtorex</name>\n" &
+"\t\t<f2/>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+const charstring nstrx_nixtor2ex :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>nixtor2ex</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o/>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+const charstring nstrx_nixtor3ex :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>nixtor3ex</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o>\n" &
+"\t\t\t\t<Deep3o/>\n" &
+"\t\t\t</Deep4o>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+const charstring nstrx_nixtor4ex :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>nixtor4ex</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o>\n" &
+"\t\t\t\t<Deep3o/>\n" &
+"\t\t\t</Deep4o>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+const charstring nstrx_an3ex :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>an3ex[0]</name>\n" &
+"\t\t<f2/>\n" &
+"\t</NestorSeq>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>an3ex[1]</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o/>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>an3ex[2]</name>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o>\n" &
+"\t\t\t\t<Deep3o/>\n" &
+"\t\t\t</Deep4o>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+const charstring nstrx_nnx :=
+"<NestorEx>\n" &
+"\t<NestorSeq>\n" &
+"\t\t<name>nnx</name>\n" &
+"\t\t<f1>\n" &
+"\t\t\t<ts1>10</ts1>\n" &
+"\t\t\t<ts2><true/></ts2>\n" &
+"\t\t</f1>\n" &
+"\t\t<f2>\n" &
+"\t\t\t<Deep4o>\n" &
+"\t\t\t\t<Deep3o>\n" &
+"\t\t\t\t\t<Deep2o>\n" &
+"\t\t\t\t\t\t<Deep1s>\n" &
+"\t\t\t\t\t\t\t<your>\n" &
+"\t\t\t\t\t\t\t\t<only>5.000000</only>\n" &
+"\t\t\t\t\t\t\t</your>\n" &
+"\t\t\t\t\t\t</Deep1s>\n" &
+"\t\t\t\t\t</Deep2o>\n" &
+"\t\t\t\t</Deep3o>\n" &
+"\t\t\t</Deep4o>\n" &
+"\t\t</f2>\n" &
+"\t</NestorSeq>\n" &
+"</NestorEx>\n\n";
+
+testcase encode_nest_asn() runs on Tnested
+{
+  var universal charstring expected;
+  
+  expected := nstr_nixtor;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.nixtor, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.nixtor, expected & lf);
+  
+  expected := nstr_nixtor2;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.nixtor2, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.nixtor2, expected & lf);
+  
+  expected := nstr_nixtor3;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.nixtor3, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.nixtor3, expected & lf);
+  
+  expected := nstr_nixtor4;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.nixtor4, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.nixtor4, expected & lf);
+  
+  expected := nstr_an3;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.an3, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.an3, expected & lf);
+  
+  expected := nstr_nn;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.nn, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.nn, expected & lf);
+  
+  expected := nstr_an3;
+  CHECK_METHOD(bxer_enc_Nst, AsnValues.an3, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nst, AsnValues.an3, expected & lf);
+  
+  /*******************************************************************/
+  
+  expected := nstrx_nixtorex;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.nixtorex, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.nixtorex, expected & lf);
+  
+  expected := nstrx_nixtor2ex;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.nixtor2ex, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.nixtor2ex, expected & lf);
+  
+  expected := nstrx_nixtor3ex;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.nixtor3ex, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.nixtor3ex, expected & lf);
+  
+  expected := nstrx_nixtor4ex;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.nixtor4ex, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.nixtor4ex, expected & lf);
+  
+  expected := nstrx_an3ex;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.an3ex, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.an3ex, expected & lf);
+  
+  expected := nstrx_nnx;
+  CHECK_METHOD(bxer_enc_Nstx, AsnValues.nnx, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_Nstx, AsnValues.nnx, expected & lf);
+  
+}
+
+/********* infinite recursion in record-of is OK *********/
+type record of Inf Inf;
+DECLARE_XER_ENCODERS(Inf, inf);
+DECLARE_EXER_ENCODERS(Inf, inf);
+
+const Inf empty  := {}
+const Inf level3 := {{{}}}
+
+const universal charstring str_empty := "<Inf/>\n\n";
+const universal charstring str3 :=
+"<Inf>\n" &
+"\t<Inf>\n" &
+"\t\t<Inf>\n" &
+"\t\t</Inf>\n" &
+"\t</Inf>\n" &
+"</Inf>\n\n";
+const universal charstring str3empty :=
+"<Inf>\n" &
+"\t<Inf>\n" &
+"\t\t<Inf/>\n" &
+"\t</Inf>\n" &
+"</Inf>\n\n";
+
+
+testcase encode_inf() runs on Tnested
+{
+  var universal charstring expected;
+
+  expected := str_empty;
+  CHECK_METHOD(bxer_enc_inf, empty, expected);
+  CHECK_METHOD(exer_enc_inf, empty, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_inf, empty, expected & lf);
+
+  expected := str3empty;
+  CHECK_METHOD(bxer_enc_inf, level3, expected);
+  CHECK_METHOD(exer_enc_inf, level3, expected);
+  flatten(expected);
+  CHECK_METHOD(cxer_enc_inf, level3, expected & lf);
+}
+
+testcase decode_inf() runs on Tnested
+{
+  CHECK_DECODE2(        inf, str_empty, Inf, empty);
+  CHECK_DECODE(exer_dec_inf, str_empty, Inf, empty);
+
+  CHECK_DECODE2(        inf, str3empty, Inf, level3);
+  CHECK_DECODE(exer_dec_inf, str3empty, Inf, level3);
+
+  // also check that non-empty element can be decoded
+  CHECK_DECODE2(        inf, str3     , Inf, level3);
+  CHECK_DECODE(exer_dec_inf, str3     , Inf, level3);
+}
+
+control {
+  execute(encode_nest());
+  execute(encode_nest_asn());
+  execute(decode_nest());
+
+  execute(encode_inf());
+  execute(decode_inf());
+}
+
+} // module
+with {
+  encode "XML";
+  extension "version R8N";
+}

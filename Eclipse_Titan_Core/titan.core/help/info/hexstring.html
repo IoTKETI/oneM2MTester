@@ -1,0 +1,170 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Csorba, Mate
+  Farkas, Laszlo
+  Forstner, Matyas
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>hexstring</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a alt="previous" href="hex2str.html"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="if.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>hexstring</h1>
+<hr align="left" width="75%">
+<p>The keyword <b><font face="Courier New">hexstring</font></b> denotes a basic string type whose distinguished values are the ordered sequences of&nbsp; of hexadecimal digits, each corresponding
+to an ordered sequence of four bits.</p>
+<ul>
+  <li>hexadecimal string values are written between <a href="#double_quotation"> single quotes and followed by the capital letter H.</a> (' 'H).</li>
+  <li>A hexadecimal string may be specified by its integer value using a <a href="#conversion">conversion function</a>.</li>
+  <li>The <a href="#relation">relational operators</a> equality (==) and non-equality (!=) can be used to compare values of two hexadecimal strings</li>
+  <li>The <a href="#shift">shift operators</a> perform the shift left (&lt;&lt;) and shift right (&gt;&gt;) operations.</li>
+  <li>The <a href="#rotate">rotate operators</a> perform the rotate left (&lt;@) and rotate right (@&gt;) operations.</li>
+  <li>The <a href="#concatenation"> concatenation operator</a> (&amp;) performs a simple concatenation from left to right.</li>
+  <li>Bitwise operators (<a href="and4b.html">and4b</a>, <a href="not4b.html">not4b</a>, <a href="or4b.html">or4b</a>, <a href="xor4b.html"
+    target="_blank">xor4b</a>) are used to manipulate bits in the string.</li>
+  <li>A <a href="#array"> single octet</a> may be accessed using an array-like syntax. The leftmost octet has the index zero.</li>
+  <li>The hexadecimal string may be <a href="#vacuum">empty</a>.</li>
+  <li>The length of the hexadecimal string can be constrained using the keyword <a href="length.html"><b><font face="Courier New" color="#003258" size="4">length</font></b></a>.</li>
+  <li>Another way to limit the permitted values of an hexadecimal string is <a href="#list">to list them</a>.</li>
+  <li>Predefined functions operating on hexadecimal strings:</li>
+  <ul>
+    <li><a href="#bit2hex">hex2oct</a> converts a hexadecimal string value to an octet string.</li>
+    <li><a href="#str2int">hex2int</a> converts a hexadecimal string to the equivalent integer.</li>
+    <li><a href="#str2oct">hex2bit</a> converts a hexadecimal string to a binary string.</li>
+    <li><a href="#bit2str">hex2str</a> displays a hexadecimal string as a character string.</li>
+    <li><a href="#lengthof">lengthof</a> returns an integer value indicating the number of octets in a string.</li>
+  </ul>
+</ul>
+<p>Related keyword:</p>
+<ul>
+  <li><a href="bit2hex.html"><b><font face="Courier New" color="#003258" size="4">bit2hex</font></b></a></li>
+  <li><a href="hex2bit.html"><b><font face="Courier New" color="#003258" size="4">hex2bit</font></b></a></li>
+  <li><a href="hex2int.html"><b><font face="Courier New" color="#003258" size="4">hex2int</font></b></a></li>
+  <li><a href="hex2oct.html"><b><font face="Courier New" color="#003258" size="4">hex2oct</font></b></a></li>
+  <li><a href="hex2str.html"><b><font face="Courier New" color="#003258" size="4">hex2str</font></b></a></li>
+  <li><a href="int2hex.html"><b><font face="Courier New" color="#003258" size="4">int2hex</font></b></a></li>
+  <li><a href="length.html"><b><font face="Courier New" color="#003258" size="4">length</font></b></a></li>
+  <li><a href="lengthof.html"><b><font face="Courier New" color="#003258" size="4">lengthof</font></b></a></li>
+  <li><a href="oct2hex.html"><b><font face="Courier New" color="#003258" size="4">oct2hex</font></b></a></li>
+  <li><a href="str2hex.html"><b><font face="Courier New" color="#003258" size="4">str2hex</font></b></a></li>
+  <li><a href="substr.html"><b><font face="Courier New" color="#003258" size="4">substr</font></b></a></li>
+  <li><a href="and4b.html"><b><font face="Courier New" color="#003258" size="4">and4bit</font></b></a></li>
+  <li><a href="not4b.html"><b><font face="Courier New" color="#003258" size="4">not4bit</font></b></a></li>
+  <li><a href="or4b.html"><b><font face="Courier New" color="#003258" size="4">or4bit</font></b></a></li>
+  <li><a href="xor4b.html"><b><font face="Courier New" color="#003258" size="4">xor4bit</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>hexstring</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<hr align="left" width="50%">
+<p><a name="double_quotation">Example 1</a>:
+<p><font face="Courier New">const hexstring c_elch := 'C'H;<br>
+</font>
+<p>The constant called c_elch contains the hexadecimal string C.</p>
+<hr align="left" width="50%">
+<p><a name="conversion">Example 2</a>:
+<p><font face="Courier New">const hexstring c_entiere := int2hex (64,3);<br>
+</font>
+<p>The constant c_entiere will contain the hexadecimal string 040 because the converted integer number (64 -&gt; 40) must be coded on 3 hexadecimal digits and therefore padded with a leading zero.</p>
+<hr align="left" width="50%">
+<p><a name="relation">Example 3</a>:
+<p><font face="Courier New">const boolean c_undanbedes := ( c_entiere == c_elch );<br>
+</font>
+<p>The constant c_undanbedes will have the value false, because two hexadecimal strings are not equal. The parentheses are optional.</p>
+<hr align="left" width="50%">
+<p><a name="concatenation">Example 4</a>:
+<p><font face="Courier New">const hexstring c_samman := c_entiere &amp; c_elch;<br>
+</font>
+<p>The constant c_samman will contain the hexadecimal string 040C&nbsp;</p>
+<hr align="left" width="50%">
+<p><a name="array">Example 5</a>:
+<p><font face="Courier New">const hexstring c_lakomec := c_entiere[1];<br>
+</font>
+<p>The constant called c_lakomec will contain the hexadecimal string 4.</p>
+<hr align="left" width="50%">
+<p><a name="vacuum">Example 6</a>:
+<p><font face="Courier New">const hexstring c_tomt := ''H;<br>
+</font>
+<p>The constant called c_tomt will be an empty string.</p>
+<hr align="left" width="50%">
+<p><a name="bit2hex">Example 7a</a>:
+<p><font face="Courier New">const octetstring c_kaprifol := hex2oct ('7AA'H);</font><br>
+<p>The constant called c_kaprifol will contain the octet string 07AA. The resulting octet string contains 0 as leftmost hex digit followed by the same sequence of hex digits as in the hexadecimal
+string because the number of the hexadecimal digits is odd.</p>
+<hr align="left" width="50%">
+<p><a name="str2int">Example 7b</a>:
+<p><font face="Courier New">const integer c_gondol := hex2int ('555'H);<br>
+</font>
+<p>The constant called c_gondol will have the integer value 1365. The result will be always positive.</p>
+<hr align="left" width="50%">
+<p><a name="str2oct">Example 7c</a>:
+<p><font face="Courier New">const bitstring c_perrongen := hex2bit ('A7'H);<br>
+</font>
+<p>The constant called c_perrongen will contain the bit string 10100111.</p>
+<hr align="left" width="50%">
+<p><a name="bit2str">Example 7d</a>:
+<p><font face="Courier New">const charstring c_snaella := hex2str ('BBC0530A0'H);<br>
+</font>
+<p>The constant called c_snaella will contain the string BBC0530A0 because the resulting character string has the same length as the hexadecimal string and contains only the characters '0' .. 'F'.</p>
+<hr align="left" width="50%">
+<p><a name="lengthof">Example 7e</a>:
+<p><font face="Courier New">const integer c_skynda := lengthof ('BBC0530A0'H);<br>
+</font>
+<p>The constant called c_skynda will have the value 9 corresponding to the number of octets in the string.</p>
+<hr align="left" width="50%">
+<p><a name="list">Example 8</a>:
+<p><font face="Courier New">var hexstring c_mot ('010'H,'77'H,'A55CC'H );<br>
+</font>
+<p>The variable called c_mot may hold the hexadecimal strings 010, 77 and A55CC only.</p>
+<hr align="left" width="50%">
+<p><a name="rotate">Example 9</a>:&nbsp;</p>
+<p><font face="Courier New">const hexstring c_koerhinta := '12345'H @&gt; 2;<br>
+</font>
+<p>The constant called c_koerhinta will hold the value '45123'H (the left operand rotated by two hexadecimal digits).&nbsp;</p>
+<hr align="left" width="50%">
+<p><a name="shift">Example 10</a>:</p>
+<p><font face="Courier New">const hexstring c_wet := '12345'H &gt;&gt; 2;&nbsp;<br>
+</font>
+<p>The constant called c_wet will hold the value '00123'H (the left operand shifted by two hexadecimal digits).</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p align="left"><a HREF="BNF.html#hexstringkeyword">BNF definition</a> of <font face="Courier New">hexstring</font><br>
+<a HREF="BNF.html#hexstringvalue">BNF definition</a> of hexstring value</p>
+</body>
+</html>

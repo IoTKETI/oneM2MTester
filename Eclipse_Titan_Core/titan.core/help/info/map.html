@@ -1,0 +1,98 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>map</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="log.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="match.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>map</h1>
+<hr align="left" width="75%">
+<p>The operation is used to map the ports of a test component to the ports of the test system interface.
+<ul>
+  <li>The operation directly maps one port to another with the <b><font face="Courier New">in</font></b> side mapped to the <b><font face="Courier New">out</font></b> side and vice versa.;</li>
+  <li>a port may be mapped to several ports (<b><font face="Courier New">map</font></b> used several times);</li>
+  <li>the messages (signatures) defined for both ports must match, i.e., the incoming port must be able to receive all outgoing messages from the mapped port;&nbsp;</li>
+  <li>one side of the connection must be the test system interface.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a></li>
+  <li><a href="mtc.html"><b><font face="Courier New" color="#003258" size="4">mtc</font></b></a></li>
+  <li><a href="self.html"><b><font face="Courier New" color="#003258" size="4">self</font></b></a></li>
+  <li><a href="system.html"><b><font face="Courier New" color="#003258" size="4">system</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>map (</b></font><i>component_reference</i><sub>A</sub><font face="Courier New" color="#003258" size="5"><b>:</b></font><i>port_reference</i><sub>A</sub><font
+      face="Courier New" color="#003258" size="5"><b> , </b></font><i>component_reference</i><sub>B</sub><font face="Courier New" color="#003258" size="5"><b>:</b></font><i>port_reference</i><sub>B</sub><font
+      face="Courier New" color="#003258" size="5"><b>);</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">map</font> </b>keyword introduces the port mapping. The indices A and B refer to the two sides of the mapping (one of them must be the
+  test system interface).</p>
+  </li>
+  <li>
+  <p><i>component_reference</i> is one of the following:</p>
+  <ul>
+    <li>a reference returned by the <a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a> operation,</li>
+    <li>the keyword <a href="self.html"><b><font face="Courier New" color="#003258" size="4">self</font></b></a> when referring to the component where <b><font
+      face="Courier New" color="#003258" size="4">map</font></b> is given,</li>
+    <li>the keyword <a href="system.html"><b><font face="Courier New" color="#003258" size="4">system</font></b></a> when referring to the test system interface,</li>
+    <li>the keyword <a href="mtc.html"><b><font face="Courier New" color="#003258" size="4">mtc</font></b></a> when referring to the main test component.<br>
+    &nbsp;</li>
+  </ul>
+  </li>
+  <li>
+  <p><i> port_reference</i> points out the port to be mapped.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>Example:
+<p><font face="Courier New">var Komp_CT vc_KompRef := Komp_CT.create;<br>
+map(vc_KompRef:Port11_PCO, system:Port2_PCO);</font>
+<p>The component of type Komp_CT is created in the first line.<br>
+In the second line, its reference (vc_KompRef) is used to point out the port on the side A of the mapping (vc_KompRef:Port11_PCO).<br>
+On the side B of the mapping is the port called Port3_PCO of the test system interface.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#mapstatement">BNF definition</a> of <font face="Courier New"> map</font></p>
+</body>
+</html>

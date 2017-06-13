@@ -1,0 +1,41 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module useunion_with_useunion_SE {	//^In TTCN-3 module `useunion_with_useunion_SE'://
+
+type union ce
+{
+  charstring s
+}
+with {
+  variant "useUnion";
+}
+
+// All the fields of this type are character-encodable.
+// However, the unions achieve this by forbidden methods.
+type union uu { //^In type definition//
+  union {       //^error: Alternative of a CHOICE/union with USE-UNION can not itself be a CHOICE/union with USE-UNION//
+    integer i
+  } alt1
+  , charstring h
+  , ce ie       //^error: Alternative of a CHOICE/union with USE-UNION can not itself be a CHOICE/union with USE-UNION//
+}
+with {
+  variant "useUnion";
+  variant (alt1) "useUnion";
+}
+  
+
+}
+with {
+  encode "XML";
+}

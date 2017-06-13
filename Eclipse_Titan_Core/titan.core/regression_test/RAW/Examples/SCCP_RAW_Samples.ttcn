@@ -1,0 +1,219 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Forstner, Matyas
+ *   Hanko, Matyas
+ *   Koppany, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *   Szalai, Gabor
+ *
+ ******************************************************************************/
+module SCCP_RAW_Samples
+{
+import from SCCP_typedefs all;
+//import from SCCP_EncDec all;
+
+// ------------- PDU_SCCP_Unitdata -----------------------
+
+const octetstring SCCPstr01 := '090003070B044301B0FE044340D8FE06000430040107'O;
+
+template PDU_SCCP SCCP01 := {unitdata := {
+    messageType := udt,
+    protClass := {
+        class := '0000'B,
+        messageHandling := '0000'B
+    },
+    pointer1 := 3,
+    pointer2 := 7,
+    pointer3 := 11,
+    calledPAddress := {
+        paramLength := 4,
+        addressIndicator := {
+            pointCodeIndic   := '1'B,
+            ssnIndicator     := '1'B,
+            globalTitleIndic := '0000'B,
+            routingIndicator := '1'B,
+            reserved         := '0'B
+        },
+        signPointCode := {
+	  present_ := {
+            reserved  := '00'B,
+            pointCode := '10110000000001'B
+	  }
+        },
+        subsystemNumber := {present_ := 254},
+        globalTitle := {gti0000 := {}}
+    },
+    callingPAddress := {
+        paramLength := 4,
+        addressIndicator :={
+            pointCodeIndic   := '1'B,
+            ssnIndicator     := '1'B,
+            globalTitleIndic := '0000'B,
+            routingIndicator := '1'B,
+            reserved         := '0'B
+        },
+        signPointCode := {
+	  present_ := {
+            reserved  := '01'B,
+            pointCode := '11011000000000'B
+	  }
+        },
+        subsystemNumber := {present_ := 254},
+        globalTitle := {gti0000 := {}}
+    },
+    data := {
+        paramLength := 6,
+        data := '000430040107'O
+    }
+
+}} // SCCP01 end
+
+// ------------- PDU_SCCP_ConnectionRequest -----------------------
+
+const octetstring SCCPstr02 :=
+ '01FF002B020206044340D8FE04044301B0FE0F290027100B030108010A0101120359188305080042F09900010001010001190005080062F2200050003200'O;
+
+template PDU_SCCP SCCP02 :=  {connrequest := {
+    messageType := cr,
+    sourceLocRef := 'FF002B'O,
+    protClass := {
+        class := '0010'B,
+        messageHandling := '0000'B
+    },
+    pointer1 := 2,
+    pointer2 := 6,
+    calledPAddress := {
+        paramLength := 4,
+        addressIndicator := {
+            pointCodeIndic   := '1'B,
+            ssnIndicator     := '1'B,
+            globalTitleIndic := '0000'B,
+            routingIndicator := '1'B,
+            reserved         := '0'B
+        },
+        signPointCode := {
+	  present_ := {
+            reserved  := '01'B,
+            pointCode := '11011000000000'B
+	  }
+        },
+        subsystemNumber := {present_ := 254},
+        globalTitle := {gti0000 := {}}
+    },
+    optionalPart := {
+      credit := omit,
+      callingPAddress := {
+          paramName := cgPA,
+          paramLength := 4,
+          addressIndicator :={
+            pointCodeIndic   := '1'B,
+            ssnIndicator     := '1'B,
+            globalTitleIndic := '0000'B,
+            routingIndicator := '1'B,
+            reserved         := '0'B
+          },
+          signPointCode := {
+	    present_ := {
+              reserved  := '00'B,
+              pointCode := '10110000000001'B
+	    }
+          },
+        subsystemNumber := {present_ := 254},
+        globalTitle := {gti0000 := {}}
+      },
+      data := {
+        paramName := datadd,
+        paramLength := 41,
+        data := '0027100B030108010A0101120359188305080042F09900010001010001190005080062F22000500032'O
+      },
+      hopCounter := omit,
+      importance := omit
+    },//optionalPart end
+    eop := { paramName := eop}
+
+}}//SCCP02 end
+
+// ------------- PDU_SCCP_ConnectionConfirm -----------------------
+
+const octetstring SCCPstr03 := '02FF002B000001020103044340D8FE00'O;
+
+template PDU_SCCP SCCP03 :=  {connconfirm := {
+    messageType := cc,
+    destLocRef  := 'FF002B'O,
+    sourceLocRef:= '000001'O,
+    protClass := {
+        class := '0010'B,
+        messageHandling := '0000'B
+    },
+    pointer1 := 1,
+    optionalPart := {
+        credit   := omit,
+        calledPAddress := {
+            paramName   := cdPA,
+            paramLength := 4,
+            addressIndicator :={
+                pointCodeIndic  := '1'B,
+                ssnIndicator    := '1'B,
+                globalTitleIndic:= '0000'B,
+                routingIndicator:= '1'B,
+                reserved        := '0'B
+            },
+            signPointCode := {
+	      present_ := {
+                reserved  := '01'B,
+                pointCode := '11011000000000'B
+              }
+	    },
+            subsystemNumber := {present_ := 254},
+            globalTitle := {gti0000 := {}}
+        },
+        data := omit,
+        importance := omit
+    },
+    eop := { paramName := eop}
+}} //SCCP03 end
+
+// ------------- PDU_SCCP_DataForm1 ----------------------------
+
+const octetstring SCCPstr04 := '06FF002B000106000416040122'O;
+
+template PDU_SCCP SCCP04 :=  { dataform1 := {
+    messageType := dt1,
+    destLocRef  := 'FF002B'O,
+    segmentingReassembl :={
+        more    := '0'B,
+        reserved:= '0000000'B
+    },
+    pointer1 := 1,
+    data := {
+        paramLength := 6,
+        data := '000416040122'O
+    }
+}}//SCCP04 end
+
+// ------------- PDU_SCCP_Released ----------------------------
+
+const octetstring SCCPstr05 := '04000001FF002B0000'O;
+
+template PDU_SCCP SCCP05 :=  { released := {
+    messageType  := rlsd,
+    destLocRef   := '000001'O,
+    sourceLocRef := 'FF002B'O,
+    releaseCause := 0,
+    pointer1     := 0,
+    optionalPart := {
+        data := omit,
+        importance := omit
+    },
+    eop := omit
+}}//SCCP05 end
+
+}

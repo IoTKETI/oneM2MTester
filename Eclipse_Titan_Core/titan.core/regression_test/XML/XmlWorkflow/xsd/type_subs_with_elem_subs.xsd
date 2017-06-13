@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="www.example.org/type/subs/with/elem/subs"
+  xmlns="www.example.org/type/subs/with/elem/subs"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+
+  <!-- Root element -->
+<xsd:element name="Submit" type="SubmitRequestType" />
+
+<xsd:complexType name="requestGroup">
+	<xsd:sequence>
+		<xsd:element ref="request"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="SubmitRequestType">
+	<xsd:sequence>
+		<xsd:element name="name" type="xsd:string" />
+		<xsd:element name="request1" type="requestAbstractType" />
+		<xsd:element name="request2" type="requestAbstractType" />
+	</xsd:sequence>
+</xsd:complexType>
+
+
+  <!-- The generic abstract type -->
+<xsd:element name="request" type="requestAbstractType" abstract="true" />
+
+<xsd:complexType name="requestAbstractType" abstract="true">
+	<xsd:sequence>
+		<xsd:element name="commonName" type="xsd:string" />
+	</xsd:sequence>
+</xsd:complexType>
+
+  <!-- Production implementation -->
+<xsd:element name="productionRequest" type="myProductionRequestType" substitutionGroup="request" />
+
+<xsd:complexType name="myProductionRequestType">
+	<xsd:complexContent>
+		<xsd:extension base="requestAbstractType">
+			<xsd:sequence>
+				<xsd:element name="productionName" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+  <!-- Production implementation -->
+<xsd:element name="programmingRequest" type="myProgrammingRequestType" substitutionGroup="request" />
+
+<xsd:complexType name="myProgrammingRequestType">
+	<xsd:complexContent>
+		<xsd:extension base="requestAbstractType">
+			<xsd:sequence>
+				<xsd:element name="programmingName" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+</xsd:schema>
+

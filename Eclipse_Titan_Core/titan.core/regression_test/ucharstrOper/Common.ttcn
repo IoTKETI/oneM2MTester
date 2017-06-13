@@ -1,0 +1,250 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+// This module contain the common constants, types and functions for testing the following functions:
+// oct2unichar
+// unichar2oct
+// get_stringencoding
+module Common {
+
+const octetstring c_BOM_UTF8    :='EFBBBF'O; 
+const octetstring c_BOM_UTF16BE :='FEFF'O
+const octetstring c_BOM_UTF16LE :='FFFE'O
+const octetstring c_BOM_UTF32BE :='0000FEFF'O;
+const octetstring c_BOM_UTF32LE :='FFFE0000'O;
+const universal charstring c_arvizturo := char(0,0,0,193)&"rv"&char(0,0,0,237)&"zt"&char(0,0,1,113)&"r"&char(0,0,1,81) & " t" & char(0,0,0,252)&"k"&char(0,0,0,246)&"rf"&char(0,0,0,250)&"r"&char(0,0,0,243)&"g"&char(0,0,0,233)&"p";
+
+type component MTC {}
+
+type record of universal charstring RoUCS;
+type record of octetstring RoOS;
+
+function f_check_string_encoding( in octetstring os, in charstring  expectedEncoding) {
+  var charstring c := get_stringencoding(os);
+  log(c);
+  if( c == expectedEncoding ) {
+    setverdict(pass,"encoding type ok");
+  } else {
+    setverdict(fail,"encoding type nok, expected: " & expectedEncoding & " got: " & c );
+  }  
+}
+
+
+function f_oct2unichar_positivetest(
+  in octetstring inputOs,
+  in charstring encType,
+  in universal charstring expectedUCS,
+  in charstring expectedEncType,
+  in octetstring expectedOs :=''O
+) {
+  var universal charstring u;
+  @try{
+    u := oct2unichar( inputOs, encType );
+    log("Unicode result:",u);
+    if(match(u,expectedUCS)) {
+      setverdict(pass,"oct2unichar() conversion is the expected");
+    } else {
+      setverdict(fail,"unmatched :", match(u,expectedUCS)); 
+    }
+  }
+  @catch(err_str) {    
+    //setverdict(fail,"oct2unichar(",inputOs , ", ", encType ," ) unexpectedly failed:" , err_str );
+    setverdict(fail,err_str);
+  }
+
+  //f_check_string_encoding(inputOs,expectedEncType);
+
+  if(expectedOs == ''O)
+  {
+    expectedOs:=inputOs;
+  }
+  if( unichar2oct( u, encType ) == expectedOs){
+    setverdict(pass, "converting back to octetstring is ok")
+  }  else {
+    setverdict(fail,"converting back to octetstring is nok, expected:", expectedOs, " got: ",  unichar2oct( u, encType ) );
+  }  
+
+}
+
+function f_oct2unichar_negativetest(
+  in octetstring inputOs,
+  in charstring encType,
+  in charstring expectedErrorMsg
+) {
+  var universal charstring u;
+  @try{
+    u := oct2unichar( inputOs, encType );
+    setverdict(fail,"Error was expected")
+  }
+  @catch(err_str) {
+    var template charstring expectedErrorTempl := pattern "*{expectedErrorMsg}";
+    log("oct2unichar(",inputOs,", """,encType," "") failed as expected:", err_str);    
+    if( match(err_str, expectedErrorTempl) ) {
+      setverdict(pass, "error message is the expected: >>" & err_str & "<<")
+    } else {
+      setverdict(fail,"error message is not the expected. Expected: >>"& expectedErrorMsg & "<< got: >>" & err_str &"<<");
+    }
+  } 
+
+}
+
+
+
+
+//changes the content of elements i,i+1
+//for utf16
+function f_changeOrder(inout octetstring o) return boolean {
+  var integer len := lengthof(o);
+  log("Octetstring to be changed:",o);
+  var octetstring temp;
+  if((len mod 2)!=0 ) {
+    return false;
+  }
+
+  for(var integer i:=0; i<len; i:=i+2) {
+    temp:=o[i];
+    o[i]:=o[i+1];
+    o[i+1]:=temp;
+  }
+  log("Changed octetstring:", o);
+  return true;
+}
+
+function f_changeOrderUTF32(inout octetstring o) return boolean {
+  var integer len := lengthof(o);
+  log( "Octetstring to be changed:", o);
+  var octetstring temp1, temp2, temp3, temp4;
+  if((len mod 4)!=0 ) {
+    return false;
+  }
+  for(var integer i:=0; i<len; i:=i+4) {
+    temp1:=o[i];
+    temp2:=o[i+1]
+    temp3:=o[i+2]
+    temp4:=o[i+3]
+    o[i]:=temp4;
+    o[i+1]:=temp3;
+    o[i+2]:=temp2;
+    o[i+3]:=temp1;
+  }
+  log("Changed octetstring:", o);
+  return true;
+}
+
+
+//*****************************************************
+
+function f_unichar2octAndReverse(
+  in universal charstring u,
+  in charstring encodingType) {
+
+  log("unichar2oct( ", u,", ",encodingType,"):")
+  var octetstring o := unichar2oct( u, encodingType );
+  log(u);
+  var universal charstring u2 := oct2unichar(o,encodingType);
+  if( u== u2) {
+    setverdict(pass, "successful conversion");
+  } else {
+    setverdict(fail, "unsuccessful concersion, the original UCS was:", u, " the encoding and decoding result was: ", u2);
+  }
+
+}
+
+//*****************************************************
+// unichar2oct checking functions 
+//*****************************************************
+
+//works if <
+function f_charstring2utf16BE(in charstring cs) return octetstring {
+  var octetstring os := c_BOM_UTF16BE;
+  var integer len := lengthof(cs)
+  for(var integer i :=0;i< len;i:=i+1){
+    os := os & '00'O & char2oct(cs[i]);
+  } 
+  return os;
+}
+
+//works if <256*256
+function f_ucharstring2utf16BE(in universal charstring cs) return octetstring {
+  var octetstring os := c_BOM_UTF16BE;
+  var integer len := lengthof(cs)
+  for(var integer i :=0;i< len;i:=i+1){
+    //os := os & '00'O & char2oct(cs[i]);
+    os := os & int2oct(unichar2int(cs[i]),2);
+  } 
+  return os;
+}
+
+
+function f_charstring2utf32BE(in charstring cs) return octetstring {
+  var octetstring os := c_BOM_UTF32BE;
+  var integer len := lengthof(cs)
+  for(var integer i :=0;i< len;i:=i+1){
+    os := os & '000000'O & char2oct(cs[i]);
+  } 
+  return os;
+}
+
+function f_ucharstring2utf32BE(in universal charstring cs) return octetstring {
+  var octetstring os := c_BOM_UTF32BE;
+  var integer len := lengthof(cs)
+  for(var integer i :=0;i< len;i:=i+1){
+    //os := os & '000000'O & char2oct(cs[i]);
+    os := os & int2oct(unichar2int(cs[i]),4);
+  } 
+  return os;
+}
+
+function f_unichar2oct_positivetest(
+  in universal charstring u,
+  in charstring encodingType,
+  in octetstring expectedResult) { 
+  log("unichar2oct( ", u,", ",encodingType,"):")
+  @try {
+    var octetstring o := unichar2oct( u, encodingType );
+    if(o==expectedResult){
+      setverdict(pass)
+    } else {
+      setverdict(fail, "expected result:", expectedResult, " received result:", o)
+    }
+  }
+  @catch(err_str) { 
+    setverdict(fail, "unichar2oct failed unexpectedly");
+  }
+}
+
+function f_unichar2oct_negativetest(
+  in universal charstring u,
+  in charstring encodingType,
+  in charstring expectedError) { 
+  log("unichar2oct( ", u,", ",encodingType,"):")
+  @try {
+    var octetstring o := unichar2oct( u, encodingType );
+  }
+  @catch(err_str) {
+    if(expectedError == "") 
+    {
+      setverdict(pass, "expected error, error message not checked:",err_str)
+    } else {
+      var template charstring expectedErrorTempl := pattern "*{expectedError}";
+      if(match(err_str, expectedErrorTempl)) {
+        setverdict(pass, "unichar2oct() failed as expected with msg: ", err_str)
+      } else {
+        setverdict(fail,"unichar2oct() failed as expected but with wrong msg: ", err_str)
+      }
+    }
+  }
+
+}
+
+
+}

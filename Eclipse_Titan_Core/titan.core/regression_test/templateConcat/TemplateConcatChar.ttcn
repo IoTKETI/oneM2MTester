@@ -1,0 +1,176 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating charstring templates
+module TemplateConcatChar {
+
+import from Types all;
+
+const charstring c_char := "abc";
+
+template charstring t_char := "def";
+
+template charstring t_char1 := "abc" & "def";
+template charstring t_char1_exp := "abcdef";
+
+template charstring t_char2 := c_char & "def";
+template charstring t_char2_exp := "abcdef";
+
+template charstring t_char3 := t_char & "ghi";
+template charstring t_char3_exp := "defghi";
+
+template charstring t_char4 := "xx" & t_char & "xx";
+template charstring t_char4_exp := "xxdefxx";
+
+
+testcase tc_char_t_values() runs on CT {
+  if (log2str(t_char1) != log2str(t_char1_exp)) {
+    setverdict(fail, "Expected: ", t_char1_exp, ", got: ", t_char1);
+  }
+  else if (log2str(t_char2) != log2str(t_char2_exp)) {
+    setverdict(fail, "Expected: ", t_char2_exp, ", got: ", t_char2);
+  }
+  else if (log2str(t_char3) != log2str(t_char3_exp)) {
+    setverdict(fail, "Expected: ", t_char3_exp, ", got: ", t_char3);
+  }
+  else if (log2str(t_char4) != log2str(t_char4_exp)) {
+    setverdict(fail, "Expected: ", t_char4_exp, ", got: ", t_char4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_char_vt_values() runs on CT {
+  var template charstring vt_char1 := "abc" & "def";
+  var template charstring vt_char1_exp := "abcdef";
+
+  var template charstring vt_char2 := c_char & "def";
+  var template charstring vt_char2_exp := "abcdef";
+
+  var template charstring vt_char3 := t_char & "ghi";
+  var template charstring vt_char3_exp := "defghi";
+
+  var template charstring vt_char4 := "xx" & t_char & "xx";
+  var template charstring vt_char4_exp := "xxdefxx";
+  
+  if (log2str(vt_char1) != log2str(vt_char1_exp)) {
+    setverdict(fail, "Expected: ", vt_char1_exp, ", got: ", vt_char1);
+  }
+  else if (log2str(vt_char2) != log2str(vt_char2_exp)) {
+    setverdict(fail, "Expected: ", vt_char2_exp, ", got: ", vt_char2);
+  }
+  else if (log2str(vt_char3) != log2str(vt_char3_exp)) {
+    setverdict(fail, "Expected: ", vt_char3_exp, ", got: ", vt_char3);
+  }
+  else if (log2str(vt_char4) != log2str(vt_char4_exp)) {
+    setverdict(fail, "Expected: ", vt_char4_exp, ", got: ", vt_char4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_char_vt_w_str_elem() runs on CT {
+  var charstring v_char := "xyz";
+
+  var template charstring vt_char1 := t_char & v_char[2];
+  var template charstring vt_char1_exp := "defz";
+  
+  var template charstring vt_char2 := v_char[2] & t_char;
+  var template charstring vt_char2_exp := "zdef";
+  
+  var template charstring vt_char3 := "abc" & v_char[1];
+  var template charstring vt_char3_exp := "abcy"
+  
+  var template charstring vt_char4 := v_char[1] & "abc";
+  var template charstring vt_char4_exp := "yabc";
+  
+  if (log2str(vt_char1) != log2str(vt_char1_exp)) {
+    setverdict(fail, "Expected: ", vt_char1_exp, ", got: ", vt_char1);
+  }
+  else if (log2str(vt_char2) != log2str(vt_char2_exp)) {
+    setverdict(fail, "Expected: ", vt_char2_exp, ", got: ", vt_char2);
+  }
+  else if (log2str(vt_char3) != log2str(vt_char3_exp)) {
+    setverdict(fail, "Expected: ", vt_char3_exp, ", got: ", vt_char3);
+  }
+  else if (log2str(vt_char4) != log2str(vt_char4_exp)) {
+    setverdict(fail, "Expected: ", vt_char4_exp, ", got: ", vt_char4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_char_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, omit, omit, "aeiou", omit, omit, omit };
+
+  var template charstring vt_char1 := t_char & v_rec.cs;
+  var template charstring vt_char1_exp := "defaeiou";
+  
+  var template charstring vt_char2 := v_rec.cs & t_char;
+  var template charstring vt_char2_exp := "aeioudef";
+  
+  var template charstring vt_char3 := "xx" & v_rec.cs;
+  var template charstring vt_char3_exp := "xxaeiou";
+  
+  var template charstring vt_char4 := v_rec.cs & "xx";
+  var template charstring vt_char4_exp := "aeiouxx";
+  
+  if (log2str(vt_char1) != log2str(vt_char1_exp)) {
+    setverdict(fail, "Expected: ", vt_char1_exp, ", got: ", vt_char1);
+  }
+  else if (log2str(vt_char2) != log2str(vt_char2_exp)) {
+    setverdict(fail, "Expected: ", vt_char2_exp, ", got: ", vt_char2);
+  }
+  else if (log2str(vt_char3) != log2str(vt_char3_exp)) {
+    setverdict(fail, "Expected: ", vt_char3_exp, ", got: ", vt_char3);
+  }
+  else if (log2str(vt_char4) != log2str(vt_char4_exp)) {
+    setverdict(fail, "Expected: ", vt_char4_exp, ", got: ", vt_char4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_char_vt_extra() runs on CT {
+  var charstring v_char := "xyz";
+  var Rec v_rec := { omit, omit, omit, "aeiou", omit, omit, omit };
+
+  var template charstring vt_char1 := v_char[0] & v_rec.cs;
+  var template charstring vt_char1_exp := "xaeiou";
+  
+  var template charstring vt_char2 := v_rec.cs & v_char[0];
+  var template charstring vt_char2_exp := "aeioux";
+  
+  if (log2str(vt_char1) != log2str(vt_char1_exp)) {
+    setverdict(fail, "Expected: ", vt_char1_exp, ", got: ", vt_char1);
+  }
+  else if (log2str(vt_char2) != log2str(vt_char2_exp)) {
+    setverdict(fail, "Expected: ", vt_char2_exp, ", got: ", vt_char2);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_char_t_values());
+  execute(tc_char_vt_values());
+  execute(tc_char_vt_w_str_elem());
+  execute(tc_char_vt_w_opt_fields());
+  execute(tc_char_vt_extra());
+}
+
+}

@@ -1,0 +1,1422 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Beres, Szabolcs
+ *   Godar, Marton
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module TrecofOper {
+// ********** Type definitions  *********************
+type component recofOper_mycomp {};
+type enumerated recofOper_myenum {xx1,xx2,xx3};
+type record recofOper_trecord {
+	integer x1 optional,
+	float x2 };
+type record of octetstring recofOper_trecof;
+type set recofOper_tset {
+	integer x1,
+	float x2 optional };
+type set of charstring recofOper_tsetof;
+type union recofOper_tunion {
+	integer x1,
+	float x2 };
+type record of integer recofOper_myrecof1; 	// record of basic types
+type record of recofOper_myenum recofOper_myrecof2; // record of enum
+type record of recofOper_trecord recofOper_myrecof3;  // record of record
+type record of recofOper_trecof recofOper_myrecof4; // record of record of
+type record of recofOper_tset recofOper_myrecof5;  // record of set
+type record of recofOper_tsetof recofOper_myrecof6; // record of set of
+type record of recofOper_tunion recofOper_myrecof7; // record of union
+type record length (3)
+  of record length (3)
+  of record length (3) of integer threeD;
+// *************** Constanst ***********************
+const recofOper_trecord recofOper_temp1:={ x1:=omit, x2:=3.4 };
+const recofOper_trecof recofOper_temp2:={ 'AF12'O };
+const recofOper_tset recofOper_temp3:={ x1:=234, x2:=1.9};
+const recofOper_tsetof recofOper_temp4:={"f","8"};
+const recofOper_tunion recofOper_temp5:={ x2:=1.3 };
+const recofOper_myrecof1 recofOper_const1:={ 1,2 }	//record of basic types
+const recofOper_myrecof2 recofOper_const2:={ xx2, xx1 }
+const recofOper_myrecof3 recofOper_const4:={   //record of record
+  { x1:=1, x2:=1.2 },recofOper_temp1 };
+const recofOper_myrecof4 recofOper_const6:={   //record of record of
+ { '12AB'O, 'CD12'O },  recofOper_temp2 };
+const recofOper_myrecof5 recofOper_const8:={   //record of set
+ { x1:=2, x2:=1.3}, recofOper_temp3 };
+const recofOper_myrecof6 recofOper_const10:={   //record of set of
+ {"a","b"}, recofOper_temp4 }; //{"f","8"},
+const recofOper_myrecof7 recofOper_const12:={   //record of union
+ { x1 :=3 }, recofOper_temp5  }; //{ x2:=1.3 }
+
+testcase recofAssign() runs on recofOper_mycomp{
+var recofOper_myrecof1 x1:={ 12,34} 	//record of basic types
+var recofOper_myrecof1 x2,x3,x4;
+x2:={ 32, 12 };
+x3:={12};
+x3:={23,21};
+x4:={};
+if (x1[0]==12) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[1]==34) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0]==32) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[1]==12) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[0]==23) {setverdict(pass);}	//later, change size
+     else {setverdict(fail);}
+if (x3[1]==21) {setverdict(pass);}
+     else {setverdict(fail);}
+//if (x4=={}) {setverdict(pass);}	//empty record of
+//     else {setverdict(fail);}
+}
+
+testcase recofReAssign() runs on recofOper_mycomp
+{
+  var recofOper_myrecof1 x := { 1, 2, 3, 4 };
+  // assigning a new value that is shorter than the previous
+  x := { -, 5, - };
+  if (sizeof(x) == 3) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (x[0] == 1) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (x[1] == 5) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (x[2] == 3) { setverdict(pass); }
+  else { setverdict(fail); }
+  x := { 6 };
+  if (sizeof(x) == 1) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (x[0] == 6) { setverdict(pass); }
+  x := { };
+  if (sizeof(x) == 0) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase recofAssignEnum() runs on recofOper_mycomp{
+var recofOper_myrecof2 x1:={ xx2 }	//record of enum
+var recofOper_myrecof2 x2;
+x2:={xx2,xx1};
+//at declaration
+if (x1[0]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+//later
+if (x2[0]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1]==xx1) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignRec() runs on recofOper_mycomp{
+var recofOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var recofOper_myrecof3 x1:={   //record of record
+ { x1:=1, x2:=1.2 }, temp1 };
+var recofOper_myrecof3 x2;
+x2:={ { x1:=1, x2:=1.2 }, temp1 };
+if (x1[0].x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignRecof() runs on recofOper_mycomp{
+var recofOper_trecof temp2:={'AF12'O};
+var recofOper_myrecof4 x1:={   //record of record of
+ { '12AB'O, 'CD12'O }, temp2 };
+var recofOper_myrecof4 x2;
+x2:={ { '12AB'O, 'CD12'O }, temp2 };
+if (x1[0][0]=='12AB'O) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=='12AB'O) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=='AF12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignSet() runs on recofOper_mycomp{
+var recofOper_tset temp1:={ x1:=2, x2:=omit };
+var recofOper_myrecof5 x1:={   //record of set
+ { x1:=1, x2:=1.2 }, temp1 };
+var recofOper_myrecof5 x2;
+x2:={ { x1:=1, x2:=1.2 }, temp1 };
+if (x1[0].x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignSetof() runs on recofOper_mycomp{
+var recofOper_tsetof temp2:={"a","7"};
+var recofOper_myrecof6 x1:={   //record of set of
+ { "1", "a" }, temp2 };
+var recofOper_myrecof6 x2;
+x2:={ { "1", "a" }, temp2 };
+if (x1[0][0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2[0][1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignUnion() runs on recofOper_mycomp{
+var recofOper_tunion temp5 := {x2:=1.3}
+var recofOper_myrecof7 x1:={   //record of union
+ { x1 :=3 }, temp5  }; //{ x2:=1.3
+var recofOper_myrecof7 x2;
+x2:={ { x1 :=3 }, temp5 }; //{ x2:=1.3 }
+if (x1[0].x1==3) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1]==temp5) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==3) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignElem() runs on recofOper_mycomp{
+var recofOper_myrecof1 x1,x2,x3,x4,x5;	//record of basic types
+x1:={ 3, 2 };
+x2:={ 1, 2 };
+x3:=x2;
+x4:=x2;
+x5:={2};
+x2[0]:=3;			//change element to value
+x3[0]:=x1[0];			//change element to element
+x4[2]:=2;			// add element
+x5[2]:=3;			// out of order
+if (x1[1]==2) {setverdict(pass);}	//accessing individual element
+     else {setverdict(fail);}
+if (x2[0]==3) {setverdict(pass);}	// change element to value
+     else {setverdict(fail);}
+if (x2[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[0]==3) {setverdict(pass);}	// change element to element
+     else {setverdict(fail);}
+if (x3[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x4[0]==1) {setverdict(pass);}	// add element
+     else {setverdict(fail);}
+if (x4[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x4[2]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x5[2]==3) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+}
+
+testcase recofAssignElemEnum() runs on recofOper_mycomp{
+var recofOper_myrecof2 x1, x2,x3;	//record of enumerated
+x1:={ xx1, xx2 };
+x2:={xx1, xx2};
+x3:={};
+x1[0]:=xx3;			//change element
+x2[2]:=xx3;			// add element
+x3[2]:=xx3;			// out of order
+if (x1[0]==xx3) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[1]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0]==xx1) {setverdict(pass);}	// add element
+     else {setverdict(fail);}
+if (x2[1]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2]==xx3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2]==xx3) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+}
+
+testcase recofAssignElemRec() runs on recofOper_mycomp{
+//var recofOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var recofOper_myrecof3 x1,x2,x3; 	//record of record
+x1:={   { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x2:=x1;
+x1[0].x1:=2;
+//temp1.x1:=3;
+x1[1].x1:=3;
+x2[2]:= {x1:=2, x2:=1.3};		// add element
+x3[1]:= {x1:=2, x2:=1.3};		//out of order
+if (x1[0].x1==2) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x1==3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//add element
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[1].x1==2) {setverdict(pass);}	   // out of order
+     else {setverdict(fail);}
+if (x3[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase recofAssignElemRecof() runs on recofOper_mycomp{
+var recofOper_myrecof4 x1,x2,x3;		 //record of record of
+x1:={  { '12AB'O, 'CD12'O }, { 'ABCD'O } };
+x2:=x1;
+x1[0][1]:='34AB'O;		//change element
+x2[2]:={ '1234'O};		//add element
+x3[2]:={'12CD'O};		//out of order
+if (x1[0][0]=='12AB'O) {setverdict(pass);}	// change element
+     else {setverdict(fail);}
+if (x1[0][1]=='34AB'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][0]=='ABCD'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=='12AB'O) {setverdict(pass);}	// add element
+     else {setverdict(fail);}
+if (x2[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][0]=='ABCD'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2][0]=='1234'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2][0]=='12CD'O) {setverdict(pass);}	//out of order
+     else {setverdict(fail);}}
+
+testcase recofAssignElemSet() runs on recofOper_mycomp{
+var recofOper_myrecof5 x1,x2,x3    	//record of set
+x1:={ { x1:=1, x2:=1.2 }, { x1:=2, x2:=omit }};
+x2:={ { x1:=1, x2:=1.2 }, { x1:=2, x2:=omit }};
+x1[0].x2:=3.4;				//change element
+x2[2]:={  x1:=2, x2:=1.3 };		// add element
+x3[2]:={  x1:=2, x2:=1.3 };		// out of order
+if (x1[0].x1==1) {setverdict(pass);}	//change element
+     else {setverdict(fail);}
+if (x1[0].x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x1[1].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==1) {setverdict(pass);}	//add element
+     else {setverdict(fail);}
+if (x2[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ispresent(x2[1].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x1==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2].x1==2) {setverdict(pass);}	//out of order
+     else {setverdict(fail);}
+if (x3[2].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofAssignElemSetof() runs on recofOper_mycomp{
+var recofOper_tsetof temp2:={"a","7"};
+var recofOper_myrecof6 x1,x2,x3;   //record of set of
+x1:={ { "1" }, {"a","7"}};
+x2:={ { "1" }, {"a","7"}};
+x1[0][0]:="h";			// change element
+x2[2]:={"2"};			//add element
+x3[2]:={"2"};			//out of order
+if (x1[0][0]=="h") {setverdict(pass);}	  //change element
+     else {setverdict(fail);}
+if (x1[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0][0]=="1") {setverdict(pass);}	  //add element
+     else {setverdict(fail);}
+if (x2[1][0]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1][1]=="7") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2][0]=="2") {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2][0]=="2") {setverdict(pass);}		// out of order
+     else {setverdict(fail);}
+}
+
+testcase recofAssignElemUnion() runs on recofOper_mycomp{
+var recofOper_tunion temp5 := {x2:=1.3}
+var recofOper_myrecof7 x1,x2,x3;   //record of union
+x1:={ {x1 :=3 }, {x2:=1.3} };
+x2:={ {x1 :=3 }, {x2:=1.3} };
+x1[0].x2:=3.4;				//change element
+x2[2]:={ x2:=1.4}; 			// add element
+x3[2]:={ x2:=1.4}; 			// out of order
+if (x1[0].x2==3.4) {setverdict(pass);}		//change element
+     else {setverdict(fail);}
+if (ischosen(x1[0].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[0].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[0].x1==3) {setverdict(pass);}		//add element
+     else {setverdict(fail);}
+if (ischosen(x2[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2[2].x2==1.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2[2].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2[2].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x3[2].x2==1.4) {setverdict(pass);}		//out of order
+     else {setverdict(fail);}
+if (ischosen(x3[2].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x3[2].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConst() runs on recofOper_mycomp{
+const recofOper_myrecof1 const1:={1,2,3} //record of basic types
+if (recofOper_const1[0]==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const1[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[0]==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const1[1]==2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[2]==3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstEnum() runs on recofOper_mycomp{
+const recofOper_myrecof2 const1:={xx1,xx2,xx3} //record of enumerated
+if (recofOper_const2[0]==xx2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const2[1]==xx1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[0]==xx1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const1[1]==xx2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1[2]==xx3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstRec() runs on recofOper_mycomp{
+const recofOper_myrecof3 const4:={   //record of record
+ { x1:=1, x2:=1.2 }, recofOper_temp1 };
+if (recofOper_const4[0].x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const4[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (recofOper_const4[1]==recofOper_temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4[0].x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const4[0].x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4[1]==recofOper_temp1) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstRecof() runs on recofOper_mycomp{
+const recofOper_myrecof4 const6:={   //record of record of
+ { '12AB'O, 'CD12'O }, recofOper_temp2 };
+if (recofOper_const6[0][0]=='12AB'O) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const6[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (recofOper_const6[1]==recofOper_temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6[0][0]=='12AB'O) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const6[0][1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6[1]==recofOper_temp2) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstSet() runs on recofOper_mycomp{
+const recofOper_myrecof5 const8:={   //record of set
+ { x1:=2, x2:=1.3}, recofOper_temp3 };
+if (recofOper_const8[0].x1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const8[0].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (recofOper_const8[1]==recofOper_temp3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const8[0].x1==2) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const8[0].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const8[1]==recofOper_temp3) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstSetof() runs on recofOper_mycomp{
+const recofOper_myrecof6 const10:={   //record of set of
+ {"a","b"}, {"f","8"} };
+if (recofOper_const10[0][0]=="a") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (recofOper_const10[0][1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (recofOper_const10[1]==recofOper_temp4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[0][0]=="a") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const10[0][1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[1][0]=="f") {setverdict(pass);}
+     else {setverdict(fail);}
+if (const10[1][1]=="8") {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofConstUnion() runs on recofOper_mycomp{
+const recofOper_myrecof7 const12:={   //record of union
+ { x1 :=3 }, { x2:=1.3 } };
+if (recofOper_const12[0].x1==3) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(recofOper_const12[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(recofOper_const12[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (recofOper_const12[1]==recofOper_temp5) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const12[0].x1==3) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const12[0].x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12[0].x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const12[1].x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const12[1].x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const12[1].x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase recofComp() runs on recofOper_mycomp{
+var recofOper_myrecof1 x1,x2,x3,x4; //record of basic type
+x1:={ 1,2,3 };
+x2:={ 1,2,3 };
+x3:={ 1,2 };
+x4:={3,1,2};
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x4)) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x4) {setverdict(pass);}	// out of order
+     else {setverdict(fail);}
+}
+
+testcase recofCompEnum() runs on recofOper_mycomp{
+var recofOper_myrecof2 x1,x2,x3; 	// record of enumerated
+x1:={ xx1,xx2,xx3 };
+x2:={ xx1,xx2,xx3 };
+x3:={ xx1,xx2 };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofCompRec() runs on recofOper_mycomp{
+var recofOper_myrecof3 x1,x2,x3;	// record of record
+x1 :={ { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x2 :={ { x1:=1, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+x3 :={ { x1:=2, x2:=1.2 }, { x1:=omit, x2:=3.4 } };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase recofCompRecof() runs on recofOper_mycomp{
+var recofOper_myrecof4 x1,x2,x3; //record of record of
+x1:={ { '12AB'O, 'CD12'O }, {'AF12'O} };
+x2:={ { '12AB'O, 'CD12'O }, {'AF12'O} };
+x3:={ { '12AB'O  }, {'AF12'O} };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofCompSet() runs on recofOper_mycomp{
+var recofOper_tset temp1:={ x1:=2, x2:=omit };
+var recofOper_myrecof5 x1,x2,x3; //record of set
+x1:={ { x1:=1, x2:=1.2 }, temp1 };
+x2:={ { x2:=1.2, x1:=1 }, { x1:=2, x2:=omit }};
+x3:={ { x1:=1, x2:=1.2 } };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x2==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofCompSetof() runs on recofOper_mycomp{
+var recofOper_tsetof temp2:={"a","7"};
+var recofOper_myrecof6 x1,x2,x3;   //record of set of
+x1:={ { "1", "a" },  temp2 };
+x2:={ { "1", "a" }, {"a","7"} };
+x3:={ { "1", "a" } };
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x2==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofCompUnion() runs on recofOper_mycomp{
+var recofOper_tunion temp5 := {x2:=1.3}
+var recofOper_myrecof7 x1,x2,x3; //record of union
+x1:={ { x1 :=3 }, { x2:=1.3 } };
+x2:={ { x1 :=3 }, temp5 }; //{ x2:=1.3 }
+x3:={ { x2 :=3.9 },temp5 }; //{ x2:=1.3 }
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2!=x3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase recofEmpty() runs on recofOper_mycomp{
+  var recofOper_myrecof1 vl_list := {}
+  if (vl_list == {}) {setverdict(pass)}
+  else {setverdict(fail)}
+  if ({} == vl_list) {setverdict(pass)}
+  else {setverdict(fail)}
+}
+
+testcase recofListOperator() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1;
+  var recofOper_myrecof1 x2,x3,x4,x5,x6;
+  var recofOper_myrecof1 res1, res2, res3, res4;
+  x1:={1,2};
+  x2:={1,2};
+  x3:={1};
+  x4:={1};
+  x4[1]:=3;
+  x5:={};
+  x6[2]:=1;
+  res1 := x1 & x2;
+  res2 := x2 & x3;
+  res3 := x2 & x3 & x5;
+  res4 := x3 & x4;
+  if (res1 == {1,2,1,2}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (res2 == {1,2,1}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (res3 == {1,2,1}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (res4 == {1,1,3}) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase recofRotateOperators() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1:={1,2,3,4,5};
+  var recofOper_myrecof1 x2,x3,x4,x5,x6,x7;	//set of basic types
+  x2 := x1 <@ 1;
+  x3 := x1 <@ 10;
+  x4 := x1 <@ 3 <@ 2;
+  x5 := x1 @> 1;
+  x6 := x1 @> 10;
+  x7 := x1 @> 3 @> 2;
+  if (x2 == {2,3,4,5,1}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x3 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x4 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x5 == {5,1,2,3,4}) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x6 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if (x7 == x1) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase recofLengthof() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1:={1,2};
+  var recofOper_myrecof1 x2,x3,x4,x5,x6;	//record of basic types
+  x2:={ 1, 2 };
+  x3:={1};
+  x4:={1};
+  x3:={1,2};								//change size by assignment
+  x4[1]:=3;									//change size by adding element
+  x5:={};									//empty record of
+  x6[2]:=1;									//out of order
+  if (lengthof(x1)==2) {setverdict(pass);}	//assignment at declaration
+  else {setverdict(fail);}
+  if (lengthof(x2)==2) {setverdict(pass);}	//assignment later
+  else {setverdict(fail);}
+  if (lengthof(x3)==2) {setverdict(pass);}	//change size by assignment
+  else {setverdict(fail);}
+  if (lengthof(x4)==2) {setverdict(pass);}	//change size by adding element
+  else {setverdict(fail);}
+  if (lengthof(x5)==0) {setverdict(pass);}	//empty record of
+  else {setverdict(fail);}
+  if (lengthof(x6)==3) {setverdict(pass);}	//out of order
+  else {setverdict(fail);}
+}
+
+testcase recofSizeof() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1:={1,2};
+  var recofOper_myrecof1 x2,x3,x4,x5,x6;	//record of basic types
+  x2:={ 1, 2 };
+  x3:={1};
+  x4:={1};
+  x3:={1,2};		//change size by assignment
+  x4[1]:=3;		//change size by adding element
+  x5:={};			//empty record of
+  x6[2]:=1;		//out of order
+  if (sizeof(x1)==2) {setverdict(pass);}	//assignment at declaration
+  else {setverdict(fail);}
+  if (sizeof(x2)==2) {setverdict(pass);}	//assignment later
+  else {setverdict(fail);}
+  if (sizeof(x3)==2) {setverdict(pass);}	//change size by assignment
+  else {setverdict(fail);}
+  if (sizeof(x4)==2) {setverdict(pass);}	//change size by adding element
+  else {setverdict(fail);}
+  if (sizeof(x5)==0) {setverdict(pass);}	//empty record of
+  else {setverdict(fail);}
+  if (sizeof(x6)==3) {setverdict(pass);}	//out of order
+  else {setverdict(fail);}
+}
+
+testcase recofReplace() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1:={1,2,3,4,5};
+  var recofOper_myrecof1 a:={8,8,8};
+  var recofOper_myrecof1 x2;
+  x2 := replace(x1,2,3,a);
+  if (x2 == {1,2,8,8,8}) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+// TR: HS22809 - A null value is generated for empty constant arrays by the compiler,
+// this can make calling 'replace' ambiguous (since there's a 'replace' function generated for both the
+// array and its template.
+testcase recofReplaceEmpty() runs on recofOper_mycomp {
+  var recofOper_myrecof1 x1 := { 1, 2, 3 };
+  const recofOper_myrecof1 a := {};  
+  var recofOper_myrecof1 x2;
+  x2 := replace(x1, 0, 1, a);
+  if (x2 == { 2, 3 }) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase recofSubstr() runs on recofOper_mycomp{
+  var recofOper_myrecof1 x1:={1,2,3,4,5};
+  var recofOper_myrecof1 x2;
+  x2 := substr(x1,2,3);
+  if (x2 == {3,4,5}) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+type record intrec { recofOper_myrecof1 a }
+type record of intrec intreclist
+
+testcase recofIsvalue() runs on recofOper_mycomp{
+  var recofOper_myrecof1 v_def;
+  var recofOper_myrecof1 v_empty := {-,-,-,-,-,-,-,-,-,-};
+  var recofOper_myrecof1 v_full := {1,2,3,4,5,6,7,8,9,10}
+
+  if ( isvalue(v_def) ) { setverdict(fail); }else { setverdict(pass); };
+  if ( isvalue(v_empty) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(v_empty[1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(v_empty[0]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(v_full[1]) ) { setverdict(pass); } else { setverdict(fail); };
+
+  v_def[1] := 3;
+  if ( isvalue(v_def) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(v_def[1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(v_def[0]) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v_empty[0] := 17; // not empty anymore
+  if ( isvalue(v_empty[0]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(v_empty) ) { setverdict(fail); } else { setverdict(pass); };
+
+  template intreclist it1 := { { a := { 1, 2, 3 } } };
+  template intreclist it2 modifies it1 := { { a := { 1, 2, -, -, -, 100 } } };
+  template intrec itt1               := { a := { 1, 2, 3 } };
+  template intrec itt2 modifies itt1 := { a := { 1, 2, -, -, -, 100 } };
+  if (isvalue (it1)) {setverdict (pass);}
+  else {setverdict (fail);}
+
+  if (isvalue (it2)) { setverdict (fail);}
+  else { setverdict (pass);}
+
+  if (isvalue (itt1)) {setverdict (pass);}
+  else {setverdict ( fail );}
+
+  if (isvalue (itt2)) { setverdict (fail);}
+  else {setverdict (pass);}
+
+  const threeD d3 := {
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    },
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    },
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    }
+  }
+  var threeD nowhere := {
+  { {-,1,-},{-,1,-},{-,1,-} },
+  { {-,1,-},{-,-,-},{-,1,-} },
+  { {-,1,-},{-,1,-},{-,1,-} }
+
+  }
+  if ( isvalue(nowhere) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(nowhere[1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(nowhere[1][1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(nowhere[1][1][1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(d3) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(d3[0]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(d3[0][1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(d3[0][1][2]) ) { setverdict(pass); } else { setverdict(fail); };
+}
+
+testcase recofIsvalue2() runs on recofOper_mycomp{
+  var recofOper_myrecof1 v;
+  if ( isvalue(v) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v[3] := 3;
+  if ( isvalue(v) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v[2] := 2;
+  if ( isvalue(v) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v[1] := 1;
+  if ( isvalue(v) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v[0] := 0;
+  if ( isvalue(v) ) { setverdict(pass); } else { setverdict(fail); };
+
+  v[4] := 4;
+  if ( isvalue(v) ) { setverdict(pass); } else { setverdict(fail); };
+
+  v[6] := 6; // there is now a hole at 5
+  if ( isvalue(v) ) { setverdict(fail); } else { setverdict(pass); };
+}
+
+testcase recofIsbound() runs on recofOper_mycomp{
+  var recofOper_myrecof1 v_def;
+  var recofOper_myrecof1 v_empty := {-,-,-,-,-,-,-,-,-,-};
+  var recofOper_myrecof1 v_full := {1,2,3,4,5,6,7,8,9,10}
+
+  if ( isbound(v_def) ) { setverdict(fail); }else { setverdict(pass); };
+  if ( isbound(v_empty) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(v_empty[1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(v_empty[0]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(v_full[1]) ) { setverdict(pass); } else { setverdict(fail); };
+
+  v_def[1] := 3;
+  if ( isbound(v_def) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(v_def[1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(v_def[0]) ) { setverdict(fail); } else { setverdict(pass); };
+
+  v_empty[0] := 17; // not empty anymore
+  if ( isbound(v_empty[0]) ) { setverdict(pass); } else { setverdict(fail); };
+
+  template intreclist it1 := { { a := { 1, 2, 3 } } };
+  template intreclist it2 modifies it1 := { { a := { 1, 2, -, -, -, 100 } } };
+  template intrec itt1               := { a := { 1, 2, 3 } };
+  template intrec itt2 modifies itt1 := { a := { 1, 2, -, -, -, 100 } };
+  if (isbound (it1)) { setverdict(pass); } else { setverdict(fail); };
+  if (isbound (it2)) { setverdict(pass); } else { setverdict(fail); };
+  if (isbound (itt1)) { setverdict(pass); } else { setverdict(fail); };
+  if (isbound (itt2)) { setverdict(pass); } else { setverdict(fail); };
+
+  var  threeD d3_emtpy;
+  const threeD d3 := {
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    },
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    },
+    {
+        { 1,2,3 },
+        { 1,2,3 },
+        { 1,2,3 }
+    }
+  }
+  var threeD nowhere := {
+  { {-,1,-},{-,1,-},{-,1,-} },
+  { {-,1,-},{-,-,-},{-,1,-} },
+  { {-,1,-},{-,1,-},{-,1,-} }
+  }
+
+  if ( isbound(d3_emtpy) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(d3_emtpy[0]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(d3_emtpy[0][1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(d3_emtpy[0][1][2]) ) { setverdict(fail); } else { setverdict(pass); };
+  
+  if ( isbound(nowhere) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(nowhere[1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(nowhere[1][1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(nowhere[1][1][1]) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(d3) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(d3[0]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(d3[0][1]) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(d3[0][1][2]) ) { setverdict(pass); } else { setverdict(fail); };
+}
+
+testcase recofCompConst() runs on recofOper_mycomp{
+  const recofOper_myrecof1 c_r1 := { 1,2,3,4};
+  const recofOper_myrecof1 c_r2 := { 1,2,3,4};
+  const recofOper_myrecof1 c_r3 := { 4,3,2,1};
+  const recofOper_myrecof1 c_r4_ind := { [0] := 1, [1] := 2, [2] := 3, [3] := 4};
+  const recofOper_myrecof1 c_r5_ind := { [3] := 1, [1] := 2, [2] := 3, [0] := 4};
+  const recofOper_myrecof1 c_r6_ind := { [3] := 4, [1] := 2, [2] := 3, [0] := 1};  
+  const recofOper_myrecof1 c_r8_ind := { [0] := 1, [1] := 2, [2] := 3, [3] := 4};
+  
+  
+  var recofOper_myrecof1 vl_r7_ind := { [3] := 4, [1] := 2};
+
+  var recofOper_myrecof1 vl_r10 := { 1,2,3,4};
+  var recofOper_myrecof1 vl_r11 := { 1,2,3,4};
+  
+  if(c_r1 == c_r1) {setverdict(pass);}
+  else {setverdict(fail);}
+  
+  if(c_r1 == c_r2) {setverdict(pass);}
+  else {setverdict(fail);}
+
+  if(c_r1 == c_r4_ind) {setverdict(pass);}
+  else {setverdict(fail);}
+  
+  if(c_r4_ind == c_r4_ind) {setverdict(pass);}
+  else {setverdict(fail);}
+  
+  if(c_r1 == c_r6_ind) {setverdict(pass);}
+  else {setverdict(fail);}
+
+
+  if(c_r1 != vl_r7_ind) {setverdict(pass);}
+  else { setverdict(fail);}
+
+  if(c_r4_ind == c_r8_ind) {setverdict(pass); }
+  else {setverdict(fail);}
+
+  if(vl_r10 == vl_r11) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+type record length(10) of integer MyRecordOfType10
+type record length(0..10) of integer MyRecordOfType0_10
+type record length(10..infinity) of integer MyRecordOfType10up
+type record length(0..10) of charstring StringArray length(12)
+type record of record of charstring StringArrayTwo length(12)
+type record of charstring MyRecof2 ("a", "aa", "aaa", "aaaa") length(2)
+type record length(2) of charstring MyRecof3 ("a", "aa", "aaa", "aaaa")
+type record length(2) of charstring MyRecof4 ("a", "aa", "aaa", "aaaa") length(2)
+// TODO: Add additional subtypes here.
+type MyRecof2 MyRecof5
+type MyRecof3 MyRecof6
+type MyRecof4 MyRecof7
+type MyRecof2 MyRecof8 ({"aa"})
+type record of integer MyRecof9 (1..10, 100)
+
+const MyRecof2 c_myrecof1 := {}
+const MyRecof2 c_myrecof2 := {"aa", "aa"}
+const MyRecof2 c_myrecof3 := {c_myrecof2[0], c_myrecof2[1]}
+const MyRecof3 c_myrecof4 := {"a", "aa"}
+const MyRecof3 c_myrecof5 := {c_myrecof4[0], c_myrecof4[1]}
+const MyRecof4 c_myrecof6 := {"aa", "aa"}
+const MyRecof4 c_myrecof7 := {c_myrecof6[0], c_myrecof6[1]}
+const MyRecof8 c_myrecof8 := {"aa"}
+const MyRecof9 c_myrecof9 := {1, 100}
+
+template MyRecof2 t_myrecof1 := {}
+template MyRecof2 t_myrecof2 := {"aa", "aa"}
+template MyRecof2 t_myrecof3 := c_myrecof2
+template MyRecof3 t_myrecof4 := {"a", "aa"}
+template MyRecof3 t_myrecof5 := c_myrecof5
+template MyRecof4 t_myrecof6 := {"aa", "aa"}
+template MyRecof4 t_myrecof7 := c_myrecof7
+template MyRecof8 t_myrecof8 := {"aa"}
+template MyRecof9 t_myrecof9 := {1, 100} length(2)
+
+testcase recofSubtype() runs on recofOper_mycomp {
+  var template MyRecordOfType10 vt_myrecof1 := { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+  var MyRecordOfType10 v_myrecof1 := { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+  if (substr(v_myrecof1, 0, 2) == substr(vt_myrecof1, 1, 2)) { setverdict(pass) }
+  else { setverdict(fail) }
+}
+
+type record of charstring ROC;
+type record of integer  ROI;
+type record MyRecord1 {
+  integer       i optional,
+  float         x optional,
+  charstring    c
+}
+
+type record of ROI ROROI;
+
+type union MyUnion1 {
+  ROC roc,
+  integer i,
+  ROI roi,
+  MyRecord1 r
+}
+
+type record MyRec2 {
+  ROC roc optional,
+  ROI roi optional,
+  MyUnion1 u optional, 
+  MyRecord1 r optional
+}
+
+type record of MyRec2 MyRecOf
+
+type record MyRec3 {
+  ROROI roroi optional,
+  MyRec2 r optional
+}
+
+const MyRec2 c_myrec2_1:={ 
+  roc:=omit,
+  roi:={},
+  u:={r:={ i:=1, x:=1.0, c:="one"}},
+  r:={ i:=1, x:=1.0, c:="one"}
+}
+
+const MyRec3 c_myrec3_1 := {
+  roroi:= { {1,2,3,4,5,6,7,8,9},{10} },
+  r:= omit
+}
+
+const MyRec3 c_myrec3_2 := {
+  roroi:= { {1,2,3,4,5,6,7,8,9},{10} },
+  r:= {
+    roc:={},
+    roi:={},
+    u:={i:=5},
+    r:=omit
+  }
+} 
+
+const MyRec3 c_myrec3_innerOmits := {
+  roroi:= { {1,2,3,4,5,6,7,8,9},{10} },
+  r:= {
+    roc:=omit,
+    roi:=omit,
+    u:=omit,
+    r:=omit
+  }
+} 
+
+testcase tc_recordOf_omit1() runs on recofOper_mycomp {
+  var MyRec2 vl_r1:=c_myrec2_1;
+  if(isbound(vl_r1.roc)){setverdict(pass)}else {setverdict(fail)};
+  var MyRec2 vl_r2:=c_myrec2_1;
+  if(isbound(vl_r2.roc[0])){setverdict(fail)}else {setverdict(pass)};
+  var MyRec2 vl_r3:=c_myrec2_1;
+  if(isbound(vl_r3.roi)){setverdict(pass)}else {setverdict(fail)};
+  var MyRec2 vl_r4:=c_myrec2_1;
+  if(isbound(vl_r4.roi[0])){setverdict(fail)}else {setverdict(pass)};
+  var MyRec2 vl_r5:=c_myrec2_1;
+  if(isbound(vl_r5.roi[90])){setverdict(fail)}else {setverdict(pass)};
+}
+
+testcase tc_recordOf_union() runs on recofOper_mycomp {
+  var MyRec2 vl_r:=c_myrec2_1;
+  if(isbound(vl_r.u)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.u.r)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.u.r.i)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.u.r.x)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.u.r.c)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.u.roi)){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.u.roi[3])){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.u.i)){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.u.roc)){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.u.roc[0])){setverdict(fail)}else {setverdict(pass)}; 
+}
+
+testcase tc_recordOf_recordOfRecordOfInt() runs on recofOper_mycomp {
+  var MyRec3 vl_r:=c_myrec3_1;
+  if(isbound(vl_r.roroi)){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[0])){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[1])){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[2])){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.roroi[200])){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.roroi[0][0])){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[0][8])){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[0][9])){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.roroi[1][0])){setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.roroi[1][1])){setverdict(fail)}else {setverdict(pass)};
+  if(isbound(vl_r.roroi[2][0])){setverdict(fail)}else {setverdict(pass)};
+}
+
+testcase tc_recordOf_recordInRecord() runs on recofOper_mycomp {
+  var MyRec3 vl_r:=c_myrec3_2;
+  if(isbound(vl_r.r)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.roc)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.roi)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.u)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.u)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.u.i)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.r)) {setverdict(pass)}else {setverdict(fail)};  //fails!
+}
+
+testcase tc_recordOf_recordInRecord_innerOmits() runs on recofOper_mycomp {
+  var MyRec3 vl_r:=c_myrec3_innerOmits;
+  if(isbound(vl_r.roroi)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.roc)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.roi)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.u)) {setverdict(pass)}else {setverdict(fail)};
+  if(isbound(vl_r.r.r)){setverdict(pass)}else {setverdict(fail)};
+}
+
+  testcase tc_recordOf_union_ispresent() runs on recofOper_mycomp {
+    var MyRec2 vl_r:=c_myrec2_1;
+    if(ispresent(vl_r.u)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.u.r)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.u.r.i)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.u.r.x)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.u.r.c)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.u.roi)){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.u.roi[3])){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.u.i)){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.u.roc)){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.u.roc[0])){setverdict(fail)}else {setverdict(pass)}; 
+  }
+
+  testcase tc_recordOf_recordOfRecordOfInt_ispresent() runs on recofOper_mycomp {
+    var MyRec3 vl_r:=c_myrec3_1;
+    if(ispresent(vl_r.roroi)){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.roroi[0])){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.roroi[1])){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.roroi[2])){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.roroi[200])){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.roroi[0][0])){setverdict(pass)}else {setverdict(fail)};
+  }
+
+  testcase tc_recordOf_recordOfRecordOfInt2() runs on recofOper_mycomp {
+    var MyRec3 vl_r:=c_myrec3_1;
+    if(ispresent(vl_r.roroi[0][8])){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.roroi[0][9])){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.roroi[1][0])){setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.roroi[1][1])){setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.roroi[2][0])){setverdict(fail)}else {setverdict(pass)};
+  }
+
+  testcase tc_recordOf_recordInRecord_ispresent() runs on recofOper_mycomp {
+    var MyRec3 vl_r:=c_myrec3_2;
+    if(ispresent(vl_r.r)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.roc)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.roi)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.u)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.u)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.u.i)) {setverdict(pass)}else {setverdict(fail)};
+  }
+
+  testcase tc_recordOf_recordInRecord2() runs on recofOper_mycomp {
+    var MyRec3 vl_r:=c_myrec3_2;
+    if(ispresent(vl_r.r.r)) {setverdict(fail)}else {setverdict(pass)}; 
+  }
+  
+  testcase tc_recordOf_recordInRecord_innerOmits_ispresent() runs on recofOper_mycomp {
+    var MyRec3 vl_r:=c_myrec3_innerOmits;
+    if(ispresent(vl_r.roroi)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r)) {setverdict(pass)}else {setverdict(fail)};
+    if(ispresent(vl_r.r.roc)) {setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.r.roi)) {setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.r.u)) {setverdict(fail)}else {setverdict(pass)};
+    if(ispresent(vl_r.r.r)){setverdict(fail)}else {setverdict(pass)};
+  }
+
+type record length(6) of integer MyArray6;
+
+//TR: HO84027
+testcase tc_sizeof_lengthof_roi_bugs() runs on recofOper_mycomp {
+  var template ROI vlt_roi :={}
+  var integer vl_array[6];  
+  var MyArray6 vl_array6;
+  var template MyArray6 vlt_array6;
+
+  vlt_roi[0]:=0;
+  vlt_roi[5]:=0;
+
+  vl_array[0]:=0;
+  vl_array[4]:=0;
+
+  vl_array6[0]:=0;
+  vl_array6[4]:=0;
+
+  vlt_array6[0]:=0;
+  vlt_array6[4]:=0;
+
+  if(sizeof(vlt_roi)==6)     { setverdict(pass) } else { setverdict(fail) };
+  if(lengthof(vlt_roi)==6)   { setverdict(pass) } else { setverdict(fail) };
+
+  if(sizeof(vl_array)==6)    { setverdict(pass) } else { setverdict(fail) };
+  if(lengthof(vl_array)==5)  { setverdict(pass) } else { setverdict(fail) };
+
+  if(sizeof(vl_array6)==5)   { setverdict(pass) } else { setverdict(fail) };
+  if(lengthof(vl_array6)==5) { setverdict(pass) } else { setverdict(fail) };
+  
+  if(sizeof(vlt_array6)==5)  { setverdict(pass) } else { setverdict(fail) };
+  if(lengthof(vlt_array6)==5){ setverdict(pass) } else { setverdict(fail) };
+}
+
+testcase tc_sizeof_lengthof_standard1() runs on recofOper_mycomp {
+  if(lengthof(bitstring : '010'B) == 3) { setverdict(pass)} else { setverdict(fail) };
+  if(lengthof(hexstring : 'F3'H) == 2) { setverdict(pass)} else { setverdict(fail) };
+  if(lengthof(octetstring : 'F2'O) == 1) { setverdict(pass)} else { setverdict(fail) };
+  if(lengthof (universal charstring : "Length_of_Example")==17) { setverdict(pass)}else { setverdict(fail) };
+  if(lengthof(charstring : "HELLO") == 5) { setverdict(pass)}else { setverdict(fail) };
+  if(lengthof(octetstring : ('12'O, '34'O))==1){ setverdict(pass)}else { setverdict(fail) };
+  if(lengthof('1??1'B)==4){ setverdict(pass)}else { setverdict(fail) };
+  if(lengthof(universal charstring : ? length(8))==8 ) { setverdict(pass)}else { setverdict(fail) }; //DTE
+  if(lengthof('1*F'H length (8)) ==8){ setverdict(pass)}else { setverdict(fail) };
+  if(lengthof('00*FF'O length(1..2))==2) { setverdict(pass)}else { setverdict(fail) };
+}
+
+type record length(0..10) of integer MyList;
+
+testcase tc_sizeof_lengthof_standard2() runs on recofOper_mycomp {
+  var MyList vl_MyListVar := { 0, 1, -, 2, - };
+  log("vl_MyListVar: ",vl_MyListVar);
+  if(lengthof(vl_MyListVar)==4) { setverdict(pass)}else { setverdict(fail) };
+}
+
+testcase tc_sizeof_lengthof_standard4() runs on recofOper_mycomp {
+  template ROI tr_roI3 := { 1, *, 10 } length(5) 
+  if(lengthof(tr_roI3)==5){ setverdict(pass)}else { setverdict(fail) };
+}
+
+testcase tc_sizeof_lengthof_standard6() runs on recofOper_mycomp {
+  template ROI tr_roI5 := { 1, 2, 3, * } length(1..3) 
+  if(lengthof(tr_roI5)==3) { setverdict(pass)}else { setverdict(fail) };
+}
+
+// test cases for bug 494614:
+// when initializing a record-of-record element with an empty value ('{}') through module parameters,
+// an actual unbound record element was created, instead of the usual null pointer used for unbound elements;
+// copying this empty record caused a dynamic test case error
+
+modulepar recofOper_myrecof3 recofOper_mymodulepar; // initialized with value list notation
+modulepar recofOper_myrecof3 recofOper_mymodulepar2; // initialized with assignment notation
+
+testcase tc_empty_record_element() runs on recofOper_mycomp {
+  var recofOper_myrecof3 copy := recofOper_mymodulepar;
+  copy[0].x1 := omit; // this is where the record-of is actually copied, and where the DTE occured
+  copy[0].x2 := 1.0;
+  if (copy == { { omit, 1.0 } }) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase tc_empty_record_element2() runs on recofOper_mycomp {
+  var recofOper_myrecof3 copy := recofOper_mymodulepar2;
+  copy[0].x1 := omit; // this is where the record-of is actually copied, and where the DTE occured
+  copy[0].x2 := 1.0;
+  if (copy == { { omit, 1.0 } }) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+control {
+  const recofOper_trecord cl_temp1:={ x1:=omit, x2:=3.4 }; // constants in the control part
+  const recofOper_trecof cl_temp2:={ 'AF12'O };
+  const recofOper_tset cl_temp3:={ x1:=234, x2:=1.9};
+  const recofOper_tsetof cl_temp4:={"f","8"};
+  const recofOper_tunion cl_temp5:={ x2:=1.3 };
+  const recofOper_trecord vl_temp1:={ x1:=omit, x2:=3.4 }; // variables in the control part
+  const recofOper_trecof vl_temp2:={ 'AF12'O };
+  const recofOper_tset vl_temp3:={ x1:=234, x2:=1.9};
+  const recofOper_tsetof vl_temp4:={"f","8"};
+  const recofOper_tunion vl_temp5:={ x2:=1.3 };
+
+  execute(recofAssign());
+  execute(recofReAssign());
+  execute(recofAssignEnum());
+  execute(recofAssignRec());
+  execute(recofAssignRecof());
+  execute(recofAssignSet());
+  execute(recofAssignSetof());
+  execute(recofAssignUnion());
+  execute(recofAssignElem());
+  execute(recofAssignElemEnum());
+  execute(recofAssignElemRec());
+  execute(recofAssignElemRecof());
+  execute(recofAssignElemSet());
+  execute(recofAssignElemSetof());
+  execute(recofAssignElemUnion());
+  execute(recofConst());
+  execute(recofConstEnum());
+  execute(recofConstRec());
+  execute(recofConstRecof());
+  execute(recofConstSet());
+  execute(recofConstSetof());
+  execute(recofConstUnion());
+  execute(recofComp());
+  execute(recofCompConst());
+  execute(recofCompEnum());
+  execute(recofCompRec());
+  execute(recofCompRecof());
+  execute(recofCompSet());
+  execute(recofCompSetof());
+  execute(recofCompUnion());  
+  execute(recofEmpty());
+
+  execute(recofListOperator());
+  execute(recofRotateOperators());
+  execute(recofLengthof());
+  execute(recofSizeof());
+  execute(recofReplace());
+  execute(recofReplaceEmpty());
+  execute(recofSubstr());
+  execute(recofIsvalue());
+  execute(recofIsvalue2());
+  execute(recofIsbound());
+
+  execute(recofSubtype());
+  
+  execute(tc_recordOf_omit1());
+  execute(tc_recordOf_union());
+  execute(tc_recordOf_recordOfRecordOfInt());
+  execute(tc_recordOf_recordInRecord());
+  execute(tc_recordOf_recordInRecord_innerOmits());
+  execute(tc_recordOf_union_ispresent());
+  execute(tc_recordOf_recordOfRecordOfInt_ispresent());
+  execute(tc_recordOf_recordOfRecordOfInt2());
+  execute(tc_recordOf_recordInRecord_ispresent());
+  execute(tc_recordOf_recordInRecord2());
+  execute(tc_recordOf_recordInRecord_innerOmits_ispresent());
+  execute(tc_sizeof_lengthof_roi_bugs());
+  execute(tc_sizeof_lengthof_standard1());
+  execute(tc_sizeof_lengthof_standard2());
+  execute(tc_sizeof_lengthof_standard4());
+  execute(tc_sizeof_lengthof_standard6());
+  
+  execute(tc_empty_record_element());
+  execute(tc_empty_record_element2());
+}
+
+}

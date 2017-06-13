@@ -1,0 +1,59 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.8, ensure that symbols created during template expansion are checked against value template restriction
+ ** @verdict  pass reject
+ ***************************************************/
+
+// Reasoning:
+// Field reference on a left hand side of an assignment statement can lead to expansion of
+// a matching symbol. If the values of the expanded symbol do not fullfil conditions set by
+// template restrictions (after the assignment has been finished), the running test shall
+// end with a dynamic error.
+
+// The following requirements are tested:
+// (15.6.2.a) When referencing a subfield within a structured field to which AnyValueOrNone 
+// or omit is assigned, at the left hand side of an assignment, the structured field is 
+// implicitly set to be present, it is expanded recursively up to and including the depth 
+// of the referenced subfield. During this expansion an AnyValue shall be assigned to mandatory 
+// subfields and AnyValueOrNone shall be assigned to optional subfields. After this expansion 
+// the value or matching mechanism at the right hand side of the assignment shall be assigned 
+// to the referenced subfield.
+//
+// (15.8) (value) the template shall resolve to a specific value (i.e. the fields of it shall 
+// resolve to a specific value or omit, but the whole template shall not resolve to omit). It 
+// can be used to define a mandatory field of a record or set template and the latter one could 
+// still be used in a send statement.
+
+module NegSem_1508_TemplateRestrictions_028 {
+
+	type component GeneralComp { }
+	
+	type record R {
+		record
+		{
+			integer subfield1,
+			integer subfield2
+		} field1 optional,
+		integer field2
+	}
+
+	testcase TC_NegSem_1508_TemplateRestrictions_028() runs on GeneralComp {
+		var template(value) R v_test := { field1 := omit, field2 := 2 };
+		v_test.field1.subfield1 := 0; 
+		// As the result of expansion, v_test value is { field1 := { ?, ? }, field2 := 2 }
+		// After the field assignment it changes to { field1 := { 0, ? }, field2 := 2 }
+		// This value (subfield2 in particular) violates value restriction an shall cause an error
+	
+		// if we get here, something must be wrong as the previous assignment shall cause an error
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1508_TemplateRestrictions_028());
+	}
+
+}

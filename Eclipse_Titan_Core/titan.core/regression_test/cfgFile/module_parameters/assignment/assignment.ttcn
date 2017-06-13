@@ -1,0 +1,497 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baji, Laszlo
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Beres, Szabolcs
+ *
+ ******************************************************************************/
+module assignment {
+
+type enumerated MyEnum {
+  ENUM_1, ENUM_2
+}
+
+type union MyUnion {
+  integer field1,
+  integer field2
+}
+
+type record EmptyRec { }
+type record MyRec {
+  integer field1,
+  integer field2 optional
+}
+type record MyRecEnum {
+  integer enum
+}
+type record MyRecursive {
+  integer field1,
+  MyRecursive field2 optional
+}
+
+type record of integer ROI;
+type record of ROI ROROI;
+type record of ROROI ROROROI;
+
+type set EmptySet { }
+type set MySet {
+  integer field1,
+  integer field2 optional
+}
+type record MyRecursiveSet {
+  integer field1,
+  MyRecursiveSet field2 optional
+}
+
+type set of integer SOI;
+type set of SOI SOSOI;
+type set of SOSOI SOSOSOI;
+
+type integer MyArray[3];
+
+
+modulepar integer tsp_integer_native;
+modulepar integer tsp_integer_native_init := -1;
+modulepar integer tsp_integer_openssl;
+modulepar integer tsp_integer_openssl_init := -1;
+
+modulepar float tsp_float_1;
+modulepar float tsp_float_1_init := -1.0;
+modulepar float tsp_float_2;
+modulepar float tsp_float_2_init := -1.0e-5;
+
+modulepar boolean tsp_boolean_false;
+modulepar boolean tsp_boolean_false_init := true;
+modulepar boolean tsp_boolean_true;
+modulepar boolean tsp_boolean_true_init := false;
+
+modulepar verdicttype tsp_verdict_none;
+modulepar verdicttype tsp_verdict_inc;
+modulepar verdicttype tsp_verdict_pass;
+modulepar verdicttype tsp_verdict_fail;
+modulepar verdicttype tsp_verdict_error;
+modulepar verdicttype tsp_verdict_error_init := none;
+
+modulepar objid tsp_objid_number;
+modulepar objid tsp_objid_number_init := objid {0 4 0 12345 6789};
+modulepar objid tsp_objid_name_number;
+modulepar objid tsp_objid_name_number_init := 
+  objid{itu_t(0) identified_organization(4) etsi(0) 12345 6789};
+
+modulepar bitstring tsp_bitstring_0;
+modulepar bitstring tsp_bitstring_0_init := '1'B;
+modulepar bitstring tsp_bitstring_128;
+
+modulepar hexstring tsp_hexstring_0;
+modulepar hexstring tsp_hexstring_0_init:= 'FF'H;
+modulepar hexstring tsp_hexstring_FF;
+
+modulepar charstring tsp_charstring_empty;
+modulepar charstring tsp_charstring_empty_init := "asdf";
+modulepar charstring tsp_charstring_fox;
+
+modulepar universal charstring tsp_univ_charstr_empty;
+modulepar universal charstring tsp_univ_charstr_empty_init := "";
+modulepar universal charstring tsp_univ_charstr_1;
+
+// Enumerated
+modulepar MyEnum tsp_enum1;
+modulepar MyEnum tsp_enum1_init := ENUM_1;
+modulepar MyEnum tsp_enum2;
+
+// Union
+modulepar MyUnion tsp_MyUnion_field1;
+modulepar MyUnion tsp_MyUnion_field1_init := {field2 := 5};
+modulepar MyUnion tsp_MyUnion_field2;
+modulepar MyUnion tsp_MyUnion_duplicate1;
+modulepar MyUnion tsp_MyUnion_duplicate2;
+
+// Record
+modulepar EmptyRec tsp_record_empty;
+modulepar EmptyRec tsp_record_empty_init := {};
+modulepar MyRec tsp_record_MyRec;
+modulepar MyRec tsp_record_MyRec_init := {1,2};
+modulepar MyRec tsp_record_MyRec1;
+modulepar MyRec tsp_record_MyRec_duplicate;
+modulepar MyRecursive tsp_record_MyRecursive1;
+modulepar MyRecursive tsp_record_MyRecursive2;
+modulepar MyRecEnum enum;
+
+// Set 
+modulepar EmptySet tsp_set_empty;
+modulepar EmptySet tsp_set_empty_init := {};
+modulepar MySet tsp_set_MySet;
+modulepar MySet tsp_set_MySet_init := {field1 := 1, field2 := 2};
+modulepar MySet tsp_set_MySet1;
+modulepar MyRecursiveSet tsp_set_MyRecursiveSet1;
+modulepar MyRecursiveSet tsp_set_MyRecursiveSet2;
+
+// Record of
+modulepar ROI tsp_ROI;
+modulepar ROI tsp_ROI2;
+modulepar ROI tsp_ROI_empty := {1, 2, 3};
+modulepar ROI tsp_ROI_indexed;
+modulepar ROI tsp_ROI_indexed2;
+modulepar ROROI tsp_ROROI := {}; 
+modulepar ROROROI tsp_ROROROI := {}; 
+modulepar ROROROI tsp_ROROROI_2 := {}; 
+
+// Set of
+modulepar SOI tsp_SOI;
+modulepar SOI tsp_SOI2;
+modulepar SOI tsp_SOI_empty := {1, 2, 3};
+modulepar SOI tsp_SOI_indexed;
+modulepar SOI tsp_SOI_indexed2;
+modulepar SOSOI tsp_SOSOI := {}; 
+modulepar SOSOSOI tsp_SOSOSOI := {}; 
+modulepar SOSOSOI tsp_SOSOSOI_2 := {}; 
+
+// Array
+modulepar MyArray tsp_array_1;
+modulepar MyArray tsp_array_2;
+modulepar MyArray tsp_array_3;
+modulepar MyArray tsp_array_4;
+modulepar MyArray tsp_array_5;
+
+// Anytype
+modulepar anytype tsp_anytype_int;
+modulepar anytype tsp_anytype_float;
+modulepar anytype tsp_anytype_MyRec;
+
+// Component
+modulepar MyComp_CT tsp_component_null;
+
+// Default
+modulepar default tsp_default;
+
+
+type component MyComp_CT {
+}
+
+testcase tc_integer() runs on MyComp_CT {
+  if (tsp_integer_native == 42) { setverdict(pass); } 
+  else { setverdict(fail, "tsp_integer_native"); }
+
+  if (tsp_integer_native_init == 43) { setverdict(pass); } 
+  else { setverdict(fail, "tsp_integer_native_init"); }
+
+
+  if (tsp_integer_openssl == 1000000000000) { setverdict(pass); }
+  else { setverdict(fail, "tsp_integer_openssl"); }
+
+  if (tsp_integer_openssl_init == 1000000000001) { setverdict(pass); }
+  else { setverdict(fail, "tsp_integer_openssl_init"); }
+}
+
+testcase tc_float() runs on MyComp_CT {
+  if (tsp_float_1 == 42.0) { setverdict(pass); }
+  else { setverdict(fail, "tsp_floar_1"); }
+
+  if (tsp_float_1_init == 43.0) { setverdict(pass); }
+  else { setverdict(fail, "tsp_float_1_init"); }
+
+
+  if (tsp_float_2 == 4.2e+1) { setverdict(pass); }
+  else { setverdict(fail, "tsp_float_2"); }
+
+  if (tsp_float_2_init == 4.3e+1) { setverdict(pass); }
+  else { setverdict(fail, "tsp_float_2_init"); }
+}
+
+testcase tc_boolean() runs on MyComp_CT {
+  if (tsp_boolean_false == false) { setverdict(pass); }
+  else { setverdict(fail, "tsp_boolean_false"); }
+
+  if (tsp_boolean_false_init == false) { setverdict(pass); }
+  else { setverdict(fail, "tsp_boolean_false_init"); }
+
+  if (tsp_boolean_true == true) { setverdict(pass); }
+  else { setverdict(fail, "tsp_boolean_true"); }
+
+  if (tsp_boolean_true_init == true) { setverdict(pass); }
+  else { setverdict(fail, "tsp_boolean_true_init"); }
+}
+
+testcase tc_verdict() runs on MyComp_CT {
+  if (tsp_verdict_none == none) { setverdict(pass); } else {setverdict(fail);}
+  if (tsp_verdict_inc == inconc) { setverdict(pass); } else {setverdict(fail);}
+  if (tsp_verdict_pass == pass) { setverdict(pass); } else {setverdict(fail);}
+  if (tsp_verdict_fail == fail) { setverdict(pass); } else {setverdict(fail);}
+  if (tsp_verdict_error == error) { setverdict(pass); } else {setverdict(fail);}
+  if (tsp_verdict_error_init == error) { setverdict(pass); } else {setverdict(fail);}
+}
+
+testcase tc_objid() runs on MyComp_CT {
+  if (tsp_objid_number == objid {0 4 0 12345 6789})
+    {setverdict(pass);} else { setverdict(fail); }
+
+  if (tsp_objid_number_init == objid {0 4 0 12345 6789})
+    {setverdict(pass);} else { setverdict(fail); }
+
+  const objid expected := objid{itu_t(0) identified_organization(4) etsi(0) 12345 6789}
+  if (tsp_objid_name_number == expected )
+    {setverdict(pass);} else { setverdict(fail); }
+  if (tsp_objid_name_number_init == expected )
+    {setverdict(pass);} else { setverdict(fail); }
+}
+
+testcase tc_bitstring() runs on MyComp_CT  {
+  if (tsp_bitstring_0 == '00000000'B) 
+   { setverdict(pass); } else {setverdict(fail, "tsp_bitstring_0");}
+
+  if (tsp_bitstring_0_init == '00000000'B) 
+   { setverdict(pass); } else {setverdict(fail, "tsp_bitstring_0");}
+
+  if(tsp_bitstring_128 == '10000000'B)
+   { setverdict(pass); } else {setverdict(fail, "tsp_bitstring_128");}
+}
+
+testcase tc_hexstring() runs on MyComp_CT {
+  if (tsp_hexstring_0 == '0'H) 
+    { setverdict(pass);} else {setverdict(fail, "tsp_hexstring_0"); }
+
+  if (tsp_hexstring_0_init == '0'H) 
+    { setverdict(pass);} else {setverdict(fail, "tsp_hexstring_0"); }
+
+  if (tsp_hexstring_FF == 'FF'H)
+    { setverdict(pass); } else { setverdict(fail, "tsp_hexstring_FF"); }
+}
+
+testcase tc_charstring() runs on MyComp_CT {
+  if (tsp_charstring_empty == "") {setverdict(pass); } else {setverdict(fail); }
+
+  if (tsp_charstring_empty_init == "")
+  {setverdict(pass); } else {setverdict(fail); }
+
+  if (tsp_charstring_fox == "The quick brown fox jumps over the lazy dog")
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+testcase tc_universal_charstring() runs on MyComp_CT {
+  if (tsp_univ_charstr_empty == "") {setverdict(pass); } else {setverdict(fail); }
+
+  if (tsp_univ_charstr_empty_init == "") {setverdict(pass); } else {setverdict(fail); }
+
+  const universal charstring expected := 
+    "Character " & char(0, 0, 1, 113) & " is a hungarian letter.";
+  if (tsp_univ_charstr_1 == expected)
+    { setverdict(pass); } else { setverdict(fail); }
+
+}
+
+testcase tc_enumerated() runs on MyComp_CT {
+  if (tsp_enum1 == ENUM_1) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_enum1_init == ENUM_1) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_enum2 == ENUM_2) 
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+testcase tc_union() runs on MyComp_CT {
+  if (tsp_MyUnion_field1.field1 == 1) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_MyUnion_field1_init.field1 == 1) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_MyUnion_field2.field2 == 2) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_MyUnion_duplicate1.field1 == 2) 
+    { setverdict(pass); } else { setverdict(fail); }
+
+  if (tsp_MyUnion_duplicate2.field2 == 2) 
+    { setverdict(pass); } else { setverdict(fail); }
+}
+
+testcase tc_record() runs on MyComp_CT {
+  if (tsp_record_empty == {})
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_empty");}
+
+  if (tsp_record_empty_init == {})
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_empty_init");}
+
+  if (tsp_record_MyRec == {1, 2})
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRec");}
+
+  if (tsp_record_MyRec_init == {1, 2})
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRec_init");}
+
+  if (tsp_record_MyRec1.field1 == 3 and not isbound(tsp_record_MyRec1.field2))
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRec1");}
+
+  if (tsp_record_MyRec_duplicate.field1 == 3 
+      and not isbound(tsp_record_MyRec_duplicate.field2))
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRec_duplicate");}
+
+  if (tsp_record_MyRecursive1.field1 == 5
+    and not isbound(tsp_record_MyRecursive1.field2))
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRecursive1");}
+
+  const MyRecursive expected := {1, {2, {3}}};
+  if (tsp_record_MyRecursive2 == expected)
+  { setverdict(pass); } else {setverdict(fail, "tsp_record_MyRecursive2");}
+
+  if (enum.enum == 42)
+  { setverdict(pass); } else {setverdict(fail, "enum.enum");}
+
+}
+
+testcase tc_set() runs on MyComp_CT {
+  if (tsp_set_empty == {})
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_empty");}
+
+  if (tsp_set_empty_init == {})
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_empty_init");}
+
+  if (tsp_set_MySet == {field1 := 1, field2 := 2})
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_MySet");}
+
+  if (tsp_set_MySet_init == {field1 := 1, field2 := 2})
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_MySet_init");}
+
+  if (tsp_set_MySet1.field1 == 3 and not isbound(tsp_set_MySet1.field2))
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_MySet1");}
+
+  if (tsp_set_MyRecursiveSet1.field1 == 5
+    and not isbound(tsp_set_MyRecursiveSet1.field2))
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_MyRecursiveSet");}
+
+  const MyRecursiveSet expected := {1, {2, {3}}};
+  if (tsp_set_MyRecursiveSet2 == expected)
+  { setverdict(pass); } else {setverdict(fail, "tsp_set_MyRecursiveSet");}
+
+}
+
+testcase tc_record_of() runs on MyComp_CT {
+  if (tsp_ROI_empty == {}) { setverdict(pass); } else { setverdict(fail, "tsp_ROI_empty"); }
+
+  if (tsp_ROI == {1,2,3}) {
+    setverdict(pass);
+  } else { setverdict(fail, "tsp_ROI"); }
+
+  if (tsp_ROI2 == {[0] := 1, [2] := 3}) {
+    setverdict(pass);
+  } else { setverdict(fail, "tsp_ROI"); }
+
+  if (tsp_ROI_indexed == {[2] := 6, [3] := 28, [5] := 496, [7] := 8128}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_ROI_indexed");}
+
+  if (tsp_ROI_indexed2 == {[2] := 6, [3] := 28, [5] := 496, [7] := 8128}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_ROI_indexed2");}
+
+  if (tsp_ROROI == {{1, 2}, {2, 3}, {3, 4}}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_ROROI"); }
+
+  if (tsp_ROROROI == {{{1}, {2}}, {{2}, {3}}, {{3}, {4}}}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_ROROROI"); }
+
+  if (tsp_ROROROI_2 == {{{1,2}, {3,4}}, {{5,6}, {7,8}}, {{9,10}, {11,12}}})
+  {setverdict(pass); } else {setverdict(fail);}
+}
+
+testcase tc_set_of() runs on MyComp_CT {
+  if (tsp_SOI_empty == {}) { setverdict(pass); } else { setverdict(fail, "tsp_SOI_empty"); }
+
+  if (tsp_SOI == {1,2,3}) { setverdict(pass);} else { setverdict(fail, "tsp_ROI"); }
+
+  if (tsp_SOI2 == {[0] := 1, [2] := 3}) { setverdict(pass);} 
+  else { setverdict(fail, "tsp_ROI"); }
+  if (tsp_SOI_indexed == {[2] := 6, [3] := 28, [5] := 496, [7] := 8128}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_SOI_indexed");}
+
+  if (tsp_SOI_indexed2 == {[2] := 6, [3] := 28, [5] := 496, [7] := 8128}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_SOI_indexed2");}
+
+  if (tsp_SOSOI == {{1, 2}, {2, 3}, {3, 4}}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_SOSOI"); }
+
+  if (tsp_SOSOSOI == {{{1}, {2}}, {{2}, {3}}, {{3}, {4}}}) {
+    setverdict(pass);
+  } else {setverdict(fail, "tsp_SOSOSOI"); }
+
+  if (tsp_SOSOSOI_2 == {{{1,2}, {3,4}}, {{5,6}, {7,8}}, {{9,10}, {11,12}}})
+  {setverdict(pass); } else {setverdict(fail);}
+}
+
+testcase tc_array() runs on MyComp_CT {
+
+  action(tsp_array_2);
+  if (tsp_array_2[0] == 1 and tsp_array_2[2] == 3 )
+    { setverdict(pass); }
+  else { setverdict(fail, "tsp_array_2");}
+
+  action(tsp_array_3);
+  if (tsp_array_3[0] == 1 and tsp_array_3[2] == 3 )
+    { setverdict(pass); }
+  else { setverdict(fail, "tsp_array_3");}
+
+  action(tsp_array_4);
+  if (tsp_array_4 == {1,2,3}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_array_3");}
+
+  action(tsp_array_5);
+  if (tsp_array_5 == {4,5,6}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_array_4");}
+}
+
+testcase tc_anytype() runs on MyComp_CT {
+  if (tsp_anytype_int == {integer := 42}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_anytype_int");}
+
+  if (tsp_anytype_float == {float := 42.0}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_anytype_float");}
+
+  if (tsp_anytype_MyRec == {MyRec := {field1 := 1, field2 := 2}}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_anytype_MyRec");}
+}
+
+testcase tc_component() runs on MyComp_CT {
+  if (tsp_component_null == null) { setverdict(pass); }
+  else { setverdict(fail, "tsp_component_null");}
+}
+
+testcase tc_default() runs on MyComp_CT {
+  if (tsp_default == null) { setverdict(pass); }
+  else { setverdict(fail, "tsp_default");}
+}
+
+control {
+  execute(tc_integer());
+  execute(tc_float());
+  execute(tc_boolean());
+  execute(tc_verdict());
+  execute(tc_objid());
+  execute(tc_bitstring());
+  execute(tc_hexstring());
+  execute(tc_charstring());
+  execute(tc_universal_charstring());
+  execute(tc_enumerated());
+  execute(tc_union());
+  execute(tc_record());
+  execute(tc_set());
+  execute(tc_record_of());
+  execute(tc_set_of());
+  execute(tc_anytype());
+  execute(tc_array());
+  execute(tc_component());
+  execute(tc_default());
+}
+} with { extension "anytype integer, float, MyRec"}

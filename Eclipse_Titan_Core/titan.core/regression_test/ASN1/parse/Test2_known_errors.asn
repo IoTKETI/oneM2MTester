@@ -1,0 +1,455 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Koppany, Csaba
+--   Kulcsar, Endre
+--   Szabados, Kristof
+--   Szabo, Janos Zoltan – initial implementation
+--
+--/////////////////////////////////////////////////////////////////////////////
+Test1-known-errors
+
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+--***************************************************************************
+-- information object class with the possoble field types
+--***************************************************************************
+MY-CLASS-1 ::= CLASS
+{
+&TypeField OPTIONAL,
+&fixedTypeValueField            ASN1-Type1   UNIQUE OPTIONAL,
+&variableTypeValueField         &TypeField   OPTIONAL,
+&FixedTypeValueSetField         ASN1-Type2,
+&VariableTypeValueSetField      &TypeField   OPTIONAL,
+&objectField                    OBJECTCLASS1 OPTIONAL,
+&ObjectSetField                 OBJECTCLASS1 OPTIONAL
+}
+WITH SYNTAX
+{
+[TYPE FIELD	                &TypeField]
+[FIXED VALUE TYPE FIELD		&fixedTypeValueField]
+[VARIABLE TYPE VALUE FIELD       &variableTypeValueField]
+FIXED TYPE VALUE SET FIELD	&FixedTypeValueSetField
+[VARIABLE TYPE VALUE SET FIELD	&VariableTypeValueSetField]
+[OBJECT FIELD			&objectField]
+[OBJECT SET FIELD		&ObjectSetField]
+}
+
+--***************************************************************************
+-- types used in this test
+--***************************************************************************
+ASN1-Type1 ::= INTEGER
+
+ASN1-Type2 ::= BOOLEAN
+
+ASN1-Type3B ::= BIT STRING
+
+ASN1-Type3 ::= SEQUENCE {f1 INTEGER}
+
+ASN1-Type4 ::= OCTET STRING
+
+ASN1-Type5 ::= SET {field1 BIT STRING,
+		    field2 INTEGER}
+
+OBJECTCLASS1 ::= RANAP-ELEMENTARY-PROCEDURE
+
+--****************************************************************************************************
+-- OBJECTS using the class defined above
+--****************************************************************************************************
+-- object not using WITH SYNTAX
+myObject-1 MY-CLASS-1 ::=
+{
+&TypeField                   ASN1-Type3,   -- SEQUENCE {f1 INTEGER}
+&fixedTypeValueField         999,
+&variableTypeValueField      {f1 1234},
+&FixedTypeValueSetField      { TRUE | FALSE },
+&VariableTypeValueSetField   { {f1 4592} | {f1 92000} }
+&objectField                 reset,
+&ObjectSetField              { reset | resetResource }
+}
+
+-- object using WITH SYNTAX
+myObject-2 MY-CLASS-1 ::=
+{
+TYPE FIELD			ASN1-Type2,  -- BOOLEAN
+FIXED VALUE TYPE FIELD		888,
+VARIABLE TYPE VALUE FIELD	TRUE,
+FIXED TYPE VALUE SET FIELD	{ TRUE },
+VARIABLE TYPE VALUE SET FIELD	{ TRUE| FALSE },
+OBJECT FIELD			resetResource
+OBJECT SET FIELD		RANAP-ELEMENTARY-PROCEDURES
+}
+
+-- object using WITH SYNTAX
+myObject-3 MY-CLASS-1 ::=
+{
+TYPE FIELD			ASN1-Type4
+FIXED VALUE TYPE FIELD		555
+}
+
+-- object not using WITH SYNTAX
+myObject-4 MY-CLASS-1 ::=
+{
+&TypeField                   ASN1-Type3B,   -- BIT STRING
+&fixedTypeValueField         2632,
+&variableTypeValueField      '001100'B,
+&FixedTypeValueSetField      { TRUE | FALSE },
+&VariableTypeValueSetField   { '0110'B | '1010'B }
+&objectField                 rAB-ReleaseRequest,
+&ObjectSetField              { reset | resetResource }
+}
+
+-- object using WITH SYNTAX
+myObject-5 MY-CLASS-1 ::=
+{
+TYPE FIELD			ASN1-Type5,  -- SET {field1 BIT STING, field2 INTEGER}
+FIXED VALUE TYPE FIELD		945,
+VARIABLE TYPE VALUE FIELD	{field1 '001100'B, field2 3},
+FIXED TYPE VALUE SET FIELD	{ TRUE },
+VARIABLE TYPE VALUE SET FIELD	{ {field1 '0101'B, field2 44}, {field1 '1100'B, field2 101}},
+OBJECT FIELD			iu-ReleaseRequest
+OBJECT SET FIELD		RANAP-ELEMENTARY-PROCEDURES-CLASS-2
+}
+
+--****************************************************************************************************
+-- Defining Information Object sets
+--****************************************************************************************************
+
+MyInformationObjectSet1 MY-CLASS-1 ::=
+{
+myObject-1|
+myObject-2,
+...
+}
+
+MyInformationObjectSet2 MY-CLASS-1 ::=
+{
+MyInformationObjectSet1|
+myObject-3,
+...
+}
+
+MyInformationObjectSet3 MY-CLASS-1 ::=
+{
+{TYPE FIELD ASN1-Type4 FIXED VALUE TYPE FIELD 1970 OBJECT FIELD myObject-5}
+|
+myObject-4,
+...
+}
+
+--****************************************************************************************************
+--References from class
+--****************************************************************************************************
+
+MyBigMessageType1 ::= SEQUENCE
+
+{
+field1 MY-CLASS-1.&TypeField,                          --open Type without constraint
+field2 MY-CLASS-1.&fixedTypeValueField,                --Type
+field3 MY-CLASS-1.&variableTypeValueField,             --open Type without constraint
+field4 MY-CLASS-1.&FixedTypeValueSetField,	       --Type
+field5 MY-CLASS-1.&VariableTypeValueSetField           --open Type without constraint
+}
+
+MyBigMessageType1B ::= SEQUENCE
+
+{
+field1 MY-CLASS-1.&TypeField (ASN1-Type5),             --open Type with constraint
+field2 MY-CLASS-1.&fixedTypeValueField,                --Type
+field3 MY-CLASS-1.&variableTypeValueField (IA5String), --open Type with constraint
+field4 MY-CLASS-1.&FixedTypeValueSetField,	       --Type
+field5 MY-CLASS-1.&VariableTypeValueSetField ( Criticality | ProcedureCode ) --open Type with constraint
+}
+
+MyBigMessageType2 ::= SEQUENCE
+
+{
+field1 MY-CLASS-1.&TypeField                 ({MyInformationObjectSet1}),
+field2 MY-CLASS-1.&fixedTypeValueField,      ({MyInformationObjectSet1}),
+field3 MY-CLASS-1.&variableTypeValueField    ({MyInformationObjectSet1}),
+field4 MY-CLASS-1.&FixedTypeValueSetField    ({MyInformationObjectSet1}),
+field5 MY-CLASS-1.&VariableTypeValueSetField ({MyInformationObjectSet1})
+}
+
+MyBigMessageType3 ::= SEQUENCE
+
+{
+field1 MY-CLASS-1.&TypeField                 ({MyInformationObjectSet1} {@field2} ),
+field2 MY-CLASS-1.&fixedTypeValueField,      ({MyInformationObjectSet1} ),
+field3 MY-CLASS-1.&variableTypeValueField    ({MyInformationObjectSet1} {@field2} ),
+field4 MY-CLASS-1.&FixedTypeValueSetField    ({MyInformationObjectSet1}),
+field5 MY-CLASS-1.&VariableTypeValueSetField ({MyInformationObjectSet1})
+}
+
+MyBigMessageType4 ::= SEQUENCE
+
+{
+field1 MY-CLASS-1.&TypeField                 ({MyInformationObjectSet1} {@field2} ),
+field2 MY-CLASS-1.&fixedTypeValueField,      ({MyInformationObjectSet1} ),
+field3 MY-CLASS-1.&variableTypeValueField    ({MyInformationObjectSet1} {@field2} ),
+field4 MY-CLASS-1.&FixedTypeValueSetField    ({MyInformationObjectSet3}),
+field5 MY-CLASS-1.&VariableTypeValueSetField ({MyInformationObjectSet3})
+}
+
+myBigMessage1 MyBigMessageType1 ::=
+{
+
+field1   aSN1-Type3 : {f1 8 },
+field2   6457,
+field3   aSN1-Type4 : '1234ABCD'H,
+field4   TRUE,
+field5   iNTEGER : 67
+}
+
+myBigMessage1B MyBigMessageType1B ::=
+{
+
+field1  aSN1-Type5 :   {field1 '00110'B, field2 5},
+field2  4594,
+field3  iA5String : "abcdefgh",
+field4  FALSE,
+field5  criticality : reject
+}
+
+myBigMessage2 MyBigMessageType2 ::=
+{
+
+field1  aSN1-Type3 : {f1 1986},
+field2  0,
+field3  aSN1-Type3 :{f1 492},
+field4  FALSE,
+field5  bOOLEAN : TRUE
+}
+
+myBigMessage3 MyBigMessageType3 ::=
+{
+
+field1  aSN1-Type2 : TRUE ,
+field2  3485 ,
+field3  aSN1-Type3 : {f1 9},
+field4  TRUE,
+field5  aSN1-Type2 : FALSE
+}
+
+myBigMessage4 MyBigMessageType4 ::=
+{
+field1  aSN1-Type2 : FALSE ,
+field2  74,
+field3  '01010'B,
+field4  TRUE,
+field5  aSN1-Type5 : {field1 '0101'B, field2 349}
+}
+
+--****************************************************************************************************
+-- References from object
+--****************************************************************************************************
+
+MyBigMessageType100 ::= SEQUENCE
+
+{
+field1 myObject-1.&TypeField,                  -- type from object SEQUENCE {f1 INTEGER}
+field2 MY-CLASS-1.&fixedTypeValueField    ({MyInformationObjectSet1}), -- type from class : ASN1-Type1 ::= INTEGER
+field3 MY-CLASS-1.&variableTypeValueField ({MyInformationObjectSet1}), -- open type from class with constraint
+field4 myObject-1.&FixedTypeValueSetField,           -- value set from object
+field5 myObject-1.&VariableTypeValueSetField         -- value set from object
+}
+
+myBigMessage100 MyBigMessageType100 ::=
+{
+field1   {f1 88},
+field2   myObject-1.&fixedTypeValueField,     -- fixed type value from object
+field3   myObject-1.&variableTypeValueField,  -- variable type value from object
+field4   TRUE,
+field5   {f1 4592}
+}
+
+myNewObject1 OBJECTCLASS1 ::= myObject-1.&objectField          -- reset
+
+MyNewObjectSet1 OBJECTCLASS1::= { myObject-1.&ObjectSetField }    -- { reset | resetResource }
+
+--****************************************************************************************************
+-- References from object set
+--****************************************************************************************************
+
+ myValueFromObjectSet INTEGER ::= MyInformationObjectSet1.myObject-1.&fixedTypeValueField
+
+ MyValueSetFromObjectSet  INTEGER ::= { MyInformationObjectSet1.myObject-1.&FixedTypeValueSetField }
+
+ MyNewObjectSet2 OBJECTCLASS1 ::= { MyInformationObjectSet1.&objectField }
+
+ MyNewObjectSet3 OBJECTCLASS1 ::= { MyInformationObjectSet3.&ObjectSetField }
+
+--****************************************************************************************************
+--simplified RANAP specification information   *******************************************************
+--****************************************************************************************************
+-- using only Reset and ResetResource elementary procedures CLASS1
+
+RANAP-ELEMENTARY-PROCEDURES RANAP-ELEMENTARY-PROCEDURE ::= {
+	RANAP-ELEMENTARY-PROCEDURES-CLASS-1
+	 |
+	RANAP-ELEMENTARY-PROCEDURES-CLASS-2,
+	...
+}
+
+RANAP-ELEMENTARY-PROCEDURES-CLASS-1 RANAP-ELEMENTARY-PROCEDURE ::= {
+
+	reset		|
+	resetResource	,
+	...
+}
+
+RANAP-ELEMENTARY-PROCEDURES-CLASS-2 RANAP-ELEMENTARY-PROCEDURE ::= {
+	rAB-ReleaseRequest		|
+	iu-ReleaseRequest	}
+
+RANAP-ELEMENTARY-PROCEDURE ::= CLASS {
+	&InitiatingMessage				,
+	&SuccessfulOutcome				OPTIONAL,
+	&UnsuccessfulOutcome				OPTIONAL,
+	&Outcome					OPTIONAL,
+	&procedureCode			ProcedureCode 	UNIQUE,
+	&criticality			Criticality 	DEFAULT ignore
+}
+WITH SYNTAX {
+	INITIATING MESSAGE		&InitiatingMessage
+	[SUCCESSFUL OUTCOME		&SuccessfulOutcome]
+	[UNSUCCESSFUL OUTCOME		&UnsuccessfulOutcome]
+	[OUTCOME			&Outcome]
+	PROCEDURE CODE				&procedureCode
+	[CRITICALITY			&criticality]
+}
+
+RANAP-PDU ::= CHOICE {
+	initiatingMessage	InitiatingMessage,
+	successfulOutcome	SuccessfulOutcome,
+	unsuccessfulOutcome	UnsuccessfulOutcome,
+	outcome			Outcome,
+	...
+}
+
+InitiatingMessage ::= SEQUENCE {
+	procedureCode	RANAP-ELEMENTARY-PROCEDURE.&procedureCode	({RANAP-ELEMENTARY-PROCEDURES}),
+	criticality	RANAP-ELEMENTARY-PROCEDURE.&criticality		({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+	value		RANAP-ELEMENTARY-PROCEDURE.&InitiatingMessage	({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+SuccessfulOutcome ::= SEQUENCE {
+	procedureCode	RANAP-ELEMENTARY-PROCEDURE.&procedureCode	({RANAP-ELEMENTARY-PROCEDURES}),
+	criticality	RANAP-ELEMENTARY-PROCEDURE.&criticality		({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+	value		RANAP-ELEMENTARY-PROCEDURE.&SuccessfulOutcome	({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+UnsuccessfulOutcome ::= SEQUENCE {
+	procedureCode	RANAP-ELEMENTARY-PROCEDURE.&procedureCode	({RANAP-ELEMENTARY-PROCEDURES}),
+	criticality	RANAP-ELEMENTARY-PROCEDURE.&criticality		({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+	value		RANAP-ELEMENTARY-PROCEDURE.&UnsuccessfulOutcome	({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+Outcome ::= SEQUENCE {
+	procedureCode	RANAP-ELEMENTARY-PROCEDURE.&procedureCode	({RANAP-ELEMENTARY-PROCEDURES}),
+	criticality	RANAP-ELEMENTARY-PROCEDURE.&criticality		({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+	value		RANAP-ELEMENTARY-PROCEDURE.&Outcome		({RANAP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+reset RANAP-ELEMENTARY-PROCEDURE ::= {
+	INITIATING MESSAGE	Reset
+	SUCCESSFUL OUTCOME	ResetAcknowledge
+	PROCEDURE CODE		id-Reset
+	CRITICALITY		reject
+}
+
+resetResource RANAP-ELEMENTARY-PROCEDURE ::= {
+	INITIATING MESSAGE      ResetResource
+	SUCCESSFUL OUTCOME      ResetResourceAcknowledge
+	PROCEDURE CODE          id-ResetResource
+	CRITICALITY             reject
+}
+
+iu-ReleaseRequest RANAP-ELEMENTARY-PROCEDURE ::= {
+	INITIATING MESSAGE	Iu-ReleaseRequest
+	PROCEDURE CODE		id-Iu-ReleaseRequest
+	CRITICALITY		ignore
+}
+
+rAB-ReleaseRequest RANAP-ELEMENTARY-PROCEDURE ::= {
+	INITIATING MESSAGE	RAB-ReleaseRequest
+	PROCEDURE CODE		id-RAB-ReleaseRequest
+	CRITICALITY		ignore
+}
+
+Reset ::= SEQUENCE {
+	protocolIEs		OCTET STRING,	     --simplified with dummy fields
+	protocolExtensions	OCTET STRING,        --simplified with dummy fields
+	...
+}
+
+ResetAcknowledge ::= SEQUENCE {
+        protocolIEs		OCTET STRING,	        --simplified with dummy fields
+	protocolExtensions	OCTET STRING,    	--simplified with dummy fields
+	...
+}
+
+ResetResource ::= SEQUENCE {
+	protocolIEs               OCTET STRING,  --simplified with dummy fields
+	protocolExtensions	  OCTET STRING,	 --simplified with dummy fields
+	...
+}
+
+ResetResourceAcknowledge ::= SEQUENCE {
+	protocolIEs			OCTET STRING,   --simplified with dummy fields
+	protocolExtensions		OCTET STRING, 	--simplified with dummy fields
+	...
+}
+
+RAB-ReleaseRequest ::= SEQUENCE {
+	protocolIEs			OCTET STRING,   --simplified with dummy fields
+	protocolExtensions		OCTET STRING 	--simplified with dummy fields
+}
+
+Iu-ReleaseRequest ::= SEQUENCE {
+	protocolIEs		 OCTET STRING,            --simplified with dummy fields
+	protocolExtensions	 OCTET STRING	OPTIONAL, --simplified with dummy fields
+	...
+}
+
+ProcedureCode		::= INTEGER (0..255)
+
+Criticality		::= ENUMERATED { reject, ignore, notify, unspecified }
+
+id-Reset ProcedureCode ::= 0
+
+id-ResetResource ProcedureCode ::= 1
+
+id-Iu-ReleaseRequest ProcedureCode ::= 2
+
+id-RAB-ReleaseRequest ProcedureCode ::= 3
+
+--Gyuri ASN1 ****************************************************************
+-- **************************************************************************
+MY-CLASS-2 ::= CLASS
+{
+&Argument,
+&identifier INTEGER UNIQUE,
+&linkedArgument &Argument OPTIONAL,
+&ErrorCodes INTEGER DEFAULT {0},
+&returnedObject
+}
+WITH SYNTAX
+{
+INFORMATION &Argument WITH ID &identifier [AND ERRORS &ErrorCodes]
+[LINKED TO &linkedArgument]
+[ANSWERS &returnedObject]
+}
+
+END

@@ -1,0 +1,78 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Beres, Szabolcs
+ *
+ ******************************************************************************/
+// TTCN-3 version of "Hello, world!"
+module MyExample1
+{
+type record of integer ROI;
+type port PCOType message
+{
+  inout charstring;
+}
+
+type component MTCType
+{
+  port PCOType MyPCO_PT;
+}
+
+testcase tc_HelloW() runs on MTCType system MTCType
+{
+  map(mtc:MyPCO_PT, system:MyPCO_PT);
+  MyPCO_PT.send("Hello, world!");
+  setverdict(pass);
+}
+
+ function f_tmpl(in template integer pt1, out template integer pt2, inout template integer pt3) {
+  for( var integer iii := 1, j:=10 ;iii<j;iii:=iii+1 ){
+    var integer myi;
+    myi := iii;
+    log("ii:",iii, j);
+  }
+}
+
+altstep as() runs on MTCType {
+    [] MyPCO_PT.receive { setverdict(fail); }
+}
+
+testcase tc_HelloW2() runs on MTCType system MTCType
+{
+ 
+  
+  for (var integer i:=0; i < 100; i := i + 1) {
+    i := 5;
+    var integer b := 5;
+    
+    b := b + 6;
+    
+  }
+
+  timer TL_T := 15.0;
+  map(mtc:MyPCO_PT, system:MyPCO_PT);
+  MyPCO_PT.send("Hello, world!");
+  var integer i := 5;
+  TL_T.start;
+  alt {
+    [i == 5] MyPCO_PT.receive("Hello, TTCN-3!") { TL_T.stop; setverdict(pass); }
+    [] TL_T.timeout { setverdict(inconc); }
+    [] MyPCO_PT.receive { TL_T.stop; setverdict(fail); }
+  }
+  
+  as();
+}
+
+control
+{
+  //action(tsp_valami);
+//  execute(tc_HelloW());
+  //execute(tc_HelloW2());
+}
+}

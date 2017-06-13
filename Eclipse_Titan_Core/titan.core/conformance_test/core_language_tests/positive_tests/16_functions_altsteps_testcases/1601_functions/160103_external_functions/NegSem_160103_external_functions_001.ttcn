@@ -1,0 +1,28 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:16.1.3, Ensure that the IUT recognizes external functions
+ ** @verdict  pass reject
+ ** @configuration  external_functions
+ ***************************************************/
+module NegSem_160103_external_functions_001 {
+	
+    type component GeneralComp {
+    }
+	
+	//external functions cannot return template
+    external function xf_NegSem_160103_external_functions_001() return template integer; 
+	// integers are easiers than octetstrings	
+	
+    testcase TC_NegSem_160103_external_functions_001 () runs on GeneralComp {
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_NegSem_160103_external_functions_001());
+    }
+
+}

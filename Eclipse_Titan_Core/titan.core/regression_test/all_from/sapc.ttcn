@@ -1,0 +1,106 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module sapc {
+import from types all;
+type component sapka {}
+
+template CreateSAPCSubscription t_sapc_data := {
+  pcBlacklistService_list := {    "a",    "b",    "c"  }
+}
+
+template GetResponseSAPCSubscription g_resp := {
+permutation(
+"hello",
+all from t_sapc_data.pcBlacklistService_list
+)
+};
+
+testcase tc_sapc() runs on sapka
+{
+var template CreateSAPCSubscription vt_sapc_data := t_sapc_data
+
+// compiler doesn't let us compare templates :(
+//if (t_sapc_data==vt_sapc_data) { setverdict(pass); } else { setverdict(fail); }
+if (log2str(t_sapc_data)==log2str(vt_sapc_data)) { setverdict(pass); } else { setverdict(fail); }
+
+var template GetResponseSAPCSubscription resp; // initialized from a template
+var template GetResponseSAPCSubscription resp_vt; //          from a var template
+var template GetResponseSAPCSubscription resp_manual; // hacked by hand
+
+if (sizeof (vt_sapc_data.pcBlacklistService_list) > 0) {
+    select (sizeof (vt_sapc_data.pcBlacklistService_list)){
+        case (1) {
+            resp_manual.pcBlacklistService_list := {
+              permutation("hello", vt_sapc_data.pcBlacklistService_list[0], "goodbye")
+            }
+        }
+        case (2) {
+            resp_manual.pcBlacklistService_list := {
+                permutation ("hello",
+                    vt_sapc_data.pcBlacklistService_list[0], 
+                    vt_sapc_data.pcBlacklistService_list[1], "goodbye")
+            }
+        }
+        case (3) {
+            resp_manual.pcBlacklistService_list := {
+                permutation ("hello",
+                    vt_sapc_data.pcBlacklistService_list[0],
+                    vt_sapc_data.pcBlacklistService_list[1],
+                    vt_sapc_data.pcBlacklistService_list[2], "goodbye")
+            }
+        }
+        case else {
+            resp_manual.pcBlacklistService_list := {
+                permutation ("hello",
+                    vt_sapc_data.pcBlacklistService_list[0],
+                    vt_sapc_data.pcBlacklistService_list[1],
+                    vt_sapc_data.pcBlacklistService_list[2],
+                    vt_sapc_data.pcBlacklistService_list[3], "goodbye",
+                    *)
+            }
+        }
+    }
+}
+
+// var template referring to a global template
+resp.pcBlacklistService_list := {
+permutation(
+"hello",
+all from t_sapc_data .pcBlacklistService_list,
+"goodbye"
+) };
+
+// var template referring to another var template
+resp_vt.pcBlacklistService_list := {
+permutation(
+"hello",
+all from vt_sapc_data .pcBlacklistService_list,
+"goodbye"
+) };
+
+action("manual ", resp_manual.pcBlacklistService_list);
+action("all    ", resp       .pcBlacklistService_list);
+action("all vt ", resp_vt    .pcBlacklistService_list);
+
+if (log2str(resp.pcBlacklistService_list)==log2str(resp_manual.pcBlacklistService_list))
+{ setverdict(pass); } else { setverdict(fail, "at line ", __LINE__, "\n", resp.pcBlacklistService_list, " !=\n", resp_manual.pcBlacklistService_list); }
+
+if (log2str(resp_vt.pcBlacklistService_list)==log2str(resp_manual.pcBlacklistService_list))
+{ setverdict(pass); } else { setverdict(fail, "at line ", __LINE__, "\n", resp_vt.pcBlacklistService_list, " !=\n", resp_manual.pcBlacklistService_list); }
+
+} // testcase
+
+}
+with {
+  encode "XML"
+}

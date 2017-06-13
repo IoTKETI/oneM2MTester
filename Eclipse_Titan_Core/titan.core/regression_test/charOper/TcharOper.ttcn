@@ -1,0 +1,102 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+
+// char type is no longer a standalone type, it maps to charstring in the standard
+module TcharOper
+{
+type char typedefbasic_mychar;
+const char TcharOper_const1:="h";
+type component charOper_comptype { };
+
+testcase charAssign() runs on charOper_comptype
+{ var char x1:="a";
+  var char x4:=x1;
+  var char x2,x3;
+  x2:="x";
+  x3:=x2;
+  if (x1=="a") {setverdict(pass);}	//at declaration, value
+     else {setverdict(fail);}
+  if (x4=="a") {setverdict(pass);}	//at declaration, variable
+     else {setverdict(fail);}
+  if (x2=="x") {setverdict(pass);}	//later, value
+     else {setverdict(fail);}
+  if (x3=="x") {setverdict(pass);}	//later, variable
+     else {setverdict(fail);}
+}
+
+testcase charConst() runs on charOper_comptype {
+const char TcharOper_const3:="1";
+if (TcharOper_const1=="h") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+//if (TcharOper_const2==2) {setverdict(pass);}	//control part
+//     else {setverdict(fail);}
+if (TcharOper_const3=="1") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+}
+
+testcase charCompEq() runs on charOper_comptype
+{ var char x1,x2,x3;
+  x1:="a";
+  x2:="a";
+  x3:="c";
+  if (x1==x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x3==x2)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1=="a") {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1=="v")) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if ("a"==x1) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not("4"==x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if ("a"=="a") {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not("c"=="a")) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase charCompNotEq() runs on charOper_comptype
+{ var char x1,x2,x3;
+  x1:="a";
+  x2:="k";
+  x3:="a";
+  if (x1!=x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1!=x3)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1!="l") {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1!="a")) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if ("m"!=x2) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not("k"!=x2)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if ("a"!="b") {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not("1"!="1")) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+control {
+  execute(charAssign());
+  execute(charConst());
+  execute(charCompEq());
+  execute(charCompNotEq());
+}
+
+}

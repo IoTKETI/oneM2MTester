@@ -1,0 +1,66 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:B.1.3.3, Ensure that all from clause operand can be a set of value
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+
+// The following requirement is tested:
+/* Restriction d) Individual members of a permutation and elements of the template in the all from clause shall only be
+expressions, templates obeying to restriction c) above, and the AnyElement and AnyElementsOrNone matching
+mechanisms.*/ 
+
+module Sem_B010303_permutation_009 { 
+
+	type set of integer SoI;
+	type record of integer RoI;
+    
+    type record MessageType {
+  	 	record of integer  	field1
+	}
+
+    type port loopbackPort message {
+	  	inout MessageType
+	} with {extension "internal"}
+	
+	type component GeneralComp {	    	    
+	  	port loopbackPort messagePort
+	}	
+	
+	template SoI t_source := { 1, 2 ,?};
+	template RoI t_perm1 := { permutation (all from t_source), 5 };    //using all from with ?
+	
+	testcase TC_Sem_B010303_permutation_009() runs on GeneralComp {
+        
+    	var MessageType v_testMessage;
+
+ 		template MessageType mw_matchingTemplate:= {  	
+  			field1 := t_perm1
+ 		} 
+
+ 		v_testMessage:=  {  
+  			field1 := {2,1,3,5}
+ 		} 
+ 
+		connect(self:messagePort, self:messagePort);
+ 		messagePort.send(v_testMessage);
+
+    	alt {
+     		[] messagePort.receive(mw_matchingTemplate) {
+        		setverdict(pass);
+     		}
+     		[] messagePort.receive {
+        		setverdict(fail);
+     		}
+    	}
+	}
+
+	control{
+	    execute(TC_Sem_B010303_permutation_009());
+	}
+
+}
+ 

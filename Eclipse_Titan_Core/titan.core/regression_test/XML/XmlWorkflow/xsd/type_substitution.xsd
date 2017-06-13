@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:tysub="www.example.org/type/substitution"
+ targetNamespace="www.example.org/type/substitution">
+
+
+<xsd:element name="head" type="tysub:ParentType" block="restriction"/>
+
+<!-- SUBSTITUTABLE PARENT TYPE -->
+<xsd:complexType name="ParentType">
+	<xsd:sequence>
+		<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string" />
+		<xsd:element name="bar" type="xsd:string"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="RestrictedTypeElem" type="tysub:restrictedType"/>
+<!-- The restricting type is: -->    
+<xsd:complexType name="restrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="tysub:ParentType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="1" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:element name="Submit" type="tysub:SubmitRequestType" />
+
+<xsd:complexType name="SubmitRequestType">
+	<xsd:sequence>
+		<xsd:element name="request1" type="tysub:ParentType" />
+		<xsd:element name="request2" type="tysub:ParentType" />
+	</xsd:sequence>
+</xsd:complexType>
+
+
+</xsd:schema>

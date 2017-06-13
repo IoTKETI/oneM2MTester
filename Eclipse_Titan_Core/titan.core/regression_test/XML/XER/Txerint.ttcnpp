@@ -1,0 +1,170 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Txerint {
+
+modulepar boolean verbose := false;
+
+#include "../macros.ttcnin"
+
+import from AsnValues all;
+type component TINT {}
+
+external function flatten(inout universal charstring par) ;
+
+DECLARE_XER_ENCODERS(integer, int);
+DECLARE_EXER_ENCODERS(integer,int)
+DECLARE_XER_ENCODERS(r_int, r_int);
+DECLARE_EXER_ENCODERS(r_int,r_int)
+DECLARE_XER_ENCODERS(u_int, u_int);
+DECLARE_EXER_ENCODERS(u_int,u_int)
+
+type record r_int {
+	integer i optional
+}
+
+type union u_int {
+	integer i
+}
+
+testcase encode_int() runs on TINT
+{
+    var integer plain := 42;
+    var universal charstring expected := "<INTEGER>42</INTEGER>";
+    CHECK_METHOD(cxer_enc_int, plain, expected);
+    CHECK_METHOD(bxer_enc_int, plain, expected & lf);
+    CHECK_METHOD(exer_enc_int, plain, expected & lf);
+
+    plain := -13;
+    expected := "<INTEGER>-13</INTEGER>";
+    CHECK_METHOD(cxer_enc_int, plain, expected);
+    CHECK_METHOD(bxer_enc_int, plain, expected & lf);
+    CHECK_METHOD(exer_enc_int, plain, expected & lf);
+
+    plain := 0;
+    expected := "<INTEGER>0</INTEGER>";
+    CHECK_METHOD(cxer_enc_int, plain, expected);
+    CHECK_METHOD(bxer_enc_int, plain, expected & lf);
+    CHECK_METHOD(exer_enc_int, plain, expected & lf);
+
+    plain := -0;
+    expected := "<INTEGER>0</INTEGER>";
+    CHECK_METHOD(cxer_enc_int, plain, expected);
+    CHECK_METHOD(bxer_enc_int, plain, expected & lf);
+    CHECK_METHOD(exer_enc_int, plain, expected & lf);
+
+    plain := 602214179000000000000000;
+    expected := "<INTEGER>602214179000000000000000</INTEGER>";
+    CHECK_METHOD(cxer_enc_int, plain, expected);
+    CHECK_METHOD(bxer_enc_int, plain, expected & lf);
+    CHECK_METHOD(exer_enc_int, plain, expected & lf);
+}
+
+testcase decode_int() runs on TINT
+{
+    var integer expected := 42;
+    const charstring the_answer := "<INTEGER>42</INTEGER>";
+    CHECK_DECODE(cxer_dec_int, the_answer, integer, expected);
+    CHECK_DECODE(bxer_dec_int, the_answer, integer, expected);
+
+    // this is not a valid encoding of an integer:
+    //const charstring deep_answer := "<INTEGER><deep>42</deep></INTEGER>"
+    //CHECK_DECODE(cxer_dec_int, deep_answer, integer, expected);
+    //CHECK_DECODE(bxer_dec_int, deep_answer, integer, expected);
+
+    const charstring eris := "<INTEGER>-13</INTEGER>";
+    expected := -13;
+    CHECK_DECODE(cxer_dec_int, eris, integer, expected);
+    CHECK_DECODE(bxer_dec_int, eris, integer, expected);
+
+    const charstring nought := "<INTEGER>0</INTEGER>";
+    expected := 0;
+    CHECK_DECODE(cxer_dec_int, nought, integer, expected);
+    CHECK_DECODE(bxer_dec_int, nought, integer, expected);
+
+    const charstring minought := "<INTEGER>0</INTEGER>";
+    expected := -0;
+    CHECK_DECODE(cxer_dec_int, minought, integer, expected);
+    CHECK_DECODE(bxer_dec_int, minought, integer, expected);
+
+    const charstring avogadros := "<INTEGER><!-- Hey look, Avogadro's constant -->602214179000000000000000</INTEGER>";
+    expected := 602214179000000000000000;
+    CHECK_DECODE(cxer_dec_int, avogadros, integer, expected);
+    CHECK_DECODE(bxer_dec_int, avogadros, integer, expected);
+
+    // The following should cause a runtime error (and not a segfault!)
+    // when the XmlReader creation fails. But we can't test that here.
+    // CHECK_DECODE(bxer_dec_int, "", integer, 0);
+}
+
+testcase encode_integer_omit() runs on TINT
+{
+	var r_int rec := { omit }
+	var universal charstring expected := "<r_int/>\n";
+    CHECK_METHOD(cxer_enc_r_int, rec, expected);
+    CHECK_METHOD(bxer_enc_r_int, rec, expected & lf);
+    CHECK_METHOD(exer_enc_r_int, rec, expected & lf);
+
+    rec.i := 33;
+    expected := "<r_int>\n\t<i>33</i>\n</r_int>\n\n";
+    CHECK_METHOD(bxer_enc_r_int, rec, expected);
+    CHECK_METHOD(exer_enc_r_int, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_r_int, rec, expected & lf);
+}
+
+testcase decode_integer_omit() runs on TINT
+{
+	var r_int expected := { omit }
+	const charstring omitted := "<r_int/>\n";
+    CHECK_DECODE(cxer_dec_r_int, omitted, r_int, expected);
+    CHECK_DECODE(bxer_dec_r_int, omitted, r_int, expected);
+
+    const charstring supplied := "<r_int><i>37</i></r_int>\n";
+    expected.i := 37;
+    CHECK_DECODE(cxer_dec_r_int, supplied, r_int, expected);
+    CHECK_DECODE(bxer_dec_r_int, supplied, r_int, expected);
+}
+
+testcase encode_integer_choice() runs on TINT
+{
+	var u_int rec := { i := 17 }
+	var universal charstring expected := "<u_int>\n\t<i>17</i>\n</u_int>\n\n";
+    CHECK_METHOD(bxer_enc_u_int, rec, expected);
+    CHECK_METHOD(exer_enc_u_int, rec, expected);
+    flatten(expected);
+    CHECK_METHOD(cxer_enc_u_int, rec, expected & lf);
+}
+
+testcase decode_integer_choice() runs on TINT
+{
+	var u_int expected := { i := 19 }
+	const charstring omitted := "<u_int>\n\t<i>19</i>\n</u_int>\n";
+    CHECK_DECODE(cxer_dec_u_int, omitted, u_int, expected);
+    CHECK_DECODE(bxer_dec_u_int, omitted, u_int, expected);
+}
+
+
+control {
+	execute(encode_int());
+	execute(decode_int());
+	execute(encode_integer_omit())
+	execute(decode_integer_omit())
+	execute(encode_integer_choice());
+	execute(decode_integer_choice());
+}
+
+}
+with {
+  encode "XML";
+  extension "version R8J"; // I is forbidden
+}

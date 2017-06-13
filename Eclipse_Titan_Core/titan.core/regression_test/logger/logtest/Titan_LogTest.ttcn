@@ -1,0 +1,325 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module Titan_LogTest {
+
+modulepar boolean tsp_cfgBoolean:=true;
+import from Titan_LogTestDefinitions all;
+
+//===Functions===
+
+function f_behavior(boolean pl_recv:=true) runs on MTCType2 {
+  var charstring vl_received_msg:="";
+  internal_port.send( "This is the sent message");//PORTEVENT_MMSEND Titan_LogTest.ttcn:41 Sent on external_port to system charstring : "This is the sent message"
+  t.start(0.5);
+  alt{
+    [pl_recv] internal_port.receive(charstring:"This")-> value vl_received_msg { setverdict(pass)} //MATCHING_MCUNSUCC
+    [pl_recv] internal_port.receive(charstring:*)-> value vl_received_msg { setverdict(pass)}
+    //PORTEVENT_MCRECV
+    //MATCHING_MCSUCCESS
+
+    [] t.timeout { 
+        if(pl_recv){ setverdict(fail);} else {setverdict(pass)}
+      }
+  }
+}
+
+function f_behavior_send_rec() runs on MTCTypeExternal {
+  var charstring vl_received_msg:="";
+  external_port.send( "This is the sent message");//PORTEVENT_MMSEND Titan_LogTest.ttcn:41 Sent on external_port to system charstring : "This is the sent message"
+//  t.start(0.5);
+// alt{
+//    //[] external_port.receive(charstring:*)-> value vl_received_msg { setverdict(pass)}
+//    [] t.timeout { setverdict(pass);}
+//  }
+}
+//======= Altsteps  ==========
+
+altstep as_1() runs on MTCType {
+  [] internal_port.receive(*) {}
+  [] t.timeout { }
+}
+
+//======= Testcases ==========
+
+//Thease are manual tests- the tester shall check the logfile manually.
+//TODO: to change this for automated checking
+// Comparison between 2 versions: logtest.sh
+
+//===ACTION===
+testcase tc_action() runs on MTCType {
+  action("This is an action"); //EXECUTOR_EXTCOMMAND
+  setverdict(pass);
+}
+
+//===DEFAULT===
+testcase tc_default() runs on MTCType {
+  var default vd_mydefault:= null;
+  vd_mydefault:= activate(as_1()); //DEFAULTOP_ACTIVATE
+  t.start(0.1); //TIMEROP_START
+  timer t1; 
+  t1.start(0.2); //TIMEROP_START
+  alt { //DEFAULTOP_EXIT
+    [] t1.timeout {  //TIMEROP_TIMEOUT 
+        setverdict(fail); //default altstep expected //VERDICTOP_SETVERDICT
+    };
+  }
+  deactivate(vd_mydefault); //DEFAULTOP_DEACTIVATE  //PARALLEL_PTC
+  setverdict(pass); //VERDICTOP_SETVERDICT
+
+}
+
+//===ERROR LOG===
+
+testcase tc_error1() runs on MTCType {
+  var integer a,b;
+  log(">>>tc_error1: last line before DTE<<<");
+  a:=b; //runtime error //executor: Performing error recovery.
+  setverdict(pass);
+}
+
+//===EXECUTOR LOG===
+
+//executor runtime
+testcase tc_ex_runtime() runs on MTCType {
+  log(">>tc_ex_runtime");
+  setverdict(none);// executor runtime: Waiting for PTCs to finish.
+}
+//see also in tc_parallel_conn: 
+//EXECUTOR_RUNTIME - Connected to MC.
+//EXECUTOR_COMPONENT - TTCN-3 Parallel Test Component finished.
+// EXECUTOR_UNQUALIFIED
+// EXECUTOR_RUNTIME 
+// EXECUTOR_UNQUALIFIED
+// EXECUTOR_CONFIGDATA 
+// EXECUTOR_RUNTIME
+
+//executor config data
+//see the log file:
+//12:51:55.161925 - Processing configuration data received from MC.
+//12:51:55.162954 - Module Titan_LogTest has the following parameters: { tsp_cfgBoolean := true }
+
+//executor ext command
+//Running of external command: See log lines with "Starting external command"
+
+//executor componenent
+//Starting and stopping MTC and HCs
+//14:39:24.116611 - TTCN-3 Main Test Component started on ehubuux110. Version: 1.8.pre3 build 4.
+//14:39:25.440605 - TTCN-3 Main Test Component finished.
+
+//executor logoptions
+// See the second line of the log file !!! "TTCN Logger v2.2 options"
+
+//executor unqualified
+//e.g in hc log:
+//12:48:04.345342 - The address of MC was set to ehubuux110[159.107.193.33]:50532.
+//12:48:04.345759 - The local IP address of the control connection to MC is 159.107.193.33.
+//12:48:04.347014 - This host supports UNIX domain sockets for local communication.
+
+//=== FUNCTION LOG ===
+
+//function rnd
+testcase tc_function_rnd() runs on MTCType {
+  var float vl:=rnd();
+  //log:
+  //14:32:00.300458 Titan_LogTest.ttcn:124->Titan_LogTest.ttcn:102 Random number generator was initialized with seed 1.300365: srand48(1435748778).
+//14:32:00.300696 Titan_LogTest.ttcn:124->Titan_LogTest.ttcn:102 Function rnd() returned 0.717026.
+  setverdict(pass);
+}
+
+//function unqualified
+//????
+
+//===PARALLEL===
+//parallel_ptc
+//PTC creation and finishing, starting and finishing a function
+//see tc_portevent
+
+//parallel_portconn
+testcase tc_parallel_portconn() runs on MTCType {
+  var MTCType2 vc_comp1 := MTCType2.create;
+  var MTCType2 vc_comp2 := MTCType2.create;
+  log("Creates finished");
+  connect(vc_comp1:internal_port, vc_comp2:internal_port);  //this is logged as
+  //15:33:17.693413 PARALLEL Titan_LogTest.ttcn:158->Titan_LogTest.ttcn:135 Connect operation on 6:internal_port and 7:internal_port finished.
+  log("Connect finished");
+  vc_comp1.start(f_behavior(true));
+  vc_comp2.start(f_behavior(false));
+  vc_comp1.done;
+  vc_comp2.done;
+  log("tc_parallel_portconn done finished");
+  setverdict(pass);
+}
+
+//parallel_portmap
+testcase tc_parallel_portmap() runs on MTCType system MTCTypeExternal{
+  var MTCTypeExternal vc_comp1 := MTCTypeExternal.create;
+  map(vc_comp1:external_port, system:external_port);  //this is logged as "Map operation of 6:internal_port to system:internal_port finished"
+  //5 WARNING_UNQUALIFIED Warning: This is a Warning in the port
+  //5 DEBUG_UNQUALIFIED This is a TTCN_DEBUG log in the port
+  //5 WARNING_UNQUALIFIED This is a TTCN_WARNING log in the port
+  //5 ERROR_UNQUALIFIED This is a TTCN_ERROR log in the port
+  //5 DEBUG_UNQUALIFIED This is a log_event
+  unmap(vc_comp1:external_port, system:external_port);
+  vc_comp1.stop;
+  setverdict(none)
+}
+
+//===Testcase===
+//TESTCASE_START Titan_LogTest.ttcn:169->Titan_LogTest.ttcn:51 Test case tc_action started.
+//TESTCASE_FINISH Titan_LogTest.ttcn:169->Titan_LogTest.ttcn:53 Test case tc_action finished. Verdict: pass
+//TESTCASE_UNQUALIFIED ????
+
+//===TTCN_PORTEVENT===
+//tc_portevent covers:
+//PORTEVENT_STATE eg:
+//16:18:16.004974 PORTEVENT_STATE  Port internal_port was started.
+//16:18:16.005240 PORTEVENT_STATE  Port internal_port was stopped.
+//PORTEVENT_MMSEND Titan_LogTest.ttcn:41 Sent on external_port to system charstring : "This is the sent message"
+// see also tc_parallel_portconn:
+//PORTEVENT_MCRECV
+//MATCHING_MCSUCCESS
+//PORTEVENT_MQUEUE
+//PORTEVENT_UNQUALIFIED
+//PORTEVENT_STATE - Port internal_port was stopped.
+testcase tc_portevent() runs on MTCTypeExternal system MTCTypeExternal{ 
+  //PORTEVENT_STATE  Port external_port was started.
+  //PARALLEL_PTC  Component type Titan_LogTest.MTCTypeExternal was initialized.
+  var MTCTypeExternal vc_comp1 := MTCTypeExternal.create; 
+  map(vc_comp1:external_port, system:external_port);// PARALLEL_UNQUALIFIED   Mapping port 6:external_port to system:external_port.
+  //this is logged as "Map operation of 6:internal_port to system:internal_port finished"
+  vc_comp1.start(f_behavior_send_rec()); //PARALLEL_PTC
+  vc_comp1.done;
+  unmap(vc_comp1:external_port, system:external_port);
+  setverdict(none)
+}
+
+//===STATISTICS==
+//STATISTICS_UNQUALIFIED - ok: Titan_LogTest.ttcn:217 Execution of control part in module Titan_LogTest finished
+//STATISTICS_VERDICT     -ok:
+//STATISTICS_VERDICT - Verdict statistics: 2 none (20.00 %), 6 pass (60.00 %), 0 inconc (0.00 %), 0 fail (0.00 %), 2 error (20.00 %)
+//STATISTICS_VERDICT - Test execution summary: 10 test cases were executed. Overall verdict: error
+
+//==TIMEROP==
+//TIMEROP_START
+//TIMEROP_TIMEOUT
+//TIMEROP_READ
+//TIMEROP_STOP
+//TIMEROP_GUARD --???
+//TIMEROP_UNQUALIFIED -- ???
+testcase tc_timer() runs on MTCType {
+  t.start(0.2);
+  alt{
+    []t.timeout { setverdict(pass)};
+  }
+  timer t1:=0.1;
+  t1.start;//TIMEROP_START
+  var float mytime:=t1.read;
+  log("Mytime: ", mytime, " s")
+  var boolean mytimerrunning:=t1.running;
+  log(mytimerrunning);
+  if(mytimerrunning) {setverdict(pass)} else{setverdict(fail)};
+  t1.stop;
+  mytimerrunning:=t1.running;
+  if(not mytimerrunning) {setverdict(pass)} else{setverdict(fail)}
+  t1.start;
+}
+
+//==TTCN_USER
+//USER_UNQUALIFIED
+testcase tc_UserLog() runs on MTCType {
+  log("This is a UserLog");
+  setverdict(pass);
+}
+
+type charstring String6_8 length(6..8);
+template String6_8 t_string6_8 := pattern "mystring";
+
+type union PDU_Dummy {
+  MyArray firstOption,
+  MyArray secondOption
+} with { variant "TAG (
+  firstOption,  i = 0;
+  secondOption, i = 1
+  )" }
+
+type record MyArray {
+  integer     i,
+  charstring  c
+} with { extension "encode(RAW)"}
+
+template MyArray t_myArray:= { ?, "a"}
+
+testcase tc_matching() runs on MTCType {
+  var MyArray myArray:={1,"a"}
+  if(match(myArray,t_myArray))
+  {setverdict(pass)} else{setverdict(fail)}
+  log(match(myArray,t_myArray));//USER_UNQUALIFIED Titan_LogTest.ttcn:302->Titan_LogTest.ttcn:281 { i := 1 with * matched, c := "a" with "a" matched }
+}
+//===TTCN_VERDICTOP===
+//VERDICTOP_GETVERDICT
+//VERDICTOP_SETVERDICT
+//VERDICTOP_FINAL
+//VERDICTOP_UNQUALIFIED ???
+testcase tc_verdict() runs on MTCType {
+  var verdicttype myverdict:=getverdict;
+  setverdict(pass);
+}
+
+//===TTCN_WARNING
+//11:50:56.113567 WARNING_UNQUALIFIED Titan_LogTest.ttcn:259->Titan_LogTest.ttcn:69 Warning: External command `'echo This is the BeginTestCase' Titan_LogTest.tc_action' returned unsuccessful exit status (1).
+
+//===TTCN_MATCHING===
+//see tc_parallel_portconn
+//MATCHING_MCSUCCESS: see tc_parallel_portconn
+//MATCHING_MCUNSUCC:  see tc_parallel_portconn
+
+//===DEBUG===
+//see tc_parallel_portmap
+//DEBUG_ENCDEC see tc_encdec
+//DEBUG_TESTPORT: ??? TODO
+//DEBUG_UNQUALIFIED - see tc_parallel_portmap
+
+external function f_encMyArray(in MyArray p_myArray) return octetstring 
+with { extension "prototype(convert) encode(RAW)"}
+
+external function f_decMyArray(in octetstring p_stream) return  MyArray
+with { extension "prototype(convert) decode(RAW)"}
+
+//DEBUG_ENCDEC
+testcase tc_encdec() runs on MTCType {
+  var MyArray pl_myArray:={ 1,"a"}
+  var octetstring vl_encodedPDU:= f_encMyArray(pl_myArray)
+  var MyArray vl_decodedPDU := f_decMyArray(vl_encodedPDU);
+  if(vl_decodedPDU==pl_myArray) { setverdict(pass);} else { setverdict(fail); }
+}
+//EXECUTOR_EXTCOMMAND
+control {
+  var verdicttype vl_verdict:=none;
+  execute(tc_action());
+  execute(tc_default());
+  vl_verdict :=execute(tc_error1());
+  log(vl_verdict);
+  execute(tc_ex_runtime());
+  execute(tc_function_rnd());
+  execute(tc_parallel_portconn());
+  execute(tc_parallel_portmap());
+  execute(tc_portevent());
+  execute(tc_timer());
+  execute(tc_UserLog());
+  execute(tc_matching());
+  execute(tc_verdict());
+  execute(tc_encdec());
+  
+}
+
+} with{ encode "RAW"}

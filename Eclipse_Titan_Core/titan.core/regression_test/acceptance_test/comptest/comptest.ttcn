@@ -1,0 +1,333 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Gecse, Roland
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module comptest {
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+type component mymtctype {
+	var mycomptype1 A;
+	var mycomptype2 B, C;
+}
+
+type component mycomptype1 {
+  port duplex io, oi;
+  var default mydef;
+  timer t := TOUT;
+}
+
+type component mycomptype2 {
+  port simplex_in i;
+  port simplex_out o;
+  port duplex io;
+  var default mydef;
+  timer t := TOUT;
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+type port duplex message {
+	inout charstring
+} with { extension "internal" }
+
+type port simplex_in message {
+	in charstring
+} with { extension "internal" }
+
+type port simplex_out message {
+	out charstring
+} with { extension "internal" }
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+type enumerated commtype { echo, relay }
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+const charstring str_hello := "Hello!";
+const charstring str1 := "Hello!";
+const charstring str2 := "!olleH";
+const float TOUT := 5.0;
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+altstep tout_fail(timer t) {
+	[] any port.receive { setverdict(fail) }
+	[] t.timeout { setverdict(inconc) }
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+function createconfig() runs on mymtctype {
+	A := mycomptype1.create;
+	B := mycomptype2.create;
+	C := mycomptype2.create;
+
+	connect(A:oi, B:io);
+	connect(B:o, C:i);
+	connect(C:o, B:i);
+	connect(C:io, A:io);
+}
+
+function donestop() runs on mymtctype {
+	A.done; B.done; C.done
+}
+
+function neg(in verdicttype v) return verdicttype {
+	if(v == fail) { return pass }
+	else { return fail }
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+function send_receive(in charstring istr, in charstring ostr, in commtype ct)
+runs on mycomptype1 {
+
+	var verdicttype v := pass;
+
+	mydef := activate(tout_fail(t));
+	if(ct == echo) { v := fail }
+	t.start;
+	oi.send(ostr);
+	alt {
+	[] io.receive(istr) { setverdict(v) }
+	[] oi.receive(istr) { setverdict(neg(v)) }
+	}
+}
+
+/*
+function send_receive2x(in charstring msg1, in charstring msg2)
+runs on mycomptype1 {
+	var charstring str;
+	timer t := TOUT;
+	t.start;
+	io.send(msg2);
+	oi.send(msg1);
+	interleave {
+	[] io.receive(charstring:?) -> value str
+		{
+			if(str == msg1) { setverdict(pass) }
+			else { setverdict(fail) }
+		}
+	[] oi.receive(charstring:?) -> value str
+		{
+			if(str == msg2) { setverdict(pass) }
+			else { setverdict(fail) }
+		}
+	[] t.timeout { setverdict(inconc) }
+	}
+}
+
+function relay_cross(in charstring msg1, in charstring msg2, in boolean single)
+runs on mycomptype2 {
+	var charstring str;
+	timer t := TOUT;
+
+	t.start;
+
+label here;
+	interleave {
+	[] io.receive(charstring:?) -> value str
+	   {
+	   		if(str == msg1) { o.send(msg1); setverdict(pass) }
+			else { setverdict(fail) }
+	   }
+	[] i.receive(charstring:?) -> value str
+	   {
+	   		if(str == msg2) { io.send(msg2); setverdict(pass) }
+			else { setverdict(fail) }
+	   }
+	[] t.timeout { setverdict(inconc) }
+	}
+	if(getverdict == pass and not single) { goto here }
+}
+*/
+
+function relay_x(in charstring id, in charstring term, in boolean last2io)
+runs on mycomptype2 {
+	var charstring str := "";
+
+ 	mydef := activate(tout_fail(t))
+ 	t.start;
+
+	alt {
+	[] io.receive(charstring:?) -> value str
+	   {
+			str := str & id;
+   			o.send(str);
+			if(str == term) { setverdict(pass) }
+			else { repeat }
+	   }
+	[] i.receive(charstring:?) -> value str
+	   {
+	   		str := str & id;
+	   		if(str == term) {
+				if(last2io) { io.send(str); setverdict(pass) }
+				else { o.send(str); setverdict(pass) }
+			}
+			else { o.send(str); repeat }
+	   }
+	}
+}
+
+/*
+//
+// This function is erronous as it tries to send a charstring on its
+// port that has direction 'in'.
+// That is why testcase 7 is supposed to give compilation error!
+//
+function relay_i() runs on mycomptype2 {
+	var charstring str;
+	timer t := TOUT;
+
+	mydef := activate(tout_fail(t));
+	t.start;
+
+	alt {
+	[] io.receive(charstring:?) -> value str { i.send(str); setverdict(pass) }
+	}
+}
+*/
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//
+//  A:oi ---str_hello--> B:io (pass)
+//  B:o  ---str_hello--> C:i  (pass)
+//  C:o  ---str_hello--> A:io (pass)
+//
+testcase comptest_1() runs on mymtctype {
+	createconfig();
+	B.start(relay_x("", str_hello, false));
+	C.start(relay_x("", str_hello, true));
+	A.start(send_receive(str_hello, str_hello, relay));
+	donestop();
+}
+
+//
+//  A:oi -----A---> B:io (pass)
+//  B:o  ----AB---> C:i  (pass)
+//  C:o  ----ABC--> B:i  (pass)
+//  B:o  ---ABCB--> A:oi (pass)
+//
+testcase comptest_2() runs on mymtctype {
+	createconfig();
+	B.start(relay_x("B", "ABCB", true));
+	C.start(relay_x("C", "ABC", false));
+	A.start(send_receive("ABCB", "A", echo));
+	donestop();
+}
+
+/*
+//
+//  A:oi ---str_1--> B:io (pass)  A:io ---str_2--> C:i  (pass)
+//  B:o  ---str_1--> C:i  (pass)  C:o  ---str_2--> B:i  (pass)
+//  C:o  ---str_1--> A:io (pass)  B:io ---str_2--> A:oi (pass)
+//
+testcase comptest_3() runs on mymtctype {
+	createconfig();
+	B.start(relay_cross(str1, str2, true));
+	C.start(relay_cross(str2, str1, true));
+	A.start(send_receive2x(str1, str2));
+	donestop();
+}
+*/
+
+//
+//  A:oi ------A-----> B:i  (pass)
+//  B:o  -----AB-----> C:i  (pass)
+//  C:o  -----ABC----> B:i  (pass)
+//  B:o  ----ABCB----> C:i  (pass)
+//  C:o  ----ABCBC---> B:i  (pass)
+//  B:o  ---ABCBCB---> C:i  (pass)
+//  C:o  ---ABCBCBC--> A:io (pass)
+//
+testcase comptest_4() runs on mymtctype {
+	createconfig();
+	B.start(relay_x("B", "ABCBCB", false));
+	C.start(relay_x("C", "ABCBCBC", true));
+	A.start(send_receive("ABCBCBC", "A", relay));
+	donestop();
+}
+
+//
+//  A:oi ---str_1--> B:io (pass)
+//          C.stop
+//  B:o  ---str_1--> C:i  (error)
+//
+testcase comptest_5(in boolean disc) runs on mymtctype {
+	action("<<< This testcase shall terminate with error verdict >>>");
+	createconfig();
+	if(disc) {
+		disconnect(B:o, C:i);
+		disconnect(C:o, B:i);
+		disconnect(C:io, A:io);
+	}
+	C.stop;
+	B.start(relay_x("B", "ABC", true));
+	A.start(send_receive("ABC", "A", echo));
+	donestop();
+}
+
+//
+//  A:oi ---str_1--> B:io (pass)
+//        disconnect
+//          C.stop
+//    connect(B:o, B:i)   (pass)
+//  B:o  ---str_1--> B:i  (pass)
+//  B:o  ---str_1--> A:io (pass)
+//
+testcase comptest_6() runs on mymtctype {
+	createconfig();
+	disconnect(B:o, C:i);
+	disconnect(C:o, B:i);
+	disconnect(C:io, A:io);
+	C.stop;
+
+	connect(B:o, B:i);
+	B.start(relay_x("B", "ABB", true));
+	A.start(send_receive("ABB", "A", echo));
+	donestop();
+}
+
+/*
+//  This is an invalid testcase! Uncomment it together with function relay_i()
+//  and you should get a compile-time error!
+//
+//  A:oi ---str_1--> B:i  (pass)
+//  B:i  ---str_1--> C:o  (compile type error)
+//
+testcase comptest_7() runs on mymtctype {
+	createconfig();
+	B.start(relay_i());
+	C.start(relay_x("", str_hello, true));
+	A.start(send_receive(str_hello, str_hello, relay));
+	donestop();
+}
+*/
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+control {
+	execute(comptest_1());
+	execute(comptest_2());
+	// execute(comptest_3());
+	execute(comptest_4());
+	execute(comptest_5(false));
+	execute(comptest_5(true));
+	execute(comptest_6());
+	// execute(comptest_7()); // results in compile type semantic error
+}
+
+}

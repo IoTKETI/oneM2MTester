@@ -1,0 +1,116 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>anytype</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="any.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="apply.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>anytype</h1>
+<hr align="left" width="75%">
+<p>This special type is defined as a shorthand for the union of all known types in a TTCN-3 module. Known types include the following: built-in types, user-defined types, imported ASN.1 and other
+imported external types.
+<ul>
+  <li>The fieldnames of the anytype shall be uniquely identified by the corresponding type names using the &quot;dot&quot; notation.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="union.html"><font face="Courier New" color="#003258" size="4"><b>union</b></font></a> &nbsp;</li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>anytype</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<p>&nbsp;</p>
+<div align="center">
+<center>
+<table border="0" width="100%" bgcolor="#C9C2BB" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <blockquote>
+    <p><u>TITAN specific restriction compared to the standard:</u></p>
+    </blockquote>
+    <ul>
+      <li>
+      <p>&nbsp;<font face="Courier New" size="4"><b>anytype</b></font> can only contain the simple types, the ones defined in the same module and the <b>address</b> type. Imported types are not
+      included.</p>
+      </li>
+      <li>
+      <p>&nbsp;The types included in the <font face="Courier New" size="4"><b>anytype</b></font> of a module have to be declared by the user, using extension attributes.</p>
+      </li>
+    </ul>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<hr align="left" width="50%">
+<p>Example 1:
+<p><font face="Courier New">module example {<br>
+type float MyFloat;<br>
+type charstring MyString;<br>
+type record MyRecord {<br>
+&nbsp;&nbsp;&nbsp;integer i,<br>
+&nbsp;&nbsp;&nbsp;float f<br>
+}<br>
+...</font>
+<p><font face="Courier New">control {<br>
+&nbsp;&nbsp;&nbsp;var anytype v_any;<br>
+&nbsp;&nbsp;&nbsp;v_any.integer := 3;<br>
+&nbsp;&nbsp;&nbsp;v_any.charstring := "hello";<br>
+&nbsp;&nbsp;&nbsp;v_any.MyRecord := { i := 42, f := 0.5};<br>
+...<br>
+&nbsp;&nbsp;&nbsp;v_any.integer := v_any.MyRecord.i - 2;<br>
+}<br>
+}<br>
+with {<br>
+extension "anytype integer, charstring, MyRecord" }<br>
+</font>
+<p><font face="Courier New" size="4"><b>anytype</b></font> is defined to contain 3 types: integer, charstring and the MyRecord type.<br>
+The type MyFloat will not be a part of the anytype.<br>
+3 is assigned to the integer part of v_any making it hold an integer value.<br>
+"hello" is assigned to the charstring part of v_any making it hold a charstring value.<br>
+A record is assigned to the MyRecord part of v_any making it hold a MyRecord value.<br>
+The MyRecord contents of v_any is read and after decreasing it with 2 it is assigned to the integer part of v_any.<br>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#anytypekeyword">BNF definition</a> of <font face="Courier New">anytype</font></p>
+</body>
+</html>

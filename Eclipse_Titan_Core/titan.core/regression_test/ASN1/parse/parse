@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+#echo "*****************************************************"
+#echo "Ez egy sokadik tok primitiv automatizalt teszter V0.0" 
+#echo "ami leellenorzi, hogy az X680, 681, 682 es 683 cuccokat"
+# echo "be tudjuk-e parseolni"
+#echo "*****************************************************"
+
+function_compiler()
+{
+$TTCN3_COMPILER -p ${ABS_SRC}/${1}.asn  2>> ERROR_file
+
+if  
+  $GREP -q Error ./ERROR_file   
+	  then Verdict="fail"
+          else  Verdict="pass"
+ fi      
+
+if (test -s ${ABS_SRC}/${1}.asn)
+ then file_present="Yes"
+ else Verdict="fail: missing .asn file"
+fi
+
+rm ./ERROR_file
+echo "ASN1:$1 = Verdict: $Verdict"
+}
+
+function_compiler Test1
+function_compiler Test1_known_errors
+function_compiler Test2
+function_compiler Test2_known_errors
+function_compiler Test3
+function_compiler Test3_known_errors
+function_compiler Test4
+function_compiler Test4_known_errors
+

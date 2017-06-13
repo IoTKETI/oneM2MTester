@@ -1,0 +1,234 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module functions {
+import from types all;
+
+//************************* Functions ******************************
+
+
+function f_checkIntegerTemplate(in template integer pl_template,in RoI pl_goodValues, in RoI pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+  
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+  
+}
+with { extension "transparent" }
+
+function f_checkCharstringTemplate(in template charstring pl_template,in RoCS pl_goodValues, in RoCS pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+with { extension "transparent" }
+
+function f_checkOctetstringTemplate(in template octetstring pl_template,in RoOS pl_goodValues, in RoOS pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+function f_checkRoITemplate(in template RoI pl_template,in RoRoI pl_goodValues, in RoRoI pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+  
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+with { extension "transparent" }
+
+function f_checkSoITemplate(in template SoI pl_template,in RoSoI pl_goodValues, in RoSoI pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+with { extension "transparent" }
+
+function f_checkMyRecTemplate(in template MyRecord pl_template,in RoMyRec pl_goodValues, in RoMyRec pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+
+function f_checkMyUnionTemplate(in template MyUnion pl_template,in RoMyUnion pl_goodValues, in RoMyUnion pl_badValues) {
+
+  action("template=", pl_template, " will be checked against ",pl_goodValues);
+
+  var integer N:=sizeof(pl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(pl_goodValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_goodValues[i], " should match ", pl_template); }
+  }
+
+  action("template=", pl_template, " will be checked against ",pl_badValues);
+  N:=sizeof(pl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(pl_badValues[i], pl_template)) { setverdict(pass); }
+    else { setverdict(fail,pl_badValues[i], " should not match ", pl_template); }
+  }
+
+}
+//==== Equivalence ====
+
+function f_checkSoITemplateEquivalence(in template SoI pl_template1, in template SoI pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkRoITemplateEquivalence(in template RoI pl_template1, in template RoI pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkRoCSTemplateEquivalence(in template RoCS pl_template1, in template RoCS pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+function f_checkIntTemplateEquivalence(in template integer pl_template1, in template integer pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkCharstringTemplateEquivalence(in template charstring pl_template1, in template charstring pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkOctetstringTemplateEquivalence(in template octetstring pl_template1, in template octetstring pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkMyRecordTemplateEquivalence(in template MyRecord pl_template1, in template MyRecord pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkMyUnionTemplateEquivalence(in template MyUnion pl_template1, in template MyUnion pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkMyFunctionRefTemplateEquivalence(in template F_int2int pl_template1, in template F_int2int pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_checkMyRoFRefTemplateEquivalence(in template RoF_int2int pl_template1, in template RoF_int2int pl_template2) {
+  action("template1=",pl_template1," check against ",pl_template2);
+  if(log2str(pl_template1)==log2str(pl_template2)) {setverdict(pass);} else {setverdict(fail,"template1=",pl_template1," should match against ",pl_template2 );}
+}
+with { extension "transparent" }
+
+function f_createIntegerWithAllFromFromInTemplateFromRoi(in template RoI pl_template1, inout template integer pl_template2) {
+  pl_template2:= (all from pl_template1);
+}
+
+function f_createIntegerWithAllFromFromInOutTemplateFromRoi(inout template RoI pl_template1, inout template integer pl_template2) {
+  pl_template2:= (all from pl_template1);
+}
+
+function f_createIntegerWithAllFromFromInTemplateFromSoi(in template SoI pl_template1, inout template integer pl_template2) {
+  pl_template2:= (all from pl_template1);
+}
+
+function f_createIntegerWithAllFromFromInOutTemplateFromSoi(inout template SoI pl_template1, inout template integer pl_template2) {
+  pl_template2:= (all from pl_template1);
+}
+
+//====== function references =======
+function f_int2int_1(in integer pl_i) return integer { log("f_int2int_1 called with ", pl_i);return 1;}
+function f_int2int_2(in integer pl_i) return integer { log("f_int2int_2 called with ", pl_i);return 2;}
+
+}//module

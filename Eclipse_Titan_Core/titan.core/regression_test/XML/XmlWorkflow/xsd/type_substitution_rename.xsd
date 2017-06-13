@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="www.example.org/type/substitution/rename"
+  xmlns:this="www.example.org/type/substitution/rename">
+
+
+<xsd:element name="Complex">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref="this:parentType" />
+			<xsd:element type="this:ParentType" name="sd"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name="parentType" type="this:ParentType"/>
+
+<xsd:complexType name="ParentType">
+	<xsd:sequence>
+		<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string" />
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="RestrictedType" type="this:restrictedType"/>
+
+<xsd:complexType name="restrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ParentType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="1" maxOccurs="unbounded" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+
+</xsd:schema>
+

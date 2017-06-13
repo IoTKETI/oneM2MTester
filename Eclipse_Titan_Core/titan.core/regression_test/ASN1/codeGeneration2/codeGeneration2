@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+#echo "*****************************************************"
+#echo "Ez egy sokadik tok primitiv automatizalt teszter V0.0" 
+#echo "ami leellenorzi , hogy a fordito elfogad-e jo ertekeket "
+# echo "kulonfele tipusokhoz"
+#echo "*****************************************************"
+
+function_compiler()
+{
+$TTCN3_COMPILER ${ABS_SRC}/${1}.asn  2>> ERROR_file
+
+if  
+  $GREP Error ./ERROR_file   
+	  then Verdict="fail"
+          else  Verdict="pass"
+ fi      
+if  
+  $GREP ERROR ./ERROR_file   
+	  then Verdict="fail"
+          else  Verdict="pass"
+ fi 
+
+if  
+  $GREP error ./ERROR_file   
+	  then Verdict="fail"
+          else  Verdict="pass"
+ fi 
+
+if (test -s ${ABS_SRC}/${1}.asn)
+ then file_present="Yes"
+ else Verdict="fail : missing ASN file"
+fi
+
+rm ./ERROR_file
+echo "ASN1:$1 = Verdict: $Verdict"
+}
+
+function_compiler Test46
+function_compiler Test48
+function_compiler Test49
+function_compiler Test51
+function_compiler Test52
+function_compiler Test53
+function_compiler Test54
+function_compiler Test55
+function_compiler Test56
+function_compiler Test57
+function_compiler Test60
+function_compiler Test61
+function_compiler Test62
+function_compiler Test63
+function_compiler Test64
+function_compiler Test65
+function_compiler Test66
+function_compiler Test68
+function_compiler Test71
+function_compiler Test74
+function_compiler Test75
+function_compiler Test76
+function_compiler Test77
+function_compiler Test78
+function_compiler Test80
+function_compiler Test81
+function_compiler Test83
+function_compiler Test86
+function_compiler Test87

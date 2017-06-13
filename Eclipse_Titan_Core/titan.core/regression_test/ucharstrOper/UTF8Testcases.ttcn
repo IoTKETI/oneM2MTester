@@ -1,0 +1,596 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+// This module tests the following functions for UTF-8:
+// oct2unichar
+// unichar2oct
+// get_stringencoding
+module UTF8Testcases { 
+
+import from Common all;
+
+const octetstring c_BOM_UTF8 :='EFBBBF'O
+//type component MTC {}
+
+//One letter tests
+//00-0F UTF-8 decoding octetstring to unicode
+//decoding is UTF-8 as default encoding
+testcase tc_UTF8_encodeDecode_BMP1_implicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0);
+  var universal charstring u2 := char(0,0,0,0); //converted
+  for(var integer i:=0;i<128;i:=i+1) {    
+    u1 := int2unichar(i);
+    o_expected := int2oct(i,1);
+    log(o_expected);
+    o:=unichar2oct(u1);
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    u2:= oct2unichar(o)
+    log(u2);
+    if(match(u2,u1)) {
+      setverdict(pass,"matched :", match(u2,u1));
+    } else {
+      setverdict(fail,"unmatched :", match(u2,u1)); 
+    }
+    
+    if( get_stringencoding(o) == "ASCII" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok, expected: UTF-8, received ", get_stringencoding(o) );
+    }  
+      
+  }
+}
+
+//00-0F UTF-8 encoding octetstring to unicode
+testcase tc_UTF8_encodeDecode_BMP1_explicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); //expected
+  var universal charstring u2 := char(0,0,0,0); //converted
+  for(var integer i:=0;i<128;i:=i+1) {    
+    
+    //unichar2oct, UTF-8 no bom
+    u1 := int2unichar(i);
+    o_expected := int2oct(i,1);
+    log(o_expected);
+    o:=unichar2oct(u1,"UTF-8"); //no BOM
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8\") encoding is ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,"\"UTF-8\") encoding is nok");
+    }
+    log(o);
+    u2 := oct2unichar(o); //default:UTF-8 no bom
+    log(u2);
+    if(match(u2,u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match(u2,u1)); 
+    }
+    
+    u2 := oct2unichar(o,"UTF-8"); //
+    log(u2);
+    if(match(u2,u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match(u2,u1)); 
+    }
+    
+    
+    //unichar2oct, UTF-8 BOM
+    o_expected := c_BOM_UTF8 & o_expected; //bom
+    o:=unichar2oct(u1,"UTF-8 BOM")
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected ", o_expected,"received ",o );
+    }
+    
+    log(o);
+    u2 := oct2unichar(o,"UTF-8");
+    log(u2);
+    if(match(u2,u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match(u2,u1)); 
+    }
+    
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }  
+    
+    if( unichar2oct(u2, "UTF-8 BOM") == o){
+      setverdict(pass, "converting back to octetstring is ok")
+    }  else {
+      setverdict(fail,"converting back to octetstring is nok, expected: ",o , " received:",unichar2oct(u2) );
+    }     
+  }
+}
+
+
+//0080-0800 UTF-8 encoding octetstring to unicode
+// UTF-8, 2 bytes long
+testcase tc_UTF8_encodeDecode_BMP2_implicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0);
+  var universal charstring u2 := char(0,0,0,0);
+  const integer L := oct2int('0080'O);
+  const integer N := oct2int('0800'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+9 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,11);
+    o_expected := bit2oct('110'B & substr(bs,0,5)&'10'B & substr(bs,5,6));
+    log("i=",i," utf-8 string:", o_expected);
+    
+    o:=unichar2oct(u1);
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    //implicit
+    u2 := oct2unichar(o);
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }  
+  }
+}
+
+//0080-0800 UTF-8 encoding unicode to octetstring and octetstring to unicode
+// UTF-8, 2 bytes long
+// encoding type explicite given
+testcase tc_UTF8_encodeDecode_BMP2_explicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0);
+  var universal charstring u2 := char(0,0,0,0);
+  const integer L := oct2int('0080'O);
+  const integer N := oct2int('0800'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+9 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,11);
+    log("i=",i," utf-8 string:",'110'B & substr(bs,0,5)&'10'B & substr(bs,5,6));
+    o_expected := bit2oct('110'B & substr(bs,0,5)&'10'B & substr(bs,5,6));
+    log("utf-8 string without bom:",o_expected);
+    o:=unichar2oct(u1,"UTF-8"); //means: without bom
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8\") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,",\"UTF-8\") encoding nok, expected: ",o_expected," received: ", o);
+    }
+        
+    u2 := oct2unichar(o, "UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+    
+    // with bom:
+    o_expected := c_BOM_UTF8 & o_expected;
+    o:=unichar2oct(u1,"UTF-8 BOM");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding nok, expected: ",o_expected," received: ", o);
+    }
+        
+    u2 := oct2unichar(o, "UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+  }
+}
+
+//0800-FFFF UTF-8 encoding octetstring to unicode
+// UTF-8, 3 bytes long
+testcase tc_UTF8_encodeDecode_BMP3_implicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); //expected
+  var universal charstring u2 := char(0,0,0,0); //converted
+  const integer L := oct2int( '0800'O);
+  const integer N := oct2int('010000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10027 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,16);
+    bs := '1110'B & substr(bs,0,4)&'10'B & substr(bs,4,6) &'10'B & substr(bs,10,6);
+    log("i=",i," utf-8 string:", bs);
+    o_expected := bit2oct(bs);
+    o:=unichar2oct(u1);
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    //implicit
+    u2 := oct2unichar(o);
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }  
+  }
+}
+
+//0800-FFFF UTF-8 encoding octetstring to unicode
+// UTF-8, 3 bytes long
+testcase tc_UTF8_encodeDecode_BMP3_explicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); //expected
+  var universal charstring u2 := char(0,0,0,0); //converted
+  const integer L := oct2int( '0800'O);
+  const integer N := oct2int('010000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10027 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,16);
+    bs := '1110'B & substr(bs,0,4)&'10'B & substr(bs,4,6) &'10'B & substr(bs,10,6);
+    log("i=",i," utf-8 string:", bs);
+    o_expected := bit2oct(bs);
+    o:=unichar2oct(u1,"UTF-8");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+     
+    u2 := oct2unichar(o,"UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+    
+    //with bom: 
+     o_expected := c_BOM_UTF8 & o_expected;
+    o:=unichar2oct(u1,"UTF-8 BOM");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding nok, expected: ",o_expected," received: ", o);
+    }
+        
+    u2 := oct2unichar(o, "UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+  }
+}
+
+//10000-20 0000 UTF-8 encoding octetstring to unicode
+// UTF-8, 4 bytes long
+testcase tc_UTF8_encodeDecode_BMP4_implicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); // expected encoded value
+  var universal charstring u2 := char(0,0,0,0); //decoded value
+  const integer L := oct2int( '010000'O);
+  const integer N := oct2int('200000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10023 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,21);    
+    bs := '11110'B & substr(bs,0,3)&'10'B & substr(bs,3,6) &'10'B & substr(bs,9,6) & '10'B & substr(bs,15,6);
+    log("i=",i," utf-8 string:", bs);
+     o_expected := bit2oct(bs);
+    o:=unichar2oct(u1);
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    //implicit
+    u2 := oct2unichar(o);
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+	
+  }
+}
+
+testcase tc_UTF8_encodeDecode_BMP4_explicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); // expected encoded value
+  var universal charstring u2 := char(0,0,0,0); //decoded value
+  const integer L := oct2int( '010000'O);
+  const integer N := oct2int('200000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10023 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,21);    
+    bs := '11110'B & substr(bs,0,3)&'10'B & substr(bs,3,6) &'10'B & substr(bs,9,6) & '10'B & substr(bs,15,6);
+    log("i=",i," utf-8 string:", bs);
+     o_expected := bit2oct(bs);
+    o:=unichar2oct(u1,"UTF-8");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    u2 := oct2unichar(o,"UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }
+    
+    //with bom: 
+    o_expected := c_BOM_UTF8 & o_expected;
+    o:=unichar2oct(u1,"UTF-8 BOM");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding nok, expected: ",o_expected," received: ", o);
+    }
+        
+    u2 := oct2unichar(o, "UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }  
+	
+  }
+}
+
+
+//20 0000 - 0400 0000 UTF-8 encoding octetstring to unicode
+// UTF-8, 5 bytes long
+testcase tc_UTF8_encodeDecode_BMP5_implicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); // expected encoded value
+  var universal charstring u2 := char(0,0,0,0); // encoded value
+  const integer L := oct2int(  '200000'O );
+  const integer N := oct2int('04000000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10000 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,26);    
+    bs := '111110'B & substr(bs,0,2)&'10'B & substr(bs,2,6) &'10'B & substr(bs,8,6) & '10'B & substr(bs,14,6)& '10'B & substr(bs,20,6);
+    log("i=",i," utf-8 string:", bs);
+    o_expected := bit2oct(bs);
+    o:=unichar2oct(u1);
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    //implicit
+    u2 := oct2unichar(o);
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    }  
+  }
+}
+
+
+//20 0000 - 0400 0000 UTF-8 encoding octetstring to unicode
+// UTF-8, 5 bytes long
+testcase tc_UTF8_encodeDecode_BMP5_explicit() runs on MTC {
+  var octetstring o:=''O;
+  var octetstring o_expected:=''O;
+  var universal charstring u1 := char(0,0,0,0); // expected encoded value
+  var universal charstring u2 := char(0,0,0,0); // encoded value
+  const integer L := oct2int(  '200000'O );
+  const integer N := oct2int('04000000'O);
+  var bitstring bs :=''B;
+  for( var integer i:=L; i<N; i:=i+10000 ) {  
+    u1 := int2unichar(i);
+    bs := int2bit(i,26);    
+    bs := '111110'B & substr(bs,0,2)&'10'B & substr(bs,2,6) &'10'B & substr(bs,8,6) & '10'B & substr(bs,14,6)& '10'B & substr(bs,20,6);
+    log("i=",i," utf-8 string:", bs);
+	o_expected := bit2oct(bs);
+    o:=unichar2oct(u1,"UTF-8");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,") encoding nok, expected: ",o_expected," received: ", o);
+    }
+    
+    u2 := oct2unichar(o,"UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+   
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+    
+    //with bom: 
+     o_expected := c_BOM_UTF8 & o_expected;
+    o:=unichar2oct(u1,"UTF-8 BOM");
+    if(o==o_expected) {
+      setverdict(pass,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding ok");
+    } else {
+      setverdict(fail,"unichar2oct(",u1,",\"UTF-8 BOM\") encoding nok, expected: ",o_expected," received: ", o);
+    }
+        
+    u2 := oct2unichar(o, "UTF-8");
+    log( u2 );
+    if(match( u2, u1)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail,"unmatched :", match( u2, u1 )); 
+    }
+    
+    if( get_stringencoding(o) == "UTF-8" ) {
+      setverdict(pass,"encoding type ok");
+    } else {
+      setverdict(fail,"encoding type nok");
+    } 
+  }
+}
+
+testcase tc_remove_bom_utf8() runs on MTC {
+  var octetstring o1:= 'EFBBBF7F'O;
+  var octetstring o2:= remove_bom(o1);
+  if( o2 == '7F'O) {
+    setverdict(pass);
+  } else {
+    setverdict(fail);
+  }
+}
+
+
+testcase tc_UTF8_negative() runs on MTC {
+  f_oct2unichar_negativetest(
+  inputOs :='FFFF'O,
+  encType := "UTF-8",
+  expectedErrorMsg:="Malformed: At character position 0, octet position 0: unused/reserved octet FF.");
+  
+  f_oct2unichar_negativetest(
+  inputOs :='FFFF'O,
+  encType := "UTF-8BE",
+  expectedErrorMsg:="oct2unichar: Invalid parameter: UTF-8BE");
+  
+  f_oct2unichar_negativetest(
+  inputOs :='FFFF'O,
+  encType := "UTF-8 BOM",
+  expectedErrorMsg:="oct2unichar: Invalid parameter: UTF-8 BOM");
+  
+  f_oct2unichar_negativetest(
+  inputOs :='FFFF'O,
+  encType := "Oracle",
+  expectedErrorMsg:="oct2unichar: Invalid parameter: Oracle");
+}
+
+
+control {
+  execute(tc_UTF8_encodeDecode_BMP1_implicit());
+  execute(tc_UTF8_encodeDecode_BMP1_explicit());
+  execute(tc_UTF8_encodeDecode_BMP2_implicit());
+  execute(tc_UTF8_encodeDecode_BMP2_explicit());
+  execute(tc_UTF8_encodeDecode_BMP3_implicit());
+  execute(tc_UTF8_encodeDecode_BMP3_explicit());
+  execute(tc_UTF8_encodeDecode_BMP4_implicit());
+  execute(tc_UTF8_encodeDecode_BMP4_explicit());
+  execute(tc_UTF8_encodeDecode_BMP5_implicit());
+  execute(tc_UTF8_encodeDecode_BMP5_explicit());
+  execute(tc_remove_bom_utf8());
+  execute(tc_UTF8_negative());
+}
+}

@@ -1,0 +1,255 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module TtemplateChar {
+type component templateChar_mycomp {};
+type record templateChar_rec {
+ char x1,
+ char x2,
+ char x3 optional };
+template templateChar_rec templateChar_tSpec :={ //specific values
+ x1:="a",
+ x2:="b",
+ x3:="c" };
+template templateChar_rec templateChar_tList :={ //specific value and value list
+ x1:="a",
+ x2:=("a","b","k"),
+ x3:="c" };
+template templateChar_rec templateChar_tComp :={ //specific value and compl. list
+ x1:="a",
+ x2:=complement ("b","2","l"),
+ x3:="c" };
+template templateChar_rec templateChar_tOmit :={ //omitting values
+ x1:="a",
+ x2:="b",
+ x3:=omit } ;
+template templateChar_rec templateChar_tAny :={ //specific and any value
+ x1:="a",
+ x2:="b",
+ x3:=? } ;
+template templateChar_rec templateChar_tAnyorNone :={ //specific and AnyorNone value
+ x1:="a",
+ x2:="b",
+ x3:=* };
+template templateChar_rec templateChar_tRange1 :={ //specific value and Range
+ x1:="a",
+ x2:=("a" .."h"),
+ x3:="c" };
+template templateChar_rec templateChar_tRange2 :={ //specific value and Range
+ x1:="a",
+ x2:=("a" .. "h"),
+ x3:="c" };
+template templateChar_rec templateChar_tRange3 :={ //specific value and Range
+ x1:="a",
+ x2:=("k" .. int2char(127)),
+ x3:="c" };
+template templateChar_rec templateChar_tRange4 :={ //specific value and Range
+ x1:="a",
+ x2:=(int2char(0) .. "k"),
+ x3:="c" };
+template templateChar_rec templateChar_tIfpresent :={ //specific value and ifpresent
+ x1:="a",
+ x2:="b",
+ x3:="c" ifpresent };
+
+testcase templateCharSpec() runs on templateChar_mycomp {
+var templateChar_rec x1,x2;		//specific value
+x1:={ x1:="a",  x2:="b",  x3:="c" };
+x2:={ x1:="k",  x2:="b",  x3:="c" };
+//match
+if (match(x1,templateChar_tSpec)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match
+if (not(match(x2,templateChar_tSpec))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharList() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//value list
+x1:={ x1:="a",  x2:="b",  x3:="c" };
+x2:={ x1:="a",  x2:="h",  x3:="c" };
+x3:={ x1:="k",  x2:="b",  x3:="c" };
+//match
+if (match(x1,templateChar_tList)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of list
+if (not(match(x2,templateChar_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tList))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharComp() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//complemented list
+x1:={ x1:="a",  x2:="c",  x3:="c" };
+x2:={ x1:="a",  x2:="2",  x3:="c" };
+x3:={ x1:="k",  x2:="c",  x3:="c" };
+//match
+if (match(x1,templateChar_tComp)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: in the list
+if (not(match(x2,templateChar_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tComp))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharOmit() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//omitting value
+x1:={ x1:="a",  x2:="b",  x3:=omit };
+x2:={ x1:="a",  x2:="b",  x3:="o" };
+x3:={ x1:="l",  x2:="b",  x3:=omit };
+//match
+if (match(x1,templateChar_tOmit)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: not omitted
+if (not(match(x2,templateChar_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tOmit))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharAny() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//any value
+x1:={ x1:="a",  x2:="b",  x3:="l" };
+x2:={ x1:="a",  x2:="b",  x3:=omit };
+x3:={ x1:="k",  x2:="b",  x3:="l" };
+//match
+if (match(x1,templateChar_tAny)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: field omitted
+if (not(match(x2,templateChar_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tAny))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharAnyorNone() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//AnyorNone value
+x1:={ x1:="a",  x2:="b",  x3:=omit };
+x2:={ x1:="a",  x2:="b",  x3:="m" };
+x3:={ x1:="p",  x2:="b",  x3:=omit };
+//match: omitted
+if (match(x1,templateChar_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: value
+if (match(x2,templateChar_tAnyorNone)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tAnyorNone))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharRange1() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//Range ( .. )
+x1:={ x1:="a",  x2:="d",  x3:="c" };
+x2:={ x1:="a",  x2:="p",  x3:="c" };
+x3:={ x1:="l",  x2:="d",  x3:="c" };
+//match
+if (match(x1,templateChar_tRange1)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateChar_tRange1))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tRange1))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharRange2() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//Range ( to )
+x1:={ x1:="a",  x2:="d",  x3:="c" };
+x2:={ x1:="a",  x2:="p",  x3:="c" };
+x3:={ x1:="l",  x2:="d",  x3:="c" };
+//match
+if (match(x1,templateChar_tRange2)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateChar_tRange2))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tRange2))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharRange3() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//Range, with infinity
+x1:={ x1:="a",  x2:="p",  x3:="c" };
+x2:={ x1:="a",  x2:="d",  x3:="c" };
+x3:={ x1:="l",  x2:="p",  x3:="c" };
+//match
+if (match(x1,templateChar_tRange3)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateChar_tRange3))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tRange3))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharRange4() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3;		//Range with - infinity
+x1:={ x1:="a",  x2:="d",  x3:="c" };
+x2:={ x1:="a",  x2:="p",  x3:="c" };
+x3:={ x1:="l",  x2:="d",  x3:="c" };
+//match
+if (match(x1,templateChar_tRange4)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: out of range
+if (not(match(x2,templateChar_tRange4))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x3,templateChar_tRange4))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+testcase templateCharIfpresent() runs on templateChar_mycomp {
+var templateChar_rec x1,x2,x3,x4;		//ifpresent
+x1:={ x1:="a",  x2:="b",  x3:="c" };
+x2:={ x1:="a",  x2:="b",  x3:=omit };
+x3:={ x1:="a",  x2:="b",  x3:="k" };
+x4:={ x1:="c",  x2:="b",  x3:=omit };
+//match: present and match
+if (match(x1,templateChar_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//match: not present
+if (match(x2,templateChar_tIfpresent)) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: present and not match
+if (not(match(x3,templateChar_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+//no match: other field
+if (not(match(x4,templateChar_tIfpresent))) {setverdict(pass);}
+ else {setverdict(fail);}
+}
+
+control {
+ execute(templateCharSpec());
+ execute(templateCharList());
+ execute(templateCharComp());
+ execute(templateCharOmit());
+ execute(templateCharAny());
+ execute(templateCharAnyorNone());
+ execute(templateCharRange1());
+ execute(templateCharRange2());
+ execute(templateCharRange3());
+ execute(templateCharRange4());
+ execute(templateCharIfpresent());
+}
+}

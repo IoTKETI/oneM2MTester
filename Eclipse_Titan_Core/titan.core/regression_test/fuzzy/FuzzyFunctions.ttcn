@@ -1,0 +1,261 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains functions and altsteps for testing fuzzy parameters
+module FuzzyFunctions {
+
+import from FuzzyTypes all;
+
+// Functions with fuzzy parameters
+// -------------------------------
+//
+// These functions add, multiply or concatenate their fuzzy parameter
+// with itself a specified amount of times, and return the result.
+// Functions with fuzzy parameters of structured types perform these
+// operations on their elements or fields.
+// Functions with fuzzy template parameters perform matching on a
+// list of values.
+//
+// Some of the functions are multi-leveled, testing the use of fuzzy
+// parameters passed as another function's fuzzy parameter.
+// Some of the multi-leveled functions have a lazy parameter instead of
+// a fuzzy one, to test the conversions between fuzzy and lazy parameters.
+
+function f_fuzzy_usage_int(in @fuzzy integer p_fuzzy, in integer p_usages) return integer {
+  var integer v_sum := 0;
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_sum := v_sum + p_fuzzy;
+  }
+  return v_sum;
+}
+
+function f_fuzzy_usage_float(in @fuzzy float p_fuzzy, in integer p_usages) return float {
+  var float v_sum := 0.0;
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_sum := v_sum + p_fuzzy;
+  }
+  return v_sum;
+}
+
+function f_wrapped_fuzzy_usage_float(in @fuzzy float p_fuzzy, in integer p_outer_usages, in integer p_inner_usages) return float {
+  var float v_prod := 1.0;
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    v_prod := v_prod * f_fuzzy_usage_float(p_fuzzy, p_inner_usages);
+  }
+  return v_prod;
+}
+
+function f_fuzzy_usage_cstr(in @fuzzy charstring p_fuzzy, in integer p_usages) return charstring {
+  var charstring v_res := "";
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_res := v_res & p_fuzzy;
+  }
+  return v_res;
+}
+
+function f_lazy_usage_bstr(in @lazy bitstring p_lazy, in integer p_usages) return bitstring {
+  var bitstring v_res := ''B;
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_res := v_res & p_lazy;
+  }
+  return v_res;
+}
+
+function f_wrapped_fuzzy_usage_bstr(in @fuzzy bitstring p_fuzzy, in integer p_outer_usages, in integer p_inner_usages) return bitstring {
+  var bitstring v_res := ''B;
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_fuzzy would be treated as lazy)
+    v_res := v_res & p_fuzzy;
+    v_res := v_res & f_lazy_usage_bstr(p_fuzzy, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_fuzzy_usage_hstr(in @fuzzy hexstring p_fuzzy, in integer p_usages) return hexstring {
+  var hexstring v_res := ''H;
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_res := v_res & p_fuzzy;
+  }
+  return v_res;
+}
+
+function f_wrapped_lazy_usage_hstr(in @lazy hexstring p_lazy, in integer p_outer_usages, in integer p_inner_usages) return hexstring {
+  var hexstring v_res := ''H;
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_lazy would be treated as fuzzy)
+    v_res := v_res & p_lazy;
+    v_res := v_res & f_fuzzy_usage_hstr(p_lazy, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_fuzzy_usage_ostr(in @fuzzy octetstring p_fuzzy, in integer p_usages) return octetstring {
+  var octetstring v_res := ''O;
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_res := v_res & p_fuzzy;
+  }
+  return v_res;
+}
+
+function f_wrapped_lazy_usage_ostr(in @lazy octetstring p_lazy, in integer p_outer_usages, in integer p_inner_usages) return octetstring {
+  var octetstring v_res := ''O;
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_lazy would be treated as fuzzy)
+    v_res := v_res & p_lazy;
+    v_res := v_res & f_fuzzy_usage_ostr(p_lazy, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_double_wrapped_fuzzy_usage_ostr(in @fuzzy octetstring p_fuzzy, in integer p_outer_usages, in integer p_middle_usages, in integer p_inner_usages) return octetstring {
+  var octetstring v_res := ''O;
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_fuzzy would be treated as lazy)
+    v_res := v_res & p_fuzzy;
+    v_res := v_res & f_wrapped_lazy_usage_ostr(p_fuzzy, p_middle_usages, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_lazy_usage_ustr(in @lazy universal charstring p_lazy, in integer p_usages) return universal charstring {
+  var universal charstring v_res := "";
+  for (var integer i := 0; i < p_usages; i := i + 1) {
+    v_res := v_res & p_lazy;
+  }
+  return v_res;
+}
+
+function f_wrapped_fuzzy_usage_ustr(in @fuzzy universal charstring p_fuzzy, in integer p_outer_usages, in integer p_inner_usages) return universal charstring {
+  var universal charstring v_res := "";
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_fuzzy would be treated as lazy)
+    v_res := v_res & p_fuzzy;
+    v_res := v_res & f_lazy_usage_ustr(p_fuzzy, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_double_wrapped_lazy_usage_ustr(in @lazy universal charstring p_lazy, in integer p_outer_usages, in integer p_middle_usages, in integer p_inner_usages) return universal charstring {
+  var universal charstring v_res := "";
+  for (var integer i := 0; i < p_outer_usages; i := i + 1) {
+    // chaining these concatenations does not currently work (p_lazy would be treated as fuzzy)
+    v_res := v_res & p_lazy;
+    v_res := v_res & f_wrapped_fuzzy_usage_ustr(p_lazy, p_middle_usages, p_inner_usages);
+  }
+  return v_res;
+}
+
+function f_wrapped_fuzzy_usage_rec(in @fuzzy Rec p_fuzzy, in integer p_rec_usages, in integer p_int_usages, in integer p_str_usages) return Rec {
+  var Rec v_res := { num := 0, str := "" };
+  for (var integer i := 0; i < p_rec_usages; i := i + 1) {
+    v_res.num := v_res.num + f_fuzzy_usage_int(p_fuzzy.num, p_int_usages);
+    v_res.str := v_res.str & f_fuzzy_usage_cstr(p_fuzzy.str, p_str_usages);
+  }
+  return v_res;
+}
+
+function f_fuzzy_usage_int_temp(in template @fuzzy integer pt_fuzzy, in IntList p_values) return integer {
+  var integer v_nof_matches := 0;
+  for (var integer i := 0; i < lengthof(p_values); i := i + 1) {
+    if (match(p_values[i], pt_fuzzy)) {
+      v_nof_matches := v_nof_matches + 1;
+    }
+  }
+  return v_nof_matches;
+}
+
+function f_wrapped_fuzzy_usage_list_temp(in template @fuzzy IntList pt_fuzzy, in IntList p_values) return integer {
+  var integer v_nof_matches := 0;
+  for (var integer i := 0; i < lengthof(pt_fuzzy); i := i + 1) {
+    v_nof_matches := v_nof_matches + f_fuzzy_usage_int_temp(pt_fuzzy[i], p_values);
+  }
+  return v_nof_matches;
+}
+
+// Altstep with fuzzy parameters
+altstep as_fuzzy_bool(in @fuzzy boolean p_fuzzy) runs on CT {
+  var template integer vt_msg := (1..10);
+  [p_fuzzy] pt.receive(vt_msg) { }
+  [not p_fuzzy] pt.receive(vt_msg) { }
+  [p_fuzzy] pt.receive { }
+  [not p_fuzzy] pt.receive { }
+}
+
+// Functions used as fuzzy parameters
+// ----------------------------------
+//
+// These functions are used as the expressions of fuzzy parameters.
+// Each function returns its value or template parameter, and
+// increases a counter, to help test how many times a fuzzy
+// parameter's expression was evaluated.
+
+function f_fuzzy_return_int(in integer p_ret) runs on CT return integer {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_float(in float p_ret) runs on CT return float {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_cstr(in charstring p_ret) runs on CT return charstring {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_bstr(in bitstring p_ret) runs on CT return bitstring {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_hstr(in hexstring p_ret) runs on CT return hexstring {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_ostr(in octetstring p_ret) runs on CT return octetstring {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_ustr(in universal charstring p_ret) runs on CT return universal charstring {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_bool(in boolean p_ret) runs on CT return boolean {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_rec(in Rec p_ret) runs on CT return Rec {
+  ct_calls := ct_calls + 1;
+  return p_ret;
+}
+
+function f_fuzzy_return_int_temp(in template integer pt_ret) runs on CT return template integer {
+  ct_calls := ct_calls + 1;
+  return pt_ret;
+}
+
+function f_fuzzy_return_list_temp(in template IntList pt_ret) runs on CT return template IntList {
+  ct_calls := ct_calls + 1;
+  return pt_ret;
+}
+
+function f_fuzzy_return_uni_temp(in template Uni pt_ret) runs on CT return template Uni {
+  ct_calls := ct_calls + 1;
+  return pt_ret;
+}
+
+} // end of module

@@ -1,0 +1,532 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          schemas_ericsson_com_cai3g1_2.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- cai3g1.2_provisioning.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "http://schemas.ericsson.com/cai3g1.2/" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module schemas_ericsson_com_cai3g1_2 {
+
+
+import from XSD all;
+
+
+type record Create
+{
+	MoType mOType,
+	AnyMOIdType mOId optional,
+	record {
+		CreateMODefinition createMODefinition
+	} mOAttributes optional,
+	AnySequenceType extension_ optional
+}
+with {
+  variant "element";
+  variant (mOType) "name as capitalized";
+  variant (mOId) "name as capitalized";
+  variant (mOAttributes) "name as capitalized";
+  variant (mOAttributes.createMODefinition) "name as capitalized";
+  variant (extension_) "name as 'extension'";
+};
+
+
+type record CreateResponse
+{
+	AnyMOIdType mOId,
+	GetResponseMOAttributesType mOAttributes optional
+}
+with {
+  variant "element";
+  variant (mOId) "name as capitalized";
+  variant (mOAttributes) "name as capitalized";
+};
+
+
+type record Get
+{
+	MoType mOType,
+	AnyMOIdType mOId optional,
+	AnySequenceType extension_ optional
+}
+with {
+  variant "element";
+  variant (mOType) "name as capitalized";
+  variant (mOId) "name as capitalized";
+  variant (extension_) "name as 'extension'";
+};
+
+
+type record GetResponse
+{
+	record of AnyMOIdType mOId_list,
+	GetResponseMOAttributesType mOAttributes optional
+}
+with {
+  variant "element";
+  variant (mOId_list) "untagged";
+  variant (mOId_list[-]) "name as 'MOId'";
+  variant (mOAttributes) "name as capitalized";
+};
+
+
+type record Set
+{
+	MoType mOType,
+	AnyMOIdType mOId,
+	record {
+		SetMODefinition setMODefinition
+	} mOAttributes,
+	AnySequenceType extension_ optional
+}
+with {
+  variant "element";
+  variant (mOType) "name as capitalized";
+  variant (mOId) "name as capitalized";
+  variant (mOAttributes) "name as capitalized";
+  variant (mOAttributes.setMODefinition) "name as capitalized";
+  variant (extension_) "name as 'extension'";
+};
+
+
+type record SetResponse
+{
+	GetResponseMOAttributesType mOAttributes optional
+}
+with {
+  variant "element";
+  variant (mOAttributes) "name as capitalized";
+};
+
+
+type record Delete
+{
+	MoType mOType,
+	AnyMOIdType mOId,
+	AnySequenceType extension_ optional
+}
+with {
+  variant "element";
+  variant (mOType) "name as capitalized";
+  variant (mOId) "name as capitalized";
+  variant (extension_) "name as 'extension'";
+};
+
+
+type record DeleteResponse
+{
+	AnyMOIdType mOId optional,
+	GetResponseMOAttributesType mOAttributes optional
+}
+with {
+  variant "element";
+  variant (mOId) "name as capitalized";
+  variant (mOAttributes) "name as capitalized";
+};
+
+
+type record Search
+{
+	MoType mOType,
+	SearchFiltersType filters,
+	AnySequenceType extension_ optional
+}
+with {
+  variant "element";
+  variant (mOType) "name as capitalized";
+  variant (extension_) "name as 'extension'";
+};
+
+
+type record SearchResponse
+{
+	record of AnyMOIdType mOId_list
+}
+with {
+  variant "element";
+  variant (mOId_list) "untagged";
+  variant (mOId_list[-]) "name as 'MOId'";
+};
+
+
+type record Login
+{
+	XSD.String userId,
+	XSD.String pwd
+}
+with {
+  variant "element";
+};
+
+
+type record LoginResponse
+{
+	SessionIdType sessionId,
+	XSD.UnsignedLong baseSequenceId
+}
+with {
+  variant "element";
+};
+
+
+type record Logout
+{
+	SessionIdType sessionId
+}
+with {
+  variant "element";
+};
+
+
+type record LogoutResponse
+{
+
+}
+with {
+  variant "element";
+};
+
+
+type record Subscribe
+{
+	XSD.AnyURI managerRef,
+	NotificationFiltersType filters
+}
+with {
+  variant "element";
+};
+
+
+type record SubscribeResponse
+{
+	XSD.String subscriptionId
+}
+with {
+  variant "element";
+};
+
+
+type record Unsubscribe
+{
+	XSD.AnyURI managerRef,
+	XSD.String subscriptionId optional
+}
+with {
+  variant "element";
+};
+
+
+type record UnsubscribeResponse
+{
+
+}
+with {
+  variant "element";
+};
+
+
+type record Notify
+{
+	NotificationHeaderType notificationHeader,
+	record of XSD.String correlatedNotifications_list,
+	XSD.String additionalText optional,
+	XSD.AnyURI sourceIndicator optional,
+	record {
+		record length(1 .. infinity) of XSD.String elem_list
+	} notificationData
+}
+with {
+  variant "element";
+  variant (correlatedNotifications_list) "untagged";
+  variant (correlatedNotifications_list[-]) "name as 'correlatedNotifications'";
+  variant (notificationData.elem_list) "untagged";
+  variant (notificationData.elem_list[-]) "anyElement";
+};
+
+
+type record NotifyResponse
+{
+
+}
+with {
+  variant "element";
+};
+
+
+type record GetResponseMOAttributesType
+{
+	GetMODefinition getMODefinition
+}
+with {
+  variant (getMODefinition) "name as capitalized";
+};
+
+
+type record AbstractCreateAttributeType
+{
+
+};
+
+
+type record AbstractSetAttributeType
+{
+
+};
+
+
+type record AbstractGetAttributeType
+{
+
+};
+
+
+type AbstractCreateAttributeType CreateMODefinition
+with {
+  variant "element";
+};
+
+
+type AbstractSetAttributeType SetMODefinition
+with {
+  variant "element";
+};
+
+
+type AbstractGetAttributeType GetMODefinition
+with {
+  variant "element";
+};
+
+
+type record AnyMOIdType
+{
+	record length(1 .. infinity) of XSD.String elem_list
+}
+with {
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement";
+};
+
+
+type record AnySequenceType
+{
+	record length(1 .. infinity) of XSD.String elem_list
+}
+with {
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement";
+};
+
+
+type XSD.String MoType (pattern "[A-Za-z][_A-Za-z0-9]*@?*");
+
+
+type SessionIdType SessionId
+with {
+  variant "element";
+};
+
+
+type XSD.UnsignedLong TransactionId
+with {
+  variant "element";
+};
+
+
+type XSD.UnsignedLong SequenceId
+with {
+  variant "element";
+};
+
+
+type XSD.String SessionIdType (pattern "[\d\w]#(1,)");
+
+
+type record SearchFiltersType
+{
+	record length(1 .. infinity) of SearchFilterType filter_list
+}
+with {
+  variant (filter_list) "untagged";
+  variant (filter_list[-]) "name as 'filter'";
+};
+
+
+type record SearchFilterType
+{
+	record length(1 .. infinity) of XSD.String mOAttributes_list
+}
+with {
+  variant (mOAttributes_list) "untagged";
+  variant (mOAttributes_list[-]) "name as 'MOAttributes'";
+};
+
+
+type record NotificationHeaderType
+{
+	XSD.String cai3gUser,
+	MoType mOType,
+	AnyMOIdType mOId,
+	XSD.String notificationId optional,
+	XSD.DateTime eventTime,
+	XSD.AnyURI notificationActor optional,
+	NotificationOperationType operation,
+	XSD.String subscriptionId
+}
+with {
+  variant (mOType) "name as capitalized";
+  variant (mOId) "name as capitalized";
+};
+
+
+/* How to make sure there must exist one element */
+type record NotificationFilterType
+{
+	record of XSD.String cai3gUser_list,
+	record of XSD.String mOType_list,
+	record length(0 .. 3) of NotificationOperationType operation_list,
+	record of XSD.String mOId_list,
+	record of XSD.String mOAttributes_list
+}
+with {
+  variant (cai3gUser_list) "untagged";
+  variant (cai3gUser_list[-]) "name as 'cai3gUser'";
+  variant (mOType_list) "untagged";
+  variant (mOType_list[-]) "name as 'MOType'";
+  variant (operation_list) "untagged";
+  variant (operation_list[-]) "name as 'operation'";
+  variant (mOId_list) "untagged";
+  variant (mOId_list[-]) "name as 'MOId'";
+  variant (mOAttributes_list) "untagged";
+  variant (mOAttributes_list[-]) "name as 'MOAttributes'";
+};
+
+
+type record NotificationFiltersType
+{
+	record length(1 .. infinity) of NotificationFilterType filter_list
+}
+with {
+  variant (filter_list) "untagged";
+  variant (filter_list[-]) "name as 'filter'";
+};
+
+
+type enumerated NotificationOperationType
+{
+	create_,
+	delete,
+	set_
+}
+with {
+  variant "text 'create_' as 'Create'";
+  variant "text 'delete' as capitalized";
+  variant "text 'set_' as 'Set'";
+};
+
+
+type record Cai3gFault
+{
+	XSD.Integer faultcode,
+	record {
+		record length(1 .. infinity) of XSD.String reasonText_list
+	} faultreason,
+	XSD.String faultrole,
+	record {
+		XSD.String elem
+	} details optional
+}
+with {
+  variant "element";
+  variant (faultreason.reasonText_list) "untagged";
+  variant (faultreason.reasonText_list[-]) "name as 'reasonText'";
+  variant (details.elem) "anyElement";
+};
+
+
+type record HeaderFaultType
+{
+	XSD.String faultactor,
+	XSD.String description
+};
+
+
+type record SessionIdFault
+{
+	XSD.String faultactor,
+	XSD.String description,
+	enumerated {
+		invalid_SessionId,
+		session_Timeout,
+		sessionId_Syntax_Error
+	} faultcode
+}
+with {
+  variant (faultcode) "text 'invalid_SessionId' as 'Invalid SessionId'";
+  variant (faultcode) "text 'sessionId_Syntax_Error' as 'SessionId Syntax Error'";
+  variant (faultcode) "text 'session_Timeout' as 'Session Timeout'";
+};
+
+
+type record SequenceIdFault
+{
+	XSD.String faultactor,
+	XSD.String description,
+	enumerated {
+		invalid_SequenceId
+	} faultcode
+}
+with {
+  variant (faultcode) "text 'invalid_SequenceId' as 'Invalid SequenceId'";
+};
+
+
+type record TransactionIdFault
+{
+	XSD.String faultactor,
+	XSD.String description,
+	enumerated {
+		invalid_TransactionId
+	} faultcode
+}
+with {
+  variant (faultcode) "text 'invalid_TransactionId' as 'Invalid TransactionId'";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'http://schemas.ericsson.com/cai3g1.2/'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

@@ -1,0 +1,596 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Gecse, Roland
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+//*******   Next version : function and ptc(create/start/stop/running/done) **********//
+
+//	List of test items
+//
+//	1.verdict : one PTC in a testcase
+//	2.verdict : two PTCs in a testcase
+//	3.PTC operation(running/stop/done)
+//
+
+module chinese // Build2
+{
+  	type component MyMtcType
+  	{
+  	}
+
+  	type component MyPtcType1
+  	{
+  	}
+
+  	function fn_ptc_verdict_get() runs on MyPtcType1
+  	{
+  		//getverdict;
+		var integer i;
+  	}
+  	function fn_ptc_verdict_pass() runs on MyPtcType1
+  	{
+  		setverdict(pass);
+  	}
+  	function fn_ptc_verdict_fail() runs on MyPtcType1
+  	{
+  		setverdict(fail);
+  	}
+
+  	// SA/PA should recognize this function and make a error
+  	function fn_ptc_verdict_error() runs on MyPtcType1
+  	{
+		var integer i;
+  	}
+
+  	function fn_ptc_verdict_inconc() runs on MyPtcType1
+  	{
+  		setverdict(inconc);
+  	}
+  	function fn_ptc_verdict_none() runs on MyPtcType1
+  	{
+  	    setverdict(none);
+    }
+  function fn_ptc_verdict_passpass() runs on MyPtcType1
+  {
+    setverdict(pass);
+    setverdict(pass);
+  }
+  function fn_ptc_verdict_passfail() runs on MyPtcType1
+  {
+    setverdict(pass);
+    setverdict(fail);
+  }
+  function fn_ptc_verdict_passinconc() runs on MyPtcType1
+  {
+    setverdict(pass);
+    setverdict(inconc);
+  }
+  function fn_ptc_verdict_passnone() runs on MyPtcType1
+  {
+    setverdict(pass);
+    setverdict(none);
+  }
+  function fn_ptc_verdict_inconcpass() runs on MyPtcType1
+  {
+    setverdict(inconc);
+    setverdict(pass);
+  }
+  function fn_ptc_verdict_inconcfail() runs on MyPtcType1
+  {
+    setverdict(inconc);
+    setverdict(fail);
+  }
+  function fn_ptc_verdict_inconcinconc() runs on MyPtcType1
+  {
+    setverdict(inconc);
+    setverdict(inconc);
+    stop;
+  }
+  function fn_ptc_verdict_inconcnone() runs on MyPtcType1
+  {
+    setverdict(inconc);
+    setverdict(none);
+  }
+  function fn_ptc_verdict_failpass() runs on MyPtcType1
+  {
+    setverdict(fail);
+    setverdict(pass);
+  }
+  function fn_ptc_verdict_failfail() runs on MyPtcType1
+  {
+    setverdict(fail);
+    setverdict(fail);
+  }
+  function fn_ptc_verdict_failinconc() runs on MyPtcType1
+  {
+    setverdict(fail);
+    setverdict(inconc);
+  }
+  function fn_ptc_verdict_failnone() runs on MyPtcType1
+  {
+    setverdict(fail)
+    setverdict(none);
+  }
+
+  type component MyPTCType2
+  {
+  }
+  function fn_ptc2_verdict_pass() runs on MyPTCType2
+  {
+    setverdict(pass);
+  }
+  function fn_ptc2_verdict_fail() runs on MyPTCType2
+  {
+    setverdict(fail);
+  }
+  function fn_ptc2_verdict_inconc() runs on MyPTCType2
+  {
+    setverdict(inconc);
+  }
+  function fn_ptc2_verdict_none() runs on MyPTCType2
+  {
+    setverdict(none);
+  }
+
+  //Verdict operation test for single PTC in a testcase
+  testcase tc_ptc_verdict_get() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_get());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_pass() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_pass());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_fail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_fail());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_inconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_inconc());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_none() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_none());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_error() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_error());
+	ptc1.done;  // ETHRGE
+  }
+
+  testcase tc_ptc_verdict_passpass() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_passpass());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_passfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_passfail());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_passinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_passinconc());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_passnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_passnone());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_failpass() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_failpass());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_failfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_failfail());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_failinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_failinconc());
+	ptc1.done;  // ETHRGE
+  }
+  testcase tc_ptc_verdict_failnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    ptc1 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_failnone());
+	ptc1.done;  // ETHRGE
+  }
+
+  //Verdict operation test for two PTCs in a testcase
+  testcase tc_ptc2_verdict_passpass() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc2_verdict_pass());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_passfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc2_verdict_fail());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_passinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc2_verdict_inconc());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_passnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc2_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_failfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc2_verdict_fail());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_failinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc2_verdict_inconc());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_failnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc2_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_inconcinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_inconc());
+    ptc2.start(fn_ptc2_verdict_inconc());
+ 	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+ }
+  testcase tc_ptc2_verdict_inconcnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_inconc());
+    ptc2.start(fn_ptc2_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptc2_verdict_nonenone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+    var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_none());
+    ptc2.start(fn_ptc2_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+
+  //Verdict operation test for two PTCs in a testcase with same PTC type
+  testcase tc_ptcd_verdict_passpass() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc_verdict_pass());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_passfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc_verdict_fail());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_passinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc_verdict_inconc());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_passnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_pass());
+    ptc2.start(fn_ptc_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_failfail() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc_verdict_fail());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_failinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1;
+	var MyPTCType2 ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPTCType2.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc_verdict_inconc());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_failnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_fail());
+    ptc2.start(fn_ptc_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_inconcinconc() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_inconc());
+    ptc2.start(fn_ptc_verdict_inconc());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_inconcnone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_inconc());
+    ptc2.start(fn_ptc_verdict_none());
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+  }
+  testcase tc_ptcd_verdict_nonenone() runs on MyMtcType
+  {
+    var MyPtcType1 ptc1, ptc2;
+    ptc1 := MyPtcType1.create;
+    ptc2 := MyPtcType1.create;
+    ptc1.start(fn_ptc_verdict_none());
+    ptc2.start(fn_ptc_verdict_none());
+ 	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+ }
+
+	//to test many PTCs and component array
+	testcase tc_ptc_manyptcs() runs on MyMtcType
+	{
+		var MyPtcType1 ptc0,ptc1,ptc2,ptc3,ptc4;
+		var MyPTCType2 ptc5,ptc6,ptc7,ptc8,ptc9;
+		ptc0 := MyPtcType1.create;
+		ptc1 := MyPtcType1.create;
+		ptc2 := MyPtcType1.create;
+		ptc3 := MyPtcType1.create;
+		ptc4 := MyPtcType1.create;
+		ptc5 := MyPTCType2.create;
+		ptc6 := MyPTCType2.create;
+		ptc7 := MyPTCType2.create;
+		ptc8 := MyPTCType2.create;
+		ptc9 := MyPTCType2.create;
+		ptc0.start(fn_ptc_verdict_pass());
+		ptc1.start(fn_ptc_verdict_pass());
+		ptc2.start(fn_ptc_verdict_pass());
+		ptc3.start(fn_ptc_verdict_pass());
+		ptc4.start(fn_ptc_verdict_pass());
+		ptc5.start(fn_ptc_verdict_pass());
+		ptc6.start(fn_ptc_verdict_pass());
+		ptc7.start(fn_ptc_verdict_pass());
+		ptc8.start(fn_ptc_verdict_pass());
+		ptc9.start(fn_ptc_verdict_pass());
+	ptc0.done;  // ETHRGE
+	ptc1.done;  // ETHRGE
+	ptc2.done;  // ETHRGE
+	ptc3.done;  // ETHRGE
+	ptc4.done;  // ETHRGE
+	ptc5.done;  // ETHRGE
+	ptc6.done;  // ETHRGE
+	ptc7.done;  // ETHRGE
+	ptc8.done;  // ETHRGE
+	ptc9.done;  // ETHRGE
+	}
+	testcase tc_ptc_ptcarray() runs on MyMtcType
+	{
+		var MyPtcType1 ptc[10];
+/*		ptc[0] := MyPtcType1.create;
+		ptc[1] := MyPtcType1.create;
+		ptc[2] := MyPtcType1.create;
+		ptc[3] := MyPtcType1.create;
+		ptc[4] := MyPtcType1.create;
+		ptc[5] := MyPtcType1.create;
+		ptc[6] := MyPtcType1.create;
+		ptc[7] := MyPtcType1.create;
+		ptc[8] := MyPtcType1.create;
+		ptc[9] := MyPtcType1.create;
+		ptc[0].start(fn_ptc_verdict_pass());
+		ptc[1].start(fn_ptc_verdict_pass());
+		ptc[2].start(fn_ptc_verdict_pass());
+		ptc[3].start(fn_ptc_verdict_pass());
+		ptc[4].start(fn_ptc_verdict_pass());
+		ptc[5].start(fn_ptc_verdict_pass());
+		ptc[6].start(fn_ptc_verdict_pass());
+		ptc[7].start(fn_ptc_verdict_pass());
+		ptc[8].start(fn_ptc_verdict_pass());
+		ptc[9].start(fn_ptc_verdict_pass());
+		ptc[0].done;
+		ptc[1].done;
+		ptc[2].done;
+		ptc[3].done;
+		ptc[4].done;
+		ptc[5].done;
+		ptc[6].done;
+		ptc[7].done;
+		ptc[8].done;
+		ptc[9].done; */
+	}
+
+/* ETHRGE:	//to test repeat create and start
+  	testcase tc_ptc_repeatcreate()  runs on MyPtcType1
+  	{
+  		var MyPtcType1 ptc1,ptc2;
+  		ptc1 := MyPtcType1.create;
+  		ptc2 := MyPTCType2.create;
+  		ptc1 := MyPtcType1.create;
+  		ptc2 := MyPTCType2.create;
+  		ptc1.start(MyFunc1_04());
+  		ptc2.start(MyFunc2_04());
+  	}
+  	testcase tc_ptc_repeatstart()  runs on MyPtcType1
+  	{
+  		var MyPtcType1 ptc1,ptc2;
+  		ptc1 := MyPtcType1.create;
+  		ptc2 := MyPTCType2.create;
+  		ptc1.start(MyFunc1_04());
+  		ptc2.start(MyFunc2_04());
+  		ptc1.start(MyFunc1_04());
+  		ptc2.start(MyFunc2_04());
+  	} */
+
+  ///////
+  control
+  {
+  	//one PTC
+    execute(tc_ptc_verdict_get());
+    execute(tc_ptc_verdict_pass());
+    execute(tc_ptc_verdict_fail());
+    execute(tc_ptc_verdict_inconc());
+    execute(tc_ptc_verdict_none());
+    execute(tc_ptc_verdict_error());
+
+   	//two PTC with different types
+    execute(tc_ptc2_verdict_passpass());
+    execute(tc_ptc2_verdict_passfail());
+    execute(tc_ptc2_verdict_passinconc());
+    execute(tc_ptc2_verdict_passnone());
+    execute(tc_ptc2_verdict_failfail());
+    execute(tc_ptc2_verdict_failinconc());
+    execute(tc_ptc2_verdict_failnone());
+    execute(tc_ptc2_verdict_inconcinconc());
+    execute(tc_ptc2_verdict_inconcnone());
+    execute(tc_ptc2_verdict_nonenone());
+
+  	//two PTC with same type
+    execute(tc_ptcd_verdict_passpass());
+    execute(tc_ptcd_verdict_passfail());
+    execute(tc_ptcd_verdict_passinconc());
+    execute(tc_ptcd_verdict_passnone());
+    execute(tc_ptcd_verdict_failfail());
+    execute(tc_ptcd_verdict_failinconc());
+    execute(tc_ptcd_verdict_failnone());
+    execute(tc_ptcd_verdict_inconcinconc());
+    execute(tc_ptcd_verdict_inconcnone());
+    execute(tc_ptcd_verdict_nonenone());
+
+	//to test many PTCs and component array
+	execute(tc_ptc_manyptcs());
+	execute(tc_ptc_ptcarray());
+
+    //to test repeat create & start
+    /* ETHRGE: execute(tc_ptc_repeatcreate());
+    execute(tc_ptc_repeatstart());*/
+  }
+}
+

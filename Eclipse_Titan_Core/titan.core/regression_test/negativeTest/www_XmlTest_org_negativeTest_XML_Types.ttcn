@@ -1,0 +1,1184 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Lovassy, Arpad
+ *
+ ******************************************************************************/
+//
+//  File:          www_XmlTest_org_negativeTest_XML_Types.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Mon Apr 18 18:05:24 2011
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- NegTest_XML_Types.xsd
+//			/* xml version = "1.0" */
+//			/* targetnamespace = "www.XmlTest.org/negativeTest_XML_Types" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_XmlTest_org_negativeTest_XML_Types {
+
+
+import from XSD all;
+
+
+/* This documentum tests based on
+      XML Schema Part 1: Structures Second Edition
+      Last modified: 2011-04-13, ETHBAAT */
+
+
+type XSD.Boolean B
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Integer I
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Integer J
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Integer K
+with {
+variant "name as uncapitalized";
+};
+
+
+type enumerated E
+{
+	first,
+	second,
+	third
+}
+with {
+variant "name as uncapitalized";
+};
+
+
+type enumerated N
+{
+	nULL
+}
+with {
+variant "text 'nULL' as capitalized";
+variant "name as uncapitalized";
+};
+
+
+type XSD.Float F
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Float R
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Float FLOAT;
+
+
+type XSD.Float X
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.Float Y
+with {
+variant "name as uncapitalized";
+};
+
+
+type Octetstring O
+with {
+variant "name as uncapitalized";
+};
+
+
+type XSD.String S
+with {
+variant "name as uncapitalized";
+};
+
+
+/* 0. elementary */
+
+
+type enumerated MyEnum
+{
+	first,
+	second,
+	third
+};
+
+
+type enumerated NULL_1
+{
+	nULL
+}
+with {
+variant "text 'nULL' as capitalized";
+variant "name as 'NULL'";
+};
+
+
+/* 1. Sequence (record_ */
+
+
+type record MySeqEmpty
+{
+
+};
+
+
+type record MySeqBool
+{
+	XSD.Boolean b
+};
+
+
+type record MySeqNull
+{
+	NULL_1 n
+};
+
+
+type record MySeqInt
+{
+	XSD.Integer i
+};
+
+
+type record MySeqMyEnum
+{
+	MyEnum e
+};
+
+
+type record MySeqInt2
+{
+	I i,
+	J j
+};
+
+
+type record MySeqInt2opt
+{
+	XSD.Integer i,
+	XSD.Integer j optional
+};
+
+
+type record MySeqIntSeqInt2
+{
+	XSD.Integer i,
+	MySeqInt2 jk
+};
+
+
+type record MySeqIntSeqInt2opt
+{
+	XSD.Integer i optional,
+	MySeqInt2 jk
+};
+
+
+type record MySeqIntSeqInt2optopt
+{
+	XSD.Integer i optional,
+	MySeqInt2opt jk
+};
+
+
+type record MySeqInt3
+{
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k
+};
+
+
+type record MySeqInt3opt
+{
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k optional
+};
+
+
+type record MySeqInt4
+{
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l
+};
+
+
+type record MySeqInt4opt
+{
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l optional
+};
+
+
+type record MySeqReal
+{
+	XSD.Float x
+};
+
+
+type record MySeqReal2
+{
+	XSD.Float x,
+	XSD.Float y
+};
+
+
+type record MySeqStr
+{
+	XSD.String s
+};
+
+
+type record MySeqStr2
+{
+	XSD.String s,
+	XSD.String t
+};
+
+
+/* there is no such thing as a bitstring */
+
+
+type XSD.Decimal Bitstring
+with {
+variant "name as uncapitalized";
+variant "element";
+};
+
+
+type record MySeqBitStr
+{
+	Bitstring b
+};
+
+
+type record MySeqBitStr2
+{
+	Bitstring a,
+	Bitstring b
+};
+
+
+type record MySeqIntReal
+{
+	XSD.Integer i,
+	XSD.Float x
+};
+
+
+type record MySeqIntStr
+{
+	XSD.Integer i,
+	XSD.String s
+};
+
+
+type record MySeqIntBitStr
+{
+	XSD.Integer i,
+	Bitstring b
+};
+
+
+/* there is no such thing as an octetstring, Double tested instead */
+
+
+type XSD.Date Octetstring
+with {
+variant "name as uncapitalized";
+variant "element";
+};
+
+
+type record MySeqOctStr
+{
+	Octetstring o
+};
+
+
+type record MySeqOJKL
+{
+	Octetstring o,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l
+};
+
+
+type record MySeqIOKL
+{
+	XSD.Integer i,
+	Octetstring o,
+	XSD.Integer k,
+	XSD.Integer l
+};
+
+
+type record MySeqISKL
+{
+	XSD.Integer i,
+	MySeqInt4 s,
+	XSD.Integer k,
+	XSD.Integer l
+};
+
+
+/* ===== sequence of sequence of sequence ==== */
+
+
+type record MySeqIntSeqIntSeqInt2SeqReal2
+{
+	XSD.Integer i optional,
+	MySeqIntSeqInt2 jkl,
+	MySeqReal2 xy
+};
+
+
+type record MySeqIntSeqIntSeqInt2optoptSeqReal2
+{
+	XSD.Integer i optional,
+	MySeqIntSeqInt2optopt jkl,
+	MySeqReal2 xy
+};
+
+
+type record MySeqIntSeqReal2
+{
+	XSD.Integer i optional,
+	MySeqReal2 xy
+};
+
+
+type record MySeqIntSeqIntSeqInt2
+{
+	XSD.Integer i,
+	MySeqIntSeqInt2 jkl
+};
+
+
+type record MySeqSeqIntSeqInt2SeqReal2
+{
+	MySeqIntSeqInt2 jkl,
+	MySeqReal2 xy
+};
+
+
+type record MySeq_SeqSeqIntSeqInt2SeqReal2_SeqSeqIntSeqInt2SeqReal2
+{
+	MySeqSeqIntSeqInt2SeqReal2 s1,
+	MySeqSeqIntSeqInt2SeqReal2 s2
+};
+
+
+type record MySeq_SeqSeqIntSeqInt2optoptSeqReal2_SeqSeqIntSeqInt2optoptSeqReal2
+{
+	MySeqIntSeqIntSeqInt2optoptSeqReal2 s1,
+	MySeqIntSeqIntSeqInt2optoptSeqReal2 s2
+};
+
+
+type record MySeqBasicTypes
+{
+	XSD.Boolean b,
+	NULL_1 n,
+	XSD.Integer i,
+	MyEnum e,
+	XSD.Float r,
+	Bitstring bs,
+	Octetstring os,
+	XSD.String oi,
+	XSD.String roi
+};
+
+
+type record MySeqEnum
+{
+	MyEnum e
+};
+
+
+/* 2. Sequence of (record of) */
+
+
+type record MySeqOfBool
+{
+	record of XSD.Boolean b_list
+}
+with {
+variant (b_list) "untagged";
+variant (b_list[-]) "name as 'b'";
+};
+
+
+type record MySeqOfNull
+{
+	record of NULL_1 n_list
+}
+with {
+variant (n_list) "untagged";
+variant (n_list[-]) "name as 'n'";
+};
+
+
+type record MySeqOfInt
+{
+	record of XSD.Integer i_list
+}
+with {
+variant (i_list) "untagged";
+variant (i_list[-]) "name as 'i'";
+};
+
+
+type record MySeqOfMyEnum
+{
+	record of MyEnum e_list
+}
+with {
+variant (e_list) "untagged";
+variant (e_list[-]) "name as 'e'";
+};
+
+
+type record MySeqOfEnum
+{
+	record of MyEnum e_list
+}
+with {
+variant (e_list) "untagged";
+variant (e_list[-]) "name as 'e'";
+};
+
+
+type record MySeqOfReal
+{
+	record of XSD.Float r_list
+}
+with {
+variant (r_list) "untagged";
+variant (r_list[-]) "name as 'r'";
+};
+
+
+type record MySeqOfBitStr
+{
+	record of Bitstring bs_list
+}
+with {
+variant (bs_list) "untagged";
+variant (bs_list[-]) "name as 'bs'";
+};
+
+
+type record MySeqOfOctStr
+{
+	record of Octetstring os_list
+}
+with {
+variant (os_list) "untagged";
+variant (os_list[-]) "name as 'os'";
+};
+
+
+type record MySeqOfObjId
+{
+	record of XSD.String oi_list
+}
+with {
+variant (oi_list) "untagged";
+variant (oi_list[-]) "name as 'oi'";
+};
+
+
+type record MySeqOfMyUnionBT
+{
+	record of MyUnionBasicTypes u_list
+}
+with {
+variant (u_list) "untagged";
+variant (u_list[-]) "name as 'u'";
+};
+
+
+type record MySeqOfSeqSeqIntSeqInt2SeqReal2
+{
+	record of MySeqSeqIntSeqInt2SeqReal2 s_list
+}
+with {
+variant (s_list) "untagged";
+variant (s_list[-]) "name as 's'";
+};
+
+
+type record MySeqOfMySeqIntSeqIntSeqInt2optoptSeqReal2
+{
+	record of MySeqIntSeqIntSeqInt2optoptSeqReal2 s_list
+}
+with {
+variant (s_list) "untagged";
+variant (s_list[-]) "name as 's'";
+};
+
+
+/* 3. Set */
+
+
+type record MySetBool
+{
+	record of enumerated {
+		b
+	} order,
+	XSD.Boolean b
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetNull
+{
+	record of enumerated {
+		n
+	} order,
+	NULL_1 n
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt
+{
+	record of enumerated {
+		i
+	} order,
+	XSD.Integer i
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetMyEnum
+{
+	record of enumerated {
+		e
+	} order,
+	MyEnum e
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt2
+{
+	record of enumerated {
+		i,
+		j
+	} order,
+	I i,
+	J j
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt2opt
+{
+	record of enumerated {
+		i,
+		j
+	} order,
+	XSD.Integer i,
+	XSD.Integer j optional
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSetInt2
+{
+	record of enumerated {
+		i,
+		jk
+	} order,
+	XSD.Integer i,
+	MySetInt2 jk
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSetInt2opt
+{
+	record of enumerated {
+		i,
+		jk
+	} order,
+	XSD.Integer i optional,
+	MySetInt2 jk
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSetInt2optopt
+{
+	record of enumerated {
+		i,
+		jk
+	} order,
+	XSD.Integer i optional,
+	MySetInt2opt jk
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt3
+{
+	record of enumerated {
+		i,
+		j,
+		k
+	} order,
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt3opt
+{
+	record of enumerated {
+		i,
+		j,
+		k
+	} order,
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k optional
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt4
+{
+	record of enumerated {
+		i,
+		j,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetInt4opt
+{
+	record of enumerated {
+		i,
+		j,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l optional
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetReal
+{
+	record of enumerated {
+		x
+	} order,
+	XSD.Float x
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetReal2
+{
+	record of enumerated {
+		x,
+		y
+	} order,
+	XSD.Float x,
+	XSD.Float y
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetStr
+{
+	record of enumerated {
+		s
+	} order,
+	XSD.String s
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetStr2
+{
+	record of enumerated {
+		s,
+		t
+	} order,
+	XSD.String s,
+	XSD.String t
+}
+with {
+variant "useOrder";
+};
+
+
+/* there is no such thing as a bitstring */
+
+
+type record MySetBitStr
+{
+	record of enumerated {
+		b
+	} order,
+	Bitstring b
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetBitStr2
+{
+	record of enumerated {
+		a,
+		b
+	} order,
+	Bitstring a,
+	Bitstring b
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntReal
+{
+	record of enumerated {
+		i,
+		x
+	} order,
+	XSD.Integer i,
+	XSD.Float x
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntStr
+{
+	record of enumerated {
+		i,
+		s
+	} order,
+	XSD.Integer i,
+	XSD.String s
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntBitStr
+{
+	record of enumerated {
+		i,
+		b
+	} order,
+	XSD.Integer i,
+	Bitstring b
+}
+with {
+variant "useOrder";
+};
+
+
+/* there is no such thing as an octetstring, Double tested instead */
+
+
+type record MySetOctStr
+{
+	record of enumerated {
+		o
+	} order,
+	Octetstring o
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetOJKL
+{
+	record of enumerated {
+		o,
+		j,
+		k,
+		l
+	} order,
+	Octetstring o,
+	XSD.Integer j,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIOKL
+{
+	record of enumerated {
+		i,
+		o,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	Octetstring o,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIOSKL
+{
+	record of enumerated {
+		i,
+		o,
+		s,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	Octetstring o,
+	MySetInt4 s,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetISKL
+{
+	record of enumerated {
+		i,
+		s,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	MySetInt4 s,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetISOKL
+{
+	record of enumerated {
+		i,
+		s,
+		o,
+		k,
+		l
+	} order,
+	XSD.Integer i,
+	MySetInt4 s,
+	Octetstring o,
+	XSD.Integer k,
+	XSD.Integer l
+}
+with {
+variant "useOrder";
+};
+
+
+/* ===== all of all of all ==== */
+
+
+type record MySetIntSetIntSetInt2SetReal2
+{
+	record of enumerated {
+		i,
+		jkl,
+		xy
+	} order,
+	XSD.Integer i optional,
+	MySetIntSetInt2 jkl,
+	MySetReal2 xy
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSeqIntSeqInt2optoptSeqReal2
+{
+	record of enumerated {
+		i,
+		jkl,
+		xy
+	} order,
+	XSD.Integer i optional,
+	MySetIntSetInt2optopt jkl,
+	MySetReal2 xy
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSeqReal2
+{
+	record of enumerated {
+		i,
+		xy
+	} order,
+	XSD.Integer i optional,
+	MySetReal2 xy
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetIntSeqIntSeqInt2
+{
+	record of enumerated {
+		i,
+		jkl
+	} order,
+	XSD.Integer i,
+	MySetIntSetInt2 jkl
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetSetIntSetInt2SetReal2
+{
+	record of enumerated {
+		jkl,
+		xy
+	} order,
+	MySetIntSetInt2 jkl,
+	MySetReal2 xy
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySet_SetSetIntSetInt2SetReal2_SetSetIntSetInt2SetReal2
+{
+	record of enumerated {
+		s1,
+		s2
+	} order,
+	MySetSetIntSetInt2SetReal2 s1,
+	MySetSetIntSetInt2SetReal2 s2
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetBasicTypes
+{
+	record of enumerated {
+		b,
+		n,
+		i,
+		e,
+		r,
+		bs,
+		os,
+		oi,
+		roi
+	} order,
+	XSD.Boolean b,
+	NULL_1 n,
+	XSD.Integer i,
+	MyEnum e,
+	XSD.Float r,
+	Bitstring bs,
+	Octetstring os,
+	XSD.String oi,
+	XSD.String roi
+}
+with {
+variant "useOrder";
+};
+
+
+type record MySetEnum
+{
+	record of enumerated {
+		e
+	} order,
+	MyEnum e
+}
+with {
+variant "useOrder";
+};
+
+
+/* 4. Set of */
+
+
+/* 5. Union */
+
+
+type record MyUnionBasicTypes
+{
+	union {
+		XSD.Boolean b,
+		NULL_1 n,
+		XSD.Integer i,
+		MyEnum e,
+		XSD.Float r,
+		Bitstring bs,
+		Octetstring os,
+		XSD.String oi
+	} choice
+}
+with {
+variant (choice) "untagged";
+};
+
+
+type record MyUnionComplexTypes
+{
+	union {
+		MyUnionBasicTypes u,
+		MySeqOfReal sofreal
+	} choice
+}
+with {
+variant (choice) "untagged";
+};
+
+
+type MyUnionBasicTypes MyUnionElement
+with {
+variant "element";
+};
+
+
+/* 5. Attribute */
+
+
+type XSD.Boolean MyAttr
+with {
+variant "name as uncapitalized";
+};
+
+
+type record InternationalPrice
+{
+	XSD.String currency optional,
+	XSD.Decimal value_ optional,
+	MyUnionBasicTypes myUnionValue optional
+}
+with {
+variant "name as uncapitalized";
+variant "element";
+variant (currency) "attribute";
+variant (value_) "name as 'value'";
+variant (value_) "attribute";
+};
+
+
+}
+with {
+encode "XML";
+variant "namespace as 'www.XmlTest.org/negativeTest_XML_Types' prefix 'n'";
+variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

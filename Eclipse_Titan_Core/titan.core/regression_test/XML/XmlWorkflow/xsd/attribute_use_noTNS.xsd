@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!-- The use attribute can be added to local attribute definitions or references but not to global attribute definitions or attribute groups -->
+
+<!--attribute declarations-->
+
+<xsd:attribute name="fooGlobal" type="xsd:float" />
+<xsd:attribute name="barGlobal" type="xsd:string" />
+<xsd:attribute name="dingGlobal" type="xsd:integer" />
+
+<!--attribute group declarations-->
+
+<xsd:attributeGroup name="Agroup">
+	<xsd:attribute name="fooInAgroup" type="xsd:float" use="optional" />
+	<xsd:attribute name="barInAgroup" type="xsd:float" use="required" />
+	<xsd:attribute name="dingInAgroup" type="xsd:string" use="prohibited" />
+</xsd:attributeGroup>
+
+<!--attribute use: complex content-->
+
+<xsd:complexType name="e17A">
+	<xsd:sequence>
+		<xsd:element name="elem" type="xsd:string"/>
+	</xsd:sequence>
+	<xsd:attribute ref="fooGlobal" use="required" />
+	<xsd:attribute ref="barGlobal" use="optional" />
+	<xsd:attribute ref="dingGlobal" use="prohibited" />
+	<xsd:attribute name="fooLocal" type="xsd:float" use="required" />
+	<xsd:attribute name="barLocal" type="xsd:string" use="optional" />
+	<xsd:attribute name="dingLocal" type="xsd:integer" use="prohibited" />
+	<xsd:attributeGroup ref="Agroup" />
+</xsd:complexType>
+
+<!--attribute use: simple content-->
+
+<xsd:complexType name="e17Asimple">
+	<xsd:simpleContent>
+		<xsd:extension base="xsd:integer">
+			<xsd:attribute ref="fooGlobal" use="required" />
+			<xsd:attribute ref="barGlobal" use="optional" />
+			<xsd:attribute ref="dingGlobal" use="prohibited" />
+			<xsd:attribute name="fooLocal" type="xsd:float" use="required" />
+			<xsd:attribute name="barLocal" type="xsd:string" use="optional" />
+			<xsd:attribute name="dingLocal" type="xsd:integer" use="prohibited" />
+			<xsd:attributeGroup ref="Agroup" />
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+</xsd:schema>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!-- The use attribute can be added to local attribute definitions or references but not to global attribute definitions or attribute groups -->
+
+<!--attribute declarations-->
+
+<xsd:attribute name="fooGlobal2" type="xsd:float" />
+<xsd:attribute name="barGlobal2" type="xsd:string" />
+<xsd:attribute name="dingGlobal2" type="xsd:integer" />
+
+</xsd:schema>
+

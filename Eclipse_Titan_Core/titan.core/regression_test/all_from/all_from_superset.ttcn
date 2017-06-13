@@ -1,0 +1,994 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module all_from_superset
+{
+import from types all;
+import from functions all;
+import from imported_templates all;
+template RoI t_RoI1 := {1, 2, (6..9)};
+template RoI t_RoI2 := {1, *, 3};
+
+group Csaba_group {
+  // B 1.2.6 Superset
+
+  //EXAMPLE 1:
+
+  template MySetOfType MyTemplate1 := superset (1, 2, 3);
+  // matches any sequence of integers which contains at least one occurrences of the numbers
+  // 1, 2 and 3 in any order and position
+
+  template MySetOfType MyTemplate2_AnyValue := superset (1, 2, ?);
+  // matches any sequence of integers which contains at least one occurrences of the numbers
+  // 1, 2 and at least one more valid integer value (i.e. between 0 and 10, inclusively), in any
+  // order and position
+
+  template MySetOfType MyTemplate3 := superset (1, 2, (3, 4));
+  // matches any sequence of integers which contains at least one occurrences of the numbers
+  // 1, 2 and a number with the value 3 or 4, in any order and position
+
+  template MySetOfType MyTemplate4 := superset (1, 2, complement(3, 4));
+  // any sequence of integers matches which contains at least one occurrences of the numbers
+  // 1, 2 and a valid integer value which is not 3 or 4, in any order and position
+
+  template MySetOfType MyTemplate6 := superset (1, 2, 3) length (7);
+  // matches any sequence of 7 integers which contains at least one occurrences of the numbers
+  // 1, 2 and 3 in any order and position
+
+  template MySetOfType MyTemplate7 := superset (1, 2, ?) length (7 .. infinity);
+  // matches any sequence of at least 7 integers which contains at least one occurrences of the
+  // numbers 1, 2 and 3 in any order and position
+
+  template MySetOfType MyTemplate8 := superset (1, 2, 3) length (2 .. 7);
+  // causes an error, the lower bound of the length attribute contradicts to the minimum number
+  // of elements imposed by the superset argument
+
+  //EXAMPLE 2:
+  template RoI t_RoI1s := {1, 2, ?};
+  template SoI t_SoI1s := superset(all from t_RoI1s); 
+  // results in superset(1, 2, ?)
+
+  testcase tc_superset() runs on A
+  {
+    action("superset: ", t_SoI1s);
+    var SoI v;
+
+    v := {};
+    if (not match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should NOT match ", t_SoI1s); }
+
+    v := { 1 };
+    if (not match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should NOT match ", t_SoI1s); }
+
+    v := { 1, 2 };
+    if (not match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should NOT match ", t_SoI1s); }
+
+    v := { 1, 2, 3 };
+    if (match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should match ", t_SoI1s); }
+
+    v := { 1, 2, 4, 8, 16, 32 };
+    if (match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should match ", t_SoI1s); }
+
+    v := { 16, 8, 4, 2, 1 };
+    if (match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should match ", t_SoI1s); }
+
+    v := { 1, 2, 1 };
+    if (match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should match ", t_SoI1s); }
+
+    v := { 10, 2, 3 };
+    if (not match(v, t_SoI1s)) { setverdict(pass); }
+    else { setverdict(fail, v, " should NOT match ", t_SoI1s); }
+  }
+
+}//Csaba_group
+
+group Attila_group {
+
+  //=============== Templates ==========================
+  //set of integers
+  template SoI t_SoI1 := {1, 2, (6..9)};
+  template SoI t_SoI2 := {1, *, 3};
+  template SoI t_SoI3 := {20,21,22};
+  template SoI t_SoI4 := {1,2,?};
+  template SoI t_SoI5 := {1,2}; 
+
+  //Superset of Integers
+  template SoI t_i0sup      := superset (all from t_SoI3 );
+  template SoI t_i0sup_eq   := superset (20,21,22);
+  template SoI t_i0sup_1    := superset ((all from t_SoI3 ));//i.e.: superset((20,21,22)); -it worked!
+  template SoI t_i0sup_1_eq := superset ((20,21,22));
+  template SoI t_i1sup      := superset (all from t_SoI1, 100);
+  template SoI t_i1sup_eq   := superset (1, 2, (6..9), 100);
+  template SoI t_i2sup      := superset (-1,0,all from t_SoI1, 100);
+  template SoI t_i2sup_eq   := superset (-1,0,1,2,(6..9),100);
+  template SoI t_i3sup      := superset(-1,0,all from t_SoI1, all from t_SoI3, 100);
+  template SoI t_i3sup_eq   := superset (-1,0,1,2,(6..9),20,21,22, 100);
+  
+  template SoI t_i4sup      := superset(-1,0,all from t_SoI1, 100, all from t_SoI3);
+  template SoI t_i4sup_eq   := superset (-1,0,1,2,(6..9),100,20,21,22);
+  
+  template SoI t_i5sup      := superset(-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3 ); //repetition
+  template SoI t_i5sup_eq   := superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22);
+  
+  template SoI t_i6sup      := superset(-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3,all from t_SoI3); //repetition
+  template SoI t_i6sup_eq   := superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+  
+  template SoI t_i7sup      := superset(all from t_SoI1) length (7);
+  template SoI t_i7sup_eq   := superset(1,2,(6..9)) length (7);
+  
+  template SoI t_i7sup_1    := superset(all from t_SoI1) length (6);
+  template SoI t_i7sup_1_eq := superset(1,2,(6..9)) length (6);
+  
+  template SoI t_i8sup      := superset(all from t_SoI1, complement(8,9)) length (4);
+  template SoI t_i8sup_eq   := superset(1,2,(6..9),complement(8,9)) length (4);
+  
+  template SoI t_i9sup      := superset(complement(all from t_SoI1)) //length (4);
+  template SoI t_i9sup_eq   := superset(complement(1,2,(6..9))) //length (4);
+    
+  template SoI t_i9sup_1      := superset(complement(all from t_SoI1)) length (4);
+  template SoI t_i9sup_1_eq   := superset(complement(1,2,(6..9))) length (4);
+  
+  template SoI t_i10sup     := superset(all from t_SoI1, complement(all from t_SoI1)) length (4);
+  template SoI t_i10sup_eq  := superset(1,2,(6..9),complement(1,2,(6..9) )) length (4);
+  
+  template SoI t_i11sup     := superset(all from t_SoI1, complement(all from t_SoI5)) length (4);
+  template SoI t_i11sup_eq  := superset(1,2,(6..9), complement(1,2)) length (4);
+
+  // compile error (correct behaviour):
+  // template SoI t_i7sup_err := superset(all from t_SoI1) length (2); 
+  // There are more (at least 3) elements in the template than it is allowed by the length restriction (2)
+  //template SoI t_i9sup_err := superset(complement(all from t_SoI1)) length (2);
+  //There are more (at least 4) elements in the template than it is allowed by the length restriction (2) <== correct 4 for 7
+  // It is ready, see tc_superset_i7
+
+  template SoI t_importing_i0sup   := superset (all from t_imported_RoI3 );
+  template SoI t_importing_i0sup_1 := superset ((all from t_imported_RoI3 ));
+  template SoI t_importing_i1sup   := superset (all from t_imported_RoI1, 100);
+  template SoI t_importing_i2sup   := superset (-1,0,all from t_imported_RoI1,100);
+  
+  //================= Testcases for Static Templates ========================
+  
+  //=== i0 ===
+  //t_i0s:=superset (20,21,22)
+  testcase tc_superset_i0_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i0sup,t_i0sup_eq);
+  }
+  
+  testcase tc_superset_importing_i0_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_importing_i0sup,t_i0sup_eq);
+  }
+  //local template
+  testcase tc_superset_i0_eq_local() runs on A {
+    template SoI tl_i0sup := superset (all from t_SoI3 );
+    f_checkSoITemplateEquivalence(tl_i0sup,t_i0sup_eq);
+  }
+  testcase tc_superset_importing_i0_eq_local() runs on A {
+    template SoI tl_importing_i0sup := superset (all from t_imported_RoI3 );
+    f_checkSoITemplateEquivalence(tl_importing_i0sup,t_i0sup_eq);
+  }
+  testcase tc_superset_i0_eq_2local() runs on A {
+    template SoI tl_SoI3 := {20,21,22};
+    template SoI tl_i0sup := superset (all from tl_SoI3 );
+    f_checkSoITemplateEquivalence(tl_i0sup,t_i0sup_eq);
+  }
+  
+  testcase tc_superset_i0() runs on A {
+    var RoSoI vl_goodValues := {{20,21,22},{20,21,22,23}, {24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21}};
+    f_checkSoITemplate(t_i0sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_importing_i0() runs on A {
+    var RoSoI vl_goodValues := {{20,21,22},{20,21,22,23}, {24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21}};
+    f_checkSoITemplate(t_importing_i0sup,vl_goodValues,vl_badValues);
+  }
+  
+  //=== i0sup_1===
+  //superset ((20,21,22))
+  testcase tc_superset_i0_1_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i0sup_1,t_i0sup_1_eq);
+  }
+  
+  testcase tc_superset_i0_1_eq_local() runs on A {
+    template SoI tl_i0sup_1    := superset ((all from t_SoI3 ))
+    f_checkSoITemplateEquivalence(tl_i0sup_1,t_i0sup_1_eq);
+  }
+  
+  testcase tc_superset_i0_1_eq_2local() runs on A {
+    template SoI tl_SoI3 := {20,21,22};
+    template SoI tl_i0sup_1    := superset ((all from tl_SoI3 ))
+    f_checkSoITemplateEquivalence(tl_i0sup_1,t_i0sup_1_eq);
+  }
+  
+  //superset ((20,21,22));
+  testcase tc_superset_i0_1() runs on A {
+    var RoSoI vl_goodValues := {{20},{21},{22},{20,21},{22,20},{22,21},{20,21,22},{20,21,22,23},{24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{}};
+    f_checkSoITemplate(t_i0sup_1,vl_goodValues,vl_badValues);
+  }
+
+  testcase tc_superset_i0_1_2local() runs on A {
+    template SoI tl_SoI3 := {20,21,22};
+    template SoI tl_i0sup_1    := superset ((all from tl_SoI3 ))
+    var RoSoI vl_goodValues := {{20},{21},{22},{20,21},{22,20},{22,21},{20,21,22},{20,21,22,23},{24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{}};
+    f_checkSoITemplate(tl_i0sup_1,vl_goodValues,vl_badValues);
+  }
+  //=== i1sup ===
+  testcase tc_superset_i1_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i1sup,t_i1sup_eq);
+  }
+  
+  testcase tc_superset_i1() runs on A {
+    var RoSoI vl_goodValues := {{1,2,6,100}, {1,2,7,100},{1,2,8,100},{1,2,9,100}, {1,2,3,4,5,6,7,8,9,100}, {1,2,3,4,5,6,7,8,9,100}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100},{2,6,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i1sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i2 ===
+  testcase tc_superset_i2_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i2sup,t_i2sup_eq);
+  }
+  
+  testcase tc_superset_i2() runs on A {
+    var RoSoI vl_goodValues := {{-1,0,1,2,6,20,21,22,100},{-1,0,1,2,7,20,21,22,100},{-1,0,1,2,8,20,21,22,100},{-1,0,1,2,9,20,21,22,100},
+      {-1,0,1,2,6,7,8,9,20,21,22,100},{1,-1,2,0,3,4,5,6,7,8,9,20,21,22,100}, {1,2,3,4,5,6,7,8,9,20,21,22,100,-1,0}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i2sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i3 ===
+  //superset (-1,0,1,2,(6..9),20,21,22, 100);
+  testcase tc_superset_i3_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i3sup,t_i3sup_eq);
+  }
+  
+  testcase tc_superset_i3() runs on A {
+    var RoSoI vl_goodValues := {{20,21,22,-1,0,1,2,6,7,8,9,100},{20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i3sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i4 ===
+  //superset (-1,0,1,2,(6..9),100,20,21,22); //order
+  testcase tc_superset_i4_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i4sup,t_i4sup_eq);
+  }
+  
+  testcase tc_superset_i4() runs on A {
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,7,100},{20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,8,100},{20,21,22,-1,0,1,2,9,100},
+      {20,21,22,-1,0,1,2,6,7,8,9,100},
+      {20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i4sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i5 ===
+  //superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22);
+  testcase tc_superset_i5_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i5sup,t_i5sup_eq);
+  }
+  
+  testcase tc_superset_i5() runs on A {
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100,20,21,22},{20,21,22,-1,0,1,2,7,100,20,21,22},{20,21,22,-1,0,1,2,8,100,20,21,22},{20,21,22,-1,0,1,2,9,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,8,9,100,20,21,22},
+      {20,21,22,20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {20,21,22,1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i5sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i6 ===
+  //superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+  testcase tc_superset_i6_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i6sup,t_i6sup_eq);
+  }
+  
+  testcase tc_superset_i6() runs on A {
+    var RoSoI vl_goodValues :=
+    {
+      {20,21,22,20,21,22,-1,0,1,2,6,100,20,21,22},{20,21,22,20,21,22,-1,0,1,2,7,100,20,21,22},
+      {20,21,22,20,21,22,-1,0,1,2,8,9,100,20,21,22},{20,21,22,20,21,22,-1,0,1,2,6,7,8,100,20,21,22},
+      {20,21,22,20,21,22,-1,0,1,2,6,7,8,9,100,20,21,22},
+      {20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,20,21,22,8,9,100,20,21,22},
+      {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0,20,21,22,20,21,22}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i6sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i7 ===
+  //superset(1,2,(6..9)) length (7);
+  testcase tc_superset_i7_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i7sup,t_i7sup_eq);
+  }
+  
+  testcase tc_superset_i7() runs on A {
+    var RoSoI vl_goodValues := {
+      {1,2,6,100,200,300,400},{1,2,7,100,200,300,400},{1,2,8,100,200,300,400},{1,2,9,100,200,300,400},
+      {2,1,6,100,200,300,400},
+      {1,2,6,7,8,9,0},{1,2,6,7,8,9,1000},{1,2,-1,6,7,8,9}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},{0},{1},{-1},{1000},{1,19},{},
+      {20},{21},{22},{20,21},
+      {22,20},{22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i7sup,vl_goodValues,vl_badValues);
+  }
+  
+  //=== i7sup_1 ===
+  //superset(1,2,(6..9)) length (6);
+  testcase tc_superset_i7_1_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i7sup_1,t_i7sup_1_eq);
+  }
+  testcase tc_superset_i7_1() runs on A {
+    var RoSoI vl_goodValues := {{1,2,6,7,8,9},
+      {1,2,6,100,200,300},{1,2,7,100,200,300},{1,2,7,100,200,300},{1,2,8,100,200,300},{1,2,9,100,200,300}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},
+      {0},{1},{-1},{1000},
+      {1,19},{},{20},{21},{22},{20,21},{22,20},
+      {22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i7sup_1,vl_goodValues,vl_badValues);
+  }
+
+  //=== i8 ===
+  //superset(1,2,(6..9),complement(8,9)) length (4);
+  testcase tc_superset_i8_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i8sup,t_i8sup_eq);
+  }
+
+  testcase tc_superset_i8() runs on A {
+    var RoSoI vl_goodValues := {
+      {1,2,6,6},{1,2,7,6},{1,2,8,6},{1,2,9,6},
+      {1,2,6,7},{1,2,7,7},{1,2,8,7},{1,2,9,7},
+      {1,2,6,10},{1,2,7,10},{1,2,8,10},{1,2,9,10},
+      {1,2,8,6},{1,2,8,7}
+    };
+    var RoSoI vl_badValues := {
+      {1,2,8,9},{1,2,9,9},
+      {1,2,8,9},{1,2,9,9},
+      {1,2,6,10,11},{1,2,7,10,12,13},{1,2,5,10},{1,2,4,10},
+
+      {},
+      {0},{1},{2},{1000},
+      {1,2},{1,6},{20,21},{22,20},
+      {22,21,100},{1,2,6},
+      {1,2,3,4,5,6,7,8,9},
+      {2,6,7,8,9,100},{1,6,7,8,9,100},{1,2,3,4,5,6,7,8,9} };
+    f_checkSoITemplate(t_i8sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i9 ===
+  //superset(complement(1,2,(6..9)))                //length (4);
+  // It matches all set of integers which contains at least one integer which is not 1,2,6,7,8 or 9
+  testcase tc_superset_i9_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i9sup,t_i9sup_eq);
+  }
+  testcase tc_superset_i9() runs on A {
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12},{0},{3},{4},{5},{10},{11},{3,4},{1,2,3},{1,2,6,10},{1,2,6,7,8,9,10}
+    };
+    var RoSoI vl_badValues := {
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9}
+    }
+    f_checkSoITemplate(t_i9sup,vl_goodValues,vl_badValues);
+  }  
+  
+  //=== i9sup_1 ===
+  //superset(complement(1,2,(6..9)))       length (4);
+  // It matches all set of integers with length 4 which contains at least one integer which is not 1,2,6,7,8 or 9
+  testcase tc_superset_i9_1_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i9sup_1,t_i9sup_1_eq);
+  }
+  testcase tc_superset_i9_1() runs on A {
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches
+      {1,2,10,11}, //2matches to compl value list
+      {1,2,6,10} //1matches
+    };
+    var RoSoI vl_badValues := {{0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9},{1,2,6,7,8,9,10}
+    }
+    f_checkSoITemplate(t_i9sup_1,vl_goodValues,vl_badValues);
+  }
+  //=== i10 ===
+  //superset(1,2,(6..9),complement(1,2,(6..9) )) length (4);
+  //This matches with set of values (with length of 4) which contains at least once values from the list 1,2,(6..9) furthermore one value which does not matches
+  // with that list
+  testcase tc_superset_i10_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i10sup,t_i10sup_eq);
+  }
+
+  testcase tc_superset_i10() runs on A {
+    var RoSoI vl_goodValues := {       
+      {1,2,6,10},{1,2,7,11},{1,2,8,-1},{1,2,9,0},{1,2,9,1000}
+    };
+    var RoSoI vl_badValues := {
+      {0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},
+      {1,2,6,9},{0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches{1,2,6,7,8,9,10}
+      {1,3,4,5},
+      {2,3,4,5},
+      {6,3,4,5},   
+      {1,2,10,11}
+    }
+    f_checkSoITemplate(t_i10sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i11 ===
+  // superset(1,2,(6..9), complement(1,2)) length (4);
+  
+  testcase tc_superset_i11_eq() runs on A {
+    f_checkSoITemplateEquivalence(t_i11sup,t_i11sup_eq);
+  }
+  
+  testcase tc_superset_i11() runs on A {
+    var RoSoI vl_goodValues := {       
+      {1,2,6,0},{1,2,7,3},{1,2,8,3},{1,2,9,4},{1,2,9,1000}
+    };
+    var RoSoI vl_badValues := {
+      {0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},
+      {1,2,6,1},{0,3,4,5},{0,10,11,12},  
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},   
+      {1,3,4,5},
+      {2,3,4,5},
+      {6,3,4,5},   
+      {1,2,10,11}
+    }
+    f_checkSoITemplate(t_i11sup,vl_goodValues,vl_badValues);
+  }
+  //========== Testcases for Dynamic Templates ==============
+
+  //=== i0 ===
+  testcase tc_superset_i0_eq_dyn() runs on A {
+    var template SoI tl_i0sup := superset (all from t_SoI3 );
+    f_checkSoITemplateEquivalence(tl_i0sup,t_i0sup_eq);
+  }
+  testcase tc_superset_importing_i0_eq_dyn() runs on A {
+    var template SoI tl_importing_i0sup   := superset (all from t_imported_RoI3 );
+    f_checkSoITemplateEquivalence(tl_importing_i0sup,t_i0sup_eq);
+  }
+  
+  testcase tc_superset_i0_eq_2dyn() runs on A {
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i0sup := superset (all from tl_SoI3 );
+    f_checkSoITemplateEquivalence(tl_i0sup,t_i0sup_eq);
+  }
+  
+  testcase tc_superset_i0_dyn() runs on A {
+    var template SoI tl_i0sup := superset (all from t_SoI3 );
+    var RoSoI vl_goodValues := {{20,21,22},{20,21,22,23}, {24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21}};
+    f_checkSoITemplate(tl_i0sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i0_2dyn() runs on A {
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i0sup := superset (all from tl_SoI3 );
+    var RoSoI vl_goodValues := {{20,21,22},{20,21,22,23}, {24,23,22,21,20,19}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21}};
+    f_checkSoITemplate(tl_i0sup,vl_goodValues,vl_badValues);
+  }
+  //=== i1 ===
+  //superset (1, 2, (6..9), 100);
+  
+  testcase tc_superset_i1_eq_dyn() runs on A {
+    var template SoI tl_i1sup := superset (all from t_SoI1, 100);
+    f_checkSoITemplateEquivalence(tl_i1sup,t_i1sup_eq);
+  }  
+  
+  testcase tc_superset_importing_i1_eq_dyn() runs on A {
+    var template SoI tl_importing_i1sup   := superset (all from t_imported_RoI1, 100);
+    f_checkSoITemplateEquivalence(tl_importing_i1sup,t_i1sup_eq);
+  }
+  testcase tc_superset_i1_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i1sup := superset (all from tl_SoI1, 100);
+    f_checkSoITemplateEquivalence(tl_i1sup,t_i1sup_eq);
+  }
+
+  testcase tc_superset_i1_dyn() runs on A {
+    var template SoI tl_i1sup := superset (all from t_SoI1, 100);
+    var RoSoI vl_goodValues := {{1,2,6,100}, {1,2,7,100},{1,2,8,100},{1,2,9,100}, {1,2,3,4,5,6,7,8,9,100}, {1,2,3,4,5,6,7,8,9,100}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100},{2,6,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i1sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i1_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i1sup := superset (all from tl_SoI1, 100);
+    var RoSoI vl_goodValues := {{1,2,6,100}, {1,2,7,100},{1,2,8,100},{1,2,9,100}, {1,2,3,4,5,6,7,8,9,100}, {1,2,3,4,5,6,7,8,9,100}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100},{2,6,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i1sup,vl_goodValues,vl_badValues);
+  }
+  //=== i2 ===
+  testcase tc_superset_i2_eq_dyn() runs on A {
+    var template SoI tl_i2sup := superset (-1,0,all from t_SoI1, 100);
+    f_checkSoITemplateEquivalence(tl_i2sup,t_i2sup_eq);
+  }
+  
+  testcase tc_superset_importing_i2_eq_dyn() runs on A {
+    var template SoI tl_importing_i2sup   := superset (-1,0,all from t_imported_RoI1,100);
+    f_checkSoITemplateEquivalence(tl_importing_i2sup,t_i2sup_eq);
+  }
+  
+  testcase tc_superset_i2_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i2sup := superset (-1,0,all from tl_SoI1, 100);
+    f_checkSoITemplateEquivalence(tl_i2sup,t_i2sup_eq);
+  }
+
+  testcase tc_superset_i2_dyn() runs on A {
+    var template SoI tl_i2sup := superset (-1,0,all from t_SoI1, 100);
+    var RoSoI vl_goodValues := {{-1,0,1,2,6,20,21,22,100},{-1,0,1,2,7,20,21,22,100},{-1,0,1,2,8,20,21,22,100},{-1,0,1,2,9,20,21,22,100},
+      {-1,0,1,2,6,7,8,9,20,21,22,100},{1,-1,2,0,3,4,5,6,7,8,9,20,21,22,100}, {1,2,3,4,5,6,7,8,9,20,21,22,100,-1,0}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i2sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i2_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i2sup := superset (-1,0,all from tl_SoI1, 100);
+    var RoSoI vl_goodValues := {{-1,0,1,2,6,20,21,22,100},{-1,0,1,2,7,20,21,22,100},{-1,0,1,2,8,20,21,22,100},{-1,0,1,2,9,20,21,22,100},
+      {-1,0,1,2,6,7,8,9,20,21,22,100},{1,-1,2,0,3,4,5,6,7,8,9,20,21,22,100}, {1,2,3,4,5,6,7,8,9,20,21,22,100,-1,0}};
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i2sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i3 ===
+  //superset (-1,0,1,2,(6..9),20,21,22, 100);
+  testcase tc_superset_i3_eq_dyn() runs on A {
+    var template SoI tl_i3sup      := superset(-1,0,all from t_SoI1, all from t_SoI3, 100);
+    f_checkSoITemplateEquivalence(tl_i3sup,t_i3sup_eq);
+  }
+  
+  testcase tc_superset_i3_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i3sup      := superset(-1,0,all from tl_SoI1, all from tl_SoI3, 100);
+    f_checkSoITemplateEquivalence(tl_i3sup,t_i3sup_eq);
+  }
+  
+  testcase tc_superset_i3_dyn() runs on A {
+    var template SoI tl_i3sup      := superset(-1,0,all from t_SoI1, all from t_SoI3, 100);
+    var RoSoI vl_goodValues := {{20,21,22,-1,0,1,2,6,7,8,9,100},{20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i3sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i3_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i3sup  := superset(-1,0,all from tl_SoI1, all from tl_SoI3, 100);
+    var RoSoI vl_goodValues := {{20,21,22,-1,0,1,2,6,7,8,9,100},{20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(t_i3sup,vl_goodValues,vl_badValues);
+  }
+
+
+  //=== i4 ===
+  //superset (-1,0,1,2,(6..9),100,20,21,22);
+  
+  testcase tc_superset_i4_eq_dyn() runs on A {
+    var template SoI tl_i4sup := superset(-1,0,all from t_SoI1, 100, all from t_SoI3);
+    f_checkSoITemplateEquivalence(tl_i4sup,t_i4sup_eq);
+  }
+  testcase tc_superset_i4_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i4sup := superset(-1,0,all from tl_SoI1, 100, all from tl_SoI3);
+    f_checkSoITemplateEquivalence(tl_i4sup,t_i4sup_eq);
+  }
+
+  testcase tc_superset_i4_dyn() runs on A {
+    var template SoI tl_i4sup := superset(-1,0,all from t_SoI1, 100, all from t_SoI3);
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,7,100},{20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,8,100},{20,21,22,-1,0,1,2,9,100},
+      {20,21,22,-1,0,1,2,6,7,8,9,100},
+      {20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i4sup,vl_goodValues,vl_badValues);
+  }
+
+  testcase tc_superset_i4_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    var template SoI tl_i4sup := superset(-1,0,all from tl_SoI1, 100, all from tl_SoI3);
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,7,100},{20,21,22,-1,0,1,2,6,100},{20,21,22,-1,0,1,2,8,100},{20,21,22,-1,0,1,2,9,100},
+      {20,21,22,-1,0,1,2,6,7,8,9,100},
+      {20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},{22,21,100}, {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i4sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i5 ===
+  //superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22);
+  
+  testcase tc_superset_i5_eq_dyn() runs on A {
+    template SoI tl_i5sup      := superset(-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3 ); //repetition
+    f_checkSoITemplateEquivalence(tl_i5sup,t_i5sup_eq);
+  }
+  
+  testcase tc_superset_i5_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    template SoI tl_i5sup      := superset(-1,0,all from tl_SoI1, 100, all from tl_SoI3,all from tl_SoI3 ); //repetition
+    f_checkSoITemplateEquivalence(tl_i5sup,t_i5sup_eq);
+  }
+  
+  testcase tc_superset_i5_dyn() runs on A {
+    template SoI tl_i5sup      := superset(-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3 );
+    
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100,20,21,22},
+      {20,21,22,-1,0,1,2,7,100,20,21,22},
+      {20,21,22,-1,0,1,2,8,100,20,21,22},
+      {20,21,22,-1,0,1,2,9,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,8,9,100,20,21,22},
+      {20,21,22,20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {20,21,22,1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},
+      {20},{21},{22},{20,21},{22,20},{22,21,100}, 
+      {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i5sup,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i5_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_SoI3 := {20,21,22};
+    template SoI tl_i5sup      := superset(-1,0,all from tl_SoI1, 100, all from tl_SoI3,all from tl_SoI3 );
+
+    var RoSoI vl_goodValues := {
+      {20,21,22,-1,0,1,2,6,100,20,21,22},
+      {20,21,22,-1,0,1,2,7,100,20,21,22},
+      {20,21,22,-1,0,1,2,8,100,20,21,22},
+      {20,21,22,-1,0,1,2,9,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,100,20,21,22},
+      {20,21,22,-1,0,1,2,6,7,8,9,100,20,21,22},
+      {20,21,22,20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,8,9,100}, 
+      {20,21,22,1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},
+      {20},{21},{22},{20,21},{22,20},{22,21,100}, 
+      {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i5sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i6 ===
+  // superset (-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+  testcase tc_superset_i6_eq_dyn() runs on A {
+    var template SoI tl_i6sup  := superset(-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3,all from t_SoI3); //repetition
+    f_checkSoITemplateEquivalence(tl_i6sup,t_i6sup_eq);
+  }
+  
+  testcase tc_superset_i6_dyn() runs on A {
+    var RoSoI vl_goodValues :=
+    {
+      {20,21,22,20,21,22,-1,0,1,2,6,100,20,21,22},{20,21,22,20,21,22,-1,0,1,2,7,100,20,21,22},
+      {20,21,22,20,21,22,-1,0,1,2,8,9,100,20,21,22},{20,21,22,20,21,22,-1,0,1,2,6,7,8,100,20,21,22},
+      {20,21,22,20,21,22,-1,0,1,2,6,7,8,9,100,20,21,22},
+      {20,21,22,1,-1,2,0,3,4,5,6,20,21,22,7,20,21,22,8,9,100,20,21,22},
+      {1,20,21,22,2,3,4,5,6,7,8,9,100,-1,0,20,21,22,20,21,22}}; 
+    var RoSoI vl_badValues := {{0},{1},{-1},{1000},{1,19},{},{20},{21},{22},{20,21},{22,20},
+      {22,21,100}, 
+      {2,6,7,8,9,20,21,22,100},{20,21,22,1,6,7,8,9,100},{20,21,22,1,6,7,8,9,100}
+    };
+    f_checkSoITemplate(t_i6sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i7 ===
+  //superset(1,2,(6..9)) length (7);
+  
+  testcase tc_superset_i7_eq_dyn() runs on A {
+    var template SoI tl_i7sup      := superset(all from t_SoI1) length (7);
+    f_checkSoITemplateEquivalence(tl_i7sup,t_i7sup_eq);
+  }
+  
+  testcase tc_superset_i7_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i7sup      := superset(all from tl_SoI1) length (7);
+    f_checkSoITemplateEquivalence(tl_i7sup,t_i7sup_eq);
+  }
+  testcase tc_superset_i7_dyn() runs on A {
+    var template SoI tl_i7sup      := superset(all from t_SoI1) length (7);
+    var RoSoI vl_goodValues := {
+      {1,2,6,100,200,300,400},{1,2,7,100,200,300,400},{1,2,8,100,200,300,400},{1,2,9,100,200,300,400},
+      {2,1,6,100,200,300,400},
+      {1,2,6,7,8,9,0},{1,2,6,7,8,9,1000},{1,2,-1,6,7,8,9}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},{0},{1},{-1},{1000},{1,19},{},
+      {20},{21},{22},{20,21},
+      {22,20},{22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i7sup,vl_goodValues,vl_badValues);
+  }  
+  
+  testcase tc_superset_i7_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i7sup      := superset(all from tl_SoI1) length (7);
+    var RoSoI vl_goodValues := {
+      {1,2,6,100,200,300,400},{1,2,7,100,200,300,400},{1,2,8,100,200,300,400},{1,2,9,100,200,300,400},
+      {2,1,6,100,200,300,400},
+      {1,2,6,7,8,9,0},{1,2,6,7,8,9,1000},{1,2,-1,6,7,8,9}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},{0},{1},{-1},{1000},{1,19},{},
+      {20},{21},{22},{20,21},
+      {22,20},{22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i7sup,vl_goodValues,vl_badValues);
+  } 
+
+  //=== i7sup_1 ===
+  //superset(1,2,(6..9)) length (6);
+  testcase tc_superset_i7_1_eq_dyn() runs on A {
+    template SoI tl_i7sup_1    := superset(all from t_SoI1) length (6);
+    f_checkSoITemplateEquivalence(tl_i7sup_1,t_i7sup_1_eq);
+  }  
+  
+  testcase tc_superset_i7_1_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i7sup_1    := superset(all from tl_SoI1) length (6);
+    f_checkSoITemplateEquivalence(tl_i7sup_1,t_i7sup_1_eq);
+  }
+  
+  testcase tc_superset_i7_1_dyn() runs on A {    
+    template SoI tl_i7sup_1    := superset(all from t_SoI1) length (6);
+    var RoSoI vl_goodValues := {{1,2,6,7,8,9},
+      {1,2,6,100,200,300},{1,2,7,100,200,300},{1,2,7,100,200,300},{1,2,8,100,200,300},{1,2,9,100,200,300}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},
+      {0},{1},{-1},{1000},
+      {1,19},{},{20},{21},{22},{20,21},{22,20},
+      {22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i7sup_1,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i7_1_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i7sup_1    := superset(all from tl_SoI1) length (6);
+    var RoSoI vl_goodValues := {{1,2,6,7,8,9},
+      {1,2,6,100,200,300},{1,2,7,100,200,300},{1,2,7,100,200,300},{1,2,8,100,200,300},{1,2,9,100,200,300}};
+    var RoSoI vl_badValues := {{1,2,3,4,5,6,7,8,9},
+      {0},{1},{-1},{1000},
+      {1,19},{},{20},{21},{22},{20,21},{22,20},
+      {22,21,100}, 
+      {2,6,7,8,9,100},{1,6,7,8,9,100}};
+    f_checkSoITemplate(tl_i7sup_1,vl_goodValues,vl_badValues);
+  } 
+
+  //=== i8 ===
+    //superset(1,2,(6..9),complement(8,9)) length (4);
+  testcase tc_superset_i8_eq_dyn() runs on A {
+    var template SoI tl_i8sup      := superset(all from t_SoI1, complement(8,9)) length (4);
+    f_checkSoITemplateEquivalence(tl_i8sup,t_i8sup_eq);
+  }
+  testcase tc_superset_i8_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i8sup      := superset(all from tl_SoI1, complement(8,9)) length (4);
+    f_checkSoITemplateEquivalence(tl_i8sup,t_i8sup_eq);
+  }
+  
+  testcase tc_superset_i8_dyn() runs on A {
+    var template SoI tl_i8sup      := superset(all from t_SoI1, complement(8,9)) length (4);
+    var RoSoI vl_goodValues := {
+      {1,2,6,6},{1,2,7,6},{1,2,8,6},{1,2,9,6},
+      {1,2,6,7},{1,2,7,7},{1,2,8,7},{1,2,9,7},
+      {1,2,6,10},{1,2,7,10},{1,2,8,10},{1,2,9,10},
+      {1,2,8,6},{1,2,8,7}
+    };
+    var RoSoI vl_badValues := {
+      {1,2,8,9},{1,2,9,9},
+      {1,2,8,9},{1,2,9,9},
+      {1,2,6,10,11},{1,2,7,10,12,13},{1,2,5,10},{1,2,4,10},
+
+      {},
+      {0},{1},{2},{1000},
+      {1,2},{1,6},{20,21},{22,20},
+      {22,21,100},{1,2,6},
+      {1,2,3,4,5,6,7,8,9},
+      {2,6,7,8,9,100},{1,6,7,8,9,100},{1,2,3,4,5,6,7,8,9} };
+    f_checkSoITemplate(tl_i8sup,vl_goodValues,vl_badValues);
+  }
+  testcase tc_superset_i8_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i8sup      := superset(all from tl_SoI1, complement(8,9)) length (4);
+    var RoSoI vl_goodValues := {
+      {1,2,6,6},{1,2,7,6},{1,2,8,6},{1,2,9,6},
+      {1,2,6,7},{1,2,7,7},{1,2,8,7},{1,2,9,7},
+      {1,2,6,10},{1,2,7,10},{1,2,8,10},{1,2,9,10},
+      {1,2,8,6},{1,2,8,7}
+    };
+    var RoSoI vl_badValues := {
+      {1,2,8,9},{1,2,9,9},
+      {1,2,8,9},{1,2,9,9},
+      {1,2,6,10,11},{1,2,7,10,12,13},{1,2,5,10},{1,2,4,10},
+
+      {},
+      {0},{1},{2},{1000},
+      {1,2},{1,6},{20,21},{22,20},
+      {22,21,100},{1,2,6},
+      {1,2,3,4,5,6,7,8,9},
+      {2,6,7,8,9,100},{1,6,7,8,9,100},{1,2,3,4,5,6,7,8,9} };
+    f_checkSoITemplate(tl_i8sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i9 ===
+  //superset(complement(1,2,(6..9)))                //length (4);
+  // It matches all set of integers which contains at least one integer which is not 1,2,6,7,8 or 9
+  testcase tc_superset_i9_eq_dyn() runs on A {
+    var template SoI tl_i9sup      := superset(complement(all from t_SoI1)) 
+    f_checkSoITemplateEquivalence(tl_i9sup,t_i9sup_eq);
+  }
+  testcase tc_superset_i9_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i9sup      := superset(complement(all from tl_SoI1)) 
+    f_checkSoITemplateEquivalence(tl_i9sup,t_i9sup_eq);
+  }
+  
+  testcase tc_superset_i9_dyn() runs on A {
+    var template SoI tl_i9sup      := superset(complement(all from t_SoI1)) 
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12},{0},{3},{4},{5},{10},{11},{3,4},{1,2,3},{1,2,6,10},{1,2,6,7,8,9,10}
+    };
+    var RoSoI vl_badValues := {
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9}
+    }
+    f_checkSoITemplate(tl_i9sup,vl_goodValues,vl_badValues);
+  }  
+  testcase tc_superset_i9_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i9sup      := superset(complement(all from tl_SoI1)) 
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12},{0},{3},{4},{5},{10},{11},{3,4},{1,2,3},{1,2,6,10},{1,2,6,7,8,9,10}
+    };
+    var RoSoI vl_badValues := {
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9}
+    }
+    f_checkSoITemplate(tl_i9sup,vl_goodValues,vl_badValues);
+  }
+
+  //=== i9sup_1 ===
+  //superset(complement(1,2,(6..9)))       length (4);
+  // It matches all set of integers with length 4 which contains at least one integer which is not 1,2,6,7,8 or 9
+  testcase tc_superset_i9_1_eq_dyn() runs on A {
+    var template SoI tl_i9sup_1      := superset(complement(all from t_SoI1)) length (4);
+    f_checkSoITemplateEquivalence(tl_i9sup_1,t_i9sup_1_eq);
+  }
+  testcase tc_superset_i9_1_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i9sup_1      := superset(complement(all from tl_SoI1)) length (4);
+    f_checkSoITemplateEquivalence(tl_i9sup_1,t_i9sup_1_eq);
+  }
+  
+  testcase tc_superset_i9_1_dyn() runs on A {
+    var template SoI tl_i9sup_1      := superset(complement(all from t_SoI1)) length (4);
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches
+      {1,2,10,11}, //2matches to compl value list
+      {1,2,6,10} //1matches
+    };
+    var RoSoI vl_badValues := {{0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9},{1,2,6,7,8,9,10}
+    }
+    f_checkSoITemplate(tl_i9sup_1,vl_goodValues,vl_badValues);
+  }
+  
+  testcase tc_superset_i9_1_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i9sup_1      := superset(complement(all from tl_SoI1)) length (4);
+    var RoSoI vl_goodValues := {
+      {0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches
+      {1,2,10,11}, //2matches to compl value list
+      {1,2,6,10} //1matches
+    };
+    var RoSoI vl_badValues := {{0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},{1,2,6,9},{1,2,6,7,8,9,10}
+    }
+    f_checkSoITemplate(tl_i9sup_1,vl_goodValues,vl_badValues);
+  }
+
+  //=== i10 ===
+  //superset(1,2,(6..9),complement(1,2,(6..9) )) length (4);
+  //This matches with set of values (with length of 4) which contains at least once values from the list 1,2,(6..9) furthermore one value which does not matches
+  // with that list
+  testcase tc_superset_i10_eq_dyn() runs on A {
+    var template SoI tl_i10sup     := superset(all from t_SoI1, complement(all from t_SoI1)) length (4);
+    f_checkSoITemplateEquivalence(tl_i10sup,t_i10sup_eq);
+  }
+  
+  testcase tc_superset_i10_eq_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i10sup     := superset(all from tl_SoI1, complement(all from tl_SoI1)) length (4);
+    f_checkSoITemplateEquivalence(tl_i10sup,t_i10sup_eq);
+  }
+  
+  testcase tc_superset_i10_dyn() runs on A {
+    var template SoI tl_i10sup     := superset(all from t_SoI1, complement(all from t_SoI1)) length (4);
+    var RoSoI vl_goodValues := {       
+      {1,2,6,10},{1,2,7,11},{1,2,8,-1},{1,2,9,0},{1,2,9,1000}
+    };
+    var RoSoI vl_badValues := {
+      {0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},
+      {1,2,6,9},{0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches{1,2,6,7,8,9,10}
+      {1,3,4,5},
+      {2,3,4,5},
+      {6,3,4,5},   
+      {1,2,10,11}
+    }
+    f_checkSoITemplate(tl_i10sup,vl_goodValues,vl_badValues);
+  }
+  testcase tc_superset_i10_2dyn() runs on A {
+    var template SoI tl_SoI1 := {1, 2, (6..9)};
+    var template SoI tl_i10sup     := superset(all from t_SoI1, complement(all from t_SoI1)) length (4);
+    var RoSoI vl_goodValues := {       
+      {1,2,6,10},{1,2,7,11},{1,2,8,-1},{1,2,9,0},{1,2,9,1000}
+    };
+    var RoSoI vl_badValues := {
+      {0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},
+      {1,2,6,9},{0,3,4,5},{0,10,11,12}, //4matches to compl
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},  //3 matches{1,2,6,7,8,9,10}
+      {1,3,4,5},
+      {2,3,4,5},
+      {6,3,4,5},   
+      {1,2,10,11}
+    }
+    f_checkSoITemplate(tl_i10sup,vl_goodValues,vl_badValues);
+  } 
+
+  //=== i11 ===
+  // superset(1,2,(6..9), complement(1,2)) length (4);
+  
+  testcase tc_superset_i11_eq_dyn() runs on A {
+    var template SoI tl_i11sup     := superset(all from t_SoI1, complement(all from t_SoI5)) length (4);
+    f_checkSoITemplateEquivalence(tl_i11sup,t_i11sup_eq);
+  }
+  
+  testcase tc_superset_i11_dyn() runs on A {
+    var template SoI tl_i11sup     := superset(all from t_SoI1, complement(all from t_SoI5)) length (4);
+    var RoSoI vl_goodValues := {       
+      {1,2,6,0},{1,2,7,3},{1,2,8,3},{1,2,9,4},{1,2,9,1000}
+    };
+    var RoSoI vl_badValues := {
+      {0},{3},{4},{5},{10},{11},{3,4},{1,2,3}, 
+      {},{1},{2},{6},{7},{8},{9},{1,2},{1,6},{1,7},{1,8},{1,9},{2,6},{2,7},{2,8},{2,9},{1,2,6},
+      {1,2,6,1},{0,3,4,5},{0,10,11,12},  
+      {1,3,4,5},{2,3,4,5},{6,3,4,5},   
+      {1,3,4,5},
+      {2,3,4,5},
+      {6,3,4,5},   
+      {1,2,10,11}
+    }
+    f_checkSoITemplate(tl_i11sup,vl_goodValues,vl_badValues);
+  }
+  
+}
+
+}  // end of module

@@ -1,0 +1,25 @@
+##############################################################################
+# Copyright (c) 2000-2017 Ericsson Telecom AB
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#   Balasko, Jeno
+#   Baranyi, Botond
+#   Ormandi, Matyas
+#   Szabo, Bence Janos
+#
+##############################################################################
+SADIRS := ver xer encode param template any_from pattern_ref float recof_index \
+port_translation
+ifeq ($(RT2), yes)
+SADIRS += deprecated erroneous_attributes template_concat
+endif
+#$(wildcard TTCN3_[a0-9]* ASN_[a0-9]*) ver xer
+
+all run check clean distclean:
+	for d in $(SADIRS); do $(MAKE) -C $$d $@ || exit 1; done
+
+

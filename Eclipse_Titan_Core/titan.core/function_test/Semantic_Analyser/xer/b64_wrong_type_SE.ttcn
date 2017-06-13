@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module base64_wrong_type_SE {	//^In TTCN-3 module `base64_wrong_type_SE'://
+
+type integer int64 //^In type definition// \
+//^error: BASE64 can only be applied to OCTET STRING, open type or restricted character string type//
+with { variant "XSD:base64Binary" }
+
+type float f64 //^In type definition// \
+//^error: BASE64 can only be applied to OCTET STRING, open type or restricted character string type//
+with { variant "XSD:base64Binary" }
+
+type boolean b64 //^In type definition// \
+//^error: BASE64 can only be applied to OCTET STRING, open type or restricted character string type//
+with { variant "XSD:base64Binary" }
+
+type record r64 {}  //^In type definition// \
+//^error: BASE64 can only be applied to OCTET STRING, open type or restricted character string type//
+with { variant "XSD:base64Binary" }
+
+type record rf64 { //^In type definition//
+   integer int64   //^In record field// \
+//^error: BASE64 can only be applied to OCTET STRING, open type or restricted character string type//
+}
+with { variant (int64) "XSD:base64Binary" }
+
+}
+with {
+encode "XML";
+}

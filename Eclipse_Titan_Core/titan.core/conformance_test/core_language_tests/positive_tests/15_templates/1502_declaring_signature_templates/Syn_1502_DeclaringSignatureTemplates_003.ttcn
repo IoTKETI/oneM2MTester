@@ -1,0 +1,48 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.2, Ensure that the basic operations call and getreply are accepted.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_1502_DeclaringSignatureTemplates_003 {
+
+    type port MyProcedurePortType procedure {
+        inout p_Syn_1502_DeclaringSignatureTemplates_003;
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyProcedurePortType pt_myPort;
+    }
+
+    signature p_Syn_1502_DeclaringSignatureTemplates_003(in integer p_par1, out integer p_par2, inout integer p_par3) return integer;
+
+    template p_Syn_1502_DeclaringSignatureTemplates_003 m_myTemplate := {
+        p_par1 := 1,
+        p_par2 := 2,
+        p_par3 := 3
+    }
+
+    testcase TC_Syn_1502_DeclaringSignatureTemplates_003() runs on GeneralComp {
+
+		connect(self:pt_myPort,self:pt_myPort);
+
+        pt_myPort.call(p_Syn_1502_DeclaringSignatureTemplates_003:m_myTemplate, nowait);
+
+        pt_myPort.getcall(p_Syn_1502_DeclaringSignatureTemplates_003:m_myTemplate) // call -> getcall
+		{
+			pt_myPort.reply(p_Syn_1502_DeclaringSignatureTemplates_003:{p_par1 := 1, p_par2 := 2, p_par3 := 3} value 1); // reply -> getreply
+		}
+		pt_myPort.getreply(p_Syn_1502_DeclaringSignatureTemplates_003:m_myTemplate value 1); 
+		
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_Syn_1502_DeclaringSignatureTemplates_003());
+    }
+
+}

@@ -1,0 +1,56 @@
+//Simple data types
+type integer <IntegerTypeId> (0..255) with {variant "COMP(2scompl)"};
+
+type charstring <CharTypeId1> length(0..7);
+
+type charstring <CharTypeId2> length(0..infinity);
+
+type charstring <CharTypeId3> ("a".."z");
+
+type <CharTypeId3> <CharTypeId4> length(0..7);
+
+type integer <SimpleReturnTypeId> with {extension "done"};
+
+//Structured data types
+type record <RecordTypeId>
+{
+  <TYpeId1> <fieldName1>,
+  <TYpeId2> <fieldName2>,
+  <TYpeId3> <fieldName3> optional
+}
+
+type enumerated MyEnumType
+{
+  <enumValue1> (101),
+  <enumValue2> (102)
+} with
+{
+  variant "FIELDLENGTH(16)";
+  variant "COMP(signbit)"
+}
+
+type record <MyRecordType>
+{
+  integer <field1> (0..255),
+  bitstring <field2> length(8),
+  <MySetOfIntegerType> <field3> optional,
+  <MyCharType4> <field4> optional
+}
+
+type set length(0..7) of integer <SetOfIntegerTypeId>;
+
+type record <StructuredReturnTypeId>
+{
+  integer <fieldName1> (0..255),
+  boolean <fieldName2> optional
+} with
+{
+  extension "done"
+}
+
+//Address type
+type union address
+{
+  charstring <fieldName1>,
+  bitstring <fieldName2>
+}

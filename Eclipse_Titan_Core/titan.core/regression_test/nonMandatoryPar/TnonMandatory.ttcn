@@ -1,0 +1,400 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module TnonMandatory {
+type port PCOType message
+{
+  inout charstring;
+}
+
+type component MTCType
+{
+  port PCOType comp_port1,comp_port2;
+  const integer comp_const_i:= 0;
+  var integer comp_var_i := 0;
+  timer comp_t := 100.0;
+}
+
+template integer templ_int := 0;
+template integer templ_int2 := 1;
+
+type record rec_type
+{
+  integer a,
+  integer b
+}
+
+template rec_type t1(in integer x:=1, in integer y := 1):=
+{
+  a := x,
+  b := y
+}
+
+type set set_type
+{
+  integer a,
+  integer b
+}
+
+type function func_type(in boolean is_set := false, in boolean b := false) return verdicttype;
+const func_type func_const := refers(boolean_function);
+
+function simple_integers(in integer i1, in integer i2 := 0, in integer i3 := 0) return integer
+{
+  return i1 + i2 + i3;
+}
+
+function simple_integer_template(in integer i1, template integer i2:=templ_int) return integer
+{
+  return i1 + valueof(i2);
+}
+
+function missing_integers(in integer i1:=0, in integer i2, inout integer i3) return integer
+{
+  return i1 + i2 + i3;
+}
+
+function mixed_integers(in integer i1:=0, in integer i2, in integer i3:=0) return integer
+{
+  return i1 + i2 + i3;
+}
+
+function lotsof_mixed_integers(in integer i1:=0, in integer i2:=0, in integer i3, in integer i4 := 0, in integer i5:=0, in integer i6:=comp_const_i, inout integer i7:= comp_var_i) runs on MTCType return integer
+{
+  return i1+i2+i3+i4+i5+i6+i7;
+}
+
+function boolean_function(in boolean is_set := false, in boolean b := false) return verdicttype
+{
+  if(is_set and b == true) {return pass;}
+  else if(not(is_set) and b == false) {return pass;}
+  else {return fail;}
+}
+
+function float_function(in boolean is_set := false, in float f:=0.0) return verdicttype
+{
+  if(is_set and f == 1.0) {return pass;}
+  else if(not(is_set) and f == 0.0) {return pass;}
+  else {return fail;}
+}
+
+function charstring_function(in boolean is_set := false, in charstring c:="") return verdicttype
+{
+  if(is_set and c == "Hello") {return pass;}
+  else if(not(is_set) and c == "") {return pass;}
+  else {return fail;}
+}
+
+function octetstring_function( in boolean is_set := false, in octetstring o:=''O) return verdicttype
+{
+  if(is_set and o == '11'O) {return pass;}
+  else if(not(is_set) and o == ''O) {return pass;}
+  else {return fail;}
+}
+
+function bitstring_function( in boolean is_set := false, in bitstring b:=''B) return verdicttype
+{
+  if(is_set and b == '11'B) {return pass;}
+  else if(not(is_set) and b == ''B) {return pass;}
+  else {return fail;}
+}
+
+function record_function(in boolean is_set := false, in rec_type r:={0,0}) return verdicttype
+{
+  if(is_set and r == {1,1}) {return pass;}
+  else if(not(is_set) and r == {0,0}) {return pass;}
+  else {return fail;}
+}
+
+function set_function(in boolean is_set := false, in set_type r:={a:=0,b:=0}) return verdicttype
+{
+  if(is_set and r == {a:=1,b:=1}) {return pass;}
+  else if(not(is_set) and r == {a:=0,b:=0}) {return pass;}
+  else {return fail;}
+}
+
+function timer_function(in boolean is_set := false, inout timer t := comp_t) runs on MTCType return verdicttype
+{
+  if(is_set and t.running) {return pass;}
+  else if(not(is_set) and not(t.running)) { return pass;}
+  else {return fail;}
+}
+
+function port_function(in boolean is_set := false, inout PCOType p := comp_port1) runs on MTCType return verdicttype
+{
+  timer t := 1.0;
+  t.start;
+  alt{
+    []p.receive(charstring:"default"){
+        if(is_set){return fail;}
+        else {return pass;}
+      }
+    []p.receive(charstring:"actual"){
+        if(is_set){return pass;}
+        else{return fail;}
+      }
+    []t.timeout{return fail;}
+  }
+  t.stop;
+return inconc;
+}
+
+altstep simple_altstep(in boolean is_set := false) runs on MTCType
+{
+  []comp_port1.receive("Hello")
+    {
+      if(is_set){setverdict(pass);}
+      else{setverdict(fail);}
+    }
+  []comp_port1.receive
+    {
+      if(is_set){setverdict(fail);}
+      else{setverdict(pass);}
+    }
+}
+
+testcase simple_integer_test() runs on MTCType
+{
+  var integer temporal;
+  if(simple_integers(1,2,3) == 6) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integers(1,2,-) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integers(1,2) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integer_template(1,templ_int) == 1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integer_template(1,templ_int2) == 2) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integer_template(1,-) == 1) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(simple_integer_template(1) == 1) {setverdict(pass);}
+  else {setverdict(fail);}
+  temporal := 2;
+  if(missing_integers(-,1,temporal) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(1,2,3) == 6) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(1,2,-) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(1,2) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(-,2,3) == 5) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(-,2,-) == 2) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(mixed_integers(-,2) == 2) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(lotsof_mixed_integers(1,2,3,4,5,6) == 21) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(lotsof_mixed_integers(-,-,3,4,5,6) == 18) {setverdict(pass);}
+  else {setverdict(fail);}
+  temporal := 7;
+  if(lotsof_mixed_integers(-,-,3,4,5,6,temporal) == 25) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(lotsof_mixed_integers(1,2,3) == 6) {setverdict(pass);}
+  else {setverdict(fail);}
+  if(lotsof_mixed_integers(-,-,3) == 3) {setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase simple_boolean_test() runs on MTCType
+{
+  setverdict(boolean_function(true,true));
+  setverdict(boolean_function(false,-));
+  setverdict(boolean_function(false));
+  setverdict(boolean_function(-,-));
+  setverdict(boolean_function());
+}
+
+testcase simple_float_test() runs on MTCType
+{
+  setverdict(float_function(true,1.0));
+  setverdict(float_function(false,-));
+  setverdict(float_function(false));
+  setverdict(float_function(-,-));
+  setverdict(float_function());
+}
+
+testcase simple_charstring_test() runs on MTCType
+{
+  setverdict(charstring_function(true,"Hello"));
+  setverdict(charstring_function(false,-));
+  setverdict(charstring_function(false));
+  setverdict(charstring_function(-,-));
+  setverdict(charstring_function());
+}
+
+testcase simple_octetstring_test() runs on MTCType
+{
+  setverdict(octetstring_function(true,'11'O));
+  setverdict(octetstring_function(false,-));
+  setverdict(octetstring_function(false));
+  setverdict(octetstring_function(-,-));
+  setverdict(octetstring_function());
+}
+
+testcase simple_bitstring_test() runs on MTCType
+{
+  setverdict(bitstring_function(true,'11'B));
+  setverdict(bitstring_function(false,-));
+  setverdict(bitstring_function(false));
+  setverdict(bitstring_function(-,-));
+  setverdict(bitstring_function());
+}
+
+testcase simple_record_test() runs on MTCType
+{
+  setverdict(record_function(true,{1,1}));
+  setverdict(record_function(false,-));
+  setverdict(record_function(false));
+  setverdict(record_function(-,-));
+  setverdict(record_function());
+}
+
+testcase simple_set_test() runs on MTCType
+{
+  setverdict(set_function(true,{a:=1,b:=1}));
+  setverdict(set_function(false,-));
+  setverdict(set_function(false));
+  setverdict(set_function(-,-));
+  setverdict(set_function());
+}
+
+testcase simple_timer_test() runs on MTCType
+{
+  timer temp := 100.0;
+  temp.start;
+  setverdict(timer_function(true,temp));
+  temp.stop;
+  comp_t.start;
+  setverdict(timer_function(true,comp_t));
+  comp_t.stop;
+  setverdict(timer_function(false,-));
+  setverdict(timer_function(false));
+  setverdict(timer_function(-,-));
+  setverdict(timer_function());
+}
+
+testcase simple_port_test() runs on MTCType
+{
+  connect(self:comp_port1,self:comp_port1);
+  connect(self:comp_port2,self:comp_port2);
+  comp_port2.send("actual");
+  setverdict(port_function(true,comp_port2));
+  comp_port1.send("default");
+  setverdict(port_function(false,-));
+  comp_port1.send("default");
+  setverdict(port_function(false));
+  comp_port1.send("default");
+  setverdict(port_function(-,-));
+  comp_port1.send("default");
+  setverdict(port_function());
+  disconnect(self:comp_port1,self:comp_port1);
+  disconnect(self:comp_port2,self:comp_port2);
+}
+
+testcase altstep_test() runs on MTCType
+{
+  connect(self:comp_port1,self:comp_port1);
+  timer T := 1.0;
+  comp_port1.send("Hello");
+  T.start;
+  alt{
+    []simple_altstep(true){T.stop;}
+    []T.timeout {setverdict(inconc);}
+  }
+  comp_port1.send("rossz uzenet");
+  T.start;
+  alt{
+    []simple_altstep(){T.stop;}
+    []T.timeout {setverdict(inconc);}
+  }
+  activate(simple_altstep(true));
+  comp_port1.send("Hello");
+  T.start;
+  alt{
+    []T.timeout {setverdict(inconc);}
+  }
+  T.stop;
+  deactivate;
+  activate(simple_altstep());
+  comp_port1.send("rossz uzenet");
+  T.start;
+  alt{
+    []simple_altstep(false){T.stop;}
+    []T.timeout {setverdict(inconc);}
+  }
+  deactivate;
+  disconnect(self:comp_port1,self:comp_port1);
+}
+
+testcase testcase_test(in boolean is_set := false, in integer x := 1,
+    in integer y := 1) runs on MTCType
+{
+  if(not(is_set) and x == 1 and y == 1){setverdict(pass);}
+  else if(is_set and x == 2 and y == 2){setverdict(pass);}
+  else {setverdict(fail);}
+}
+
+testcase template_test() runs on MTCType
+{
+  var rec_type given := {2,2};
+  var rec_type base := {1,1};
+  if(match(base,t1())){setverdict(pass);}
+  else{setverdict(fail);}
+  if(match(base,t1(-,-))){setverdict(pass);}
+  else{setverdict(fail);}
+  if(match(base,t1(1))){setverdict(pass);}
+  else{setverdict(fail);}
+  if(match(base,t1(-,1))){setverdict(pass);}
+  else{setverdict(fail);}
+  if(match(given,t1(2,2))){setverdict(pass);}
+  else{setverdict(fail);}
+}
+
+testcase functionreference_test() runs on MTCType
+{
+  var func_type func_var := refers(boolean_function);
+  setverdict(func_var.apply(true,true));
+  setverdict(func_var.apply(false,-));
+  setverdict(func_var.apply(false));
+  setverdict(func_var.apply(-,-));
+  setverdict(func_var.apply());
+  setverdict(func_const.apply(true,true));
+  setverdict(func_const.apply(false,-));
+  setverdict(func_const.apply(false));
+  setverdict(func_const.apply(-,-));
+  setverdict(func_const.apply());
+}
+
+control{
+  execute(simple_integer_test());
+  execute(simple_boolean_test());
+  execute(simple_float_test());
+  execute(simple_charstring_test());
+  execute(simple_octetstring_test());
+  execute(simple_bitstring_test());
+  execute(simple_record_test());
+  execute(simple_set_test());
+  execute(simple_timer_test());
+  execute(simple_port_test());
+  execute(altstep_test());
+  execute(testcase_test(false,-,-));
+  execute(testcase_test(false,-,1));
+  execute(testcase_test(false));
+  execute(testcase_test());
+  execute(testcase_test(true,2,2));
+  execute(template_test());
+  execute(functionreference_test());
+}
+}

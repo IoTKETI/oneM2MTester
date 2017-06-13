@@ -1,0 +1,264 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module FractionDigitsTest {
+
+modulepar boolean FractionDigitsTest_verbose := false;
+#define verbose FractionDigitsTest_verbose
+
+#include "../macros.ttcnin"
+
+type float MyFloatDecimal2
+with {
+  variant "XSD:decimal"
+  variant "fractionDigits 2"
+}
+
+type float MyFloatDecimal0
+with {
+  variant "XSD:decimal"
+  variant "fractionDigits 0"
+}
+
+type record MyRec { 
+  MyFloatDecimal2 myfloat
+} 
+with {
+  variant (myfloat) "fractionDigits 2";
+  variant (myfloat) "attribute";
+};
+
+
+type component FDT {}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+DECLARE_XER_ENCODERS(MyFloatDecimal2, fdec2)
+DECLARE_EXER_ENCODERS(MyFloatDecimal2, fdec2)
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+const MyFloatDecimal2 myfdec2 := 12345.6789;
+const universal charstring c_myfxml2_bxer := "<MyFloatDecimal2>12345.678900</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_exer := "<MyFloatDecimal2>12345.67</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_2 := 12345.1;
+const universal charstring c_myfxml2_2_bxer := "<MyFloatDecimal2>12345.100000</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_2_exer := "<MyFloatDecimal2>12345.10</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_3 := 12345E-4;
+const universal charstring c_myfxml2_3_bxer := "<MyFloatDecimal2>1.234500</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_3_exer := "<MyFloatDecimal2>1.23</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_4 := 12345E-1;
+const universal charstring c_myfxml2_4_bxer := "<MyFloatDecimal2>1234.500000</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_4_exer := "<MyFloatDecimal2>1234.50</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_5 := 12345E+0;
+const universal charstring c_myfxml2_5_bxer := "<MyFloatDecimal2>12345.000000</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_5_exer := "<MyFloatDecimal2>12345.00</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_6 := 12345E-0;
+const universal charstring c_myfxml2_6_bxer := "<MyFloatDecimal2>12345.000000</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_6_exer := "<MyFloatDecimal2>12345.00</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_7 := 12345E+1;
+const universal charstring c_myfxml2_7_bxer := "<MyFloatDecimal2>123450.000000</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_7_exer := "<MyFloatDecimal2>123450.00</MyFloatDecimal2>\n";
+
+const MyFloatDecimal2 myfdec2_8 := 1234567890.0987654321;
+const universal charstring c_myfxml2_8_bxer := "<MyFloatDecimal2>1234567890.098770</MyFloatDecimal2>\n";
+const universal charstring c_myfxml2_8_exer := "<MyFloatDecimal2>1234567890.09</MyFloatDecimal2>\n";
+
+testcase float_decimal_enc2() runs on FDT
+{
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2, c_myfxml2_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2, c_myfxml2_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_2, c_myfxml2_2_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_2, c_myfxml2_2_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_3, c_myfxml2_3_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_3, c_myfxml2_3_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_4, c_myfxml2_4_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_4, c_myfxml2_4_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_5, c_myfxml2_5_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_5, c_myfxml2_5_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_6, c_myfxml2_6_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_6, c_myfxml2_6_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_7, c_myfxml2_7_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_7, c_myfxml2_7_exer);
+
+  CHECK_METHOD(bxer_enc_fdec2, myfdec2_8, c_myfxml2_8_bxer);
+  CHECK_METHOD(exer_enc_fdec2, myfdec2_8, c_myfxml2_8_exer);
+}
+
+testcase float_decimal_dec2() runs on FDT
+{
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_bxer, MyFloatDecimal2, myfdec2);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_exer, MyFloatDecimal2, 12345.670000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_2_bxer, MyFloatDecimal2, myfdec2_2);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_2_exer, MyFloatDecimal2, 12345.100000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_3_bxer, MyFloatDecimal2, myfdec2_3);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_3_exer, MyFloatDecimal2, 1.230000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_4_bxer, MyFloatDecimal2, myfdec2_4);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_4_exer, MyFloatDecimal2, 1234.500000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_5_bxer, MyFloatDecimal2, myfdec2_5);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_5_exer, MyFloatDecimal2, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_6_bxer, MyFloatDecimal2, myfdec2_6);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_6_exer, MyFloatDecimal2, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_7_bxer, MyFloatDecimal2, myfdec2_7);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_7_exer, MyFloatDecimal2, 123450.000000);
+
+  CHECK_DECODE(bxer_dec_fdec2, c_myfxml2_8_bxer, MyFloatDecimal2, myfdec2_8);
+  CHECK_DECODE(exer_dec_fdec2, c_myfxml2_8_exer, MyFloatDecimal2, 1234567890.090000);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+DECLARE_XER_ENCODERS(MyFloatDecimal0, fdec0)
+DECLARE_EXER_ENCODERS(MyFloatDecimal0, fdec0)
+
+const MyFloatDecimal0 myfdec0 := 12345.6789;
+const universal charstring c_myfxml0_bxer := "<MyFloatDecimal0>12345.678900</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_exer := "<MyFloatDecimal0>12345</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_2 := 12345.1;
+const universal charstring c_myfxml0_2_bxer := "<MyFloatDecimal0>12345.100000</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_2_exer := "<MyFloatDecimal0>12345</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_3 := 12345E-4;
+const universal charstring c_myfxml0_3_bxer := "<MyFloatDecimal0>1.234500</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_3_exer := "<MyFloatDecimal0>1</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_4 := 12345E-1;
+const universal charstring c_myfxml0_4_bxer := "<MyFloatDecimal0>1234.500000</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_4_exer := "<MyFloatDecimal0>1234</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_5 := 12345E+0;
+const universal charstring c_myfxml0_5_bxer := "<MyFloatDecimal0>12345.000000</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_5_exer := "<MyFloatDecimal0>12345</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_6 := 12345E-0;
+const universal charstring c_myfxml0_6_bxer := "<MyFloatDecimal0>12345.000000</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_6_exer := "<MyFloatDecimal0>12345</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_7 := 12345E+1;
+const universal charstring c_myfxml0_7_bxer := "<MyFloatDecimal0>123450.000000</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_7_exer := "<MyFloatDecimal0>123450</MyFloatDecimal0>\n";
+
+const MyFloatDecimal0 myfdec0_8 := 1234567890.0987654321;
+const universal charstring c_myfxml0_8_bxer := "<MyFloatDecimal0>1234567890.098770</MyFloatDecimal0>\n";
+const universal charstring c_myfxml0_8_exer := "<MyFloatDecimal0>1234567890</MyFloatDecimal0>\n";
+
+testcase float_decimal_enc0() runs on FDT
+{
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0, c_myfxml0_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0, c_myfxml0_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_2, c_myfxml0_2_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_2, c_myfxml0_2_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_3, c_myfxml0_3_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_3, c_myfxml0_3_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_4, c_myfxml0_4_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_4, c_myfxml0_4_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_5, c_myfxml0_5_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_5, c_myfxml0_5_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_6, c_myfxml0_6_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_6, c_myfxml0_6_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_7, c_myfxml0_7_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_7, c_myfxml0_7_exer);
+
+  CHECK_METHOD(bxer_enc_fdec0, myfdec0_8, c_myfxml0_8_bxer);
+  CHECK_METHOD(exer_enc_fdec0, myfdec0_8, c_myfxml0_8_exer);
+}
+
+testcase float_decimal_dec0() runs on FDT
+{
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_bxer, MyFloatDecimal0, myfdec0);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_exer, MyFloatDecimal0, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_2_bxer, MyFloatDecimal0, myfdec0_2);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_2_exer, MyFloatDecimal0, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_3_bxer, MyFloatDecimal0, myfdec0_3);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_3_exer, MyFloatDecimal0, 1.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_4_bxer, MyFloatDecimal0, myfdec0_4);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_4_exer, MyFloatDecimal0, 1234.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_5_bxer, MyFloatDecimal0, myfdec0_5);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_5_exer, MyFloatDecimal0, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_6_bxer, MyFloatDecimal0, myfdec0_6);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_6_exer, MyFloatDecimal0, 12345.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_7_bxer, MyFloatDecimal0, myfdec0_7);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_7_exer, MyFloatDecimal0, 123450.000000);
+
+  CHECK_DECODE(bxer_dec_fdec0, c_myfxml0_8_bxer, MyFloatDecimal0, myfdec0_8);
+  CHECK_DECODE(exer_dec_fdec0, c_myfxml0_8_exer, MyFloatDecimal0, 1234567890.000000);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+DECLARE_XER_ENCODERS(MyRec, frec)
+DECLARE_EXER_ENCODERS(MyRec, frec)
+
+const MyRec c_myrec := { myfloat := 1234.5678 };
+
+const universal charstring c_myrec_bxer := "<MyRec>\n\t<myfloat>1234.567800</myfloat>\n</MyRec>\n\n";
+
+const universal charstring c_myrec_exer := "<MyRec myfloat='1234.56'/>\n\n";
+
+testcase float_decimal_attr_enc() runs on FDT {
+  CHECK_METHOD(bxer_enc_frec, c_myrec, c_myrec_bxer);
+  CHECK_METHOD(exer_enc_frec, c_myrec, c_myrec_exer);
+}
+
+testcase float_decimal_attr_dec() runs on FDT {
+  CHECK_DECODE(bxer_dec_frec, c_myrec_bxer, MyRec, c_myrec);
+  var MyRec local_rec := c_myrec;
+  local_rec.myfloat := 1234.560000;
+  CHECK_DECODE(exer_dec_frec, c_myrec_exer, MyRec, local_rec);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+control {
+  execute(float_decimal_enc2());
+  execute(float_decimal_dec2());
+
+  execute(float_decimal_enc0());
+  execute(float_decimal_dec0());
+
+  execute(float_decimal_attr_enc());
+  execute(float_decimal_attr_dec());
+}
+
+}
+with { encode "XML" }
+

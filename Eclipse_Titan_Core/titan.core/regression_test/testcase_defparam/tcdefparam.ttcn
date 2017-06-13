@@ -1,0 +1,94 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module tcdefparam {
+
+type component D {
+  var integer dx := 13;
+  var template float fx;
+}
+
+testcase tc_no_par() runs on D
+{
+  setverdict(pass);
+}
+
+testcase tc_one_dp(in integer par1 := 42) runs on D
+{
+  if (par1 == 42) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase tc_two_dps(in charstring s := "Stan", in charstring o := "Ollie") runs on D
+{
+  if (s == "Stan" and o == "Ollie") { setverdict(pass); }
+  else { setverdict(fail, "here's another nice mess you've gotten me into!"); }
+}
+
+modulepar integer x;
+
+testcase tc_outpar(out integer o := dx) runs on D
+{
+  if (o == 13) { setverdict(pass); }
+  else { setverdict(fail, match(o,13)); }
+  
+  o := 17;
+}
+
+testcase tc_inoutpar(inout integer io := dx) runs on D
+{
+  if (io == 13) { setverdict(pass); }
+  else { setverdict(fail, match(io, 13)); }
+  
+  io := 18;
+}
+
+testcase tc_one_template_dp(in template charstring foobar := charstring : ("foo", "bar", "baz")) runs on D
+{
+  if (match("baz", foobar)) { setverdict(pass); }
+  else { setverdict(fail, match("baz", foobar)); }
+}
+
+testcase tc_out_template_dp(out template float fd := fx) runs on D {
+  if (isbound(fd)) { setverdict(fail, "inbound out parameter should be unbound"); }
+  else { setverdict(pass); }
+}
+
+control {
+  // This control part is not supposed to be run. The following call
+  // intentionally causes a fail verdict.
+  execute(tc_one_dp(13));
+
+  // These calls are here to see the generated code
+  execute(tc_out_template_dp());
+  execute(tc_outpar());
+  execute(tc_inoutpar());
+
+  execute(tc_one_template_dp());
+  execute(tc_one_template_dp(-));
+  execute(tc_one_template_dp("baz"));
+  execute(tc_one_template_dp(?));
+
+  execute(tc_one_dp());
+  execute(tc_one_dp(-));
+  execute(tc_one_dp(42));
+
+  execute(tc_two_dps());
+  execute(tc_two_dps(-));
+  execute(tc_two_dps(-, -));
+  execute(tc_two_dps("Stan"));
+  execute(tc_two_dps(-, "Ollie"));
+  execute(tc_two_dps(-));
+  execute(tc_two_dps("Stan", "Ollie"));
+}
+
+}

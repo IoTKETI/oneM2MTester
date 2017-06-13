@@ -1,0 +1,828 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module rec_of
+{
+
+import from ReadXml all;
+
+import from rec { type R , Neg; function test_match; };
+// We import the component Neg and testcases to have a single control part.
+// This is all bogus because everything is imported.
+
+type record of R RS;
+
+external function encRS(in RS pars) return octetstring
+with { extension "prototype(convert) encode(XER:XER_EXTENDED)" }
+
+/*---------------------------- OMIT ----------------------------*/
+
+const RS c_omit := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([1]) "value := omit";
+}
+
+template Nodes t_omit := { // the equivalent of an 1-element record-of
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" } // [15]
+}
+
+testcase rof_omit() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_omit);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_omit);
+}
+
+/*---------------------------- PLAIN ----------------------------*/
+
+// int, charstring, boolean, float
+const RS c_plain := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+
+template Nodes t_plain modifies t_omit := {
+  // node type             , depth, name   , value
+[15] := { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+[16] := { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+[17] := { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+[18] := { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+[19] := { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+[20] := { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+[21] := { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+[22] := { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+[23] := { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+[24] := { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+[25] := { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+[26] := { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+[27] := { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+[28] := { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+[29] := { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+testcase rof_plain() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_plain);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_plain);
+}
+
+/*--------------------------- BEFORE -----------------------------*/
+
+type integer myinteger;
+
+// int, charstring, boolean, float
+const RS c_before_elem := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "before := 42"
+}
+
+// int, charstring, boolean, float
+const RS c_before_elem_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "before := myinteger : 42"
+}
+
+const RS c_before_member := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "before := 42"
+}
+
+const RS c_before_member_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "before := myinteger : 42"
+}
+
+template Nodes t_before_elem := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  // Perturbation: an extra element
+  { XML_READER_TYPE_ELEMENT,     1, "INTEGER", "", "" },
+  { XML_READER_TYPE_TEXT,        2, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "INTEGER", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+template Nodes t_before_member modifies t_before_elem :=
+{
+  // just move the <INTEGER> inside the <R> (need to adjust depths)
+  [1] := { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" }, //t_before_elem[4],
+  [2] := { XML_READER_TYPE_ELEMENT,     2, "INTEGER", "", "" }, //t_before_elem[1],
+  [3] := { XML_READER_TYPE_TEXT,        3, "#text", "42", "" }, //t_before_elem[2],
+  [4] := { XML_READER_TYPE_END_ELEMENT, 2, "INTEGER", "", "" } //,t_before_elem[3]
+}
+
+template Nodes t_before_elem_named modifies t_before_elem := {
+  // the perturbation
+  [1] := { XML_READER_TYPE_ELEMENT,     1, "myinteger", "", "" },
+  //[2] := { XML_READER_TYPE_TEXT,        2, "#text", "42", "" }, // unmodified
+  [3] := { XML_READER_TYPE_END_ELEMENT, 1, "myinteger", "", "" }
+}
+
+template Nodes t_before_member_named modifies t_before_member := {
+  [2] := { XML_READER_TYPE_ELEMENT,     2, "myinteger", "", "" },
+  [4] := { XML_READER_TYPE_END_ELEMENT, 2, "myinteger", "", "" }
+}
+
+testcase rof_before() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_before_elem);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_elem);
+
+  o := encRS(c_before_member);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_member);
+
+  o := encRS(c_before_elem_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_elem_named);
+
+  o := encRS(c_before_member_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_member_named);
+}
+
+
+// int, charstring, boolean, float
+const RS c_before_elem_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "before(raw) := ""rawr before first elem"" "
+}
+
+const RS c_before_member_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "before(raw) := ""rawr before member of first"" "
+}
+
+template Nodes t_before_elem_raw := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  // Perturbation: an extra text node
+  { XML_READER_TYPE_TEXT,        1, "#text", pattern "\s#(1,)rawr before first elem\s#(1,)", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+// <RS> text <R> <i>  becomes  <RS> <R> text <i>
+template Nodes t_before_member_raw modifies t_before_elem_raw :=
+{
+  // just move the #text inside the <R> (need to adjust depths)
+  [1] := { XML_READER_TYPE_ELEMENT, 1, "R"    , "", "" }, //t_before_elem_raw[2],
+  [2] := { XML_READER_TYPE_TEXT,    2, "#text", pattern "\s#(1,)rawr before member of first\s#(1,)", "" } //t_before_elem_raw[1],
+}
+
+testcase rof_before_raw() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_before_elem_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_elem_raw);
+
+  o := encRS(c_before_member_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_before_member_raw);
+}
+
+
+
+/*---------------------------- REPLACE ----------------------------*/
+
+const RS c_replace_elem := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "value := 42"
+}
+
+const RS c_replace_member := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "value := 42"
+}
+
+template Nodes t_replace_elem := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  // first record element replaced with single <INTEGER>
+  { XML_READER_TYPE_ELEMENT,     1, "INTEGER", "", "" },
+  { XML_READER_TYPE_TEXT,        2, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "INTEGER", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" } // [15]
+}
+
+template Nodes t_replace_member := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_ELEMENT,     2, "INTEGER", "", "" },
+  { XML_READER_TYPE_TEXT,        3, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "INTEGER", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" } // [15]
+}
+
+type float real;
+
+const RS c_replace_elem_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "value := real : 42.42"
+}
+
+const RS c_replace_member_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "value := real : 42.42"
+}
+
+template Nodes t_replace_elem_named modifies t_replace_elem := {
+  [1] := { XML_READER_TYPE_ELEMENT,     1, "real", "", "" },
+  [2] := { XML_READER_TYPE_TEXT,        2, "#text", "42.420000", "" },
+  [3] := { XML_READER_TYPE_END_ELEMENT, 1, "real", "", "" }
+}
+
+template Nodes t_replace_member_named modifies t_replace_member := {
+  [2] := { XML_READER_TYPE_ELEMENT,     2, "real", "", "" },
+  [3] := { XML_READER_TYPE_TEXT,        3, "#text", "42.420000", "" },
+  [4] := { XML_READER_TYPE_END_ELEMENT, 2, "real", "", "" }
+}
+
+
+const RS c_replace_elem_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "value(raw) := char2oct(""Nothing to see here"")"
+}
+
+const RS c_replace_member_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "value(raw) := 'e5909be98194e381aee59fbae59cb0e381afe38081e585a8e381a643415453e3818ce38184e3819fe381a0e38184e3819f'O "
+}
+
+template Nodes t_replace_elem_raw := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  // first record element replaced with single text node
+  { XML_READER_TYPE_TEXT,        1, "#text", "\nNothing to see here\t", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" } // [15]
+}
+
+template Nodes t_replace_member_raw := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_TEXT,        2, "#text", "\n" & "\xe5\x90\x9b\xe9\x81\x94\xe3\x81\xae\xe5\x9f\xba\xe5\x9c\xb0\xe3\x81\xaf\xe3\x80\x81\xe5\x85\xa8\xe3\x81\xa6\x43\x41\x54\x53\xe3\x81\x8c\xe3\x81\x84\xe3\x81\x9f\xe3\x81\xa0\xe3\x81\x84\xe3\x81\x9f" & "\t\t", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" } // [15]
+}
+
+
+testcase rof_replacer() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_replace_elem);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_elem);
+
+  o := encRS(c_replace_member);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_member);
+
+  o := encRS(c_replace_elem_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_elem_named);
+
+  o := encRS(c_replace_member_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_member_named);
+}
+
+testcase rof_replacer_raw() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_replace_elem_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_elem_raw);
+
+  o := encRS(c_replace_member_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_replace_member_raw);
+}
+
+
+/*--------------------------- AFTER -----------------------------*/
+
+
+// int, charstring, boolean, float
+const RS c_after_elem := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "after := 42"
+}
+
+const RS c_after_member := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "after := 42"
+}
+
+template Nodes t_after_elem := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },// 10
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },//14
+
+  // Perturbation: an extra element
+  { XML_READER_TYPE_ELEMENT,     1, "INTEGER", "", "" },
+  { XML_READER_TYPE_TEXT,        2, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "INTEGER", "", "" },
+
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+template Nodes t_after_member :=
+{
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" }, //4
+
+  // Perturbation: an extra element
+  { XML_READER_TYPE_ELEMENT,     2, "INTEGER", "", "" },
+  { XML_READER_TYPE_TEXT,        3, "#text", "42", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "INTEGER", "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },// 10
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },//14
+
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+type universal charstring ustr;
+
+const RS c_after_elem_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "after := ustr : ""fourty-two"" "
+}
+
+const RS c_after_member_named := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "after := ustr : ""fourty-two"" "
+}
+
+template Nodes t_after_elem_named modifies t_after_elem := {
+  // Perturbation: an extra element
+  [15] := { XML_READER_TYPE_ELEMENT,     1, "ustr", "", "" },
+  [16] := { XML_READER_TYPE_TEXT,        2, "#text", "fourty-two", "" },
+  [17] := { XML_READER_TYPE_END_ELEMENT, 1, "ustr", "", "" }
+}
+
+template Nodes t_after_member_named modifies t_after_member := {
+  // Perturbation: an extra element
+  [5] := { XML_READER_TYPE_ELEMENT,     2, "ustr", "", "" },
+  [6] := { XML_READER_TYPE_TEXT,        3, "#text", "fourty-two", "" },
+  [7] := { XML_READER_TYPE_END_ELEMENT, 2, "ustr", "", "" }
+}
+
+testcase rof_after() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_after_elem);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_elem);
+
+  o := encRS(c_after_member);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_member);
+
+  o := encRS(c_after_elem_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_elem_named);
+
+  o := encRS(c_after_member_named);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_member_named);
+}
+
+
+// int, charstring, boolean, float
+const RS c_after_elem_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0]) "after(raw) := ""rawr after first elem"" "
+}
+
+const RS c_after_member_raw := {
+  { 1, "first" , true ,  7.0 },
+  { 2, "second", false, -3.7 }
+}
+with {
+  erroneous ([0].i) "after(raw) := ustr : ""rawr after member of first"" "
+}
+
+template Nodes t_after_elem_raw := {
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  // Perturbation: an extra text node
+  { XML_READER_TYPE_TEXT,        1, "#text", pattern "\s#(1,)rawr after first elem\s#(1,)", "" },
+
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+// <RS> text <R> <i>  becomes  <RS> <R> text <i>
+template Nodes t_after_member_raw modifies t_after_elem_raw :=
+{
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 0, "RS"   , "", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "1", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+
+  // Perturbation: an extra text node
+  { XML_READER_TYPE_TEXT,        2, "#text", pattern "\s#(1,)rawr after member of first\s#(1,)", "" },
+
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "first", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "true", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "7.000000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+  // node type             , depth, name   , value
+  { XML_READER_TYPE_ELEMENT    , 1, "R"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "i"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "2", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "i"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "s"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "second", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "s"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "b"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "false", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "b"    , "", "" },
+  { XML_READER_TYPE_ELEMENT    , 2, "f"    , "", "" },
+  { XML_READER_TYPE_TEXT       , 3, "#text", "-3.700000", "" },
+  { XML_READER_TYPE_END_ELEMENT, 2, "f"    , "", "" },
+  { XML_READER_TYPE_END_ELEMENT, 1, "R"    , "", "" },
+
+  { XML_READER_TYPE_END_ELEMENT, 0, "RS"   , "", "" }
+}
+
+testcase rof_after_raw() runs on Neg
+{
+  var octetstring o;
+  var Nodes nodes;
+
+  o := encRS(c_after_elem_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_elem_raw);
+
+  o := encRS(c_after_member_raw);
+  nodes := gather(o, ignore_ws);
+  check_match(nodes, t_after_member_raw);
+}
+
+
+
+
+}  // end of module
+with {
+  encode "XML"
+}

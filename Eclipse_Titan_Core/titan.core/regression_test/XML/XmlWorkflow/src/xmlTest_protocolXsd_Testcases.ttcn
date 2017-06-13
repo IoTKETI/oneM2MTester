@@ -1,0 +1,596 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+
+//=========================================================================
+// References: (XSD_0)  XML Schema Part 0: Primer Second Edition
+//             (XSD_1)  XML Schema Part 1: Structures Second Edition
+//             (XSD_2)  XML Schema Part 2: Datatypes Second Edition
+//             (ETSI_9) ETSI ES 201 873-9 V4.1.2, The Testing and Test Control Notation version 3;
+//                      Part 9: Using XML schema with TTCN-3
+
+module xmlTest_protocolXsd_Testcases
+{
+
+//=========================================================================
+// Import Part
+//=========================================================================
+//import from XSD all;
+import from PIPEasp_Types all;
+import from PIPEasp_PortType all;
+import from PIPEasp_Templates all;
+import from xmlTest_Shell all;
+import from www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02_e all;
+import from uri_etsi_org_ngn_params_xml_simservs_sci_e all;
+//=========================================================================
+// Module Parameters
+//=========================================================================
+
+// Insert module parameters here if applicable!
+// You can use the module_param skeleton!
+
+//=========================================================================
+// Data Types
+//=========================================================================
+
+// Insert data type defintions here if applicable!
+// You can use the data_type skeleton!
+
+//=========================================================================
+// Signatures
+//=========================================================================
+
+// Insert signature definitions here if applicable!
+// You can use the signature skeleton!
+
+//=========================================================================
+//Port Types
+//=========================================================================
+
+// Insert port type defintions here if applicable!
+// You can use the port_type skeleton!
+
+//=========================================================================
+//Component Types
+//=========================================================================
+
+//=========================================================================
+// Constants
+//=========================================================================
+group Group_MGW_constants {
+
+const IntegratedSite c_mgw_integratedsite_pdu := {
+  administrativeData := {
+    siteAlias := omit,
+    ipb := omit,
+    systemRestart := { omit }
+  },
+  bladeSystems := {
+    bladeSystem_list := {
+      {
+        name  := "blade-1",
+        alias := "Blade of the immortal",
+        number := omit,
+        typeName := omit,
+        swgRef := "swg17",
+        scpRef := omit,
+        admState := omit,
+        opState := omit,
+        availStatus := omit,
+        bsdRef := omit,
+        bsomAddress := omit,
+        externalBootServerRef := omit,
+        autoCreatePrivateNetwork := omit,
+        namespace := omit,
+        blade_list := {},
+        bsNetworkConfiguration := {
+          bsIpTrafficClass_list := {},
+          bsLanTrafficClass_list := {},
+          bsLogicalNetwork_list := {},
+          bsVlan_list := {}
+        }
+      }
+    }
+  },
+  hardware := {
+    activeSis := omit,
+    bladeSystemDomain_list := {},
+    bladeType_list := {},
+    interSubrackLink_list := {},
+    subrack_list := {}
+  },
+  networkConfiguration := {
+    externalBootServer_list := { },
+    isIpTrafficClass_list := { },
+    isLanTrafficClass_list := { },
+    isLogicalNetwork_list := {},
+    isVariables := {
+      updateMode := omit,
+      dataModelVersion := omit,
+      rlspMarkerGenerateInterval := omit,
+      rlspLinkDownThreshold := omit,
+      rlspLinkUpThreshold := omit,
+      timezoneDstRule := omit,
+      dnsDomain := omit,
+      notifyAfter := omit,
+      defaultDhcpLeaseTime := omit,
+      lifeTimeDhcpLeaseTime := omit
+    },
+    isVlan_list := {}
+  },
+  software := {
+    softwareInventory := {
+      backup_list := {},
+      softwareAlarm_list := {},
+      softwareDeliveryPackage_list := {{
+          prodNo   := "1",
+          prodRev  := "3",
+          prodName := omit,
+          type_    := omit
+        }},
+      softwareGroup_list := {}
+    },
+    softwareJobs := {
+      backupCreateJob_list := {},
+      backupExportJob_list := {},
+      backupImportJob_list := {},
+      backupRestoreJob_list:= {},
+      softwareChangeJob_list := {},
+      softwareDownloadJob_list := {}
+    }
+  }
+};
+
+
+const charstring c_mgw_integratedsite_encodedPdu:=
+"<IntegratedSite:IntegratedSite xmlns:IntegratedSite='http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02'>\n" &
+"\t<IntegratedSite:AdministrativeData>\n" &
+"\t\t<IntegratedSite:SystemRestart/>\n" &
+"\t</IntegratedSite:AdministrativeData>\n" &
+"\t<IntegratedSite:BladeSystems>\n" &
+"\t\t<IntegratedSite:BladeSystem>\n" &
+"\t\t\t<IntegratedSite:name>blade-1</IntegratedSite:name>\n" &
+"\t\t\t<IntegratedSite:alias>Blade of the immortal</IntegratedSite:alias>\n" &
+"\t\t\t<IntegratedSite:swgRef>swg17</IntegratedSite:swgRef>\n" &
+"\t\t\t<IntegratedSite:BsNetworkConfiguration/>\n" &
+"\t\t</IntegratedSite:BladeSystem>\n\t</IntegratedSite:BladeSystems>\n" &
+"\t<IntegratedSite:Hardware/>\n" &
+"\t<IntegratedSite:NetworkConfiguration>\n" &
+"\t\t<IntegratedSite:IsVariables/>\n" &
+"\t</IntegratedSite:NetworkConfiguration>\n" &
+"\t<IntegratedSite:Software>\n" &
+"\t\t<IntegratedSite:SoftwareInventory>\n" &
+"\t\t\t<IntegratedSite:SoftwareDeliveryPackage>\n" &
+"\t\t\t\t<IntegratedSite:prodNo>1</IntegratedSite:prodNo>\n" &
+"\t\t\t\t<IntegratedSite:prodRev>3</IntegratedSite:prodRev>\n" &
+"\t\t\t</IntegratedSite:SoftwareDeliveryPackage>\n" &
+"\t\t</IntegratedSite:SoftwareInventory>\n" &
+"\t\t<IntegratedSite:SoftwareJobs/>\n" &
+"\t</IntegratedSite:Software>\n" &
+"</IntegratedSite:IntegratedSite>\n" &
+"\n"
+
+}//Group_MGW_constants
+
+
+group Group_SIP_constants {
+
+const MessageType c_sipserver_pdu1:= {
+    choice:= {
+      crgt:= {
+        chargingControlIndicators:={
+          immediateChangeOfActuallyAppliedTariff:=true,
+          delayUntilStart:=true
+        },
+        chargingTariff:= {
+          choice:= {
+            tariffCurrency:= {
+              currentTariffCurrency:= {
+                communicationChargeSequenceCurrency_list:={
+                  {
+                    currencyFactorScale:={
+                      currencyFactor:=1111,
+                      currencyScale:= -2
+                    },
+                    tariffDuration:=3,
+                    subTariffControl:=false
+                  }
+                },
+                tariffControlIndicators:=true,
+                callAttemptChargeCurrency:= {
+                    currencyFactor:=273,
+                    currencyScale:= -7
+                },
+                callSetupChargeCurrency:={
+                    currencyFactor:=273,
+                    currencyScale:= -7
+                }
+              },
+              tariffSwitchCurrency:={
+                nextTariffCurrency:= {
+                  communicationChargeSequenceCurrency_list:={
+                    {
+                    currencyFactorScale:={
+                      currencyFactor:=1111,
+                      currencyScale:= -2
+                    },
+                    tariffDuration:=3,
+                    subTariffControl:=false
+                    }
+                  },
+                  tariffControlIndicators:=true,
+                  callAttemptChargeCurrency:= {
+                      currencyFactor:=999999,
+                      currencyScale:= -7
+                  },
+                  callSetupChargeCurrency:={
+                      currencyFactor:=999999,
+                      currencyScale:= -7
+                  }
+                },//nextTariffCurrency
+                tariffSwitchOverTime:= 'EF'O
+              }//tariffSwitchCurrency
+            }//tariffCurrency
+          }//choice
+        },//chargingTariff
+        originationIdentification:= {
+          networkIdentification:= "Ericsson Supported Core NW",
+          referenceID:= 0
+        },//originationIdentification
+        destinationIdentification:=omit,
+        currency:="HUF"
+      }//cgrt
+    }//choice
+}//pdu"
+
+
+const charstring c_sipserver_expectedEncodedPdu:=
+"<sci:messageType xmlns:sci='http://uri.etsi.org/ngn/params/xml/simservs/sci'>\n" &
+"\t<sci:crgt>\n" &
+"\t\t<sci:chargingControlIndicators>\n" &
+"\t\t\t<sci:immediateChangeOfActuallyAppliedTariff>true</sci:immediateChangeOfActuallyAppliedTariff>\n" &
+"\t\t\t<sci:delayUntilStart>true</sci:delayUntilStart>\n" &
+"\t\t</sci:chargingControlIndicators>\n" &
+"\t\t<sci:chargingTariff>\n" &
+"\t\t\t<sci:tariffCurrency>\n" &
+"\t\t\t\t<sci:currentTariffCurrency>\n" &
+"\t\t\t\t\t<sci:communicationChargeSequenceCurrency>\n" &
+"\t\t\t\t\t\t<sci:currencyFactorScale>\n" &
+"\t\t\t\t\t\t\t<sci:currencyFactor>1111</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t\t<sci:currencyScale>-2</sci:currencyScale>\n" &
+"\t\t\t\t\t\t</sci:currencyFactorScale>\n" &
+"\t\t\t\t\t\t<sci:tariffDuration>3</sci:tariffDuration>\n" &
+"\t\t\t\t\t\t<sci:subTariffControl>false</sci:subTariffControl>\n" &
+"\t\t\t\t\t</sci:communicationChargeSequenceCurrency>\n" &
+"\t\t\t\t\t<sci:tariffControlIndicators>true</sci:tariffControlIndicators>\n" &
+"\t\t\t\t\t<sci:callAttemptChargeCurrency>\n" &
+"\t\t\t\t\t\t<sci:currencyFactor>273</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t<sci:currencyScale>-7</sci:currencyScale>\n" &
+"\t\t\t\t\t</sci:callAttemptChargeCurrency>\n" &
+"\t\t\t\t\t<sci:callSetupChargeCurrency>\n" &
+"\t\t\t\t\t\t<sci:currencyFactor>273</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t<sci:currencyScale>-7</sci:currencyScale>\n" &
+"\t\t\t\t\t</sci:callSetupChargeCurrency>\n" &
+"\t\t\t\t</sci:currentTariffCurrency>\n" &
+"\t\t\t\t<sci:tariffSwitchCurrency>\n" &
+"\t\t\t\t\t<sci:nextTariffCurrency>\n" &
+"\t\t\t\t\t\t<sci:communicationChargeSequenceCurrency>\n" &
+"\t\t\t\t\t\t\t<sci:currencyFactorScale>\n" &
+"\t\t\t\t\t\t\t\t<sci:currencyFactor>1111</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t\t\t<sci:currencyScale>-2</sci:currencyScale>\n" &
+"\t\t\t\t\t\t\t</sci:currencyFactorScale>\n" &
+"\t\t\t\t\t\t\t<sci:tariffDuration>3</sci:tariffDuration>\n" &
+"\t\t\t\t\t\t\t<sci:subTariffControl>false</sci:subTariffControl>\n" &
+"\t\t\t\t\t\t</sci:communicationChargeSequenceCurrency>\n" &
+"\t\t\t\t\t\t<sci:tariffControlIndicators>true</sci:tariffControlIndicators>\n" &
+"\t\t\t\t\t\t<sci:callAttemptChargeCurrency>\n" &
+"\t\t\t\t\t\t\t<sci:currencyFactor>999999</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t\t<sci:currencyScale>-7</sci:currencyScale>\n" &
+"\t\t\t\t\t\t</sci:callAttemptChargeCurrency>\n" &
+"\t\t\t\t\t\t<sci:callSetupChargeCurrency>\n" &
+"\t\t\t\t\t\t\t<sci:currencyFactor>999999</sci:currencyFactor>\n" &
+"\t\t\t\t\t\t\t<sci:currencyScale>-7</sci:currencyScale>\n" &
+"\t\t\t\t\t\t</sci:callSetupChargeCurrency>\n" &
+"\t\t\t\t\t</sci:nextTariffCurrency>\n" &
+"\t\t\t\t\t<sci:tariffSwitchOverTime>EF</sci:tariffSwitchOverTime>\n" &
+"\t\t\t\t</sci:tariffSwitchCurrency>\n" &
+"\t\t\t</sci:tariffCurrency>\n" &
+"\t\t</sci:chargingTariff>\n" &
+"\t\t<sci:originationIdentification>\n" &
+"\t\t\t<sci:networkIdentification>Ericsson Supported Core NW</sci:networkIdentification>\n" &
+"\t\t\t<sci:referenceID>0</sci:referenceID>\n" &
+"\t\t</sci:originationIdentification>\n" &
+"\t\t<sci:currency>HUF</sci:currency>\n" &
+"\t</sci:crgt>\n" &
+"</sci:messageType>\n" &
+"\n"
+
+}//Group_SIP_constants
+
+
+//=========================================================================
+// Functions
+//=========================================================================
+
+external function f_enc_MGW_IntegratedSite(in IntegratedSite pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED) errorbehavior(ALL:WARNING)" }
+
+external function f_dec_MGW_IntegratedSite(in octetstring stream, out IntegratedSite pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED) errorbehavior(ALL:WARNING)" }
+
+external function f_enc_SIP_MessageType(in MessageType pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED) errorbehavior(ALL:WARNING)" }
+
+external function f_dec_SIP_MessageType(in octetstring stream, out MessageType pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED) errorbehavior(ALL:WARNING)" }
+
+
+//=========================================================================
+//  f_encDecTest_MGW_IntegratedSite
+//=========================================================================
+function f_encDecTest_MGW_IntegratedSite(in IntegratedSite pl_pdu, in charstring pl_expectedEncodedPdu, in IntegratedSite pl_expectedDecodedPdu  ) {
+  var octetstring vl_encodedPdu:=''O;
+  f_enc_MGW_IntegratedSite(pl_pdu,vl_encodedPdu);
+
+  if(match(vl_encodedPdu,char2oct(pl_expectedEncodedPdu))) {
+    setverdict(pass)
+  } else {
+    log("The encoded message: ",vl_encodedPdu);
+    setverdict(fail, match(vl_encodedPdu,char2oct(pl_expectedEncodedPdu)));
+  }
+  //log("===Checking value decoded from the encoded value vs expected value===");
+  var IntegratedSite vl_decodedPdu;
+  var integer vl_retval:= f_dec_MGW_IntegratedSite(vl_encodedPdu,vl_decodedPdu)
+  if( vl_retval==0) {
+    if(match(vl_decodedPdu,pl_expectedDecodedPdu)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail, match(vl_decodedPdu,pl_expectedDecodedPdu));
+    }
+  }else {
+    setverdict(fail);
+  }
+}//f_
+
+//=========================================================================
+//  f_encDecTest_SIP_MessageType
+//=========================================================================
+function f_encDecTest_SIP_MessageType(in MessageType pl_pdu, in charstring pl_expectedEncodedPdu, in MessageType pl_expectedDecodedPdu  ) {
+  var octetstring vl_encodedPdu:=''O;
+  f_enc_SIP_MessageType(pl_pdu,vl_encodedPdu);
+
+  if(match(vl_encodedPdu,char2oct(pl_expectedEncodedPdu))) {
+    setverdict(pass)
+  } else {
+    log("The encoded message: ",vl_encodedPdu);
+    setverdict(fail, match(vl_encodedPdu,char2oct(pl_expectedEncodedPdu)));
+  }
+  //log("===Checking value decoded from the encoded value vs expected value===");
+  var MessageType vl_decodedPdu;
+  var integer vl_retval:= f_dec_SIP_MessageType(vl_encodedPdu,vl_decodedPdu)
+  if( vl_retval==0) {
+    if(match(vl_decodedPdu,pl_expectedDecodedPdu)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail, match(vl_decodedPdu,pl_expectedDecodedPdu));
+    }
+  }else {
+    setverdict(fail);
+  }
+}//f_
+
+
+//=========================================================================
+// Testcases
+//=========================================================================
+
+testcase tc_XmlTest_CAI3G_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "Bulk.xsd GenericCai3gType.xsd Provisioning.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "schemas_ericsson_com_cai3g1_1.ttcn","schemas_ericsson_com_cai3g1_1_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "schemas_ericsson_com_upg_bulkprovisioning_1_0.ttcn","schemas_ericsson_com_upg_bulkprovisioning_1_0_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "schemas_ericsson_com_upg_provisioning_1_0.ttcn","schemas_ericsson_com_upg_provisioning_1_0_e.ttcn", c_numOfDiff_headerModNameAndNamespace);
+  }
+}
+
+testcase tc_XmlTest_CCAPI_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "CCAPI.xsd","",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "NoTargetNamespace.ttcn","NoTargetNamespace_CCAPI_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_HSS_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "avg.xsd cai3g1.2_provisioning.xsd eps.xsd hssla_types.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "schemas_ericsson_com_cai3g1_2.ttcn","schemas_ericsson_com_cai3g1_2_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "schemas_ericsson_com_ma_HSS.ttcn","schemas_ericsson_com_ma_HSS_e.ttcn", 4+c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_JMdict_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "jmdict-good.xsd","",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "NoTargetNamespace.ttcn","NoTargetNamespace_JMdict_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_MGW_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "confd.xsd IntegratedSite.xsd IsTypes.xsd MainSwitch.xsd Mgw_R9B27.xsd Misc.xsd xml.xsd XMLSchema.xsd", "",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "tail_f_com_ns_confd_1_0.ttcn","tail_f_com_ns_confd_1_0_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02.ttcn","www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_ericsson_com_is_isco_IsTypes_R4L06_R4AB_1_02.ttcn","www_ericsson_com_is_isco_IsTypes_R4L06_R4AB_1_02_e.ttcn", 4+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_ericsson_com_is_isco_MainSwitch_R4L06_R4AB_1_02.ttcn","www_ericsson_com_is_isco_MainSwitch_R4L06_R4AB_1_02_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_ericsson_com_is_isco_Mgw_R9B27.ttcn","www_ericsson_com_is_isco_Mgw_R9B27_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_ericsson_com_is_isco_Misc_R4L06_R4AB_1_02.ttcn","www_ericsson_com_is_isco_Misc_R4L06_R4AB_1_02_e.ttcn", 4+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_w3_org_XML_1998_namespace.ttcn","www_w3_org_XML_1998_namespace_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_MGW_HK84933_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "IntegratedSite_HK84933.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02.ttcn",
+      "www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02_HK84933_e.ttcn",
+      c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_MGW_encDec() runs on xmlTest_CT
+{
+  f_encDecTest_MGW_IntegratedSite(c_mgw_integratedsite_pdu,c_mgw_integratedsite_encodedPdu,c_mgw_integratedsite_pdu);
+}
+
+testcase tc_XmlTest_PAP_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "PAP.xsd","",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "NoTargetNamespace.ttcn","NoTargetNamespace_PAP_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_ParlayX_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "parlayx_common_types_2_0.xsd parlayx_payment_amount_charging_interface_2_0.xsd parlayx_payment_reserve_amount_charging_interface_2_0.xsd parlayx_payment_reserve_volume_charging_interface_2_0.xsd parlayx_payment_types_2_0.xsd parlayx_payment_volume_charging_interface_2_0.xsd", "",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_common_v2_0.ttcn","www_csapi_org_schema_parlayx_common_v2_0_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_payment_amount_charging_v2_0_local.ttcn","www_csapi_org_schema_parlayx_payment_amount_charging_v2_0_local_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_payment_reserve_amount_charging_v2_0_local.ttcn","www_csapi_org_schema_parlayx_payment_reserve_amount_charging_v2_0_local_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_payment_reserve_volume_charging_v2_0_local.ttcn","www_csapi_org_schema_parlayx_payment_reserve_volume_charging_v2_0_local_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_payment_v2_0.ttcn","www_csapi_org_schema_parlayx_payment_v2_0_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_csapi_org_schema_parlayx_payment_volume_charging_v2_0_local.ttcn","www_csapi_org_schema_parlayx_payment_volume_charging_v2_0_local_e.ttcn", 8+c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_PIDF_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "pidf.xsd rlmi.xsd testschema.xsd xml_PIDF.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "ietf_params_xml_ns_pidf.ttcn","ietf_params_xml_ns_pidf_e.ttcn", 4+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "ietf_params_xml_ns_pidf_status.ttcn","ietf_params_xml_ns_pidf_status_e.ttcn", c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "ietf_params_xml_ns_rlmi.ttcn","ietf_params_xml_ns_rlmi_e.ttcn", 4+c_numOfDiff_headerAndModuleName);
+    f_compareFiles(
+      "www_w3_org_XML_1998_namespace.ttcn","www_w3_org_XML_1998_namespace_PIDF_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_RLP_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "RLP_SVC.xsd","",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "NoTargetNamespace.ttcn","NoTargetNamespace_RLP_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_RLXML_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "RLXML_small.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "ietf_params_xml_ns_resource_lists.ttcn","ietf_params_xml_ns_resource_lists_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_ShData_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "ShDataType.xsd","",c_shell_successWithWarning);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "schemas_ericsson_com_upg_dm_hss_sh_4_1.ttcn","schemas_ericsson_com_upg_dm_hss_sh_4_1_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_SIPserver_converter() runs on xmlTest_CT
+{
+  f_shellCommandWithVerdict(xsd2ttcn_command & "SIP.xsd","",c_shell_successWithoutWarningAndError);
+
+  if(getverdict==pass) {
+    f_compareFiles(
+      "uri_etsi_org_ngn_params_xml_simservs_sci.ttcn","uri_etsi_org_ngn_params_xml_simservs_sci_e.ttcn", c_numOfDiff_headerAndModuleName);
+  }
+}
+
+testcase tc_XmlTest_SIPserver_crgt_encDec() runs on xmlTest_CT
+{
+  f_encDecTest_SIP_MessageType(c_sipserver_pdu1,c_sipserver_expectedEncodedPdu,c_sipserver_pdu1);
+}
+
+//=========================================================================
+// Control
+//=========================================================================
+
+control {
+  execute(tc_XmlTest_CAI3G_converter());
+  execute(tc_XmlTest_CCAPI_converter());
+  execute(tc_XmlTest_HSS_converter());
+  execute(tc_XmlTest_JMdict_converter());
+  execute(tc_XmlTest_MGW_converter());
+  execute(tc_XmlTest_MGW_encDec());
+  execute(tc_XmlTest_MGW_HK84933_converter());
+  execute(tc_XmlTest_PAP_converter());
+  execute(tc_XmlTest_ParlayX_converter());
+  execute(tc_XmlTest_PIDF_converter());
+  execute(tc_XmlTest_RLP_converter());
+  execute(tc_XmlTest_RLXML_converter());
+  execute(tc_XmlTest_ShData_converter());
+  execute(tc_XmlTest_SIPserver_converter());
+  execute(tc_XmlTest_SIPserver_crgt_encDec());
+  execute(tc_XmlTest_XML_RPC_converter());
+}
+
+}  // end of module

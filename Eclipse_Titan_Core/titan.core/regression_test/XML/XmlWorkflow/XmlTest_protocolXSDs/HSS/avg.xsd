@@ -1,0 +1,103 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<!--  Home Subscriber Server, EPS  -->
+<xs:schema xmlns="http://schemas.ericsson.com/ma/HSS/" xmlns:x="http://schemas.ericsson.com/ma/HSS/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cai3g="http://schemas.ericsson.com/cai3g1.2/" targetNamespace="http://schemas.ericsson.com/ma/HSS/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="hssla_types.xsd"/>
+	<xs:import namespace="http://schemas.ericsson.com/cai3g1.2/" schemaLocation="cai3g1.2_provisioning.xsd"/>
+	<!--  CreateAVGMultiSC
+		MOId: imsi or impi
+		MOType: AVG@http://schemas.ericsson.com/ma/HSS/
+	-->
+	<xs:element name="CreateAVGMultiSC" substitutionGroup="cai3g:CreateMODefinition">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cai3g:AbstractCreateAttributeType">
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="imsi" type="imsiType"/>
+							<xs:element name="impi" type="impiType"/>
+						</xs:choice>
+						<xs:element name="avgEncryptedK" type="avgEncryptedKType"/>
+						<xs:element name="avgA4KeyInd" type="avgA4KeyIndType"/>
+						<xs:element name="avgFSetInd" type="avgFSetIndType"/>
+						<xs:element name="avgAmf" type="avgAmfType" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="imsi" type="imsiType" use="optional"/>
+					<xs:attribute name="impi" type="impiType" use="optional"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+		<xs:key name="key_imsi">
+			<xs:selector xpath="./x:imsi"/>
+			<xs:field xpath="."/>
+		</xs:key>
+		<xs:keyref name="keyref_imsi" refer="key_imsi">
+			<xs:selector xpath="."/>
+			<xs:field xpath="@imsi"/>
+		</xs:keyref>
+		<xs:key name="key_impi">
+			<xs:selector xpath="./x:impi"/>
+			<xs:field xpath="."/>
+		</xs:key>
+		<xs:keyref name="keyref_impi" refer="key_impi">
+			<xs:selector xpath="."/>
+			<xs:field xpath="@impi"/>
+		</xs:keyref>
+	</xs:element>
+	<!--  DeleteAVGMultiSC
+		MOId: imsi or impi
+		MOType: AVG@http://schemas.ericsson.com/ma/HSS/
+	-->
+	<!--  SetAVGMultiSC
+		MOId: imsi
+		MOType: AVG@http://schemas.ericsson.com/ma/HSS/
+	-->
+	<xs:element name="SetAVGMultiSC" substitutionGroup="cai3g:SetMODefinition">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cai3g:AbstractSetAttributeType">
+					<xs:sequence>
+						<xs:element name="avgEncryptedK" type="avgEncryptedKType" minOccurs="0"/>
+						<xs:element name="avgA4KeyInd" type="avgA4KeyIndType" minOccurs="0"/>
+						<xs:element name="avgAmf" type="avgAmfType" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="imsi" type="imsiType" use="optional"/>
+					<xs:attribute name="impi" type="impiType" use="optional"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!--  GetAVGMultiSC
+		MOId: imsi or impi
+		MOType: AVG@http://schemas.ericsson.com/ma/HSS/
+	-->
+	<!--  GetResponseAVGMultiSC
+	-->
+	<xs:element name="GetResponseAVGMultiSC" substitutionGroup="cai3g:GetMODefinition">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="cai3g:AbstractGetAttributeType">
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="imsi" type="imsiType"/>
+							<xs:element name="impi" type="impiType"/>
+						</xs:choice>
+						<xs:element name="avgEncryptedK" type="avgEncryptedKType"/>
+						<xs:element name="avgA4KeyInd" type="avgA4KeyIndType"/>
+						<xs:element name="avgFSetInd" type="avgFSetIndType"/>
+						<xs:element name="avgAmf" type="avgAmfType"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

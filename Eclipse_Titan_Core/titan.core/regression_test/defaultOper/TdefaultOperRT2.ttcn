@@ -1,0 +1,94 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for bug fix 500919.
+// Description: If an altstep deactivates itself (more specifically deactivates the
+// default variable that executed the altstep), then all of its parameters are deleted,
+// and accessing them generally causes dynamic test case errors or segmentation faults.
+// The bug fix is only available in Runtime 2.
+module TdefaultOperRT2 {
+
+type port PT message {
+  inout integer
+}
+with {
+  extension "internal";
+}
+
+type component CT {
+  var default ct_def;
+  var integer ct_int;
+  timer ct_tmr[2];
+  port PT pt;
+}
+
+altstep as_deactivates_itself(in integer x) runs on CT {
+  var integer copy := x;
+  [] ct_tmr[x].timeout {
+    deactivate(ct_def);
+    if (x != copy) {
+      setverdict(fail, "Parameter has changed from ", copy, " to ", x);
+    }
+    else {
+      setverdict(pass);
+    }
+  }
+}
+
+testcase tc_altstep_deactivates_itself() runs on CT {
+  ct_def := activate(as_deactivates_itself(1));
+  connect(self:pt, self:pt);
+  pt.send(1);
+  ct_tmr[1].start(0.1);
+  alt {
+    [] pt.receive(integer:2) {
+      setverdict(fail, "Invalid alt branch");
+    }
+  }
+}
+
+altstep as_deactivates_everyone(in integer x, inout integer y) runs on CT {
+  var integer x_copy := x;
+  [] ct_tmr[x].timeout {
+    var integer y_copy := y;
+    deactivate;
+    if (x != x_copy) {
+      setverdict(fail, "Parameter 'x' has changed from ", x_copy, " to ", x);
+    }
+    else if (y != y_copy) {
+      setverdict(fail, "Parameter 'y' has changed from ", y_copy, " to ", y);
+    }
+    else {
+      setverdict(pass);
+    }
+  }
+}
+
+testcase tc_altstep_deactivates_everyone() runs on CT {
+  ct_int := 6;
+  ct_def := activate(as_deactivates_everyone(1, ct_int));
+  connect(self:pt, self:pt);
+  pt.send(1);
+  ct_tmr[1].start(0.1);
+  alt {
+    [] pt.receive(integer:2) {
+      setverdict(fail, "Invalid alt branch");
+    }
+  }
+}
+
+control {
+  execute(tc_altstep_deactivates_itself());
+  execute(tc_altstep_deactivates_everyone());
+}
+
+}

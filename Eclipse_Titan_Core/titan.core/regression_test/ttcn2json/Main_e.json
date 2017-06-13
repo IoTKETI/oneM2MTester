@@ -1,0 +1,280 @@
+{
+	"$schema" : "http://json-schema.org/draft-04/schema#",
+	"definitions" : {
+		"Main" : {
+			"HasPardType" : {
+				"type" : "object",
+				"subType" : "record",
+				"properties" : {
+					"pard" : {
+						"$ref" : "#/definitions/PDU_Definitions/ProtocolElem_Field1"
+					},
+					"buul" : {
+						"type" : "boolean"
+					},
+					"price" : {
+						"$ref" : "#/definitions/PDU_Definitions/Price"
+					}
+				},
+				"additionalProperties" : false,
+				"fieldOrder" : [
+					"pard",
+					"buul",
+					"price"
+				],
+				"required" : [
+					"pard",
+					"buul",
+					"price"
+				]
+			}
+		},
+		"PDU_Definitions" : {
+			"Priority" : {
+				"enum" : [
+					"low",
+					"normal",
+					"medium",
+					"high",
+					"urgent"
+				],
+				"numericValues" : [
+					0,
+					1,
+					2,
+					3,
+					4
+				]
+			},
+			"Conditionality" : {
+				"enum" : [
+					"optional_",
+					"conditional",
+					"mandatory"
+				],
+				"numericValues" : [
+					0,
+					1,
+					2
+				]
+			},
+			"ProtocolElem_ID" : {
+				"type" : "integer"
+			},
+			"ProtocolElem_Field2" : {
+				"type" : "object",
+				"subType" : "record",
+				"properties" : {
+					"id" : {
+						"$ref" : "#/definitions/PDU_Definitions/ProtocolElem_ID"
+					},
+					"priority" : {
+						"$ref" : "#/definitions/PDU_Definitions/Priority"
+					},
+					"val" : {
+						"anyOf" : [
+							{
+								"type" : "object",
+								"properties" : {
+									"iA5String" : {
+										"type" : "string",
+										"subType" : "charstring"
+									}
+								},
+								"additionalProperties" : false,
+								"required" : [
+									"iA5String"
+								]
+							}
+						]
+					}
+				},
+				"additionalProperties" : false,
+				"fieldOrder" : [
+					"id",
+					"priority",
+					"val"
+				],
+				"required" : [
+					"id",
+					"priority",
+					"val"
+				]
+			},
+			"ProtocolElem_Field1" : {
+				"type" : "object",
+				"subType" : "record",
+				"properties" : {
+					"id" : {
+						"$ref" : "#/definitions/PDU_Definitions/ProtocolElem_ID"
+					},
+					"priority" : {
+						"$ref" : "#/definitions/PDU_Definitions/Priority"
+					},
+					"val" : {
+						"anyOf" : [
+							{
+								"type" : "object",
+								"properties" : {
+									"iNTEGER" : {
+										"type" : "integer"
+									}
+								},
+								"additionalProperties" : false,
+								"required" : [
+									"iNTEGER"
+								]
+							},
+							{
+								"type" : "object",
+								"properties" : {
+									"iA5String" : {
+										"type" : "string",
+										"subType" : "charstring"
+									}
+								},
+								"additionalProperties" : false,
+								"required" : [
+									"iA5String"
+								]
+							}
+						]
+					}
+				},
+				"additionalProperties" : false,
+				"fieldOrder" : [
+					"id",
+					"priority",
+					"val"
+				],
+				"required" : [
+					"id",
+					"priority",
+					"val"
+				]
+			},
+			"Price" : {
+				"anyOf" : [
+					{
+						"type" : "object",
+						"properties" : {
+							"value_" : {
+								"anyOf" : [
+									{
+										"type" : "number"
+									},
+									{
+										"enum" : [
+											"not_a_number",
+											"infinity",
+											"-infinity"
+										]
+									}
+								]
+							}
+						},
+						"additionalProperties" : false,
+						"required" : [
+							"value_"
+						]
+					},
+					{
+						"type" : "object",
+						"properties" : {
+							"invaluable" : {
+								"type" : "null"
+							}
+						},
+						"additionalProperties" : false,
+						"required" : [
+							"invaluable"
+						]
+					}
+				]
+			},
+			"Object" : {
+				"type" : "object",
+				"subType" : "record",
+				"properties" : {
+					"id" : {
+						"type" : "string",
+						"subType" : "objid",
+						"pattern" : "^[0-2][.][1-3]?[0-9]([.][0-9]|([1-9][0-9]+))*$"
+					},
+					"data" : {
+						"type" : "string",
+						"subType" : "octetstring",
+						"pattern" : "^([0-9A-Fa-f][0-9A-Fa-f])*$"
+					}
+				},
+				"additionalProperties" : false,
+				"fieldOrder" : [
+					"id",
+					"data"
+				],
+				"required" : [
+					"id",
+					"data"
+				]
+			},
+			"HasNull" : {
+				"type" : "object",
+				"subType" : "record",
+				"properties" : {
+					"theNull" : {
+						"type" : "null"
+					}
+				},
+				"additionalProperties" : false
+			}
+		}
+	},
+	"anyOf" : [
+		{
+			"$ref" : "#/definitions/Main/HasPardType",
+			"decoding" : {
+				"prototype" : [
+					"convert",
+					"f_dec_hpt",
+					"x"
+				]
+			},
+			"encoding" : {
+				"prototype" : [
+					"convert",
+					"f_enc_hpt",
+					"x"
+				],
+				"printing" : "pretty"
+			}
+		},
+		{
+			"$ref" : "#/definitions/PDU_Definitions/ProtocolElem_Field1",
+			"encoding" : {
+				"prototype" : [
+					"convert",
+					"f_enc_pard",
+					"x"
+				],
+				"printing" : "pretty"
+			}
+		},
+		{
+			"$ref" : "#/definitions/PDU_Definitions/Object",
+			"decoding" : {
+				"prototype" : [
+					"convert",
+					"f_dec_obj",
+					"x"
+				]
+			},
+			"encoding" : {
+				"prototype" : [
+					"convert",
+					"f_enc_obj",
+					"x"
+				]
+			}
+		}
+	]
+}

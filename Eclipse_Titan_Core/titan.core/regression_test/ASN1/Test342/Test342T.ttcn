@@ -1,0 +1,76 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kulcsar, Endre
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module Test342T
+{
+import from Test342A all;
+
+type float MyRealType2
+
+// AS A CONSTANT *********************************************
+const MyRealType2 myRealValue2 := myRealValue1
+
+type port MyPort message
+{
+inout MyType
+} with { extension "internal" }
+
+type record MyType
+{
+float field1
+}
+
+template MyType myMessage(float  par_float) :=
+{
+field1 := par_float
+}
+
+type component MyMainComponent
+    {
+      port MyPort M_PCO;
+    }
+
+type component MyParallelComponent
+    {
+      port MyPort P_PCO;
+    }
+
+function handle_msg_on_ptc() runs on MyParallelComponent
+{
+
+// AS A PARAMETER *********************************************
+P_PCO.receive (myMessage(myRealValue1))
+setverdict ( pass );
+}
+
+testcase Test() runs on MyMainComponent
+{
+
+// AS A VARIABLE *********************************************
+var MyRealType2 myRealValue3 := myRealValue1
+
+var MyParallelComponent myparallelcomponent := MyParallelComponent.create;
+connect ( mtc:M_PCO, myparallelcomponent: P_PCO );
+ myparallelcomponent.start(handle_msg_on_ptc());
+
+// AS A PARAMETER *********************************************
+ M_PCO.send(myMessage(myRealValue1))
+myparallelcomponent.done;
+}
+
+control
+    {
+   execute (Test())
+    }
+}
+

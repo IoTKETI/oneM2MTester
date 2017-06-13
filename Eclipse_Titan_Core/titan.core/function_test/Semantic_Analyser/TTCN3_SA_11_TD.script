@@ -1,0 +1,331 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Pandi, Krisztian
+.*
+.******************************************************************************/
+text.
+:lang eng.
+.*
+:docname.Test Description
+:docno. xy/152 91-CRL 113 200/5 Uen
+:rev.A
+:date.2015-04-27
+.*
+:prep.ETH/XZR ETHBAAT
+:subresp.ETHBAAT
+:appr.ETH/RZ (Gyula Koos)
+:checked.ETHGRY
+.*
+:title.Test description of the TTCN-3 Semantic Analyzer: Import of Imports
+:contents level=3.
+.*---------------------------------------------------------------------*
+:h1.PREREQUISITES AND PREPARATIONS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Scope of the Test Object
+.*---------------------------------------------------------------------*
+:xmp tab=1 nokeep.
+This TD contains unified test cases related to TTCN3 Executor's import of imports function.
+DON'T YOU DARE TO WRITE AN INSPECTION RECORD ABOUT THIS FILE
+
+:exmp.
+
+:p.:us.Revision Information:eus.
+
+:xmp nokeep.
+:us.History:eus.
+
+REV   DATE         PREPARED   CHANGE
+===   ==========   ========   ======
+PA1   2011.11.21   ETHBAAT
+
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+:p.:us.Software Tools:eus.
+:xmp tab=2 nokeep.
+
+	SAtester
+
+:exmp.
+:np.
+.*---------------------------------------------------------------------*
+:h1.REQUIREMENT-BASED TESTS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Testing Import of Imports feature
+.*---------------------------------------------------------------------*
+
+.*---------------------------------------------------------------------*
+:h3. Default private import lines - virtual but not real circular import
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - Default private import lines - virtual but not real circular import  >
+
+<COMPILE>
+
+<MODULE TTCN A A.ttcn>
+module A  {
+  import from C {import all};
+  const integer i_A := 60;
+}
+
+<END_MODULE>
+
+<MODULE TTCN B B.ttcn>
+ module B  {
+  import from A all;
+  import from A {import all};
+  const integer i_B:=2;
+
+  type component CT {}
+  testcase tc_A() runs on  CT {
+    var integer i:= i_A;
+  }  
+}
+
+<END_MODULE>
+
+<MODULE TTCN C C.ttcn>
+ module C{
+  import from B all;
+  import from B { import all };
+  const integer i_C:=3;
+  type component CT {}
+  //because of "import from B { import all };" -but B contatains only private imports!
+  testcase tc_A() runs on  CT {
+    var integer i:= i_A; //wrong
+  }
+  
+  testcase tc_B() runs on  CT {
+    var integer i:= i_B;
+  }
+}
+
+<END_MODULE>
+
+<RESULT>
+C\.ttcn: In TTCN-3 module `C':
+ C\.ttcn:7.3-9.3: In testcase definition `tc_A':
+  C\.ttcn:8.17-23: In variable definition `i':
+   C\.ttcn:8.21-23: error: There is no local or imported definition with name `i_A'
+(Notify: .* sec
+)?(Notify: Error found in the input modules. Code will not be generated\.)
+<END_RESULT>
+
+<END_TC>
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3. Explicit private import lines - No real circular import chain
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC -  Explicit private import lines - No real circular import chain>
+
+<COMPILE>
+
+<MODULE TTCN A_PR A_PR.ttcn>
+module A_PR  {
+  private import from C_PR {import all};
+  const integer i_A := 60;
+}
+
+<END_MODULE>
+
+<MODULE TTCN B_PR B_PR.ttcn>
+ module B_PR  {
+  private import from A_PR all;
+  private import from A_PR {import all};
+  const integer i_B:=2;
+  type component CT {}
+  testcase tc_A() runs on  CT {
+    var integer i:= i_A;
+  }  
+}
+
+<END_MODULE>
+
+<MODULE TTCN C_PR C_PR.ttcn>
+ module C_PR{
+  private import from B_PR all;
+  private import from B_PR { import all };
+  const integer i_C:=3;
+  type component CT {}
+  //because of "private import from B_PR { import all };" -but B contatains only private imports!
+  testcase tc_A() runs on  CT {
+    var integer i:= i_A; //wrong
+  }
+  
+  testcase tc_B() runs on  CT {
+    var integer i:= i_B; 
+  }
+}
+
+<END_MODULE>
+
+<RESULT>
+
+C_PR\.ttcn: In TTCN-3 module `C_PR':
+ C_PR\.ttcn:7.3-9.3: In testcase definition `tc_A':
+  C_PR\.ttcn:8.17-23: In variable definition `i':
+   C_PR\.ttcn:8.21-23: error: There is no local or imported definition with name `i_A'
+(Notify:.*.sec
+)?(Notify: Error found in the input modules. Code will not be generated\.)
+<END_RESULT>
+
+<END_TC>
+
+:exmp.
+.*---------------------------------------------------------------------*
+:h3. Chain of modules with public import statements - 3 circle of imports
+.*---------------------------------------------------------------------*
+
+<TC -  Chain of modules with public import statements - 3 circle of imports>
+
+<COMPILE>
+
+:xmp tab=0.
+<MODULE TTCN A_PU A_PU.ttcn>
+module A_PU  {
+  public import from C_PU {import all}; //circle!
+  const integer i_A := 60;
+}
+<END_MODULE>
+
+<MODULE TTCN B_PU B_PU.ttcn>
+module B_PU  {
+  public import from A_PU all;
+  public import from A_PU {import all}; //circle
+  const integer i_b:=2;
+  type component CT {}
+}
+
+<END_MODULE>
+
+<MODULE TTCN C_PU C_PU.ttcn>
+module C_PU{
+  public import from B_PU all;
+  public import from B_PU { import all }; //circle
+  const integer i_C:=3;
+  type component CT {}
+}
+
+<END_MODULE>
+
+<RESULT>
+A_PU.ttcn: In TTCN-3 module `A_PU':
+ A_PU.ttcn:2.10-38: In import definition:
+  A_PU.ttcn: warning: Circular import chain is not recommended: `@A_PU' -> `@C_PU' -> `@B_PU' -> `@A_PU'
+<END_RESULT>
+
+<END_TC>
+:exmp.
+.*---------------------------------------------------------------------*
+:h3. Chain of modules with public import statements - one circle of imports
+.*---------------------------------------------------------------------*
+
+<TC - Chain of modules with public import statements - one circle of imports >
+
+<COMPILE>
+
+:xmp tab=0.
+<MODULE TTCN A_PU A_PU.ttcn>
+module A_PU  {
+  public import from C_PU {import all}; //circle !
+  const integer i_A := 60;
+}
+<END_MODULE>
+
+<MODULE TTCN B_PU B_PU.ttcn>
+module B_PU  {
+  public import from A_PU all; //no circle
+  const integer i_B:=2;
+}
+
+<END_MODULE>
+
+<MODULE TTCN C_PU C_PU.ttcn>
+module C_PU{
+  public import from B_PU all; //sees i_B
+  public import from B_PU { import all };// sees: public import from A_PU all; =>sees: i_A. don't see: public import from C_PU {import all};(from A)
+  // no circe!
+  const integer i_C:=3;
+}
+
+<END_MODULE>
+
+<RESULT>
+A_PU.ttcn: In TTCN-3 module `A_PU':
+ A_PU.ttcn:2.10-38: In import definition:
+  A_PU.ttcn: warning: Circular import chain is not recommended: `@A_PU' -> `@C_PU' -> `@B_PU' -> `@A_PU'
+<END_RESULT>
+
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h4. Circular import check
+.*---------------------------------------------------------------------*
+
+<TC - Circular import check >
+
+<COMPILE>
+
+:xmp tab=0.
+<MODULE TTCN a a.ttcn>
+module a  {
+    import from b all;
+
+    function f_a()
+    {
+        f_b();
+    }
+}
+<END_MODULE>
+
+<MODULE TTCN b b.ttcn>
+module b {
+    import from c all;
+
+    function f_b()
+    {
+        f_c();
+    }
+}
+
+<END_MODULE>
+
+<MODULE TTCN c c.ttcn>
+module c {
+    import from b all;
+
+    function f_c()
+    {
+        f_b();
+
+    }
+}
+
+<END_MODULE>
+
+<RESULT>
+b.ttcn: In TTCN-3 module `b':
+ b.ttcn:2.5-21: In import definition:
+  b.ttcn: warning: Circular import chain is not recommended: `@b' -> `@c' -> `@b'
+<END_RESULT>
+
+<END_TC>
+:exmp.

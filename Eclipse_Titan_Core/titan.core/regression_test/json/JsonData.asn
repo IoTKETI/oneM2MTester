@@ -1,0 +1,226 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Baranyi, Botond
+--
+--/////////////////////////////////////////////////////////////////////////////
+JsonData
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+IMPORTS ;
+
+-- Type definitions --
+----------------------
+
+-- Sequence of
+SeqOfInt ::= SEQUENCE OF INTEGER
+
+-- Sequence
+SeqProduct ::= SEQUENCE {
+  name UniversalString,
+  price REAL,
+  id OCTET STRING OPTIONAL,
+  available BOOLEAN
+}
+
+-- Choice
+Number ::= CHOICE {
+  decimal INTEGER,
+  binary BIT STRING,
+  hexadecimal OCTET STRING
+}
+
+-- Choice containing all string types
+AnyString ::= CHOICE {
+  generalstr GeneralString,
+  numericstr NumericString,
+  utf8str UTF8String,
+  printablestr PrintableString,
+  universalstr UniversalString,
+  bmpstr BMPString,
+  graphicstr GraphicString,
+  ia5str IA5String,
+  teletexstr TeletexString,
+  videotexstr VideotexString,
+  visiblestr VisibleString
+}
+
+-- Sequence of strings
+ManyStrings ::= SEQUENCE OF AnyString
+
+-- Set containing all of the above
+ComplexSet ::= SET {
+  product SeqProduct,
+  numbers SET OF Number,
+  strings ManyStrings
+}
+
+Priority        ::= ENUMERATED { low, normal, medium, high, urgent }
+
+Conditionality  ::= ENUMERATED { optional, conditional, mandatory }
+
+ProtocolElem-ID   ::= INTEGER (0..65535)
+
+-- IOC
+PROTOCOL-ELEMS ::= CLASS
+{
+    &id             ProtocolElem-ID UNIQUE,
+    &priority       Priority,
+    &Value,
+    &conditionality Conditionality
+}
+WITH SYNTAX
+{
+    ID                  &id
+    PRIORITY            &priority
+    TYPE                &Value
+    CONDITIONALITY      &conditionality
+}
+
+-- parameterized type
+ProtocolElem-Field {PROTOCOL-ELEMS : ElemsSetParam} ::= SEQUENCE
+{
+    id                  PROTOCOL-ELEMS.&id            ({ElemsSetParam}),
+    priority            PROTOCOL-ELEMS.&priority      ({ElemsSetParam}{@id}),
+    val                 PROTOCOL-ELEMS.&Value         ({ElemsSetParam}{@id})
+}
+
+
+-- Information objects
+ies-Set-Element-1 PROTOCOL-ELEMS ::=
+{
+    ID 0
+    PRIORITY low
+    TYPE INTEGER
+    CONDITIONALITY mandatory
+}
+
+ies-Set-Element-2 PROTOCOL-ELEMS ::=
+{
+    ID 1
+    PRIORITY high
+    TYPE IA5String
+    CONDITIONALITY optional
+}
+-- Information Object Set
+Elems-Set PROTOCOL-ELEMS ::= { ies-Set-Element-1 | ies-Set-Element-2 }
+
+
+-- instantiation
+ProtocolElem-Field1 ::= ProtocolElem-Field {{Elems-Set}}
+
+ProtocolElem-Field2 ::= ProtocolElem-Field {{ies-Set-Element-2 }}
+
+-- Choice containing NULL
+Price ::= CHOICE
+{
+  value REAL,
+  invaluable NULL
+}
+
+-- Sequence containing an object identifier and an ANY type
+Object ::= SEQUENCE
+{
+  id OBJECT IDENTIFIER,
+  data ANY
+}
+
+-- Sequence containing an optional NULL field
+HasNull ::= SEQUENCE
+{
+  theNull NULL OPTIONAL
+}
+
+-- Renaming basic ASN.1 types for use in TTCN-3
+AsnNull ::= NULL
+AsnInt ::= INTEGER
+AsnVisibleString ::= VisibleString
+AsnAny ::= ANY
+
+
+-- Values and their encoding --
+-------------------------------
+
+-- SeqOfInt
+c-ints SeqOfInt ::= { 1, 3, 6 }
+
+c-ints-str VisibleString ::= "[1,3,6]"
+
+-- SeqProduct
+c-product SeqProduct ::= {
+  name "TV",
+  price 250.0,
+  id '1D65'H,
+  available TRUE
+}
+
+c-product-str VisibleString ::= "{""name"":""TV"",""price"":250.000000,""id"":""1D65"",""available"":true}"
+
+-- Number
+c-number Number ::= binary : '1100'B
+
+c-number-str VisibleString ::= "{""binary"":""1100""}"
+
+-- ManyStrings
+c-strings ManyStrings ::= {
+  generalstr : "General String <o",
+  numericstr : "1 457 664",
+  utf8str : "Doesn't actually contain non-ASCII characters",
+  printablestr : "hello",
+  universalstr : "not so universal, apparently",
+  bmpstr : "abc",
+  ia5str : "one two three",
+  teletexstr : "Let's just bug out and call it even, OK?!",
+  videotexstr : "abc123;.",
+  visiblestr : "invisible"
+}
+
+c-strings-str VisibleString ::= "[{""generalstr"":""General String <o""},{""numericstr"":""1 457 664""},{""utf8str"":""Doesn't actually contain non-ASCII characters""},{""printablestr"":""hello""},{""universalstr"":""not so universal, apparently""},{""bmpstr"":""abc""},{""ia5str"":""one two three""},{""teletexstr"":""Let's just bug out and call it even, OK?!""},{""videotexstr"":""abc123;.""},{""visiblestr"":""invisible""}]"
+
+-- ComplexSet
+c-set-val ComplexSet ::= {
+  product {
+    name "Headset",
+    price 28.5,
+    available FALSE
+  },
+  numbers {
+    hexadecimal : '16678D'H,
+    decimal : 12
+  },
+  strings {
+    printablestr : "first",
+    numericstr : "2"
+  }
+}
+
+c-set-val-str VisibleString ::= "{""product"":{""name"":""Headset"",""price"":28.500000,""available"":false},""numbers"":[{""hexadecimal"":""16678D""},{""decimal"":12}],""strings"":[{""printablestr"":""first""},{""numericstr"":""2""}]}"
+
+-- Object
+c-obj Object ::= {
+  id { joint-iso-itu-t remote-operations(4) informationObjects(5) version1(0) },
+  data 'DEADBEEF'H
+}
+
+c-obj-str VisibleString ::= "{""id"":""2.4.5.0"",""data"":""DEADBEEF""}"
+
+-- HasNull
+c-null HasNull ::= { theNull NULL }
+c-not-null HasNull ::= {}
+
+c-null-str VisibleString ::= "{""theNull"":null}"
+c-not-null-str VisibleString ::= "{}"
+
+END

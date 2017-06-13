@@ -1,0 +1,73 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:B.1.2.8, Ensure that the IUT correctly handles content decoding 
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+
+//Restriction a)
+/*It can be assigned to templates and template fields of bitstring, hexstring, octetstring,
+charstring and universal charstring types.*/
+
+//RAW encoding adds extra bits, up to 8 bit, to a bitstring because it encodes anything into an octetstring
+
+module Sem_B010209_decoded_content_001 { 
+
+	type record MessageType {
+	  	bitstring payload
+	}
+	
+	type record Mymessage {
+	  	integer 	field1,
+	  	bitstring 	field2 optional
+    } with { variant " "};
+	
+
+    type port loopbackPort message { 
+		inout MessageType
+	} with {extension "internal"}
+	
+
+	type component GeneralComp {	    	    
+	  	port loopbackPort messagePort
+	}	
+
+	testcase TC_Sem_B010209_decoded_content_001() runs on GeneralComp {
+		var bitstring v_enc;
+		var Mymessage v_testMessage;
+		var MessageType Message;
+		
+		v_testMessage:=  {  
+		    field1 := 10,
+		    field2 := '1001'B
+		} 
+
+		Message.payload := encvalue(v_testMessage);		//encode message to payload
+          
+ 		template MessageType mw_matchingTemplate:= {  			
+  			payload :=  decmatch Mymessage: {field1:= 10, field2 := '00001001'B}
+  		} 
+
+		connect(self:messagePort, self:messagePort);
+  		messagePort.send(Message);	//send message
+
+    	alt {
+     		[] messagePort.receive(mw_matchingTemplate) {
+        		setverdict(pass);
+     		}
+     		[] messagePort.receive {
+        		setverdict(fail);
+     		}
+    	}
+    
+	}
+
+	control{
+		execute(TC_Sem_B010209_decoded_content_001());
+	}
+
+} with { encode "RAW"}
+ 

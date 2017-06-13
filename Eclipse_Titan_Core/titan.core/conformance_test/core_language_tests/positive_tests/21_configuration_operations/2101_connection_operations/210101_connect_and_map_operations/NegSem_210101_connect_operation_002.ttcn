@@ -1,0 +1,40 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:21.1.1, Ensure that the the IUT does not allow connecting incompatible ports
+ ** @verdict  pass reject
+ ***************************************************/
+//Test the two input port cannot connect 
+module NegSem_210101_connect_operation_002{ 
+  
+	type port myport message {
+	  in integer
+	} with {extension "internal"}
+	
+	type component Mysystem
+	{
+	 	port myport messagePort;
+	}
+	
+	testcase TC_NegSem_210101_connect_operation_002() runs on Mysystem system Mysystem {
+	   	var Mysystem MyCompA;
+	   	var Mysystem MyCompB;
+	
+		MyCompA:=Mysystem.create;
+		MyCompB:=Mysystem.create;
+
+		connect(MyCompB:messagePort, MyCompA:messagePort); //not allowed messageports are output
+		//connect(self:messagePort, self:messagePort);
+
+		messagePort.send(5);
+
+	}
+
+	control{
+		execute(TC_NegSem_210101_connect_operation_002());
+	}
+}
+

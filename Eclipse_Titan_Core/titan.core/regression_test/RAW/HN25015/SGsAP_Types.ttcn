@@ -1,0 +1,111 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Lovassy, Arpad
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+//
+//  File:               SGsAP_Types.ttcn
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 684
+//  Updated:            2010-06-29
+//  Contact:            http://ttcn.ericsson.se
+//  Reference:          3GPP TS 29.118 v9.0.0
+//
+
+module SGsAP_Types
+{
+ import from General_Types all;
+
+ external function enc_PDU_SGsAP(in PDU_SGsAP pdu) return octetstring
+ with { extension "prototype(convert)" extension "encode(RAW)" }
+
+ external function dec_PDU_SGsAP(in octetstring stream) return PDU_SGsAP
+ with { extension "prototype(convert)" extension "decode(RAW)" }
+
+ // 9.4.6
+ type record IMSI_Value
+ {
+  BIT3               field1, //'001'B
+  BIT1               parity,
+  hexstring          digits,
+  BIT4               fillerDigit optional
+ } with {
+   variant (fillerDigit) "PRESENCE (parity = '0'B)";
+ }
+
+ type record IMSI
+ {
+   BIT8                   iEI,
+   LIN1                   lengthIndicator,
+   IMSI_Value             iMSI
+ } with {
+   variant "PRESENCE (iEI = '00000001'B)";
+   variant (lengthIndicator) "LENGTHTO (iMSI)"
+ };
+
+
+ // 9.4.18
+ type record SGsCause
+ {
+   BIT8                   iEI,
+   LIN1                   lengthIndicator,
+   SGs_Cause              cause
+ } with {
+     variant "PRESENCE (iEI = '00001000'B)";
+     variant (lengthIndicator) "LENGTHTO (cause)"
+ };
+
+ type enumerated SGs_Cause
+ {
+   unspecified_value_14                               (14)
+ } with { variant "FIELDLENGTH(8)"; }
+
+
+ // 9.4.22
+ type record VLR_Name
+ {
+   BIT8                       iEI,
+   LIN1                       lengthIndicator,
+   charstring                 name
+ } with {
+     variant "PRESENCE (iEI = '00000010'B)";
+     variant (lengthIndicator) "LENGTHTO (name)"
+ };
+
+ // 8.13
+ type record SGsAP_PAGING_REJECT
+ {
+  BIT8                         messageType,
+  IMSI                         iMSI,
+  SGsCause                     sGsCause
+ } with {
+     variant "PRESENCE (messageType = '00000010'B)";
+ }
+
+ // 8.14
+ type record SGsAP_PAGING_REQUEST
+ {
+  BIT8                         messageType,
+  IMSI                         iMSI,
+  VLR_Name                     vLR_Name
+ } with {
+     variant "PRESENCE (messageType = '00000001'B)";
+ }
+
+ type union PDU_SGsAP
+ {
+
+   SGsAP_PAGING_REJECT                sGsAP_PAGING_REJECT,
+   SGsAP_PAGING_REQUEST               sGsAP_PAGING_REQUEST
+ } with { variant ""}
+
+} with { encode "RAW"}

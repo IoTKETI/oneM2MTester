@@ -1,0 +1,4713 @@
+.******************************************************************************
+.* Copyright (C) 2017 ETSI  All Rights Reserved.
+.*
+.* Contributors:
+.*   Adrien Kirjak 
+.*
+.******************************************************************************/
+text.
+:lang eng.
+.*
+:docname.Test Description
+:docno.xz/152 91-CRL 113 200 Uen
+:rev.PA1
+:date.2016-04-04
+.*
+:prep.ETH/XZ EADRKIR
+:subresp.EADRKIR
+:appr.ETH/XZ (Elemer Lelik)
+:checked.
+.*
+:title.ETSI TTCN3 Negative Conformance Test
+:contents level=3.
+.*---------------------------------------------------------------------*
+:h1.PREREQUISITES AND PREPARATIONS
+.*---------------------------------------------------------------------*	
+.*---------------------------------------------------------------------*
+:h2.Scope of the Test Object
+.*---------------------------------------------------------------------*
+:xmp tab=1 nokeep.
+This TD contains negative tests from ETSI TTCN3 Conformance Test's 15_templates folder. 
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+:p.:us.Software Tools:eus.
+:xmp tab=2 nokeep.
+
+	SAtester.pl
+
+:exmp.
+:np.
+
+.*---------------------------------------------------------------------*
+:h1.REQUIREMENT-BASED TESTS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2. 1503_global_and_local_templates folder
+.*---------------------------------------------------------------------*
+*---------------------------------------------------------------------*
+:h3. NegSem_1503_GlobalAndLocalTemplates_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_001 Ensure that there's an error for re-assignment of a global non-parameterized template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1503_GlobalAndLocalTemplates_001 NegSem_1503_GlobalAndLocalTemplates_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error for re-assignment of a global non-parameterized template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSem_1503_GlobalAndLocalTemplates_001
+{
+	template integer t := ?;
+	type component GeneralComp {
+	}
+
+	testcase TC_NegSem_1503_GlobalAndLocalTemplates_001() runs on GeneralComp {
+		t := 2; // error expected
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a variable or template variable was expected instead of template `@NegSem_1503_GlobalAndLocalTemplates_001.t'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1503_GlobalAndLocalTemplates_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_002 Ensure that there's an error for re-assignment of a global non-parameterized template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1503_GlobalAndLocalTemplates_002 NegSem_1503_GlobalAndLocalTemplates_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error for re-assignment of a global non-parameterized template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSem_1503_GlobalAndLocalTemplates_002
+{
+	type component GeneralComp {
+	}
+
+	testcase TC_NegSem_1503_GlobalAndLocalTemplates_002() runs on GeneralComp {
+		template integer t := ?;
+		t := 2; // error expected
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a variable or template variable was expected instead of template `t'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1503_GlobalAndLocalTemplates_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_003 Ensure that there's an error for re-assignment of a global parameterized template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1503_GlobalAndLocalTemplates_003 NegSem_1503_GlobalAndLocalTemplates_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error for re-assignment of a global parameterized template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSem_1503_GlobalAndLocalTemplates_003
+{
+	template integer t(in integer p) := (0..p);
+	type component GeneralComp {
+	}
+	testcase TC_NegSem_1503_GlobalAndLocalTemplates_003() runs on GeneralComp {
+		t := 2; // error expected
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a variable or template variable was expected instead of template `@NegSem_1503_GlobalAndLocalTemplates_003.t'
+<END_RESULT>
+<RESULT COUNT 1>
+error: Reference to parameterized definition `t' without actual parameter list
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1503_GlobalAndLocalTemplates_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_004 Ensure that there's an error for re-assignment of a local parameterized template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1503_GlobalAndLocalTemplates_004 NegSem_1503_GlobalAndLocalTemplates_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error for re-assignment of a local parameterized template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSem_1503_GlobalAndLocalTemplates_004
+{
+	type component GeneralComp {
+	}
+	testcase TC_NegSem_1503_GlobalAndLocalTemplates_004() runs on GeneralComp {
+		template integer t(in integer p) := (0..p);
+		t := 2; // error expected
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a variable or template variable was expected instead of template `t'
+<END_RESULT>
+<RESULT COUNT 1>
+error: Reference to parameterized definition `t' without actual parameter list
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1503_GlobalAndLocalTemplates_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_001 Ensure that there's an error if no value is assigned in a global non-parameterized template declaration >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1503_GlobalAndLocalTemplates_001 NegSyn_1503_GlobalAndLocalTemplates_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error if no value is assigned in a global non-parameterized template declaration
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSyn_1503_GlobalAndLocalTemplates_001
+{
+	template integer t;
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `;': syntax error, unexpected ';', expecting ModifiesKeyword or := or '\('
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1503_GlobalAndLocalTemplates_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_002 Ensure that there's an error if no value is assigned in a local non-parameterized template declaration >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1503_GlobalAndLocalTemplates_002 NegSyn_1503_GlobalAndLocalTemplates_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error if no value is assigned in a local non-parameterized template declaration
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSyn_1503_GlobalAndLocalTemplates_002
+{
+	type component GeneralComp {
+	}
+	testcase TC_NegSyn_1503_GlobalAndLocalTemplates_002() runs on GeneralComp {
+		template integer t;
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `;': syntax error, unexpected ';', expecting ModifiesKeyword or := or '\('
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1503_GlobalAndLocalTemplates_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_003 Ensure that there's an error if no value is assigned in a global parameterized template declaration >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1503_GlobalAndLocalTemplates_003 NegSyn_1503_GlobalAndLocalTemplates_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error if no value is assigned in a global parameterized template declaration
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSyn_1503_GlobalAndLocalTemplates_003
+{
+	template integer t(in integer p);
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `;': syntax error, unexpected ';', expecting := 
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1503_GlobalAndLocalTemplates_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1503_004 Ensure that there's an error if no value is assigned in a local parameterized template declaration >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1503_GlobalAndLocalTemplates_004 NegSyn_1503_GlobalAndLocalTemplates_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.3, Ensure that there's an error if no value is assigned in a local parameterized template declaration
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Both global and local templates are initialized at the place of their 
+// declaration. This means, all template fields which are not affected by 
+// parameterization shall receive a value or matching mechanism. Template 
+// fields affected by parameterization are initialized at the time of 
+// template use.
+module NegSyn_1503_GlobalAndLocalTemplates_004
+{
+	type component GeneralComp {
+	}
+	testcase TC_NegSyn_1503_GlobalAndLocalTemplates_004() runs on GeneralComp {
+		template integer t(in integer p);
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `;': syntax error, unexpected ';', expecting := 
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1505_modified_templates folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_001 Ensure that a modified template does not refer to itself. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_001 NegSem_1505_ModifiedTemplates_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that a modified template does not refer to itself.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_001 {
+
+	type record of integer MyMessageType;
+
+	template MyMessageType m_myBaseTemplate := { 0, 1, 2, 3, 4 };
+
+	template MyMessageType m_myOtherTemplate modifies m_myOtherTemplate := { 
+		[2]:=3, // switch the positions of 2 and 3 
+		[3]:=2 
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: While checking the chain of base templates: Circular reference: `@NegSem_1505_ModifiedTemplates_001.m_myOtherTemplate' -> `@NegSem_1505_ModifiedTemplates_001.m_myOtherTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_002 Ensure that a modified template does not omit possible parameters of the base >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_002 NegSem_1505_ModifiedTemplates_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that a modified template does not omit possible parameters of the base template.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_002 {
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_value) := {
+		field1 := p_value,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	// illegal definition as the (integer p_value) formal parameter is missing and must
+	// not be omitted.
+	template MyMessageType m_templateTwo modifies m_templateOne := {  
+		field3 := false
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The modified template has fewer formal parameters than base template `@NegSem_1505_ModifiedTemplates_002.m_templateOne': at least 1 parameter was expected instead of 0
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_003 Ensure that a modified template does not omit possible parameters introduced in any modification step. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_003 NegSem_1505_ModifiedTemplates_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that a modified template does not omit possible parameters introduced in any modification step.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_003 {
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_intValue) := {
+		field1 := p_intValue,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	template MyMessageType m_templateTwo(integer p_intValue, boolean p_boolValue) modifies m_templateOne := 	{  
+		field1 := p_intValue,
+		field3 := p_boolValue
+	}
+
+	// illegal as it is missing the (boolean p_boolValue) formal parameter introduced in the previous
+	// modification step.
+	template MyMessageType m_templateThree(integer p_intValue) modifies m_templateTwo := {  
+		field2 := "foobar"
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The modified template has fewer formal parameters than base template `@NegSem_1505_ModifiedTemplates_003.m_templateTwo': at least 2 parameters were expected instead of 1
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_004 Ensure that parameter names in modified templates are the same. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_004 NegSem_1505_ModifiedTemplates_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that parameter names in modified templates are the same.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_004 {
+
+	type component GeneralComp { }
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_value) := {
+		field1 := p_value,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	// illegal as p_intValue is a different parameter name than p_value 
+	template MyMessageType m_templateTwo(integer p_intValue) modifies m_templateOne := {  
+		field3 := false
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The name of parameter is not the same as in base template `@NegSem_1505_ModifiedTemplates_004.m_templateOne': `p_value' was expected instead of `p_intValue'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_005 Ensure that the dash in default parameter values of a modified templates is only accepted when the base template actually has a default value. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_005 NegSem_1505_ModifiedTemplates_005.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that the dash in default parameter values of a modified templates is only accepted when the base template actually has a default value. 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_005 {
+
+	type component GeneralComp { }
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_intValue) := {
+		field1 := p_intValue,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	// illegal as p_intValue does not have a default value that can be referred to with the "-".
+	template MyMessageType m_templateTwo(integer p_intValue := -) modifies m_templateOne := {  
+		field1 := p_intValue
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Not used symbol \(`-'\) doesn't have the corresponding default parameter in the base template
+<END_RESULT>
+<RESULT COUNT 1>
+error: integer value was expected
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_006 Ensure that the same parameter name is used when modifying the base template. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_006 NegSem_1505_ModifiedTemplates_006.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that the same parameter name is used when modifying the base template. 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_006 {
+
+	type component GeneralComp { }
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_intValue) := {
+		field1 := p_intValue,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	// illegal as parameter name mismatch p_intValue defined in m_templateOne
+	template MyMessageType m_templateTwo(integer p_value := -) modifies m_templateOne := {  
+		field1 := p_value
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The name of parameter is not the same as in base template `@NegSem_1505_ModifiedTemplates_006.m_templateOne': `p_intValue' was expected instead of `p_value'
+<END_RESULT>
+<RESULT COUNT 1>
+error: integer value was expected
+<END_RESULT>
+<RESULT COUNT 1>
+error: Not used symbol \(`-'\) doesn't have the corresponding default parameter in the base template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1505_ModifiedTemplates_007 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_007 Ensure that the same parameter type is used when modifying the base template. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1505_ModifiedTemplates_007 NegSem_1505_ModifiedTemplates_007.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that the same parameter type is used when modifying the base template. 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1505_ModifiedTemplates_007 {
+
+	type component GeneralComp { }
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_intValue) := {
+		field1 := p_intValue,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	// illegal as parameter type mismatch boolean defined in m_templateOne
+	template MyMessageType m_templateTwo(boolean p_intValue) modifies m_templateOne := {  
+		field1 := 5
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The type of parameter is not the same as in base template `@NegSem_1505_ModifiedTemplates_007.m_templateOne': `integer' was expected instead of `boolean
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1505_ModifiedTemplates_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1505_001 Ensure that the base template and modified template cannot be the same >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1505_ModifiedTemplates_001 NegSyn_1505_ModifiedTemplates_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.5, Ensure that the base template and modified template cannot be the same 
+ ** @verdict  pass reject, noexecution
+ *****************************************************************/
+//Restriction a)
+/*A modified template shall not refer to itself, either directly or indirectly, i.e. recursive derivation is not
+allowed.*/
+
+module NegSyn_1505_ModifiedTemplates_001{
+
+	type component GeneralComp { }
+
+	type record MyMessageType {
+		integer field1,
+		charstring field2,
+		boolean field3
+	}
+
+	template MyMessageType m_templateOne(integer p_intValue) := {
+		field1 := p_intValue,
+		field2 := "Hello World",
+		field3 := true
+	}
+
+	template MyMessageType m_templateTwo(integer p_intValue) modifies m_templateOne := {  
+		field1 := 5
+	}
+
+	//error: not allowed to modify itself
+	template MyMessageType m_templateTwo(integer p_intValue) modifies m_templateTwo := {  
+		field1 := 10
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Duplicate definition with name `m_templateTwo'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1506_referencing_elements_of_templates_or_template_fields folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150601_ReferencingIndividualStringElements_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150601_001 Ensure that the referencing of individual string elements inside templates or template fields is forbidden. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_150601_ReferencingIndividualStringElements_001 NegSem_150601_ReferencingIndividualStringElements_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.1, Ensure that the referencing of individual string elements inside templates or template fields is forbidden.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150601_ReferencingIndividualStringElements_001 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_150601_ReferencingIndividualStringElements_001() runs on GeneralComp {
+		var template charstring m_char1 := "MYCHAR1";
+		var template charstring m_char2;
+	
+		// illegal acchess. Instead, substr should be used.	
+		m_char2 := m_char1[1];
+	
+		if (valueof(m_char2) == "Y") {
+			setverdict(fail);
+		} else {
+			setverdict(pass);
+		}
+	}
+
+	control{
+		execute(TC_NegSem_150601_ReferencingIndividualStringElements_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to template variable `m_char1' can not be indexed
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150602_ReferencingRecordAndSetFields_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150602_001 Ensure that fields with omit values on the right-hand side of an assignment are rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150602_ReferencingRecordAndSetFields_001 NegSem_150602_ReferencingRecordAndSetFields_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.2, Ensure that fields with omit values on the right-hand side of an assignment are rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150602_ReferencingRecordAndSetFields_001 {
+
+	type component GeneralComp { }
+
+	type record MyRecordTwo {
+		integer g1,
+		MyRecordTwo g2 optional
+	}
+
+	type record MyRecordOne {
+		integer f1 optional,
+		MyRecordTwo f2 optional
+	}
+
+	testcase TC_NegSem_150602_ReferencingRecordAndSetFields_001() runs on GeneralComp {
+		var template MyRecordOne m_R1 := {
+			f1 := 5,
+			f2 := omit
+		}
+	
+		// shall cause an error as omit is assigned to m_R1.f2
+		var template MyRecordTwo m_R2 := m_R1.f2.g2;
+		// if we get here, something must be wrong
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_150602_ReferencingRecordAndSetFields_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Copying an uninitialized/unsupported record/set template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150602_ReferencingRecordAndSetFields_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150602_003 Ensure that fields with omit values on the right-hand side of an assignment are rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150602_ReferencingRecordAndSetFields_003 NegSem_150602_ReferencingRecordAndSetFields_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.2, Ensure that value lists on the right-hand side of an assignment are not acceped.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150602_ReferencingRecordAndSetFields_003 {
+
+	type component GeneralComp { }
+
+	type record MyRecordTwo {
+		integer g1,
+		MyRecordTwo g2 optional
+	}
+
+	type record MyRecordOne {
+		integer f1 optional,
+		MyRecordTwo f2 optional
+	}
+
+	testcase TC_NegSem_150602_ReferencingRecordAndSetFields_003() runs on GeneralComp {
+		var template MyRecordOne m_R1 := (
+		{
+			f1 := omit,
+			f2 := 
+			{
+				g1 := 0,
+				g2 := omit
+			}
+		},
+		{
+			f1 := 5,
+			f2 := 
+			{
+				g1 := 1,
+				g2 := 
+				{
+					g1 := 2,
+					g2 := omit
+				}
+			}
+		}
+		);
+	
+		// shall cause an error as value list is assigned to m_R1
+		var template MyRecordTwo m_R2 := m_R1.f2;
+		m_R2 := m_R1.f2.g2;
+		m_R2 := m_R1.f2.g2.g2;
+		// if we get here, something must be wrong
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_150602_ReferencingRecordAndSetFields_003());
+	}
+
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Copying an uninitialized/unsupported record/set template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150602_ReferencingRecordAndSetFields_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150602_004 Ensure that complement lists on the right-hand side of an assignment are not accepted. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150602_ReferencingRecordAndSetFields_004 NegSem_150602_ReferencingRecordAndSetFields_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.2, Ensure that complement lists on the right-hand side of an assignment are not accepted. 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150602_ReferencingRecordAndSetFields_004 {
+
+	type component GeneralComp { }
+
+	type record MyRecordTwo {
+		integer g1,
+		MyRecordTwo g2 optional
+	}
+
+	type record MyRecordOne {
+		integer f1 optional,
+		MyRecordTwo f2 optional
+	}
+
+	testcase TC_NegSem_150602_ReferencingRecordAndSetFields_004() runs on GeneralComp {
+		var template MyRecordOne m_R1 := complement(
+		{
+			f1 := omit,
+			f2 := 
+			{
+				g1 := 0,
+				g2 := omit
+			}
+		},
+		{
+			f1 := 5,
+			f2 := 
+			{
+				g1 := 1,
+				g2 := 
+				{
+					g1 := 2,
+					g2 := omit
+				}
+			}
+		}
+		);
+	
+		// shall cause an error as a complement list is assigned to m_R1
+		var template MyRecordTwo m_R2 := m_R1.f2;
+		m_R2 := m_R1.f2.g2;
+		m_R2 := m_R1.f2.g2.g2;
+		// if we get here, something must be wrong
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_150602_ReferencingRecordAndSetFields_004());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Copying an uninitialized/unsupported record/set template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150602_ReferencingRecordAndSetFields_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150602_005 Ensure that referencing a template field with the ifpresent attribute causes a rejection. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150602_ReferencingRecordAndSetFields_005 NegSem_150602_ReferencingRecordAndSetFields_005.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.2, Ensure that referencing a template field with the ifpresent attribute causes a rejection.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150602_ReferencingRecordAndSetFields_005 {
+
+	type component GeneralComp { }
+
+	type record MyRecordOne {
+		MyRecordOne f1 optional
+	}
+
+	testcase TC_NegSem_150602_ReferencingRecordAndSetFields_005() runs on GeneralComp {
+		var template MyRecordOne m_R1 := {
+			f1 := * ifpresent
+		}
+		var template MyRecordOne m_R2 := {
+			f1 := m_R1.f1.f1 // access to a field with ifpresent shall cause an error!
+		}
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_150602_ReferencingRecordAndSetFields_005());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Accessing field f1 of a non-specific template of type @NegSem_150602_ReferencingRecordAndSetFields_005.MyRecordOne.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_001 Ensure that referencing an element within a value list causes an error in the context of record of. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_001 NegSem_150603_ReferencingRecordOfAndSetElements_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing an element within a value list causes an error in the context of record of.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_001 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+    type record of RoI RoRoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_001() runs on GeneralComp {
+        var template RoI m_one;
+        var template RoRoI m_two;
+        template RoRoI constraint_value := {{},{0},{0,0},{0,0,0}};
+	
+        m_two := ( constraint_value, constraint_value ); // value list
+        m_one := m_two[0]; // shall cause an error as we access a value list
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_001());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Accessing an element of a non-specific template for type @NegSem_150603_ReferencingRecordOfAndSetElements_001.RoRoI.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_002 Ensure that access to unitialized fields in the context of record of is rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_002 NegSem_150603_ReferencingRecordOfAndSetElements_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that access to unitialized fields in the context of record of is rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_002 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_002() runs on GeneralComp {
+        var template RoI m_one;
+        var integer v_test;
+	
+        m_one[0] := 0;
+        m_one[2] := 1;
+        v_test := valueof(m_one[1]); // shall cause an error as element one is an unitialized field
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_002());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_003 Ensure that anyvalueornone fields in the context of record of is rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_003 NegSem_150603_ReferencingRecordOfAndSetElements_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that anyvalueornone fields in the context of record of is rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_003 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_003() runs on GeneralComp {
+        var template RoI m_one;
+        var integer v_test;
+	
+        m_one := {0,*,1,2};
+        v_test := valueof(m_one[1]); // shall cause an error as element one is an "any value or none" field
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_003());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_004 Ensure that complement value lists in the context of record of are rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_004 NegSem_150603_ReferencingRecordOfAndSetElements_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that complement value lists in the context of record of are rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_004 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_004() runs on GeneralComp {
+        var template RoI m_one;
+        var integer v_test;
+	
+        m_one := {0,complement(1,3,5),1,2};
+        v_test := valueof(m_one[1]); // shall cause an error as element one is a complement list
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_004());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_005 Ensure that subset in the context of record of are rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_005 NegSem_150603_ReferencingRecordOfAndSetElements_005.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that subset in the context of record of are rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_005 {
+
+    type component GeneralComp { }
+
+    //type record of integer RoI;
+	
+	type set of integer SoI;
+	type record of SoI RoS;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_005() runs on GeneralComp {
+        //var template RoI m_one;
+		var template RoS m_one;
+
+        //var integer v_test;
+		var SoI v_test;
+	
+        //m_one := {0,subset(1,3,5),1,2};
+		m_one := {{0},subset(1,3,5), {1,2}};
+
+        v_test := valueof(m_one[1]); // shall cause an error as element one is a subset
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_005());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific template of type @PreGenRecordOf.PREGEN_SET_OF_INTEGER.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_006 Ensure that superset in the context of record of are rejected. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_006 NegSem_150603_ReferencingRecordOfAndSetElements_006.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that superset in the context of record of are rejected.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_006 {
+
+    type component GeneralComp { }
+
+    //type record of integer RoI;
+	type set of integer SoI;
+	type record of SoI RoS;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_006() runs on GeneralComp {
+        //var template RoI m_one;
+		var template RoS m_one;
+
+        //var integer v_test;
+		var SoI v_test;
+	
+        //m_one := {0,superset(1,3,5),1,2};
+		m_one := {{0},subset(1,3,5), {1,2}};
+        v_test := valueof(m_one[1]); // shall cause an error as element one is a superset
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_006());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific template of type @PreGenRecordOf.PREGEN_SET_OF_INTEGER.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_008 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_008 Ensure that access to record of indexes is forbidden when a previous index entry is a permutation with a *. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_008 NegSem_150603_ReferencingRecordOfAndSetElements_008.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that access to record of indexes is forbidden when a previous index entry is a permutation with a *.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_008 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_008() runs on GeneralComp {
+        var template RoI m_one;
+        var integer v_test;
+	
+        m_one := {permutation(0,1,3,*),2,?};
+        v_test := valueof(m_one[5]); // shall cause an error as the permutation contains a * that is able to cover any record of indexes
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_008());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_009 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_009 Ensure that access to ifpresent fields is not allowed. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_009 NegSem_150603_ReferencingRecordOfAndSetElements_009.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that access to ifpresent fields is not allowed.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_009 {
+
+    type component GeneralComp { }
+
+	template integer If := 1 ifpresent; // simple integer can't have ifpresent attribute 
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_009() runs on GeneralComp {
+        var template RoI m_one;
+        var integer v_test;
+
+        m_one := {If,2,?};
+       	v_test := valueof(m_one[0]); // shall cause an error due to the presence of ifpresent
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_009());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_010 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_010 Ensure that referencing AnyValueOrNone fields is not allowed. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_010 NegSem_150603_ReferencingRecordOfAndSetElements_010.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing AnyValueOrNone fields is not allowed.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_010 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_010() runs on GeneralComp {
+        var template RoI m_one;
+    
+        m_one := ?;
+        m_one[2] := 2;
+        // assignment should yield {?,?,2,*}
+    
+        if (not match(5,m_one[0])) {
+            setverdict(fail);
+        }
+        if (not match(5,m_one[1])) {
+            setverdict(fail);
+        }
+        if (not match(2,m_one[2])) {
+            setverdict(fail);
+        }
+        if (not match(5,m_one[3])) {  // shall cause an error due to the presence of AnyValueOrNone
+            setverdict(fail);
+        }
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_010());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Matching with an uninitialized/unsupported integer template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_011 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_011 Ensure that referencing uninitialized fields is not allowed. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_011 NegSem_150603_ReferencingRecordOfAndSetElements_011.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing uninitialized fields is not allowed.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+ //Restriction a) Omit: referencing an element within a record of, set of or array field to which omit is assigned shall follow the rules specified in clause 6.2.3.
+
+ /*Clause 6.2.3: If the value of the element indicated by the index at the right-hand of an assignment is undefined (uninitialized), this
+shall cause a semantic or runtime error. Referencing an identified element of an uninitialized or omitted record of or set
+of field or value on the right hand side of an assignment shall cause an error.*/
+
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_011 {
+
+    type component GeneralComp { }
+
+    type record of integer RoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_011() runs on GeneralComp {
+      
+	var template RoI m_one;
+	var template RoI m_two;
+        
+        m_one := {1,-};		// {1,-}
+        m_two := {m_one[1],4};	// {-,4} error not allowed referencing
+ 
+        if (not isvalue(m_two)) {
+            setverdict(pass);
+        }
+
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_011());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Copying an uninitialized/unsupported integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_012 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_012 Ensure that referencing uninitialized fields is not allowed. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_012 NegSem_150603_ReferencingRecordOfAndSetElements_012.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing uninitialized fields is not allowed.
+ ** @verdict  pass reject
+ *****************************************************************/
+ 
+//Restriction a)	Omit: referencing an element within a record of, set of or array field to which omit is assigned shall follow the rules specified in clause 6.2.3.
+
+/*Clause 6.2.3: If the value of the element indicated by the index at the right-hand of an assignment is undefined (uninitialized), this
+shall cause a semantic or runtime error. Referencing an identified element of an uninitialized or omitted record of or set
+of field or value on the right hand side of an assignment shall cause an error.*/
+
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_012{
+
+    type component GeneralComp { }
+
+    type set of integer SoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_012() runs on GeneralComp {
+      
+	var template SoI m_one;
+	var template SoI m_two;
+        
+        m_one := {1,-};		// {1,-}
+        m_two := {m_one[1],2};	// {-,2} error not allowed referencing
+ 
+        if (not isvalue(m_two)) {
+            setverdict(pass);
+        }
+
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_012());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Copying an uninitialized/unsupported integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_013 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_013 Ensure that referencing uninitialized fields is not allowed. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_013 NegSem_150603_ReferencingRecordOfAndSetElements_013.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing uninitialized fields is not allowed.
+ ** @verdict  pass reject
+ *****************************************************************/
+ 
+//Restriction a)	Omit: referencing an element within a record of, set of or array field to which omit is assigned shall follow the rules specified in clause 6.2.3.
+
+/*Clause 6.2.3: If the value of the element indicated by the index at the right-hand of an assignment is undefined (uninitialized), this
+shall cause a semantic or runtime error. Referencing an identified element of an uninitialized or omitted record of or set
+of field or value on the right hand side of an assignment shall cause an error.*/
+
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_013{
+
+    type component GeneralComp { }
+
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_013() runs on GeneralComp {
+      
+	var integer m_one[2];
+	var integer m_two[2];
+        
+        m_one := {1,-};		// {1,-}
+        m_two := {m_one[1],2};	// {-,2} error not allowed referencing
+ 
+        if (not isvalue(m_two)) {
+            setverdict(pass);
+        }
+
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_013());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Assignment of an unbound integer value.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150603_ReferencingRecordOfAndSetElements_014 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150603_014 Ensure that referencing an element within a value list causes an error in the context of set of. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150603_ReferencingRecordOfAndSetElements_014 NegSem_150603_ReferencingRecordOfAndSetElements_014.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.3, Ensure that referencing an element within a value list causes an error in the context of set of.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_150603_ReferencingRecordOfAndSetElements_014 {
+
+    type component GeneralComp { }
+
+    type set of integer SoI;
+    type set of SoI SoSoI;
+
+    testcase TC_NegSem_150603_ReferencingRecordOfAndSetElements_014() runs on GeneralComp {
+        var template SoI m_one;
+        var template SoSoI m_two;
+        template SoSoI constraint_value := {{},{0},{0,0},{0,0,0}};
+	
+        m_two := ( constraint_value, constraint_value ); // value list
+        m_one := m_two[0]; // shall cause an error as we access a value list
+
+        setverdict(fail);
+    }
+
+    control{
+        execute(TC_NegSem_150603_ReferencingRecordOfAndSetElements_014());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Accessing an element of a non-specific template for type @NegSem_150603_ReferencingRecordOfAndSetElements_014.SoSoI.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150605_Referencing_union_alternatives_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150605_001 Ensure that template variables does not allow referencing alternatives inside an union with omit >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150605_Referencing_union_alternatives_001 NegSem_150605_Referencing_union_alternatives_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.5, Ensure that template variables does not allow referencing alternatives inside an union with omit
+ ** @verdict  pass reject
+ *****************************************************************/
+
+ //Restriction a)
+    /*referencing an alternative of a union template or template field to which Omit, AnyValueOrNone,
+     * a template list or a complemented list is assigned, at the right hand side of an assignment, shall cause an error.*/
+
+ 
+ 
+module NegSem_150605_Referencing_union_alternatives_001 {
+
+    type union My_Union {
+        integer   u1,
+        float     u2
+    }
+    
+    type record ExampleType {	// Exampletype record with union
+	    integer a,
+	    My_Union b optional
+    }
+       
+
+    type component GeneralComp {  }	
+
+
+    testcase TC_NegSem_150605_Referencing_union_alternatives_001() runs on GeneralComp {
+		
+		var template ExampleType m_template;
+		var template integer m_template_2;
+
+		//assign values to template:
+		
+		m_template.a:=10;	
+		m_template.b:= omit;
+
+		m_template_2 := m_template.b.u1;		//error: omit
+	  
+		setverdict(pass);
+
+	}
+
+    control{
+        execute(TC_NegSem_150605_Referencing_union_alternatives_001());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Accessing field u1 in a non-specific template of union type @NegSem_150605_Referencing_union_alternatives_001.My_Union
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_150605_Referencing_union_alternatives_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 150605_002 Ensure that template variables does not allow referencing alternatives inside an union with AnyValueOrNone >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_150605_Referencing_union_alternatives_002 NegSem_150605_Referencing_union_alternatives_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.6.5, Ensure that template variables does not allow referencing alternatives inside an union with AnyValueOrNone
+ ** @verdict  pass reject
+ *****************************************************************/
+//Restriction a)
+/*referencing an alternative of a union template
+or template field to which Omit, AnyValueOrNone, a template list or a complemented list is assigned, at the right hand side of an assignment, shall cause an error.*/
+
+
+module NegSem_150605_Referencing_union_alternatives_002 {
+
+    type union My_Union {
+        integer   u1,
+        float     u2
+    }
+    
+    type record ExampleType {	// Exampletype record with union
+	    integer a,
+	    My_Union b optional
+    }
+
+    type component GeneralComp {  }	
+
+
+    testcase TC_NegSem_150605_Referencing_union_alternatives_002() runs on GeneralComp {
+    
+   	 	var template ExampleType m_template;
+    	var template integer m_template_2;
+
+    //assign values to template:
+    
+		m_template.a:=10;	
+		m_template.b:= *;
+
+		m_template_2 := m_template.b.u1;		//error: AnyValueOrNone
+  
+      	setverdict(pass);
+
+ }
+
+    control{
+        execute(TC_NegSem_150605_Referencing_union_alternatives_002());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Accessing field u1 in a non-specific template of union type @NegSem_150605_Referencing_union_alternatives_002.My_Union.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1508_template_restrictions folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_001 Ensure that template(omit) is rejected with anyvalue(?). >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_001 NegSem_1508_TemplateRestrictions_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with anyvalue(?).
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_001 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := ?;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_002 Ensure that template(omit) is rejected with setof template. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_002 NegSem_1508_TemplateRestrictions_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with setof template.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_002 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := ({1,true},{2,false});
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of value list match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_003 Ensure that template(omit) is rejected with anyvalueornone(*). >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_003 NegSem_1508_TemplateRestrictions_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with anyvalueornone(*).
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_003 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := *;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any or omit
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_004 Ensure that template(omit) is rejected with value ranges. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_004 NegSem_1508_TemplateRestrictions_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with value ranges.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_004 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := {(1..6), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of value range match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_005 Ensure that template(omit) is rejected with supersets. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_005 NegSem_1508_TemplateRestrictions_005.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with supersets.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_005 {
+
+	type record ExampleType {
+		set of integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := {superset(1,2,3), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of superset match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_006 Ensure that template(omit) is rejected with supersets. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_006 NegSem_1508_TemplateRestrictions_006.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with subsets.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_006 {
+
+	type record ExampleType {
+		set of integer a,
+		boolean b optional
+	}
+
+	template(omit) ExampleType exampleOmitAny := {subset(1,2,3), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of subset match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_007 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_007 Ensure that template(omit) is rejected with patterns. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_007 NegSem_1508_TemplateRestrictions_007.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with patterns.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_007 {
+
+	type record ExampleType {
+		integer a,
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {1, pattern "ab*c"};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of character string pattern
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_008 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_008 Ensure that template(omit) is rejected with anyelement inside values. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_008 NegSem_1508_TemplateRestrictions_008.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with anyelement inside values.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_008 {
+
+	type record ExampleType {
+		integer a,
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {2, ?};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_009 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_009 Ensure that template(omit) is rejected with anyelementornone inside values. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_009 NegSem_1508_TemplateRestrictions_009.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with anyelementornone inside values.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_009 {
+
+	type record ExampleType {
+		integer a,
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {2, *};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any or omit
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_010 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_010 Ensure that template(omit) is rejected with permutation inside values. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_010 NegSem_1508_TemplateRestrictions_010.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with permutation inside values.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_010 {
+
+	type record ExampleType {
+		set of integer a,
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {permutation(2,4,6),"abcde"};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of permutation match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_011 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_011 Ensure that template(omit) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_011 NegSem_1508_TemplateRestrictions_011.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with length restrictions.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_011 {
+
+	type record ExampleType {
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {"abcde" length(1..3)};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of length restriction
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_012 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_012 Ensure that template(omit) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_012 NegSem_1508_TemplateRestrictions_012.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with length restrictions.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_012 {
+
+	type record ExampleType {
+		charstring b
+	}
+
+	template(omit) ExampleType exampleOmitAny := {"abcde" ifpresent};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of `ifpresent'
+<END_RESULT>
+<RESULT COUNT 1>
+error: `ifpresent' is not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_013 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_013 Ensure that template(omit) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_013 NegSem_1508_TemplateRestrictions_013.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) is rejected with length restrictions.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_013 {
+
+	type record ExampleType {
+		integer f1
+	}
+
+	template(omit) ExampleType exampleOmitAny := {complement(2,3)};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of complemented list match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_014 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_014 Ensure that template(value) is rejected with anyvalue(?). >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_014 NegSem_1508_TemplateRestrictions_014.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with anyvalue(?).
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_014 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny := ?;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_015 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_015 Ensure that template(value) is rejected with valuelist. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_015 NegSem_1508_TemplateRestrictions_015.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with valuelist.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_015 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny :=  ({1,true},{2,false});
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of value list match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_016 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_016 Ensure that template(value) is rejected with anyvalueornone(*). >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_016 NegSem_1508_TemplateRestrictions_016.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with anyvalueornone(*).
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_016 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny := *;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any or omit
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_017 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_017 Ensure that template(value) is rejected with value ranges. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_017 NegSem_1508_TemplateRestrictions_017.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with value ranges.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_017 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny := {(1..6), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of value range match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_018 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_018 Ensure that template(value) is rejected with supersets. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_018 NegSem_1508_TemplateRestrictions_018.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with supersets.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_018 {
+
+	type record ExampleType {
+		set of integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny := {superset(1,2,3), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of superset match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_019 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_019 Ensure that template(value) is rejected with supersets. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_019 NegSem_1508_TemplateRestrictions_019.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with supersets.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_019 {
+
+	type record ExampleType {
+		set of integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmitAny := {subset(1,2,3), true};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of subset match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_020 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_020 Ensure that template(value) is rejected with patterns. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_020 NegSem_1508_TemplateRestrictions_020.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with patterns.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_020 {
+
+	type record ExampleType {
+		integer a,
+		charstring b
+	}
+
+	template(value) ExampleType exampleOmitAny := {1, pattern "ab*c"};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of character string pattern
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_021 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_021 Ensure that template(value) is rejected with anyelement inside values. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_021 NegSem_1508_TemplateRestrictions_021.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with anyelement inside values.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_021 {
+
+	type record ExampleType {
+		integer a,
+		charstring b
+	}
+
+	template(value) ExampleType exampleOmitAny := {2, ?};
+
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_022 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_022 Ensure that template(value) is rejected with permutation inside values. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_022 NegSem_1508_TemplateRestrictions_022.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with permutation inside values.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_022 {
+
+	type record ExampleType {
+		set of integer a,
+		charstring b
+	}
+
+	template(value) ExampleType exampleOmitAny := {permutation(2,4,6),"abcde"};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of permutation match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_023 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_023 Ensure that template(value) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_023 NegSem_1508_TemplateRestrictions_023.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with length restrictions.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_023 {
+
+	type record ExampleType {
+		charstring b
+	}
+
+	template(value) ExampleType exampleOmitAny := {"abcde" length(1..3)};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of length restriction
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_024 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_024 Ensure that template(value) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_024 NegSem_1508_TemplateRestrictions_024.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) is rejected with length restrictions.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_024 {
+
+	type record ExampleType {
+		charstring b
+	}
+
+	template(value) ExampleType exampleOmitAny := {"abcde" ifpresent};
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of `ifpresent'
+<END_RESULT>
+<RESULT COUNT 1>
+error: `ifpresent' is not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_025 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_025 Ensure that template(value) is rejected with length restrictions. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_025 NegSem_1508_TemplateRestrictions_025.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) refuses omitvalue as a whole.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_025 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(present) ExampleType exampleOmit := omit;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of omit value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_026 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_026 Ensure that template(value) refuses omit as a whole. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_026 NegSem_1508_TemplateRestrictions_026.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(value) refuses omit as a whole.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_026 {
+
+	type record ExampleType {
+		integer a,
+		boolean b optional
+	}
+
+	template(value) ExampleType exampleOmit := omit;
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of omit value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_029 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_029 Ensure that the template(present) with anyvalue(?) can't be assigned to an omit restricted variable template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_029 NegSem_1508_TemplateRestrictions_029.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the template(present) with anyvalue(?) can't be assigned to an omit restricted variable template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_029 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+		var template (omit) ExampleType v_omit;	//omit restricted template variable
+	}
+
+	template (present) ExampleType MyintTemplate :={ 
+	//actual template with present restriction contains anytype (?)
+		a := ?,
+		b := false
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_029() runs on GeneralComp {
+      
+		v_omit := MyintTemplate; //error: v_omit is omit restricted, hence can not contain anytype(?)
+		
+		if (valueof(v_omit.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_029());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_030 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_030 Ensure that unrestricted template with anyvalue(?) can't be assigned to an omit restricted variable template >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_030 NegSem_1508_TemplateRestrictions_030.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that unrestricted template with anyvalue(?) can't be assigned to an omit restricted variable template
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_030 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a optional,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+		var template (omit) ExampleType v_omit;	//omit restricted template variable
+	}
+
+
+	template ExampleType MyintTemplate :={		//actual template without restriction contains anyvalue (?)
+		a := ?,
+		b := false
+	}
+	
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_030() runs on GeneralComp {
+      
+		v_omit := MyintTemplate;	//error: v_omit is omit restricted, hence can not contain anyvalue(?)
+		
+		if (valueof(v_omit.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_030());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_031 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_031 Ensure that template(omit) can't be assigned to a variable template(value) if omit >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_031 NegSem_1508_TemplateRestrictions_031.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(omit) can't be assigned to a variable template(value) if omit
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_031 {
+
+    type record ExampleType {	
+	// Exampletype record contains a charstring and a boolean
+       	charstring a optional,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+		var template (value) ExampleType v_value;	//value restricted template variable
+	}
+
+	//actual template (with omit restriction) is omit
+	template (omit) ExampleType MyintTemplate := omit; 
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_031() runs on GeneralComp {
+      
+		v_value := MyintTemplate;	//error: v_value is value restricted, hence can not be omit
+		
+		if (valueof(v_value.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_031());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of omit value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_032 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_032 Ensure that template(present) can't be assigned to a template(value) variable if contains anyvalueornone(*) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_032 NegSem_1508_TemplateRestrictions_032.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can't be assigned to a template(value) variable if contains anyvalueornone(*)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_032 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a optional,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+		var template (value) ExampleType v_value;	//value restricted template variable
+	}
+
+	template (present) ExampleType MyintTemplate :={	
+	//actual template (with present restriction) contains *
+		a := *,
+		b:= true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_032() runs on GeneralComp {
+      
+		v_value := MyintTemplate;	//error: v_value is value restricted, hence can not contain *
+		
+		if (valueof(v_value.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_032());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of any or omit
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_033 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_033 Ensure that an unrestricted template can't be assigned to a template(value) variable if contains anyvalueornone(*) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_033 NegSem_1508_TemplateRestrictions_033.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that an unrestricted template can't be assigned to a template(value) variable if contains anyvalueornone(*)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_033 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a optional,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+		var template (value) ExampleType v_value;	//value restricted template variable
+	}
+
+
+	template ExampleType MyintTemplate :={	//actual template (without restriction) contains *
+		a := *,
+		b:= true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_033() runs on GeneralComp {
+      
+		v_value := MyintTemplate;	//error: v_value is value restricted, hence can not contain *
+		
+		if (valueof(v_value.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_033());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of any or omit
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_034 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_034 Ensure that a template with omit restriction can't be assigned to a template(present)variable if omit >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_034 NegSem_1508_TemplateRestrictions_034.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that a template with omit restriction can't be assigned to a template(present)variable if omit
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_034 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a ,
+		boolean b optional
+    }	
+	
+	type component GeneralComp {
+		var template (present) ExampleType v_present;	//value restricted template variable
+	}
+
+	template (omit) ExampleType MyintTemplate := omit;	//actual template (omit) is omit
+
+	testcase TC_NegSem_1508_TemplateRestrictions_034() runs on GeneralComp {
+      
+		v_present := MyintTemplate;	//error: v_present is present restricted, hence can not be omit
+		
+		if (valueof(v_present.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_034());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of omit value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_035 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_035 Ensure that an unrestricted template can't be assigned to a template(present)variable if omit >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_035 NegSem_1508_TemplateRestrictions_035.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that an unrestricted template can't be assigned to a template(present)variable if omit
+ ** @verdict  pass reject
+ *****************************************************************/
+
+
+module NegSem_1508_TemplateRestrictions_035 {
+
+    type record ExampleType {	// Exampletype record contains a charstring and a boolean
+       	charstring a ,
+		boolean b optional
+    }	
+	
+	type component GeneralComp {
+		var template (present) ExampleType v_present;	//value restricted template variable
+	}
+
+	template ExampleType MyintTemplate := omit;	//actual template is omit
+
+	testcase TC_NegSem_1508_TemplateRestrictions_035() runs on GeneralComp {
+      
+		v_present := MyintTemplate;	//error: v_present is present restricted, hence can not be omit
+		
+		if (valueof(v_present.b) == false) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_035());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template does not allow usage of omit value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_036 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_036 Ensure that template(present) can't be parameter to a template(omit) if contains anyvalueornone(*) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_036 NegSem_1508_TemplateRestrictions_036.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can't be parameter to a template(omit) if contains anyvalueornone(*)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_036 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {}
+
+	template (omit) ExampleType m_baseTemplate(template (present) integer MyintTemplate := *) :={
+		a := MyintTemplate,	
+	// template (present) MyintTemplate contains anyvalueornone(*), which is not allowed in omit restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_036() runs on GeneralComp {
+      
+		if (valueof(m_baseTemplate.b) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_036());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template formal parameter does not allow usage of any or omit
+<END_RESULT>
+<RESULT COUNT 1>
+error: Formal parameter with template restriction `present' not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_037 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_037 Ensure that template(present) can't be parameter to template(omit) if contains anyvalue(?) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_037 NegSem_1508_TemplateRestrictions_037.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can't be parameter to template(omit) if contains anyvalue(?)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_037 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+	}
+
+	template (omit) ExampleType m_baseTemplate(template (present) integer MyintTemplate := ?) :={
+		a := MyintTemplate,	
+		// template (present) MyintTemplate contains anyvalue(?), which is not allowed in omit restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_037() runs on GeneralComp {
+
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_037());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter with template restriction `present' not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_038 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_038 Ensure that template(present) can't be parameter to template(value) if it contains anyvalueornone(*) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_038 NegSem_1508_TemplateRestrictions_038.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can't be parameter to template(value) if it contains anyvalueornone(*)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_038 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {}
+
+	template (value) ExampleType m_baseTemplate(template (present) integer MyintTemplate := *) :={
+		a := MyintTemplate,	
+// template (present) MyintTemplate contains anyvalueornone(*), which is not allowed with value restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_038() runs on GeneralComp {
+
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_038());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template formal parameter does not allow usage of any or omit
+<END_RESULT>
+<RESULT COUNT 1>
+error: Formal parameter with template restriction `present' not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_039 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_039 Ensure that unrestricted template can't be parameter to template(value) if it contains anyvalueornone(*) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_039 NegSem_1508_TemplateRestrictions_039.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that unrestricted template can't be parameter to template(value) if it contains anyvalueornone(*)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_039 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {}
+
+	template (value) ExampleType m_baseTemplate(template integer MyintTemplate := *) :={
+		a := MyintTemplate,	
+	// template MyintTemplate contains anyvalueornone(*), which is not allowed with value restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_039() runs on GeneralComp {
+      
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_039());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter without template restriction not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_040 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_040 Ensure that template(present) can't be parameter to a template(omit) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_040 NegSem_1508_TemplateRestrictions_040.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can't be parameter to a template(omit)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_040 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {}
+
+	template (omit) ExampleType m_baseTemplate(template (present) integer MyintTemplate := 1) :={
+		a := MyintTemplate,	// template (present)is not allowed parameter in omit restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_040() runs on GeneralComp {
+
+		if (valueof(m_baseTemplate.b) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_040());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter with template restriction `present' not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_041 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_041 Ensure that unrestricted template cannot be parameter to template(value) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_041 NegSem_1508_TemplateRestrictions_041.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that unrestricted template cannot be parameter to template(value)
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_041 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+	}
+
+	template (value) ExampleType m_baseTemplate(template integer MyintTemplate := 1) :={
+		a := MyintTemplate,	 // template is not allowed parameter in value restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_041() runs on GeneralComp {
+      
+		
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_041());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter without template restriction not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_042 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_042 Ensure that template(present) cannot be parameter to template(value) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_042 NegSem_1508_TemplateRestrictions_042.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) cannot be parameter to template(value)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_042 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+	boolean b 
+       }	
+	
+	type component GeneralComp {
+	}
+
+	template (value) ExampleType m_baseTemplate(template (present) integer MyintTemplate := 2) :={
+		a := MyintTemplate,	 // template (present)is not allowed parameter in value restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_042() runs on GeneralComp {
+      
+		
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       }
+ }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_042());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter with template restriction `present' not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_043 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_043 Ensure that template(present) can be parameter to template(omit) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_043 NegSem_1508_TemplateRestrictions_043.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that template(present) can be parameter to template(omit)
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1508_TemplateRestrictions_043 {
+
+    type record ExampleType {	// Exampletype record integer and a boolean
+       	integer a,
+		boolean b 
+    }	
+	
+	type component GeneralComp {
+	}
+
+	template (omit) ExampleType m_baseTemplate(template integer MyintTemplate := 1) :={
+		a := MyintTemplate,	// template is not allowed parameter in omit restriction 
+		b := true
+	}
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_043() runs on GeneralComp {
+      
+		
+		if (ispresent(m_baseTemplate.a) == true) {
+      		setverdict(pass);
+		} else {
+            setverdict(fail);
+       	}
+ 	}
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_043());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Formal parameter without template restriction not allowed here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_044 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_044 Ensure that the restrictiveness of parameters template(value)->template(present) is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_044 NegSem_1508_TemplateRestrictions_044.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(value)->template(present) is handled correctly.
+ ** @verdict  pass reject, noexecution
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_044 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(value) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+	
+    template(present) ExampleType m_modifiedTemplate(template(present) integer p_myInt) modifies m_baseTemplate := { // value -> present restriction change is not allowed
+        a := 21
+    }
+
+	testcase TC_NegSem_1508_TemplateRestrictions_044() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_044());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_044.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_045 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_045 Ensure that the restrictiveness of parameters template(value)->template(omit) is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_045 NegSem_1508_TemplateRestrictions_045.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(value)->template(omit) is handled correctly.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_045 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(value) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+
+    template(present) ExampleType m_modifiedTemplate(template(omit) integer p_myInt) modifies m_baseTemplate := { // value -> omit restriction change is not allowed
+        a := 21
+    }
+	
+	testcase TC_NegSem_1508_TemplateRestrictions_045() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_045());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_045.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_046 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_046 Ensure that the restrictiveness of parameters template(value)->template is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_046 NegSem_1508_TemplateRestrictions_046.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(value)->template is handled correctly.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_046 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(value) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+
+    template(present) ExampleType m_modifiedTemplate(template integer p_myInt) modifies m_baseTemplate := {
+		// value -> unrestricted change is not allowed
+        a := 21
+    }
+
+	testcase TC_NegSem_1508_TemplateRestrictions_046() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_046());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_046.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_047 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_047 Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_047 NegSem_1508_TemplateRestrictions_047.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_047 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(omit) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+
+    template(present) ExampleType m_modifiedTemplate(template(present) integer p_myInt) modifies m_baseTemplate := { // omit -> present restriction change is not allowed
+        a := 21
+    }
+
+	testcase TC_NegSem_1508_TemplateRestrictions_047() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_047());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_047.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_048 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_048 Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_048 NegSem_1508_TemplateRestrictions_048.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_048 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(omit) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+
+    template(present) ExampleType m_modifiedTemplate(template integer p_myInt) modifies m_baseTemplate := {
+		// omit -> unrestricted change is not allowed
+        a := 21
+    }
+
+	testcase TC_NegSem_1508_TemplateRestrictions_048() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_048());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_048.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_049 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_049 Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_049 NegSem_1508_TemplateRestrictions_049.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that the restrictiveness of parameters template(omit)->template(present) is handled correctly.
+ ** @verdict  pass accept, ttcn3verdict:pass
+ *****************************************************************/
+
+// ATTENTION: This is not allowed in Titan
+
+module NegSem_1508_TemplateRestrictions_049 {
+
+	type component GeneralComp { }
+
+    type record ExampleType {
+        integer a,
+        boolean b optional
+    }
+
+    template(present) ExampleType m_baseTemplate(template(present) integer p_myInt) := {
+        a := p_myInt,
+        b := true
+    }
+
+    template(present) ExampleType m_modifiedTemplate(template integer p_myInt) modifies m_baseTemplate := {
+		// present -> unrestricted change is not allowed
+        a := 21
+    }
+
+	testcase TC_NegSem_1508_TemplateRestrictions_049() runs on GeneralComp {
+        if (match(valueof(m_modifiedTemplate(1).a), 21) and
+            match(valueof(m_modifiedTemplate(1).b), true)
+        ) {
+            setverdict(pass);
+        } else {
+            setverdict(fail);
+        }
+    }
+
+    control{
+        execute(TC_NegSem_1508_TemplateRestrictions_049());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The restriction of parameter is not the same or more restrictive as in base template `@NegSem_1508_TemplateRestrictions_049.m_baseTemplate'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_050 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_050 Ensure that decoded content match is not allowed for omit template restriction >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_050 NegSem_1508_TemplateRestrictions_050.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that decoded content match is not allowed for omit template restriction
+ ** @verdict  pass reject, noexecution
+ ***************************************************/
+
+module NegSem_1508_TemplateRestrictions_050 { 
+
+	type record MessageType {
+	  	hexstring payload
+	}
+	
+	type record Mymessage {
+	  	integer field1,
+	  	bitstring field2 optional
+    } with { variant " "};
+	
+
+    type port loopbackPort message
+	{inout MessageType} with {extension "internal"};
+	
+
+    type component GeneralComp {	    	    
+	  	port loopbackPort messagePort
+    }	
+
+	testcase TC_NegSem_1508_TemplateRestrictions_050() runs on GeneralComp {
+		var bitstring v_enc;
+		var Mymessage v_testMessage;
+		var MessageType Message;
+		
+		v_testMessage:=  {  
+		    field1 := 10,
+		    field2 := '1001'B
+		} 
+
+		connect(self:messagePort,self:messagePort);
+
+      	Message.payload := bit2hex(encvalue(v_testMessage));		//encode message to payload
+
+	 	template (omit) MessageType mw_matchingTemplate:=
+	  	{  			
+	  		payload :=  decmatch Mymessage: {field1:= 10, field2 := omit}        
+			//error: omit restriction not allowed
+	  	} 
+
+	  	messagePort.send(Message);	//send message
+
+		alt {
+		 	[] messagePort.receive(mw_matchingTemplate) {
+		   	 	setverdict(pass);
+		 	}
+		 	[] messagePort.receive {
+		    	setverdict(fail,mw_matchingTemplate);
+		 	}
+		}
+		
+	}
+
+	control{
+		execute(TC_NegSem_1508_TemplateRestrictions_050());
+	}
+
+} with { encode "RAW"}
+ 
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of decoded content match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1508_TemplateRestrictions_051 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1508_051 Ensure that decoded content match is not allowed for omit template restriction >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1508_TemplateRestrictions_051 NegSem_1508_TemplateRestrictions_051.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.8, Ensure that decoded content match is not allowed for omit template restriction
+ ** @verdict  pass reject, noexecution
+ ***************************************************/
+
+module NegSem_1508_TemplateRestrictions_051 { 
+
+	type record MessageType {
+	  	hexstring payload
+	}
+	
+	type record Mymessage {
+	  	integer field1,
+	  	bitstring field2 optional
+    } with { variant " "};
+	
+    type port loopbackPort message
+	{inout MessageType} with {extension "internal"};
+	
+    type component GeneralComp {	    	    
+	    port loopbackPort messagePort
+    }	
+
+	testcase TC_NegSem_1508_TemplateRestrictions_051() runs on GeneralComp {
+		var bitstring v_enc;
+		var Mymessage v_testMessage;
+		var MessageType Message;
+		
+		v_testMessage:=  {  
+		    field1 := 10,
+		    field2 := '1001'B
+		 } 
+
+		Message.payload := bit2hex(encvalue(v_testMessage)); //encode message to payload
+
+	 	template (value) MessageType mw_matchingTemplate:=
+	  	{  			
+	  		payload :=  decmatch Mymessage: {field1:= 10, field2 :=  '1001'B}        
+			//error: value restriction not allowed
+	  	} 
+
+	  	messagePort.send(Message);	//send message
+
+		alt {
+		 	[] messagePort.receive(mw_matchingTemplate) {
+		    	setverdict(pass);
+		 	}
+		 	[] messagePort.receive {
+		    	setverdict(fail,mw_matchingTemplate);
+		 	}
+		}
+		
+	}
+
+	control{
+		execute(TC_NegSem_1508_TemplateRestrictions_051());
+	}
+
+} with { encode "RAW"}
+ 
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Restriction on template definition does not allow usage of decoded content match
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1509_match_operation folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1509_MatchOperation_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1509_001 Ensure that the match operation refuses two templates as actual parameters. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1509_MatchOperation_001 NegSem_1509_MatchOperation_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.9, Ensure that the match operation refuses two templates as actual parameters. 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1509_MatchOperation_001 {
+
+	type component GeneralComp { }
+
+	template integer m_lessThan10 := (-infinity..9);
+	template integer m_second := (-20,-40);
+
+	testcase TC_NegSem_1509_MatchOperation_001() runs on GeneralComp {
+		if (match(m_second, m_lessThan10)) { // shall fail as both actual parameters refer to templates
+			setverdict(fail);
+		} else {
+			setverdict(pass);
+		}
+	}
+
+	control{
+		execute(TC_NegSem_1509_MatchOperation_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a value was expected instead of template `@NegSem_1509_MatchOperation_001.m_second'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1510_valueof_operation folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_001 Ensure that the valueof function works correctly on omit. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_001 NegSem_1510_ValueOfOperation_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10, Ensure that the valueof function works correctly on omit.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1510_ValueOfOperation_001 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_1510_ValueOfOperation_001() runs on GeneralComp {
+		var template integer m_int := omit;
+		var integer v_int := valueof(m_int);
+	
+		// if we get here, something must be wrong as valueof on m_int shall cause an error
+		// due to the omit.
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_002 Ensure that the valueof function works correctly on templates with wildcards. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_002 NegSem_1510_ValueOfOperation_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10,  Ensure that the valueof function works correctly on templates with wildcards.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1510_ValueOfOperation_002 {
+
+	type component GeneralComp { }
+
+	type record ExampleType {
+		integer field1,
+		boolean field2
+	}
+
+	template ExampleType m_template := {
+		field1 := *,
+		field2 := ?
+	}
+
+	testcase TC_NegSem_1510_ValueOfOperation_002() runs on GeneralComp {
+		var ExampleType v_int := valueof(m_template);
+	
+		// if we get here, something must be wrong as valueof on m_template shall cause an error
+		// due to the * and ? wildcards.
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_002());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A specific value was expected instead of any value
+<END_RESULT>
+<RESULT COUNT 1>
+error: A specific value was expected instead of any or omit
+<END_RESULT>
+
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_003 Ensure that the valueof function works correctly on regular value templates. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_003 NegSem_1510_ValueOfOperation_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10,  Ensure that the valueof function works correctly on regular value templates.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1510_ValueOfOperation_003 {
+
+	type component GeneralComp { }
+
+	type record ExampleType {
+		integer field1,
+		boolean field2
+	}
+
+	testcase TC_NegSem_1510_ValueOfOperation_003() runs on GeneralComp {
+		var template ExampleType f_first := {
+			field1 := (1, 2),
+			field2 := true
+		};
+
+		var ExampleType v_second := valueof(f_first);
+	
+		// if we get here, something must be wrong as valueof on m_template shall cause an error
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_003());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_004 Ensure that the valueof function works correctly on range templates. >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_004 NegSem_1510_ValueOfOperation_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10,  Ensure that the valueof function works correctly on range templates.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1510_ValueOfOperation_004 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_1510_ValueOfOperation_004() runs on GeneralComp {
+		var template integer v_test := (1..5);
+
+		var integer v_second := valueof(v_test);
+	
+		// if we get here, something must be wrong as valueof on v_test shall cause an error
+		// as it is not a template.
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_004());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_005 check that runtime error occurs if valueof is applied to uninitialized template >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_005 NegSem_1510_ValueOfOperation_005.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10, check that runtime error occurs if valueof is applied to uninitialized template
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// The template shall be completely initialized and resolve to a specific value.
+
+module NegSem_1510_ValueOfOperation_005 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_1510_ValueOfOperation_005() runs on GeneralComp {
+		var template integer v_test;
+
+		var integer v_second := valueof(v_test);
+	
+		// if we get here, something must be wrong as valueof on v_test shall cause an error
+		// as it is not a template.
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_005());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1510_ValueOfOperation_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1510_006 check that runtime error occurs if valueof is applied to partially initialized template >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1510_ValueOfOperation_006 NegSem_1510_ValueOfOperation_006.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.10, check that runtime error occurs if valueof is applied to partially initialized template
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// The template shall be completely initialized and resolve to a specific value.
+
+module NegSem_1510_ValueOfOperation_006 {
+
+	type component GeneralComp { }
+	
+	type record R {
+		integer field1,
+		integer field2
+	}
+
+	testcase TC_NegSem_1510_ValueOfOperation_006() runs on GeneralComp {
+		var template R v_test;
+		var R v_result; 
+		v_test.field1 := 1; // field2 is left uninitialized
+		v_result := valueof(v_test);
+	
+		// if we get here, something must be wrong as valueof on v_test shall cause an error
+		// as it is not a template.
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1510_ValueOfOperation_006());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 1511_concatenating_templates_of_string_and_list_types folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1511_001 Ensure that concatenation of octetstring types yields an even number of digits. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001 NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.11, Ensure that concatenation of octetstring types yields an even number of digits.
+ ** @verdict  pass reject
+ *****************************************************************/
+//Note: see CR5805 regarding corresponding BNF update
+
+module NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001() runs on GeneralComp {
+		var template octetstring v_str := 'ABCD'O & '?'O & '?E'O;
+
+		// shall cause an error as it would denote 9 (i.e., uneven) number of digits
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Octetstring match contains half octet\(s\)
+<END_RESULT>
+<RESULT COUNT 1>
+error: at or before token `'O': syntax error, unexpected OctetStringMatch
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1511_003 Ensure that a simple concatenation of non-wildcard octetstring must not yield in a non-even number of hexadecimals. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003 NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.11, Ensure that a simple concatenation of non-wildcard octetstring must not yield in a non-even number of hexadecimals.
+ ** @verdict  pass reject
+ *****************************************************************/
+//Note: see CR5805 regarding corresponding BNF update
+
+module NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003 {
+
+	type component GeneralComp { }
+
+	testcase TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003() runs on GeneralComp {
+		var template octetstring v_str := 'AB'O & '0F'O & '2A'O & 'F'O;
+
+		// shall cause an error as the length of the concantenated octetstring is is uneven
+		setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_003());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Octetstring value contains odd number of hexadecimal digits
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1511_004 Ensure that the inline template definitions are correctly concatenated. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004 NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.11, Ensure that the inline template definitions are correctly concatenated.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004 {
+
+	type component GeneralComp { }
+
+	type record MyRecord {
+		charstring field1,
+		charstring field2
+	}
+
+	template MyRecord m_receiveTemplate := {
+		field1 := pattern "AB*DE",
+		field2 := "ABCC" & * & "EF"	//only specific values allowed when there is no pattern keyword
+	}
+
+	testcase TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004() runs on GeneralComp {
+		var MyRecord v_value := {
+			field1 := "AB*DE",
+			field2 := "ABCCDE*EF"
+		}
+
+		if (match(v_value, m_receiveTemplate)) {
+			setverdict(pass);
+		} else {
+			setverdict(fail);
+		}
+	}
+
+	control{
+		execute(TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_004());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: any or omit is not allowed in charstring template concatenation
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1511_005 Ensure that the inline template definitions are correctly concatenated. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005 NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:15.11, Ensure that the inline template definitions are correctly concatenated.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005 {
+
+	type component GeneralComp { }
+
+	type record MyRecord {
+		charstring field1,
+		charstring field2
+	}
+
+	template MyRecord m_receiveTemplate := {
+		field1 := pattern "AB*DE",
+		field2 := pattern "ABCC" & * length(2) & "EF"	
+		//cannot use length(n) attribute on charstring pattern
+	}
+
+	testcase TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005() runs on GeneralComp {
+		var MyRecord v_value := {
+			field1 := "AB*DE",
+			field2 := "ABCCDE*EF"
+		}
+
+		if (match(v_value, m_receiveTemplate)) {
+			setverdict(pass);
+		} else {
+			setverdict(fail);
+		}
+	}
+
+	control{
+		execute(TC_NegSem_1511_ConcatenatingTemplatesOfStringAndListTypes_005());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `\*': syntax error, unexpected '\*', expecting Identifier or Cstring or CharKeyword
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h1.References
+.*---------------------------------------------------------------------*
+:list.
+:li D='[1]'.1/174 02-CRL 113 200/5 Uen
+:nl.Statement of Compliance for TITAN project
+:li D='[2]'.ETSI ES 201 873-1, v4.7.1 Mockup v1 (2015-06):
+:nl.Testing and Test Control Notation version 3.,
+:nl.Part 1: TTCN-3 Core Language
+:elist.

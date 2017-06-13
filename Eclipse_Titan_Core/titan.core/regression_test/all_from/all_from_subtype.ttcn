@@ -1,0 +1,196 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// subtyping and the 'all from' clause
+module all_from_subtype {
+
+import from types all;
+import from functions all;
+
+/* * * * integer * * * */
+template RoI t_RoI1 := { 1, 2, (6..9) };
+template RoI t_RoI2 := { 1, ?, 3 };
+const RoI c_RoI := { 20, 21, 22 };
+
+template PosInt t_posint1 := (0, all from t_RoI1);
+template PosInt t_posint1_exp := (0, 1, 2, (6..9));
+
+template PosInt t_posint2 := (all from c_RoI, 50, 100);
+template PosInt t_posint2_exp := (20, 21, 22, 50, 100);
+
+template PosInt t_posint3 := (10, all from c_RoI, 30, all from t_RoI1);
+template PosInt t_posint3_exp := (10, 20, 21, 22, 30, 1, 2, (6..9));
+
+template ShortRoI t_sroi1 := { 0, (all from t_RoI1, 10), 20 };
+template ShortRoI t_sroi1_exp := { 0, (1, 2, (6..9), 10), 20 };
+
+template ShortRoI t_sroi2 := ( { 1, 2, 3 }, { permutation (all from t_RoI2) } );
+template ShortRoI t_sroi2_exp := ( { 1, 2, 3 }, { permutation (1, ?, 3) } );
+
+testcase tc_all_from_subtype_integer() runs on A
+{
+  if (log2str(t_posint1) != log2str(t_posint1_exp)) {
+    setverdict(fail, "Expected: ", t_posint1_exp, ", got: ", t_posint1);
+  }
+  if (log2str(t_posint2) != log2str(t_posint2_exp)) {
+    setverdict(fail, "Expected: ", t_posint2_exp, ", got: ", t_posint2);
+  }
+  if (log2str(t_posint3) != log2str(t_posint3_exp)) {
+    setverdict(fail, "Expected: ", t_posint3_exp, ", got: ", t_posint3);
+  }
+  if (log2str(t_sroi1) != log2str(t_sroi1_exp)) {
+    setverdict(fail, "Expected: ", t_sroi1_exp, ", got: ", t_sroi1);
+  }
+  if (log2str(t_sroi2) != log2str(t_sroi2_exp)) {
+    setverdict(fail, "Expected: ", t_sroi2_exp, ", got: ", t_sroi2);
+  }
+  setverdict(pass);
+}
+
+/* * * * float * * * */
+template RoF t_RoF := { (-10.0..-2.5), -1.0, 0.0 };
+const RoF c_RoF := { -0.3, -0.2, -0.1 };
+
+template NegFloat t_negfloat := (all from t_RoF, -2.0, all from c_RoF, -100.0);
+template NegFloat t_negfloat_exp := ((-10.0..-2.5), -1.0, 0.0, -2.0, -0.3, -0.2, -0.1, -100.0);
+
+template ShortRoF t_srof := { permutation (all from c_RoF) };
+template ShortRoF t_srof_exp := { permutation (-0.3, -0.2, -0.1) };
+
+testcase tc_all_from_subtype_float() runs on A
+{
+  if (log2str(t_negfloat) != log2str(t_negfloat_exp)) {
+    setverdict(fail, "Expected: ", t_negfloat_exp, ", got: ", t_negfloat);
+  }
+  if (log2str(t_srof) != log2str(t_srof_exp)) {
+    setverdict(fail, "Expected: ", t_srof_exp, ", got: ", t_srof);
+  }
+  setverdict(pass);
+}
+
+/* * * * bitstring * * * */
+template RoBS t_RoBS := { '1010'B, ? };
+const RoBS c_RoBS := { '11011000'B, '00110011'B, '10101010'B };
+
+template ByteString t_bytestr := ('00000000'B, all from c_RoBS, '11111111'B);
+template ByteString t_bytestr_exp := ('00000000'B, '11011000'B, '00110011'B, '10101010'B, '11111111'B);
+
+template ShortRoBS t_srobs := { '1'B, permutation (all from t_RoBS) };
+template ShortRoBS t_srobs_exp := { '1'B, permutation ('1010'B, ?) };
+
+testcase tc_all_from_subtype_bitstring() runs on A
+{
+  if (log2str(t_bytestr) != log2str(t_bytestr_exp)) {
+    setverdict(fail, "Expected: ", t_bytestr_exp, ", got: ", t_bytestr);
+  }
+  if (log2str(t_srobs) != log2str(t_srobs_exp)) {
+    setverdict(fail, "Expected: ", t_srobs_exp, ", got: ", t_srobs);
+  }
+  setverdict(pass);
+}
+
+/* * * * hexstring * * * */
+template RoHS t_RoHS := { '100'H, 'ABC'H };
+const RoHS c_RoHS := { '19A6'H, '999D'H, '1337'H };
+
+template WordString t_wordstr := ('A000'H, 'FFFF'H, all from c_RoHS, '0000'H);
+template WordString t_wordstr_exp := ('A000'H, 'FFFF'H, '19A6'H, '999D'H, '1337'H, '0000'H);
+
+template ShortRoHS t_srohs := { permutation (all from t_RoHS, '180DD'H) };
+template ShortRoHS t_srohs_exp := { permutation ('100'H, 'ABC'H, '180DD'H) };
+
+testcase tc_all_from_subtype_hexstring() runs on A
+{
+  if (log2str(t_wordstr) != log2str(t_wordstr_exp)) {
+    setverdict(fail, "Expected: ", t_wordstr_exp, ", got: ", t_wordstr);
+  }
+  if (log2str(t_srohs) != log2str(t_srohs_exp)) {
+    setverdict(fail, "Expected: ", t_srohs_exp, ", got: ", t_srohs);
+  }
+  setverdict(pass);
+}
+
+/* * * * octetstring * * * */
+template RoOS t_RoOS := { '00'O, 'FF'O };
+const RoOS c_RoOS := { 'E77FB41C'O, 'DEADBEEF'O, 'CDCDCDCD'O };
+
+template DWordString t_dwordstr := (all from c_RoOS, '0FFFFFFF'O);
+template DWordString t_dwordstr_exp := ('E77FB41C'O, 'DEADBEEF'O, 'CDCDCDCD'O, '0FFFFFFF'O);
+
+template ShortRoOS t_sroos := { permutation (?, all from t_RoOS) };
+template ShortRoOS t_sroos_exp := { permutation (?, '00'O, 'FF'O) };
+
+testcase tc_all_from_subtype_octetstring() runs on A
+{
+  if (log2str(t_dwordstr) != log2str(t_dwordstr_exp)) {
+    setverdict(fail, "Expected: ", t_dwordstr_exp, ", got: ", t_dwordstr);
+  }
+  if (log2str(t_sroos) != log2str(t_sroos_exp)) {
+    setverdict(fail, "Expected: ", t_sroos_exp, ", got: ", t_sroos);
+  }
+  setverdict(pass);
+}
+
+/* * * * charstring * * * */
+template RoCS t_RoCS := { ("a".."z"), ("0".."9"), ("A".."Z") };
+const RoCS c_RoCS := { "all_from.ttcn", "types.ttcn", "functions.ttcn", "sapc.ttcn" };
+
+template TtcnFileName t_ttcnfiles := (all from c_RoCS);
+template TtcnFileName t_ttcnfiles_exp := ("all_from.ttcn", "types.ttcn", "functions.ttcn", "sapc.ttcn");
+
+template ShortRoCS t_srocs := { permutation (all from t_RoCS) };
+template ShortRoCS t_srocs_exp := { permutation (("a".."z"), ("0".."9"), ("A".."Z")) };
+
+testcase tc_all_from_subtype_charstring() runs on A
+{
+  if (log2str(t_ttcnfiles) != log2str(t_ttcnfiles_exp)) {
+    setverdict(fail, "Expected: ", t_ttcnfiles_exp, ", got: ", t_ttcnfiles);
+  }
+  if (log2str(t_srocs) != log2str(t_srocs_exp)) {
+    setverdict(fail, "Expected: ", t_srocs_exp, ", got: ", t_srocs);
+  }
+  setverdict(pass);
+}
+
+/* * * * universal charstring * * * */
+template RoUCS t_RoUCS := { "abc", ?, "cba" };
+const RoUCS c_RoUCS := { "nothing", "special", "here" };
+
+template XsdString t_xsdstr := (pattern "<*>", all from c_RoUCS);
+template XsdString t_xsdstr_exp := (pattern "<*>", "nothing", "special", "here");
+
+template ShortRoUCS t_sroucs := { all from t_RoUCS };
+template ShortRoUCS t_sroucs_exp := { "abc", ?, "cba" };
+
+testcase tc_all_from_subtype_universal_charstring() runs on A
+{
+  if (log2str(t_xsdstr) != log2str(t_xsdstr_exp)) {
+    setverdict(fail, "Expected: ", t_xsdstr_exp, ", got: ", t_xsdstr);
+  }
+  if (log2str(t_sroucs) != log2str(t_sroucs_exp)) {
+    setverdict(fail, "Expected: ", t_sroucs_exp, ", got: ", t_sroucs);
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc_all_from_subtype_integer());
+  execute(tc_all_from_subtype_float());
+  execute(tc_all_from_subtype_bitstring());
+  execute(tc_all_from_subtype_hexstring());
+  execute(tc_all_from_subtype_octetstring());
+  execute(tc_all_from_subtype_charstring());
+  execute(tc_all_from_subtype_universal_charstring());
+}
+
+}

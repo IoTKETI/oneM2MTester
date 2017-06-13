@@ -1,0 +1,343 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module TassignmentNotation
+{
+import from ASN_Definitions language "ASN.1 : 1997" all
+type component empty { }
+type record tri
+{
+  integer a,
+  integer b,
+  integer c
+}
+function f1 () return integer { return 100 }
+type record of tri tritri
+type record of tritri tritritri
+modulepar tritri tsp_param :=
+{
+  { 0, 1, 2 },
+  { 4, 5, 6 }
+}
+modulepar tritritri tsp_param_param :=
+{
+  { { 10, 11, 12 }, { 13, 14, 15 } },
+  { { 16, 17, 18 }, { 19, 20, 21 } }
+}
+modulepar integer tsp_index := 0
+modulepar charstring tsp_editor := "mcedit"
+testcase asns () runs on empty
+{
+  template ASN_SEQ_R asn_temp := { asn_seq_i := { 0, 1, 2 } }
+  template ASN_SEQ_R asn_temp_mod modifies asn_temp := { asn_seq_i := { [1] := 0, [2] := 0 } }
+  var ASN_SEQ_R asn_temp_exp := { asn_seq_i := { 0, 0, 0 } }
+  if (match (asn_temp_exp, asn_temp_mod)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var integer index := 1
+  var ASN_SEQ_I v1 := { 1, 2, 3 }
+  var ASN_SEQ_I v2 := { [0] := 100, [index] := 200, [index + 1] := 300 }
+  var ASN_SEQ_I v1_exp := { 100, 200, 300 }
+  v1[0] := 100 * v1[0]
+  v1[index] := 100 * v1[index + 1 - 1]
+  v1[index + 1] := v2[2]
+  if (v1 != v2) { setverdict (fail, __LINE__) }
+  else { setverdict (pass) }
+  v1 := { 100 }
+  /* Evaluated from left to right.  */
+  v1 := { [sizeof (v1)] := 200, [sizeof (v1)] := 300 }
+  if (v1 != v1_exp) { setverdict (fail, __LINE__) }
+  else { setverdict (pass) }
+  var ASN_SEQ_R v3 := { asn_seq_i := { 1, 2, 3 } }
+  var ASN_SEQ_R v4 := { asn_seq_i := { [index] := 111 } }
+  var ASN_SEQ_R v3_exp := { asn_seq_i := { 11, 22, 33 } }
+  var ASN_SEQ_R v5 := { asn_seq_i := { [1000 + index + sizeof (v3.asn_seq_i)] := 1000 } }
+  v4.asn_seq_i[index] := 22
+  v4 := { asn_seq_i := { [index - 1] := index + 10, [2] := 33 } }
+  v3 := v4
+  v3 := { asn_seq_i := { [index - 1] := 11 } }
+  if (v3 != v3_exp) { setverdict (fail, __LINE__) }
+  else { setverdict (pass) }
+  v4.asn_seq_i[0] := v3.asn_seq_i[0]
+  if (v4 != v3_exp) { setverdict (fail, __LINE__) }
+  else { setverdict (pass) }
+  if (isvalue (v4)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v4.asn_seq_i[index])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v2[valueof (asn_temp_mod.asn_seq_i[0])])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (sizeof (v5.asn_seq_i) == 1005) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (asn_temp_mod)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  /* Template with uninitialized elements.  */
+  template ASN_SEQ_R mod2 modifies asn_temp_mod := { asn_seq_i := { [100] := 0, [200] := 0 } }
+  if (not isvalue (mod2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (mod2.asn_seq_i)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+}
+type record array_element { integer a, integer b }
+type array_element array_elements[4]
+type record of array_element array_record_of
+type record of integer intlist
+type set of integer intset
+testcase arrays () runs on empty
+{
+  var integer first := 0
+  var integer second := 1
+  var integer third := 2
+  var array_element arr2[4]
+  var array_element arr3[14]
+  var array_elements array :=
+  {
+    [first] := { first, 0 },
+    [second] := { 1, second },
+    [third] := { third, 2 },
+    [third + 1] := { 3, third + 1 }
+  }
+  arr2 := array
+  arr2 := { [3] := { 100, third } }
+  arr3 := { [10] := arr2[1] }
+  var array_elements array_expected := { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, third + 1 } }
+  if (array == array_expected) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  template array_elements array_base := { { 100, 200 }, { -1, -2 }, { 1000, 2000 }, { -10, -20 } }
+  template array_elements array_modified modifies array_base :=
+  {
+    [0] := { 0, 0 },
+    [2] := { third, third },
+    [second] := { 1, first + 1 },
+    [third + 1] := { third + 1, 3 }
+  }
+  if (match (array_expected, array_modified)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  /* "array[500 + f1 ()]" is a dynamic test case error.  */
+  if (isvalue (array[500 + f1 () - 599])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (array)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (array[f1 () - f1 () + 1].a)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (arr2[500 + f1 () - 598])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (arr2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (arr3)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (arr2[f1 () - f1 () + 1].a)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (sizeof (arr3) == 14) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  /* Creating holes in arrays is not possible.  (Without dynamic test case
+     error.)  */
+}
+testcase configs () runs on empty
+{
+  template tritri tsp_param_expected :=
+  {
+    { 0, 1, 2 },
+    { 3, 4, 5 },
+    { 33, 22, 11 },
+    { 100, 100, 100 }
+  }
+  var tritri tsp_param_exp2 :=
+  {
+    [0] := { 0, 1, 2 },
+    [1] := { 3, 4, 5 },
+    [2] := { 33, 22, 11 },
+    [3] := { 100, 100, 100 }
+  }
+  var tritri tsp_param_exp3 :=
+  {
+    [0] := { 0, 1, 2 },
+    [3] := { 3, 4, 5 },
+    [2] := { 33, 22, 11 },
+    [1] := { 100, 100, 100 }
+  }
+  if (match (tsp_param, tsp_param_expected)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (tsp_param == tsp_param_exp2) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (tsp_param != tsp_param_exp3) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+}
+type record of my mylist
+type set of my_set myset
+type record my { intlist ilist, integer i }
+type record my_set { intset iset, integer i }
+type record dummy { mylist mlist }
+type record dummy_set { myset mset }
+testcase recofs () runs on empty
+{
+  template dummy t1 := { mlist := { { ilist := { 0 }, i := 0 } } }
+  template dummy t1_mod1 modifies t1 := { mlist := { [0] := { ilist := { 1 } } } }
+  var dummy t1_mod_exp := { mlist := { { ilist := { 1 }, i := 0 } } }
+  if (match (t1_mod_exp, t1_mod1)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var integer index := 0
+  /* An index like "index + 1 - 1" caused circular reference with previous
+     versions.  The name was not set correctly.  */
+  template dummy t1_mod2 modifies t1 := { mlist := { [index + 1 - index - 1] := { ilist := { [0 - index] := index + 1 } } } }
+  if (match (t1_mod_exp, t1_mod2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var intlist v1 := { [0] := 0, [index + 1] := 1 }
+  var intlist v1_exp := { 100, 1 }
+  var intlist v3 := { [100 + f1 ()] := 100 }
+  v1[1] := index + 1
+  v1 := { [0] := 100 }
+  if (v1 == v1_exp) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var dummy v2 := { mlist := { { ilist := { 1, 2 }, i := 500 } } }
+  v2 := { mlist := { { ilist := { [index + 2] := 3 }, i := v2.mlist[index].i - 100 } } }
+  var dummy v2_exp := { mlist := { { ilist := { -, -, 3 }, i := 400 } } }
+  if (v2 == v2_exp) { setverdict (pass) }
+  else { setverdict (fail, __LINE__, ": ", match(v2, v2_exp)) }
+  if (not isvalue (t1_mod2.mlist[500])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (t1_mod2.mlist[0])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (t1_mod2.mlist[1])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v2.mlist[index].ilist[1])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v1)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v1[0])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v3)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v3[200])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (sizeof (v3) == 201) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+}
+testcase setofs () runs on empty
+{ /* Same as the previous.  */
+  template dummy_set t1 := { mset := { { iset := { 0 }, i := 0 } } }
+  template dummy_set t1_mod1 modifies t1 := { mset := { [0] := { iset := { 1 } } } }
+  var dummy_set t1_mod_exp := { mset := { { iset := { 1 }, i := 0 } } }
+  if (match (t1_mod_exp, t1_mod1)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var integer index := 0
+  template dummy_set t1_mod2 modifies t1 := { mset := { [index + 1 - index - 1] := { iset := { [0 - index] := index + 1 } } } }
+  if (match (t1_mod_exp, t1_mod2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var intset v1 := { [0] := 0, [index + 1] := 1 }
+  var intset v1_exp := { 100, 1 }
+  v1[1] := index + 1
+  v1 := { [0] := 100 }
+  if (v1 == v1_exp) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  var dummy_set v2 := { mset := { { iset := { 1, 2 }, i := 500 } } }
+  var dummy_set v2_exp := { mset := { { iset := { -, -, 3 }, i := 400 } } }
+  var intset v3 := { [100 + f1 ()] := 100 }
+  v2 := { mset := { { iset := { [index + 2] := 3 }, i := v2.mset[index].i - 100 } } }
+  if (v2 == v2_exp) { setverdict (pass) }
+  else { setverdict (fail, __LINE__, ": ", match(v2, v2_exp)) }
+  /* It should be a compile only test.  */
+  var ASN_CSTR asnstr
+  asnstr := { { fixed := NULL }, "{ itu-t identified-organization etsi(0) reserved(127) etsi-identified-organization(0) ericsson(5) }", 'abcd'O };
+  var objid oi := objid { itu_t (0) 1 2 }
+  /* Using isvalue.  */
+  if (isvalue (t1_mod2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (t1_mod2.mset)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  /* Indexing with constants was a problem with INDEXED_TEMPLATE_LIST
+     nodes.  */
+  if (not isvalue (t1_mod2.mset[500])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (t1_mod2.mset[0])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (t1_mod2.mset[1])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v2)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v2.mset[index].iset[1])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v1)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v1[0])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (not isvalue (v3)) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (isvalue (v3[200])) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+  if (sizeof (v3) == 201) { setverdict (pass) }
+  else { setverdict (fail, __LINE__) }
+}
+
+type integer intarr[2..5]
+
+testcase tc_TR938_939() runs on empty {
+  // Constants with the same base-types, but initialized in different ways.
+  // All the same.  Evaluated during CP.  It's specific to the mentioned
+  // TR939, but the restructuring for TR938 should make this obsolete.
+  const intlist il1 := { [0] := 0, [1] := 1 }
+  const intlist il2 := { [0] := 0, [1] := 1 }
+  const intlist il3 := { [1] := 1, [0] := 0 }
+  const intlist il4 := { 0, 1 }
+  const intlist il5 := { 1, 0 }
+  const intlist il6 := { 0, 1, 2 }
+  const intlist il7 := { [0] := 0, [1] := 1, [2] := 2 }
+  const intlist il8 := { [2] := 2, [1] := 1, [0] := 0 }
+  if (il1 == il1)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 == il2)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 == il3)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 == il4)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 == il2 and il2 == il3
+      and il3 == il4)            { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 != il5)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 != il6)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 != il7)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (il1 != il8)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  // Initializing value-range arrays.
+  var intarr ia1 := { [2] := 2, [3] := 3, [4] := 4, [5] := 5 }
+  var intarr ia2 := { 2, 3, 4, 5 }
+  if (ia1 == ia2)                { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  // Initializing arrays using dynamic index values.
+  var integer i := 2
+  var intarr ia3 := { [i] := 2, [i] := 2 }
+  ia3[i + 1] := 3; ia3[i + 2] := 4; ia3[i + 3] := 5
+  var intarr ia4 := { [i] := 2, [i] := 2 }
+  ia4[i + 1] := 3; ia4[i + 2] := 4; ia4[i + 3] := 5
+  if (ia3 == ia4) { setverdict(pass) } else { setverdict(fail, __LINE__) }
+}
+
+// Test for TR943.  The code section was not set correctly for references from
+// different modules.  The module of the referenced index should come after
+// this module.  Otherwise, the test is useless.
+template intlist t_intlist := { 0 }
+template intlist tm_intlist modifies t_intlist := { [idx_ASN] := 1 }
+testcase tc_TR943() runs on empty {
+  // Same for values.
+  var intlist il1 := { [idx_ASN] := 1 }
+  if (il1 == { 1 })           { setverdict(pass) } else { setverdict(fail, __LINE__) }
+  if (match(il1, tm_intlist)) { setverdict(pass) } else { setverdict(fail, __LINE__) }
+}
+
+control
+{
+  execute (asns ())
+  execute (recofs ())
+  execute (setofs ())
+  execute (arrays ())
+  execute (configs ())
+  execute (tc_TR938_939 ())
+  execute (tc_TR943 ())
+}
+}

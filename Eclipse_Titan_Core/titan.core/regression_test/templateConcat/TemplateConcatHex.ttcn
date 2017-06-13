@@ -1,0 +1,353 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating hexstring templates
+module TemplateConcatHex {
+
+import from Types all;
+
+const hexstring c_hex := 'ABCD'H;
+
+template hexstring t_hex := ? length(2..2);
+
+template hexstring t_hex1 := 'ABCD'H & ? length (2) & 'EF'H;
+template hexstring t_hex1_exp := 'ABCD??EF'H;
+
+template hexstring t_hex2 := 'ABCD'H & 'EF'H & ? & ? length(1) & 'EF'H;
+template hexstring t_hex2_exp := 'ABCDEF*?EF'H;
+
+template hexstring t_hex3 := ('ABCD'H & ? length(2..2)) length(6);
+template hexstring t_hex3_exp := 'ABCD??'H length(6);
+
+template hexstring t_hex4 := c_hex & ? length (2) & 'EF'H;
+template hexstring t_hex4_exp := 'ABCD??EF'H;
+
+template hexstring t_hex5 := ('ABCD'H & t_hex) length(6);
+template hexstring t_hex5_exp := 'ABCD??'H length(6);
+
+template hexstring t_hex6 := 'ABCD'H & ?;
+template hexstring t_hex6_exp := 'ABCD*'H;
+
+template hexstring t_hex7 := ? & 'EF'H;
+template hexstring t_hex7_exp := '*EF'H;
+
+template hexstring t_hex8 := 'ABCD'H & ? & 'EF'H;
+template hexstring t_hex8_exp := 'ABCD*EF'H;
+
+template hexstring t_hex9 := ? & ?;
+template hexstring t_hex9_exp := ?;
+
+template hexstring t_hex10 := ? & ? & 'EF'H;
+template hexstring t_hex10_exp := '*EF'H;
+
+template hexstring t_hex11 := 'ABCD'H & 'EF'H & ? & ? & ? length(1) & 'EF'H;
+template hexstring t_hex11_exp := 'ABCDEF*?EF'H;
+
+testcase tc_hex_t_w_literals() runs on CT {
+  if (log2str(t_hex1) != log2str(t_hex1_exp)) {
+    setverdict(fail, "Expected: ", t_hex1_exp, ", got: ", t_hex1);
+  }
+  else if (log2str(t_hex2) != log2str(t_hex2_exp)) {
+    setverdict(fail, "Expected: ", t_hex2_exp, ", got: ", t_hex2);
+  }
+  else if (log2str(t_hex3) != log2str(t_hex3_exp)) {
+    setverdict(fail, "Expected: ", t_hex3_exp, ", got: ", t_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_t_w_refs() runs on CT {
+  if (log2str(t_hex4) != log2str(t_hex4_exp)) {
+    setverdict(fail, "Expected: ", t_hex4_exp, ", got: ", t_hex4);
+  }
+  else if (log2str(t_hex5) != log2str(t_hex5_exp)) {
+    setverdict(fail, "Expected: ", t_hex5_exp, ", got: ", t_hex5);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_t_w_any_value() runs on CT {
+  if (log2str(t_hex6) != log2str(t_hex6_exp)) {
+    setverdict(fail, "Expected: ", t_hex6_exp, ", got: ", t_hex6);
+  }
+  else if (log2str(t_hex7) != log2str(t_hex7_exp)) {
+    setverdict(fail, "Expected: ", t_hex7_exp, ", got: ", t_hex7);
+  }
+  else if (log2str(t_hex8) != log2str(t_hex8_exp)) {
+    setverdict(fail, "Expected: ", t_hex8_exp, ", got: ", t_hex8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_t_dbl_any_value() runs on CT {
+  if (log2str(t_hex9) != log2str(t_hex9_exp)) {
+    setverdict(fail, "Expected: ", t_hex9_exp, ", got: ", t_hex9);
+  }
+  else if (log2str(t_hex10) != log2str(t_hex10_exp)) {
+    setverdict(fail, "Expected: ", t_hex10_exp, ", got: ", t_hex10);
+  }
+  else if (log2str(t_hex11) != log2str(t_hex11_exp)) {
+    setverdict(fail, "Expected: ", t_hex11_exp, ", got: ", t_hex11);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_w_literals() runs on CT {
+  var template hexstring vt_hex1 := 'ABCD'H & ? length (2) & 'EF'H;
+  var template hexstring vt_hex1_exp := 'ABCD??EF'H;
+  
+  var template hexstring vt_hex2 := 'ABCD'H & 'EF'H & ? & ? length(1) & 'EF'H;
+  var template hexstring vt_hex2_exp := 'ABCDEF*?EF'H;
+  
+  var template hexstring vt_hex3 := ('ABCD'H & ? length(2..2)) length(6);
+  var template hexstring vt_hex3_exp := 'ABCD??'H length(6);
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_w_refs() runs on CT {
+  var integer v_len := 3;
+  var hexstring v_hex := 'EF'H;
+  var template hexstring vt_hex := ?;
+
+  var template hexstring vt_hex1 := c_hex & ? length (2) & 'EF'H;
+  var template hexstring vt_hex1_exp := 'ABCD??EF'H;
+  
+  var template hexstring vt_hex2 := 'ABCD'H & v_hex & vt_hex & ? length(v_len) & v_hex;
+  var template hexstring vt_hex2_exp := 'ABCDEF*???EF'H;
+  
+  var template hexstring vt_hex3 := ('ABCD'H & t_hex) length(6);
+  var template hexstring vt_hex3_exp := 'ABCD??'H length(6);
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_w_any_value() runs on CT {
+  var template hexstring vt_hex1 := 'ABCD'H & ?;
+  var template hexstring vt_hex1_exp := 'ABCD*'H;
+  
+  var template hexstring vt_hex2 := ? & 'EF'H;
+  var template hexstring vt_hex2_exp := '*EF'H;
+  
+  var template hexstring vt_hex3 := 'ABCD'H & ? & 'EF'H;
+  var template hexstring vt_hex3_exp := 'ABCD*EF'H;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_dbl_any_value() runs on CT {
+  var integer v_len := 3;
+
+  var template hexstring vt_hex1 := ? & ?;
+  var template hexstring vt_hex1_exp := ?;
+  
+  var template hexstring vt_hex2 := ? & ? & 'EF'H;
+  var template hexstring vt_hex2_exp := '*EF'H;
+  
+  var template hexstring vt_hex3 := 'ABCD'H & 'EF'H & ? & ? & ? length(v_len - 1) & 'EF'H;
+  var template hexstring vt_hex3_exp := 'ABCDEF*??EF'H;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_dbl_any_value_w_refs() runs on CT {
+  var template hexstring vt_hex := ?;
+  
+  var template hexstring vt_hex1 := vt_hex & ?;
+  var template hexstring vt_hex1_exp := ?;
+  
+  var template hexstring vt_hex2 := ? & vt_hex;
+  var template hexstring vt_hex2_exp := ?;
+  
+  var template hexstring vt_hex3 := vt_hex & vt_hex;
+  var template hexstring vt_hex3_exp := ?;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "1st test. Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "2nd test. Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "3rd test. Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_w_str_elem() runs on CT {
+  var hexstring v_hex := 'EF'H;
+  var hexstring v_hex2 := 'ABCD'H;
+
+  var template hexstring vt_hex1 := v_hex[0] & ?;
+  var template hexstring vt_hex1_exp := 'E*'H;
+  
+  var template hexstring vt_hex2 := 'AB'H & ? length(3) & v_hex2[2];
+  var template hexstring vt_hex2_exp := 'AB???C'H;
+  
+  var template hexstring vt_hex3 := ? & v_hex2[0];
+  var template hexstring vt_hex3_exp := '*A'H;
+  
+  var template hexstring vt_hex4 := v_hex2[1] & vt_hex1_exp;
+  var template hexstring vt_hex4_exp := 'BE*'H;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else if (log2str(vt_hex4) != log2str(vt_hex4_exp)) {
+    setverdict(fail, "Expected: ", vt_hex4_exp, ", got: ", vt_hex4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { omit, '12A'H, omit, omit, omit, omit, omit };
+
+  var template hexstring vt_hex1 := 'EF'H & ? length(1) & v_rec.hs;
+  var template hexstring vt_hex1_exp := 'EF?12A'H;
+  
+  var template hexstring vt_hex2 := v_rec.hs & vt_hex1_exp;
+  var template hexstring vt_hex2_exp := '12AEF?12A'H;
+  
+  var template hexstring vt_hex3 := ? & v_rec.hs;
+  var template hexstring vt_hex3_exp := '*12A'H;
+  
+  var template hexstring vt_hex4 := v_rec.hs & ?;
+  var template hexstring vt_hex4_exp := '12A*'H;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else if (log2str(vt_hex4) != log2str(vt_hex4_exp)) {
+    setverdict(fail, "Expected: ", vt_hex4_exp, ", got: ", vt_hex4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_hex_vt_extra() runs on CT {
+  var hexstring v_hex2 := 'ABCD'H;
+  var Rec v_rec := { omit, '12A'H, omit, omit, omit, omit, omit };
+
+  var template hexstring vt_hex1 := v_rec.hs & 'FF'H;
+  var template hexstring vt_hex1_exp := '12AFF'H;
+  
+  var template hexstring vt_hex2 := 'FF'H & v_rec.hs & 'FF'H;
+  var template hexstring vt_hex2_exp := 'FF12AFF'H;
+  
+  var template hexstring vt_hex3 := v_hex2[3] & v_rec.hs;
+  var template hexstring vt_hex3_exp := 'D12A'H;
+  
+  var template hexstring vt_hex4 := v_rec.hs & v_hex2[3];
+  var template hexstring vt_hex4_exp := '12AD'H;
+  
+  if (log2str(vt_hex1) != log2str(vt_hex1_exp)) {
+    setverdict(fail, "Expected: ", vt_hex1_exp, ", got: ", vt_hex1);
+  }
+  else if (log2str(vt_hex2) != log2str(vt_hex2_exp)) {
+    setverdict(fail, "Expected: ", vt_hex2_exp, ", got: ", vt_hex2);
+  }
+  else if (log2str(vt_hex3) != log2str(vt_hex3_exp)) {
+    setverdict(fail, "Expected: ", vt_hex3_exp, ", got: ", vt_hex3);
+  }
+  else if (log2str(vt_hex4) != log2str(vt_hex4_exp)) {
+    setverdict(fail, "Expected: ", vt_hex4_exp, ", got: ", vt_hex4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_hex_t_w_literals());
+  execute(tc_hex_t_w_refs());
+  execute(tc_hex_t_w_any_value());
+  execute(tc_hex_t_dbl_any_value());
+  execute(tc_hex_vt_w_literals());
+  execute(tc_hex_vt_w_refs());
+  execute(tc_hex_vt_w_any_value());
+  execute(tc_hex_vt_dbl_any_value());
+  execute(tc_hex_vt_dbl_any_value_w_refs());
+  execute(tc_hex_vt_w_str_elem());
+  execute(tc_hex_vt_w_opt_fields());
+  execute(tc_hex_vt_extra());
+}
+
+}

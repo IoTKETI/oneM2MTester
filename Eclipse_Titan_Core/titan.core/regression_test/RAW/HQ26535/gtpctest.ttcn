@@ -1,0 +1,35 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module gtpctest {
+import from GTPv2_Types all;
+
+type component gtp {}
+
+const octetstring input := '482400410000831E00CB9A00490001000556000D001842F099460142F09900007B014D000200080057001900CA0AF000011F00080A20011B70828834080000000000000009'O
+
+testcase dec() runs on gtp
+{
+  var PDU_GTPCv2 gtpc := dec_PDU_GTPCv2(input);
+  log(gtpc);
+  if (ispresent(gtpc.gtpcv2_pdu.deleteSessionRequest.fullyQualifiedTEID)) { setverdict(pass); }
+  else { setverdict(fail); }
+  
+  var octetstring reencode := enc_PDU_GTPCv2(gtpc);
+  if (reencode != input) { setverdict(fail, "decode+encode does not match original"); }
+}
+
+control {
+  execute(dec());
+}
+
+}

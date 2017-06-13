@@ -1,0 +1,73 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+//^In TTCN-3 module `B_APU_SE'://
+// This module is
+// 1. a module with "public import from A_SE all;" to test import statement located in next modules and this module
+// 2. a module which is a friend of A
+// 3. a module whose friend is C_BPU_SE.ttcn
+module B_APU_SE {
+
+public import from A_SE all;
+
+friend module C_BPU_SE;
+
+type component MTC {};
+
+//==CONST===
+const integer c_B_i := 0;
+public const integer c_B_i_pu := 0;
+friend const integer c_B_i_fr := 0;
+private const integer c_B_i_pr := 0;
+
+//==TEMPLATES===
+template integer t_B_i := 0;
+public template integer t_B_i_pu := 0;
+friend template integer t_B_i_fr := 0;
+private template integer t_B_i_pr := 0;
+
+//===TYPES===
+type integer B_MyInt;
+public type integer B_MyInt_pu;
+private type integer B_MyInt_pr;
+friend type integer B_MyInt_fr;
+
+//==functions
+/* public */ function f_B() { log("This is f_C") } 
+public function f_B_pu() { log("This is f_B_pu") } 
+friend function f_B_fr() { log("This is f_B_fr") } 
+private function f_B_pr() { log("This is f_B_pr") }
+
+
+//=============Testcases=========================================
+
+testcase tc_A() runs on MTC { //^In testcase definition `tc_A'://
+  var integer i:=c_A_i;
+  i:=valueof(t_A_i_pu);
+  i:=valueof(t_A_i);
+  var A_MyInt myInt;
+  var A_MyInt_pu myInt_pu;
+  f_A();
+  f_A_pu();
+
+  i:=c_A_i_fr; 
+  i:=valueof(t_A_i_fr); 
+  var A_MyInt myInt_fr; 
+  f_A_fr();
+  
+  i:=c_A_i_pr;//^In variable assignment:// //^error: There is no local or imported definition with name `c_A_i_pr'//
+  i:=valueof(t_A_i_pr);//^In variable assignment:// //^In the operand of operation `valueof\(\)'// //^error: There is no local or imported definition with name `t_A_i_pr'//
+  var A_MyInt_pr a_myInt_pr; //^In variable definition `a_myInt_pr'// //^error: There is no local or imported definition with name `A_MyInt_pr'//
+  f_A_pr();//^In function or altstep instance:// //^error: There is no local or imported definition with name `f_A_pr'//
+  setverdict(pass);  
+}
+
+}

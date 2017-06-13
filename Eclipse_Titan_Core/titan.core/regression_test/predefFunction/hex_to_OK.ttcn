@@ -1,0 +1,279 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module hex_to_OK {
+
+type component PDTestComponent {};
+
+/*--- HEX2BIT --------------------------------------------------*/
+
+modulepar bitstring h2bpar := hex2bit(''H)
+modulepar bitstring h2bpar1 := hex2bit('000000'H & ''H & '111111'H)
+modulepar bitstring h2bpar2 := hex2bit(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+const     bitstring h2bcon2 := hex2bit(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+modulepar bitstring h2bpar3 := hex2bit(('000000'H <@ lengthof(h2bcon2)/2) & ''H & ('111111'H @> lengthof(h2bcon2)/2))
+modulepar bitstring h2bpar4 := hex2bit((not4b 'FFFFFF'H) & '111111'H)
+modulepar bitstring h2bpar5 := hex2bit('000000111111'H and4b '000000111111'H)
+modulepar bitstring h2bpar6 := hex2bit('000000000000'H or4b  '000000111111'H)
+modulepar bitstring h2bpar7 := hex2bit('000000000000'H xor4b '000000111111'H)
+
+const bitstring h2bparb := '000000000000000000000000000100010001000100010001'B
+
+testcase hex_to_bit() runs on PDTestComponent{
+
+	if ((h2bpar == hex2bit(''H))
+	and (h2bpar == ''B))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar1 == hex2bit('000000'H & ''H & '111111'H))
+	and (h2bpar1 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar2 == hex2bit(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2bpar2 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar3 == hex2bit(('000000'H <@ lengthof(h2bpar2)/2) & ''H & ('111111'H @> lengthof(h2bpar2)/2)))
+	and (h2bpar3 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar4 == hex2bit((not4b 'FFFFFF'H) & '111111'H))
+	and (h2bpar4 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar5 == hex2bit('000000111111'H and4b '000000111111'H))
+	and (h2bpar5 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar6 == hex2bit('000000000000'H or4b  '000000111111'H))
+	and (h2bpar6 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2bpar7 == hex2bit('000000000000'H xor4b '000000111111'H))
+	and (h2bpar7 == h2bparb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+/*--- HEX2INT --------------------------------------------------*/
+
+modulepar integer h2ipar := hex2int(''H)
+modulepar integer h2ipar1 := hex2int('FFF'H & 'FFFF'H)
+modulepar integer h2ipar2 := hex2int((not4b 'FFF'H) & 'FFFF'H)
+modulepar integer h2ipar3 := hex2int(('FFF'H and4b '000'H) & 'FFFF'H)
+modulepar integer h2ipar4 := hex2int(('000'H or4b '000'H) & 'FFFF'H)
+modulepar integer h2ipar5 := hex2int(('0FF'H xor4b '0FF'H) & 'FFFF'H)
+modulepar integer h2i1_16 := 12345678910111213141516;
+
+testcase hex_to_int() runs on PDTestComponent{
+	var integer i1 := 12345678910111213141516
+	var hexstring hs1 := '000000000000029D42B65689328BBE0C'H
+	var integer b;
+
+	if ((h2ipar == hex2int(''H))
+	and (h2ipar == 0))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2ipar1 == hex2int('FFF'H & 'FFFF'H))
+	and (h2ipar1 == 268435455))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	b := hex2int((not4b 'FFF'H) & 'FFFF'H)
+	if ((h2ipar2 == b)
+	and (h2ipar2 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	b := hex2int(('FFF'H and4b '000'H) & 'FFFF'H)
+	if ((h2ipar3 == b)
+	and (h2ipar3 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	b := hex2int(('000'H or4b '000'H) & 'FFFF'H)
+	if ((h2ipar4 == b)
+	and (h2ipar4 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	b := hex2int(('0FF'H xor4b '0FF'H) & 'FFFF'H)
+	if ((h2ipar5 == b)
+	and (h2ipar5 == 65535))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if (hex2int(hs1) == i1)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (hex2int('000000000000029D42B65689328BBE0C'H) == h2i1_16)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (hex2int(hs1) == 12345678910111213141516)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if (hex2int('029D42B65689328BBE0C'H) == h2i1_16)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j
+	for (j:=0; j<4096; j:=j+1) {
+	if (hex2int(int2hex(j,3)) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+
+/*--- HEX2OCT --------------------------------------------------*/
+
+modulepar octetstring h2opar := hex2oct(''H)
+modulepar octetstring h2opar1 := hex2oct('000000'H & ''H & '111111'H)
+modulepar octetstring h2opar2 := hex2oct(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+modulepar octetstring h2opar3 := hex2oct(('000000'H <@ 3) & ''H & ('111111'H @> 3))
+modulepar octetstring h2opar4 := hex2oct((not4b 'FFFFFF'H) & '111111'H)
+modulepar octetstring h2opar5 := hex2oct('000000111111'H and4b '000000111111'H)
+modulepar octetstring h2opar6 := hex2oct('000000000000'H or4b  '000000111111'H)
+modulepar octetstring h2opar7 := hex2oct('000000000000'H xor4b '000000111111'H)
+modulepar octetstring h2opar8 := hex2oct('00011'H)
+modulepar octetstring h2opar9 := hex2oct('1'H)
+
+modulepar octetstring h2oparo := '000000111111'O
+
+testcase hex_to_oct() runs on PDTestComponent{
+
+	if ((h2opar == hex2oct(''H))
+	and (h2opar == ''O))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar1 == hex2oct('000000'H & ''H & '111111'H))
+	and (h2opar1 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar2 == hex2oct(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2opar2 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar3 == hex2oct(('000000'H <@ 3) & ''H & ('111111'H @> 3)))
+	and (h2opar3 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar4 == hex2oct((not4b 'FFFFFF'H) & '111111'H))
+	and (h2opar4 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar5 == hex2oct('000000111111'H and4b '000000111111'H))
+	and (h2opar5 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar6 == hex2oct('000000000000'H or4b  '000000111111'H))
+	and (h2opar6 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar7 == hex2oct('000000000000'H xor4b '000000111111'H))
+	and (h2opar7 == h2oparo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar8 == hex2oct('00011'H))
+	and (h2opar8 == '000011'O))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2opar9 == hex2oct('1'H))
+	and (h2opar9 == '01'O))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+
+}
+
+/*--- HEX2STR --------------------------------------------------*/
+
+modulepar charstring h2spar := hex2str(''H)
+modulepar charstring h2spar1 := hex2str('000000'H & ''H & '111111'H)
+modulepar charstring h2spar2 := hex2str(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6))
+modulepar charstring h2spar3 := hex2str(('000000'H <@ 3) & ''H & ('111111'H @> 3))
+modulepar charstring h2spar4 := hex2str((not4b 'FFFFFF'H) & '111111'H)
+modulepar charstring h2spar5 := hex2str('000000111111'H and4b '000000111111'H)
+modulepar charstring h2spar6 := hex2str('000000000000'H or4b  '000000111111'H)
+modulepar charstring h2spar7 := hex2str('000000000000'H xor4b '000000111111'H)
+
+modulepar charstring h2spars := "000000111111"
+
+testcase hex_to_str() runs on PDTestComponent{
+
+	if ((h2spar == hex2str(''H))
+	and (h2spar == ""))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar1 == hex2str('000000'H & ''H & '111111'H))
+	and (h2spar1 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar2 == hex2str(substr('000000111111'H,0,6) & ''H & substr('000000111111'H,6,6)))
+	and (h2spar2 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar3 == hex2str(('000000'H <@ 3) & ''H & ('111111'H @> 3)))
+	and (h2spar3 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar4 == hex2str((not4b 'FFFFFF'H) & '111111'H))
+	and (h2spar4 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar5 == hex2str('000000111111'H and4b '000000111111'H))
+	and (h2spar5 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar6 == hex2str('000000000000'H or4b  '000000111111'H))
+	and (h2spar6 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	if ((h2spar7 == hex2str('000000000000'H xor4b '000000111111'H))
+	and (h2spar7 == h2spars))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+
+control {
+	execute (hex_to_bit());
+	execute (hex_to_int());
+	execute (hex_to_oct());
+	execute (hex_to_str());
+}
+
+}

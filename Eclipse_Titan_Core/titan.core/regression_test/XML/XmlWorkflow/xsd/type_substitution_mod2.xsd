@@ -1,0 +1,35 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:A="www.example.org/type/substitution/mod1"
+            targetNamespace="www.example.org/type/substitution/mod2"
+            xmlns="www.example.org/type/substitution/mod2">
+<xsd:import namespace="www.example.org/type/substitution/mod1" schemaLocation="type_substitution_mod1.xsd"/>
+
+<xsd:element name="subsgroup" type="A:ParentType" abstract="true" />
+
+<xsd:complexType name="extendedType" block="restriction">
+	<xsd:complexContent>
+		<xsd:extension base="A:ParentType">
+			<xsd:sequence>
+			</xsd:sequence>
+			<xsd:attribute name="attr1" type="xsd:string" />
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="restrictedExtendedType">
+	<xsd:complexContent>
+		<xsd:restriction base="extendedType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr1" type="xsd:string" use="prohibited" />
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:element name="nameTest" type="A:restrictedType"/>
+
+<xsd:element name="nameTest2" type="extendedType"/>
+
+</xsd:schema>

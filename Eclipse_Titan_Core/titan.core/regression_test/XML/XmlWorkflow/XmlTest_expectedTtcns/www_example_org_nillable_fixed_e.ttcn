@@ -1,0 +1,110 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_nillable_fixed.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Thu Sep 10 10:18:35 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- nillable_fixed.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/nillable/fixed" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_nillable_fixed {
+
+
+import from XSD all;
+
+
+const XSD.Integer c_defaultForEmpty_1 := 1;
+
+
+type record RemarkNillable
+{
+	XSD.String content optional
+}
+with {
+  variant "name as uncapitalized";
+  variant "useNil";
+  variant "element";
+};
+
+
+type record E16c
+{
+	XSD.Integer foo,
+	record {
+		XSD.String content optional
+	} bar
+}
+with {
+  variant "name as uncapitalized";
+  variant "element";
+  variant (bar) "useNil";
+};
+
+
+type record SeqNillable
+{
+	XSD.Integer bar optional,
+	XSD.Integer foo (c_defaultForEmpty_1) optional,
+	record {
+		record {
+			XSD.String content optional
+		} forename,
+		record {
+			XSD.String content optional
+		} surname optional,
+		record of record {
+			XSD.String content optional
+		} livingAddress_list
+	} content optional
+}
+with {
+  variant "useNil";
+  variant "element";
+  variant (bar) "attribute";
+  variant (foo) "defaultForEmpty as c_defaultForEmpty_1";
+  variant (foo) "attribute";
+  variant (content.forename) "useNil";
+  variant (content.surname) "useNil";
+  variant (content.livingAddress_list) "untagged";
+  variant (content.livingAddress_list[-]) "name as 'livingAddress'";
+  variant (content.livingAddress_list[-]) "useNil";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/nillable/fixed'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

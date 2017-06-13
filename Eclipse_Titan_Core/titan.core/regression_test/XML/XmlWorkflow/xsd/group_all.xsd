@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema  xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:ns="www.example.org"
+targetNamespace="www.example.org">
+
+<annotation><documentation xml:lang="EN">GROUP DEFINITIONS</documentation></annotation>
+
+<xs:group name="shipAndBillAll">
+  <xs:all>
+    <xs:element name="shipTo" type="xs:string"/>
+    <xs:element name="billTo" type="xs:string"/>
+  </xs:all>
+</xs:group>
+
+<xs:group name="storeAndDeliverAll">
+  <xs:all>
+    <xs:element name="store" type="xs:string"/>
+    <xs:element name="deliver" type="xs:string"/>
+  </xs:all>
+</xs:group>
+
+<annotation><documentation xml:lang="EN">GROUP REFERENCES</documentation></annotation>
+
+<xs:complexType name="TwoReferencedAllGroups">
+	<annotation><documentation xml:lang="EN">all group</documentation></annotation>
+	<xs:group   ref="ns:shipAndBillAll"/>
+	<xs:group   ref="ns:storeAndDeliverAll"/> <!--IS THIS ALLOWED BY XSD? (not accepted by the OSS converter) -->
+</xs:complexType>
+
+</schema>
+

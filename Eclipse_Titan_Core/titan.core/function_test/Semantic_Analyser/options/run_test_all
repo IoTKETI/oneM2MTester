@@ -1,0 +1,23 @@
+#! /usr/bin/perl -w
+use strict;
+
+# Don't change the current directory. This test doesn't play well with
+# harness.pl and Cwd of perl 5.005_03 has a broken abs_path.
+
+my $fail = 0;
+
+# Run all tests but remember if any of them failed.
+
+$fail |= system qw'../cw.pl -s     quitter3.ttcn'; 
+$fail |= system qw'../cw.pl -s -Q1 quitter3Q1.ttcn';
+$fail |= system qw'../cw.pl -s -Q2 quitter3Q2.ttcn';
+
+$fail |= system qw'../cw.pl -s -S     quitter3S.ttcn'; 
+$fail |= system qw'../cw.pl -s -S -Q1 quitter3Q1S.ttcn';
+$fail |= system qw'../cw.pl -s -S -Q2 quitter3Q2S.ttcn';
+
+do {
+  system('echo "makeitfail" >options_TD.script_error');
+  $! = 42; # errno (exit code used by die)
+  die "some tests failed";
+} if  $fail;

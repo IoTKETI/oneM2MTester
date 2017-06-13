@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/type/substitution/elem/in/ct/mod1"
+ targetNamespace="www.example.org/type/substitution/elem/in/ct/mod1"
+ blockDefault="restriction">
+
+<xsd:element name="Complex">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element name="string" type="xsd:string"/>
+			<xsd:element name="parentType" type="this:ParentType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:simpleType name="stringtype">
+	<xsd:restriction base="string"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="stringtype2">
+	<xsd:restriction base="this:stringtype">
+		<xsd:length value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="ParentType">
+	<xsd:sequence>
+		<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string" />
+		<xsd:element name="bar" type="xsd:string"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="restrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ParentType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="1" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="morerestrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="this:restrictedType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="2" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+</xsd:schema>

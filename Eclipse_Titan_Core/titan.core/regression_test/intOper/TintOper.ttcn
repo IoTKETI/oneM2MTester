@@ -1,0 +1,1077 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Forstner, Matyas
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Janos Zoltan – initial implementation
+ *
+ ******************************************************************************/
+module TintOper
+{const integer TintOper_const1:=2;
+type component intOper_comptype { };
+
+type port PCOType message
+{
+  inout integer
+  inout eint1
+  inout rint1
+}
+
+type component bigIntOper_comptype { port PCOType comp_port }
+
+template integer tint1 := -12345678910111213141516
+template integer tint2 := 123456789101112131415
+template integer tint3 := -11111111111111111111111
+template integer tint4 := 111111111111111111111
+type enumerated eint1 {ec1(-1), ec2(2147483647), ec3(-2147483647)}
+type record rint1 {
+  integer f1,
+  integer f2,
+  integer f3,
+  integer f4
+}
+
+template integer t_param1(rint1 par) := par.f2;  // parameterised template
+
+modulepar integer par_unbound;
+modulepar integer par_bound := 42;
+
+testcase intAssign() runs on intOper_comptype
+{ var integer x1:=123;
+  var integer x4:=x1;
+  var integer x2,x3;
+  x2:=124;
+  x3:=x2;
+  if (x1==123) {setverdict(pass);}	//at declaration, value
+     else {setverdict(fail);}
+  if (x4==123) {setverdict(pass);}	//at declaration, variable
+     else {setverdict(fail);}
+  if (x2==124) {setverdict(pass);}	//later, value
+     else {setverdict(fail);}
+  if (x3==124) {setverdict(pass);}	//later, variable
+     else {setverdict(fail);}
+}
+
+testcase intConst() runs on intOper_comptype {
+const integer TintOper_const3:=5;
+if (TintOper_const1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+//if (TintOper_const2==2) {setverdict(pass);}	//control part
+//     else {setverdict(fail);}
+if (TintOper_const3==5) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+}
+
+testcase intCompEq() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=100;
+  x3:=200;
+  if (x1==x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x3==x2)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1==100) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1==1010)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (100==x1) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(1001==x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (100==100) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(1100==100)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intCompNotEq() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=200;
+  x3:=100;
+  if (x1!=x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1!=x3)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1!=150) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1!=100)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (120!=x2) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(200!=x2)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (111!=112) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(111!=111)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intCompLess() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=100;
+  x3:=200;
+  if (x1<x3) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1<x2)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x3<x1)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1<110) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1<100)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x2<90)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (100<x3) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(100<x2)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(110<x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (100<120) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(100<100)) {setverdict(pass);} //value_value
+   else {setverdict(fail);}
+  if (not(110<10)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intCompLessEq() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=100;
+  x3:=200;
+  if (x1<=x3) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1<=x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x3<=x1)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1<=110) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x1<=100) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x2<=90)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (100<=x3) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (100<=x2) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(110<=x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (100<=120) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (100<=100) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(110<=10)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intCompGreat() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=100;
+  x3:=200;
+  if (x3>x1) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1>x2)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1>x3)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1>99) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x1>100)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x2>110)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (210>x3) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(100>x2)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(90>x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (130>120) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(100>100)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(10>110)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intCompGreatEq() runs on intOper_comptype
+{ var integer x1,x2,x3;
+  x1:=100;
+  x2:=100;
+  x3:=200;
+  if (x3>=x1) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1>=x2) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (not(x1>=x3)) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x1>=99) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x1>=100) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (not(x2>=110)) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (210>=x3) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (100>=x2) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (not(90>=x1)) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (130>=120) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (100>=100) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (not(10>=110)) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intAdd() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6,x7,x8,x9;
+  const integer x10:=-100,x11:=-200,x12:=x10+x11;
+  x1:=125;
+  x2:=1000;
+  x3:=x1+x2;
+  x4:=x2+456;
+  x5:=100+x1;
+  x6:=100+234;
+  x7:=-100;
+  x8:=-200;
+  x9:=x7+x8;
+  if (x3==1125) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==1456) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==225) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==334) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (x9==-300) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x7+x8==-300) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (-100+-200==-300) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x12==-300) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x10+x11==x12) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (-100+-200==x12) {setverdict(pass);}
+   else {setverdict(fail);}
+}
+
+testcase intSubs() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6;
+  x1:=125;
+  x2:=1125;
+  x3:=x1-x2;
+  x4:=x2-102;
+  x5:=100-x1;
+  x6:=100-234;
+  if (x3==-1000) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==1023) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==-25) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==-134) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intMultipl() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17;
+  x1:=12;
+  x2:=10;
+  x3:=x1*x2;
+  x4:=x2*-2;
+  x5:=10*x1;
+  x6:=-2*3;
+  x7:=3*-2;
+  x8:=-2*-3;
+  x9:=-x1*x2;
+  x10:=-x1*-x2;
+  x11:=x1*-x2;
+  x12:=1000000;
+  x13:=x12*x2;
+  x14:=-x2*x12;
+  x15:=-x12*-x2;
+  x16:=1000000*10;
+  x17:=-10*1000000;
+  if (x3==120) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==-20) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==120) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==-6) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (x7==-6) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x8==6) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x9==-120) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x10==120) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x11==-120) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x13==10000000) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x14==-10000000) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x15==10000000) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x16==10000000) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x17==-10000000) {setverdict(pass);}
+   else {setverdict(fail);}
+}
+
+testcase intDiv() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6,x7,x8;
+  x1:=-125;
+  x2:=501;
+  x3:=x2/x1;
+  x4:=x2/50;
+  x5:=252/x1;
+  x6:=102/-25;
+  x7:=-102/-25;
+  x8:=-25/102;
+  if (x3==-4) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==10) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==-2) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==-4) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  if (x7==4) {setverdict(pass);}
+   else {setverdict(fail);}
+  if (x8==0) {setverdict(pass);}
+   else {setverdict(fail);}
+}
+
+testcase intMod() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6;
+  x1:=-125;
+  x2:=503;
+  x3:=x2 mod x1;
+  x4:=x2 mod 50;
+  x5:=254 mod x1;
+  x6:=102 mod -25;			// positive x
+  if (x3==3) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==3) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==4) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==2) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  x2:=-503;
+  x3:=x2 mod x1;
+  x4:=x2 mod 50;
+  x5:=-254 mod x1;
+  x6:=-102 mod -25;			// negative x
+  if (x3==122) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==47) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==121) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==23) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+testcase intRem() runs on intOper_comptype
+{ var integer x1,x2,x3,x4,x5,x6;
+  x1:=-125;
+  x2:=503;
+  x3:=x2 rem x1;
+  x4:=x2 rem 50;
+  x5:=254 rem x1;
+  x6:=102 rem -25;			// positive x
+  if (x3==3) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==3) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==4) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==2) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+  x2:=-503;
+  x3:=x2 rem x1;
+  x4:=x2 rem 50;
+  x5:=-254 rem x1;
+  x6:=-102 rem -25;			// negative x
+  if (x3==-3) {setverdict(pass);}	//variable_variable
+   else {setverdict(fail);}
+  if (x4==-3) {setverdict(pass);}	//variable_value
+   else {setverdict(fail);}
+  if (x5==-4) {setverdict(pass);}	//value_variable
+   else {setverdict(fail);}
+  if (x6==-2) {setverdict(pass);}	//value_value
+   else {setverdict(fail);}
+}
+
+/*
+testcase intShiftRight1() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=234;
+  x2:=x1 >> 1;
+  if (x2==117) {setverdict(pass);}	//variable
+     else {setverdict(fail);}
+}
+
+testcase intShiftRight2() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=234;
+  x2:=x1 >> 2;
+  if (x2==58) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase intShiftRightSum() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=234;
+  x2:=x1 >> (1+1);
+  if (x2==58) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase intShiftLeft1() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=112;
+  x2:=x1 << 1;
+  if (x2==224) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase intShiftLeft2() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=112;
+  x2:=x1 << 2;
+  if (x2==448) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase intShiftLeftSum() runs on intOper_comptype
+{ var integer x1,x2;
+  x1:=112;
+  x2:=x1 << (1+1);
+  if (x2==448) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+*/
+
+testcase bigIntConst() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  comp_port.send(-12345678910111213141516)
+  comp_port.send(123456789101112131415)
+  comp_port.send(-1234567891011121314)
+  comp_port.send(12345678910111213)
+  T.start
+  alt {
+    [11111111111111111111 > 0]                    comp_port.receive(-12345678910111213141516) { setverdict(pass) repeat }
+    [22222222222222222222 > 11111111111111111111] comp_port.receive(123456789101112131415)    { setverdict(pass) repeat }
+    [33333333333333333333 > 22222222222222222222] comp_port.receive(-1234567891011121314)     { setverdict(pass) repeat }
+    [44444444444444444444 > 33333333333333333333] comp_port.receive(12345678910111213)        { setverdict(pass) }
+    [] T.timeout { setverdict(fail) }
+  }
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntVar() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  const integer ca := 0
+  const integer cb := 11111111111111111111
+  const integer cc := 22222222222222222222
+  const integer cd := 33333333333333333333
+  const integer ce := 44444444444444444444
+  var integer a := -12345678910111213141516
+  var integer b := 123456789101112131415
+  var integer c := -1234567891011121314
+  var integer d := 123456789101112131
+  comp_port.send(a)
+  comp_port.send(b)
+  comp_port.send(c)
+  comp_port.send(d)
+  T.start
+  alt {
+    [cb > ca] comp_port.receive(a) { setverdict(pass) repeat }
+    [cc > cb] comp_port.receive(b) { setverdict(pass) repeat }
+    [cd > cc] comp_port.receive(c) { setverdict(pass) repeat }
+    [ce > cd] comp_port.receive(d) { setverdict(pass) }
+    [] T.timeout { setverdict(fail) }
+  }
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntTemplate() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  var integer a := -12345678910111213141516
+  var integer b := 123456789101112131415
+  var integer c := -11111111111111111111111
+  var integer d := 111111111111111111111
+  // No `valueof' on large integer templates.  Only values can be sent on
+  // ports due to interface problems.
+  comp_port.send(a)
+  comp_port.send(b)
+  comp_port.send(c)
+  comp_port.send(d)
+  T.start
+  alt {
+    [] comp_port.receive(tint1) { setverdict(pass) repeat }
+    [] comp_port.receive(tint2) { setverdict(pass) repeat }
+    [] comp_port.receive(tint3) { setverdict(pass) repeat }
+    [] comp_port.receive(tint4) { setverdict(pass) }
+    [] T.timeout { setverdict(fail) }
+  }
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntVariableTemplate() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  var integer a := -12345678910111213141516
+  var integer b := 123456789101112131415
+  var integer c := -11111111111111111111111
+  var integer d := 111111111111111111111
+  var template integer vtint1 := a
+  var template integer vtint2 := b
+  var template integer vtint3 := -11111111111111111111111
+  var template integer vtint4 := 111111111111111111111
+  comp_port.send(a)
+  comp_port.send(b)
+  comp_port.send(c)
+  comp_port.send(d)
+  T.start
+  alt {
+    [] comp_port.receive(vtint1) { setverdict(pass) repeat }
+    [] comp_port.receive(vtint2) { setverdict(pass) repeat }
+    [] comp_port.receive(vtint3) { setverdict(pass) repeat }
+    [] comp_port.receive(vtint4) { setverdict(pass) }
+    [] T.timeout { setverdict(fail) }
+  }
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntEnumerated() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  var eint1 veint1 := ec1
+  var eint1 veint2 := ec2
+  var eint1 veint3 := ec3
+  comp_port.send(veint1); T.start; comp_port.receive(veint1) { setverdict(pass) }; T.stop
+  comp_port.send(veint2); T.start; comp_port.receive(veint2) { setverdict(pass) }; T.stop
+  comp_port.send(veint3); T.start; comp_port.receive(veint3) { setverdict(pass) }; T.stop
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntRecord() runs on bigIntOper_comptype
+{
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  var rint1 vrint1 := { 12345678910111213141516, -11111111111111111111, 1234, -12345 }
+  var rint1 vrint2 := { 128, 65536, 4294967296, -4294967296 }
+  var rint1 vrint3 := { 2147483648, -2147483648, 0, -1 }
+  var rint1 vrint4 := { 4294967296, -4294967296, 4294967295, -4294967295 }
+  var rint1 vrint5 := { 4294967297, -4294967297, 2147483648, -2147483648 }
+  var rint1 vrint6 := { 2147483647, -2147483647, 2147483649, -2147483649 }
+  var rint1 vrint7 := { 260217910, -260217910, 1, -1 }
+  comp_port.send(vrint1); T.start; comp_port.receive(vrint1) { setverdict(pass) }; T.stop
+  comp_port.send(vrint2); T.start; comp_port.receive(vrint2) { setverdict(pass) }; T.stop
+  comp_port.send(vrint3); T.start; comp_port.receive(vrint3) { setverdict(pass) }; T.stop
+  comp_port.send(vrint4); T.start; comp_port.receive(vrint4) { setverdict(pass) }; T.stop
+  comp_port.send(vrint5); T.start; comp_port.receive(vrint5) { setverdict(pass) }; T.stop
+  comp_port.send(vrint6); T.start; comp_port.receive(vrint6) { setverdict(pass) }; T.stop
+  comp_port.send(vrint7); T.start; comp_port.receive(vrint7) { setverdict(pass) }; T.stop
+  disconnect(self:comp_port, self:comp_port)
+}
+
+testcase bigIntLogicalOps() runs on bigIntOper_comptype
+{
+  {
+  // Only Cond2/Cond4/Cond6/Cond7/Cond10/Cond11/Cond15/Cond17/Cond18 should
+  // stay.  Test for conditional operators and CP on big integers.
+  if (12345678910111213141516 < 0)  { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 > 0)  { setverdict(pass) }
+  if (12345678910111213141516 == 0) { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 != 0) { setverdict(pass) }
+  if (12345678910111213141516 <= 0) { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 >= 0) { setverdict(pass) }
+  if (0 < 12345678910111213141516)  { setverdict(pass) }
+  if (0 > 12345678910111213141516)  { setverdict(fail) }  // Removed by CP.
+  if (0 == 12345678910111213141516) { setverdict(fail) }  // Removed by CP.
+  if (0 != 12345678910111213141516) { setverdict(pass) }
+  if (0 <= 12345678910111213141516) { setverdict(pass) }
+  if (0 >= 12345678910111213141516) { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 < 12345678910111213141516)  { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 > 12345678910111213141516)  { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 == 12345678910111213141516) { setverdict(pass) }
+  if (12345678910111213141516 != 12345678910111213141516) { setverdict(fail) }  // Removed by CP.
+  if (12345678910111213141516 <= 12345678910111213141516) { setverdict(pass) }
+  if (12345678910111213141516 >= 12345678910111213141516) { setverdict(pass) }
+  }
+  {
+  // With a constant.  Same as the previous.
+  const integer i := 0, j := 12345678910111213141516
+  if (j < i)  { setverdict(fail) }  // Removed by CP.
+  if (j > i)  { setverdict(pass) }
+  if (j == i) { setverdict(fail) }  // Removed by CP.
+  if (j != i) { setverdict(pass) }
+  if (j <= i) { setverdict(fail) }  // Removed by CP.
+  if (j >= i) { setverdict(pass) }
+  if (i < j)  { setverdict(pass) }
+  if (i > j)  { setverdict(fail) }  // Removed by CP.
+  if (i == j) { setverdict(fail) }  // Removed by CP.
+  if (i != j) { setverdict(pass) }
+  if (i <= j) { setverdict(pass) }
+  if (i >= j) { setverdict(fail) }  // Removed by CP.
+  if (j < j)  { setverdict(fail) }  // Removed by CP.
+  if (j > j)  { setverdict(fail) }  // Removed by CP.
+  if (j == j) { setverdict(pass) }
+  if (j != j) { setverdict(fail) }  // Removed by CP.
+  if (j <= j) { setverdict(pass) }
+  if (j >= j) { setverdict(pass) }
+  }
+  {
+  // With variable operands.  No CP.
+  var integer i := 0, j := 12345678910111213141516, result := 0
+  if (12345678910111213141516 < i)  { result := result + 1 }
+  if (12345678910111213141516 > i)  { result := result + 1 }
+  if (12345678910111213141516 == i) { result := result + 1 }
+  if (12345678910111213141516 != i) { result := result + 1 }
+  if (12345678910111213141516 <= i) { result := result + 1 }
+  if (12345678910111213141516 >= i) { result := result + 1 }
+  if (i < 12345678910111213141516)  { result := result + 1 }
+  if (i > 12345678910111213141516)  { result := result + 1 }
+  if (i == 12345678910111213141516) { result := result + 1 }
+  if (i != 12345678910111213141516) { result := result + 1 }
+  if (i <= 12345678910111213141516) { result := result + 1 }
+  if (i >= 12345678910111213141516) { result := result + 1 }
+  if (12345678910111213141516 < j)  { result := result + 1 }
+  if (j > 12345678910111213141516)  { result := result + 1 }
+  if (12345678910111213141516 == j) { result := result + 1 }
+  if (j != 12345678910111213141516) { result := result + 1 }
+  if (12345678910111213141516 <= j) { result := result + 1 }
+  if (j >= 12345678910111213141516) { result := result + 1 }
+  if (result == 9) { setverdict(pass) }  // Number of branches executed.
+  else { setverdict(fail) }
+  }
+}
+
+testcase bigIntBasicArithmetic() runs on bigIntOper_comptype
+{
+  {
+  // Basic tests for add/subtract/multiply/divide/mod/rem.  Constant literals
+  // at first.  These are all handled by CP.
+  if (100000000000000000000 + 100000000000000000000 == 200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 + 0 == 100000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (0 + 100000000000000000000 == 100000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 - 100000000000000000000 == 0)   { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 - 0 == 100000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (0 - 100000000000000000000 == -100000000000000000000)  { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 * 100000000000000000000 == 10000000000000000000000000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 * 100000000000000000000 == -10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 * -100000000000000000000 == 10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 * 0 == 0)                       { setverdict(pass) } else { setverdict(fail) }
+  if (0 * 100000000000000000000 == 0)                       { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 / 100000000000000000000 == 1)   { setverdict(pass) } else { setverdict(fail) }
+  if (0 / 100000000000000000000 == 0)                       { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 mod 100000000000000000000 == 0) { setverdict(pass) } else { setverdict(fail) }  // Same as rem.
+  if (0 mod 100000000000000000000 == 0)                     { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 rem 100000000000000000000 == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (0 rem 100000000000000000000 == 0)                     { setverdict(pass) } else { setverdict(fail) }
+  }
+  {
+  // Same as before with constants.
+  const integer i := 0, j := 100000000000000000000, k := 1
+  if (j + j == 200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (j + i == j)   { setverdict(pass) } else { setverdict(fail) }
+  if (i + j == j)   { setverdict(pass) } else { setverdict(fail) }
+  if (j - j == i)   { setverdict(pass) } else { setverdict(fail) }
+  if (j - i == j)   { setverdict(pass) } else { setverdict(fail) }
+  if (i - j == -j)  { setverdict(pass) } else { setverdict(fail) }
+  if (j * j == 10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }  // Ugly.
+  if (j * i == i)   { setverdict(pass) } else { setverdict(fail) }
+  if (i * j == i)   { setverdict(pass) } else { setverdict(fail) }
+  if (k * j == j)   { setverdict(pass) } else { setverdict(fail) }
+  if (k * -j == -j) { setverdict(pass) } else { setverdict(fail) }
+  if (-k * j == -j) { setverdict(pass) } else { setverdict(fail) }
+  if (-k * -j == j) { setverdict(pass) } else { setverdict(fail) }
+  if (j / j == 1)   { setverdict(pass) } else { setverdict(fail) }
+  if (i / j == i)   { setverdict(pass) } else { setverdict(fail) }
+  if (j mod j == i) { setverdict(pass) } else { setverdict(fail) }  // Same as rem.
+  if (i mod j == i) { setverdict(pass) } else { setverdict(fail) }
+  if (j rem j == i) { setverdict(pass) } else { setverdict(fail) }
+  if (i rem j == i) { setverdict(pass) } else { setverdict(fail) }
+  }
+  {
+  // With variables and constants mixed.  No CP.
+  var integer i := 0, j := 100000000000000000000, k := 1
+  if (100000000000000000000 + j == 200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (j + i == 100000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (i + 100000000000000000000 == j)   { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 - j == 0)   { setverdict(pass) } else { setverdict(fail) }
+  if (j - i == 100000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (i - 100000000000000000000 == -j)  { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 * j == 10000000000000000000000000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 * -j == -10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 * j == -10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (j * 100000000000000000000 == 10000000000000000000000000000000000000000)   { setverdict(pass) } else { setverdict(fail) }
+  if (-j * 100000000000000000000 == -10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (j * -100000000000000000000 == -10000000000000000000000000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (i * 100000000000000000000 == 0)   { setverdict(pass) } else { setverdict(fail) }
+  if (j / 100000000000000000000 == k)   { setverdict(pass) } else { setverdict(fail) }
+  if (i / 100000000000000000000 == 0)   { setverdict(pass) } else { setverdict(fail) }
+  if (j mod 100000000000000000000 == i) { setverdict(pass) } else { setverdict(fail) }  // Same as rem.
+  if (i mod 100000000000000000000 == 0) { setverdict(pass) } else { setverdict(fail) }
+  if (100000000000000000000 rem j == i) { setverdict(pass) } else { setverdict(fail) }
+  if (i rem 100000000000000000000 == 0) { setverdict(pass) } else { setverdict(fail) }
+  }
+  {
+  var integer i := 4294967295, j := -4294967295, k := 2147483647, l := -2147483647
+  if ((i + i) / 4294967295 == 2)  { setverdict(pass) } else { setverdict(fail) }
+  if ((j + j) / -4294967295 == 2) { setverdict(pass) } else { setverdict(fail) }
+  if ((k + k) / 2147483647 == 2)  { setverdict(pass) } else { setverdict(fail) }
+  if ((l + l) / -2147483647 == 2) { setverdict(pass) } else { setverdict(fail) }
+  }
+  {
+  var integer i := -100000000000000000000, j := -100000000000000000000, k := i + j
+  const integer l := -100000000000000000000, m := -100000000000000000000, o := l + m
+  if (i + j == -200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (k == -200000000000000000000)     { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 + -100000000000000000000 == k) { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 + -100000000000000000000 == o) { setverdict(pass) } else { setverdict(fail) }
+  if (-100000000000000000000 + -100000000000000000000 == -200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (l + m == -200000000000000000000) { setverdict(pass) } else { setverdict(fail) }
+  if (o == -200000000000000000000)     { setverdict(pass) } else { setverdict(fail) }
+  }
+}
+
+template rint1 myrint1 := { f1 := 260217910,  f2 := 1234567891011121314151617181920, f3 := 0, f4 := -260217910 }
+template rint1 myrint2 := { f1 := 2147483648, f2 := -2147483648, f3 := 0, f4 := -1 }
+template rint1 myrint3 := { 4294967296, -4294967296, 4294967295, -4294967295 }
+template rint1 myrint4 := { 4294967297, -4294967297, 2147483648, -2147483648 }
+
+testcase bigIntTemplateSendRecv() runs on bigIntOper_comptype
+{
+  // Implicit `valueof' on sending with implicit matching.
+  connect(self:comp_port, self:comp_port)
+  timer T := 1.0
+  comp_port.send(myrint1); T.start; comp_port.receive(myrint1) { setverdict(pass) }; T.stop
+  comp_port.send(myrint2); T.start; comp_port.receive(myrint2) { setverdict(pass) }; T.stop
+  comp_port.send(myrint3); T.start; comp_port.receive(myrint3) { setverdict(pass) }; T.stop
+  comp_port.send(myrint4); T.start; comp_port.receive(myrint4) { setverdict(pass) }; T.stop
+  disconnect(self:comp_port, self:comp_port)
+}
+
+// For testing operator-() in compile-time/run-time on boundaries.
+testcase bigIntOnTheEdge() runs on bigIntOper_comptype
+{
+  const integer LLONG_MIN := -9223372036854775808
+  const integer LLONG_MAX := 9223372036854775807
+  const integer INT_MIN := -2147483648
+  const integer INT_MAX := 2147483647
+  var integer llong_min_v := LLONG_MIN
+  var integer llong_max_v := LLONG_MAX
+  var integer int_min_v := INT_MIN
+  var integer int_max_v := INT_MAX
+  // Compile-time.
+  if (-LLONG_MIN == 9223372036854775808)  { setverdict(pass) } else { setverdict(fail) }
+  if (-LLONG_MAX == -9223372036854775807) { setverdict(pass) } else { setverdict(fail) }
+  if (-LLONG_MIN == LLONG_MAX + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-LLONG_MAX == LLONG_MIN + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-INT_MIN == 2147483648)  { setverdict(pass) } else { setverdict(fail) }
+  if (-INT_MAX == -2147483647) { setverdict(pass) } else { setverdict(fail) }
+  if (-INT_MIN == INT_MAX + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-INT_MAX == INT_MIN + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (9223372036854775808 - 1 == LLONG_MAX) { setverdict(pass) } else { setverdict(fail) }
+  if (-LLONG_MIN - 1 == LLONG_MAX) { setverdict(pass) } else { setverdict(fail) }
+  // Run-time.
+  if (-llong_min_v == 9223372036854775808)  { setverdict(pass) } else { setverdict(fail) }
+  if (-llong_max_v == -9223372036854775807) { setverdict(pass) } else { setverdict(fail) }
+  if (-llong_min_v == llong_max_v + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-llong_max_v == llong_min_v + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-int_min_v == 2147483648)  { setverdict(pass) } else { setverdict(fail) }
+  if (-int_max_v == -2147483647) { setverdict(pass) } else { setverdict(fail) }
+  if (-int_min_v == int_max_v + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (-int_max_v == int_min_v + 1) { setverdict(pass) } else { setverdict(fail) }
+  if (2147483648 - 1 == int_max_v) { setverdict(pass) } else { setverdict(fail) }
+  if (-int_min_v - 1 == int_max_v) { setverdict(pass) } else { setverdict(fail) }
+}
+
+external function MyConverter() return boolean
+
+testcase bigIntLongLong() runs on bigIntOper_comptype
+{
+  if (MyConverter()) { setverdict(pass) } else { setverdict(fail) }
+}
+
+type component intOperSubtypes_comptype { }
+
+type integer myi1
+type integer myi2 (1, 2, 3)
+type integer myi3 (-infinity..0)
+type integer myi4 (-infinity..infinity)
+type integer myi5 (-infinity..infinity, 0, 1, 2, 3)
+type myi5 myi6
+type integer myi7 (2147483648, 4294967296, 8589934592)
+type integer myi8 (2147483648..8589934592)
+type integer myi9 (1, 2..c_myi1 + 3)
+type integer myi10 (1, str2int(log2str(valueof(t_myi1))) + 1, 3)
+type integer myi11 (-1, -0, 1)
+type integer myi12 (myi2, myi3)
+type myi12 myi13 (myi2)
+type myi4 myi14 (0..infinity)
+
+const myi1 c_myi1 := 1
+const myi2 c_myi2 := 1
+const myi3 c_myi3 := 0
+const myi4 c_myi4 := c_myi3
+const myi5 c_myi5 := c_myi4
+const myi6 c_myi6 := c_myi5
+const myi7 c_myi7 := 4294967296
+const myi8 c_myi8 := c_myi7
+const myi9 c_myi9 := 4
+const myi10 c_myi10 := c_myi1
+const myi12 c_myi11 := 0
+const myi13 c_myi12 := 1
+template myi1 t_myi1 := 1
+template myi2 t_myi2 := 1
+template myi3 t_myi3 := 0
+template myi4 t_myi4 := t_myi3
+template myi5 t_myi5 := t_myi4
+template myi6 t_myi6 := t_myi5
+template myi7 t_myi7 := 4294967296
+template myi8 t_myi8 := t_myi7
+template myi12 t_myi9 := 0
+template myi13 t_myi10 := 1
+
+function f_i1() return boolean {
+  var myi9 v_myi1 := 4
+  var myi10 v_myi2 := v_myi1
+  var template myi9 vt_myi1 := 4
+  var template myi10 vt_myi2 := vt_myi1
+  if (v_myi1 == valueof(vt_myi1) and valueof(vt_myi1) == c_myi1 and
+      v_myi2 == valueof(vt_myi2) and valueof(vt_myi2) == c_myi2) { return true }
+  else { return false }
+}
+
+testcase intSubtypes() runs on intOperSubtypes_comptype
+{
+  if (c_myi1 == c_myi2 and valueof(t_myi1) == valueof(t_myi2)) { setverdict(pass) }
+  else { setverdict(fail) }
+  var template myi1 vt_myi1 := 1
+  var template myi2 vt_myi2 := 1
+  var myi1 v_myi1 := 1
+  var myi2 v_myi2 := 1
+  if (v_myi1 == v_myi2 and valueof(vt_myi1) == valueof(vt_myi2)) { setverdict(pass) }
+  else { setverdict(fail) }
+  if (c_myi3 == c_myi4 and c_myi4 == c_myi5 and c_myi5 == c_myi6 and
+      valueof(t_myi3) == valueof(t_myi4) and valueof(t_myi4) == valueof(t_myi5) and
+      valueof(t_myi5) == valueof(t_myi6)) { setverdict(pass) }
+  else { setverdict(fail) }
+  var template myi3 vt_myi3 := 0
+  var template myi4 vt_myi4 := vt_myi3
+  var template myi5 vt_myi5 := vt_myi4
+  var template myi6 vt_myi6 := vt_myi5
+  var myi3 v_myi3 := 0
+  var myi4 v_myi4 := v_myi3
+  var myi5 v_myi5 := v_myi4
+  var myi6 v_myi6 := v_myi5
+  if (v_myi3 == v_myi4 and v_myi4 == v_myi5 and v_myi5 == v_myi6 and
+      valueof(vt_myi3) == valueof(vt_myi4) and valueof(vt_myi4) == valueof(vt_myi5) and
+      valueof(vt_myi5) == valueof(vt_myi6)) { setverdict(pass) }
+  else { setverdict(fail) }
+  if (c_myi7 == c_myi8 and valueof(t_myi7) == valueof(t_myi8)) { setverdict(pass) }
+  else { setverdict(fail) }
+  var template myi7 vt_myi7 := 4294967296
+  var template myi8 vt_myi8 := vt_myi7
+  var myi7 v_myi7 := 4294967296
+  var myi8 v_myi8 := v_myi7
+  if (v_myi7 == v_myi8 and valueof(vt_myi7) == valueof(vt_myi8)) { setverdict(pass) }
+  else { setverdict(fail) }
+}
+
+testcase intIsvalue() runs on intOper_comptype
+{
+  var integer i0, i1 := 1;
+  var template integer one_int := (13);
+  var template integer two_ints := (1,2);
+
+  if ( isvalue(i0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(i1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(TintOper_const1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(one_int) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isvalue(two_ints) ) { setverdict(fail); } else { setverdict(pass); };
+
+  if ( isvalue(par_unbound) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isvalue(par_bound) ) { setverdict(pass); } else { setverdict(fail); };
+
+  if ( isvalue(i1 + 1) ) { setverdict(pass); } else { setverdict(fail); };
+}
+
+testcase intIsbound() runs on intOper_comptype
+{
+  var integer i0, i1 := 1;
+  var template integer one_int := (13);
+  var template integer two_ints := (1,2);
+
+  if ( isbound(i0) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(i1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(TintOper_const1) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(one_int) ) { setverdict(pass); } else { setverdict(fail); };
+  if ( isbound(two_ints) ) { setverdict(pass); } else { setverdict(fail); };
+
+  if ( isbound(par_unbound) ) { setverdict(fail); } else { setverdict(pass); };
+  if ( isbound(par_bound) ) { setverdict(pass); } else { setverdict(fail); };
+
+  if ( isbound(i1 + 1) ) { setverdict(pass); } else { setverdict(fail); };
+}
+
+testcase HO29687() runs on intOper_comptype {
+  log(log2str(integer:1));
+  setverdict(pass);
+}
+
+testcase HO29695() runs on intOper_comptype {
+  log(valueof(integer:1));
+  setverdict(pass);
+}
+
+testcase tc_simple_integer() runs on intOper_comptype {
+  var integer vl_i;
+  if(isbound(vl_i)){setverdict(fail)} else {setverdict(pass)}
+  vl_i:=5;
+  if(isbound(vl_i)) {setverdict(pass)} else {setverdict(fail)}
+
+  var template integer vtl_i :=*;
+  if(isbound( vtl_i )) {setverdict(pass)}else {setverdict(fail)};
+  vtl_i:=5;
+  if(isbound( vtl_i )) {setverdict(pass)}else {setverdict(fail)};
+}
+
+template integer t_i(integer i, integer j) :=i+j;
+
+testcase tc_runtimeExprEval() runs on intOper_comptype {
+  var template integer vt_i:= t_i(1,2);
+  var integer vl_i:=1, vl_j:=0;
+  if(isbound(vt_i)) {setverdict(pass)} else {setverdict(fail)};
+  if(isbound(t_i(1,2))) {setverdict(pass)} else {setverdict(fail)};
+  if(isbound(t_i(1,2*vl_i))) {setverdict(pass)} else {setverdict(fail)};
+  //if(isbound(t_i(1,2/vl_j))) {setverdict(pass)} else {setverdict(fail)}; //DTE
+}
+
+  testcase tc_simple_integer_unbound() runs on intOper_comptype {
+    var integer vl_i;
+    if(ispresent(vl_i)){setverdict(fail)} else {setverdict(pass)} //fail
+  }
+
+  testcase tc_simple_integer_value() runs on intOper_comptype {
+    var integer vl_i:=5;
+    if(ispresent(vl_i)) {setverdict(pass)} else {setverdict(fail)} //pass,  
+  }
+
+  testcase tc_simple_integer_templ_asterix() runs on intOper_comptype {
+    var template integer vtl_i :=*;
+    if(ispresent( vtl_i )) {setverdict(fail)}else {setverdict(pass)}; 
+  }
+
+  testcase tc_simple_integer_templ_qm() runs on intOper_comptype {
+    var template integer vtl_i :=?;
+    if(ispresent( vtl_i )) {setverdict(pass)}else {setverdict(fail)}; 
+  }
+
+  testcase tc_simple_integer_templ_value() runs on intOper_comptype {
+    var template integer vtl_i:=5;
+    if(ispresent( vtl_i )) {setverdict(pass)}else {setverdict(fail)}; 
+  }
+
+  testcase tc_runtimeExprEval_ispresent() runs on intOper_comptype {
+    var template integer vt_i:= t_i(1,2);
+    var integer vl_i:=1, vl_j:=0;
+    if(ispresent(vt_i)) {setverdict(pass)} else {setverdict(fail)};
+    if(ispresent(t_i(1,2))) {setverdict(pass)} else {setverdict(fail)};
+    if(ispresent(t_i(1,2*vl_i))) {setverdict(pass)} else {setverdict(fail)};
+    //if(ispresent(t_i(1,2/vl_j))) {setverdict(pass)} else {setverdict(fail)}; //DTE
+  }
+
+control {
+  const integer cl_1:=2;
+  var integer vl_1;
+
+  execute(intAssign());
+  execute(intConst());
+  execute(intCompEq());
+  execute(intCompNotEq());
+  execute(intCompLess());
+  execute(intCompLessEq());
+  execute(intCompGreat());
+  execute(intCompGreatEq());
+  execute(intAdd());
+  execute(intSubs());
+  execute(intMultipl());
+  execute(intDiv());
+  execute(intMod());
+  execute(intRem());
+  execute(intSubtypes());
+  /*
+  execute(intShiftRight1());
+  execute(intShiftRight2());
+  execute(intShiftRightSum());
+  execute(intShiftLeft1());
+  execute(intShiftLeft2());
+  execute(intShiftLeftSum());
+  */
+  execute(bigIntConst());
+  execute(bigIntVar());
+  execute(bigIntTemplate());
+  execute(bigIntVariableTemplate());
+  execute(bigIntEnumerated());
+  execute(bigIntRecord());
+  execute(bigIntLogicalOps());
+  execute(bigIntBasicArithmetic());
+  execute(bigIntTemplateSendRecv());
+  execute(bigIntOnTheEdge());
+  execute(bigIntLongLong());
+
+  execute(intIsvalue());
+  execute(intIsbound());
+
+  execute(HO29687());
+  execute(HO29695());
+  
+  execute(tc_simple_integer());
+  execute(tc_runtimeExprEval());
+  execute(tc_simple_integer_unbound());
+  execute(tc_simple_integer_value());
+  execute(tc_simple_integer_templ_asterix());
+  execute(tc_simple_integer_templ_qm());
+  execute(tc_simple_integer_templ_value());
+  execute(tc_runtimeExprEval_ispresent());
+}
+
+}

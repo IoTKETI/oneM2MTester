@@ -1,0 +1,426 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *   Zalanyi, Balazs Andor
+ *
+ ******************************************************************************/
+module cstr_content {
+
+type component empty {}
+
+external function tc_univ_char_cpp() return integer;
+
+testcase tc_charstring_content() runs on empty {
+	const charstring cl_s1 := "abcd";
+	const charstring cl_s2 := "efghi";
+	const charstring cl_res1 := "abcdefghi";
+	const charstring cl_res2 := "aefghi";
+	const universal charstring cl_ures2 := cl_res2;
+	const charstring cl_res3 := "abcde";
+	const universal charstring cl_ures3 := cl_res3;
+	const charstring cl_res4 := "bcda";
+	const universal charstring cl_ures4 := cl_res4;
+	const charstring cl_res5 := "dabc";
+	const universal charstring cl_ures5 := cl_res5;
+	const universal charstring cl_us1 := char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24);
+	const universal charstring cl_us2 := char(0,0,1,25) & char(0,0,1,26) & char(0,0,1,27) & char(0,0,1,28) & char(0,0,1,29);
+	const universal charstring cl_us3 := char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24) & char(0,0,1,25) & char(0,0,1,26) & char(0,0,1,27) & char(0,0,1,28) & char(0,0,1,29);
+	const universal charstring cl_us4 := "abcd" & char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24);
+	const universal charstring cl_ures6 := "a" & char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24);
+	const universal charstring cl_ures7 := char(0,0,1,25) & char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24);
+	const universal charstring cl_ures8 := char(0,0,1,20) & char(0,0,1,21) & char(0,0,1,22) & char(0,0,1,23) & char(0,0,1,24) & "a";
+	var universal charstring vl_us1 := cl_s1;
+	var universal charstring vl_us2 := cl_s2;
+	var universal charstring vl_us3 := cl_us1;
+	var universal charstring vl_res1 := vl_us1 & vl_us2;
+	log(vl_res1);
+	if (vl_res1 != cl_res1) { setverdict(fail); }
+	vl_res1 := vl_us1 & cl_s2;
+	log(vl_res1);
+	if (vl_res1 != cl_res1) { setverdict(fail); }
+	vl_res1 := cl_s1 & vl_us2;
+	log(vl_res1);
+	if (vl_res1 != cl_res1) { setverdict(fail); }
+	vl_res1 := vl_us1[0] & vl_us2;
+	log(vl_res1);
+	if (vl_res1 != cl_res2 or vl_res1 != cl_ures2) { setverdict(fail); }
+	vl_res1 := vl_us1 & vl_us2[0];
+	log(vl_res1);
+	if (vl_res1 != cl_res3 or vl_res1 != cl_ures3) { setverdict(fail); }
+	vl_res1 := cl_s1[0] & vl_us2;
+	log(vl_res1);
+	if (vl_res1 != cl_res2 or vl_res1 != cl_ures2) { setverdict(fail); }
+	vl_res1 := vl_us1 & cl_s2[0];
+	log(vl_res1);
+	if (vl_res1 != cl_res3 or vl_res1 != cl_ures3) { setverdict(fail); }
+	vl_res1 := vl_us1[0] & cl_us1;
+	log(vl_res1);
+	if (vl_res1 != cl_ures6) { setverdict(fail); }
+	vl_res1 := cl_us2[0] & cl_us1;
+	log(vl_res1);
+	if (vl_res1 != cl_ures7) { setverdict(fail); }
+	vl_res1 := cl_us1 & vl_us1[0];
+	log(vl_res1);
+	if (vl_res1 != cl_ures8) { setverdict(fail); }
+	vl_res1 := cl_us1 & cl_s1[0];
+	log(vl_res1);
+	if (vl_res1 != cl_ures8) { setverdict(fail); }
+	vl_res1 := cl_us1 & "a";
+	log(vl_res1);
+	if (vl_res1 != cl_ures8) { setverdict(fail); }
+	vl_res1 := vl_us1[0];
+	log(vl_res1);
+	if (vl_res1 != "a" or vl_res1 != cl_s1[0] or vl_res1 != vl_us1[0]) { setverdict(fail); }
+	vl_res1 := cl_s1[0];
+	log(vl_res1);
+	if (vl_res1 != "a" or vl_res1 != cl_s1[0] or vl_res1 != vl_us1[0]) { setverdict(fail); }
+	vl_res1 := vl_us1 <@ 1;
+	log(vl_res1);
+	if (vl_res1 != "bcda" or vl_res1 != cl_res4 or vl_res1 != cl_ures4) { setverdict(fail); }
+	vl_res1 := vl_us1 @> 1;
+	log(vl_res1);
+	if (vl_res1 != "dabc" or vl_res1 != cl_res5 or vl_res1 != cl_ures5) { setverdict(fail); }
+	vl_res1 := char(1,1,1,1);
+	log(vl_res1);
+	if (vl_res1 != char(1,1,1,1)) { setverdict(fail); }
+	vl_res1 := vl_us1;
+	log(vl_res1);
+	if (vl_res1 != vl_us1 or vl_res1 != cl_s1) { setverdict(fail); }
+	vl_res1 := cl_us1;
+	log(vl_res1);
+	if (vl_res1 != cl_us1) { setverdict(fail); }
+	vl_res1 := cl_us1 & cl_us2;
+	log(vl_res1);
+	if (vl_res1 != cl_us3) { setverdict(fail); }
+	vl_res1 := cl_s1 & cl_us1;
+	log(vl_res1);
+	if (vl_res1 != cl_us4) { setverdict(fail); }
+	vl_res1 := "abcd" & cl_us1;
+	log(vl_res1);
+	if (vl_res1 != cl_us4) { setverdict(fail); }
+	setverdict(pass);
+}
+
+testcase tc_cpp_test() runs on empty {
+	var integer ret_val := tc_univ_char_cpp();
+	if (ret_val != 0) { setverdict(fail, "Failed in external function in line: ", ret_val); }
+	setverdict(pass);
+}
+
+const           charstring c_str  := "\xA5\xC3";
+const           charstring c_str0 := "\xA5";
+
+modulepar           charstring mp_str  := "\xA5\xC3" 
+modulepar universal charstring mp_us   := "\xA5\xC3";
+modulepar universal charstring mp_uscs := c_str;
+
+modulepar           charstring mp_str0  := "\xA5";
+modulepar universal charstring mp_us0   := "\xA5";
+modulepar universal charstring mp_uscs0 := c_str[0];
+
+
+testcase tc_compareHN89648() runs on empty {
+  if (mp_str == c_str) { setverdict(pass); }
+  else { setverdict(fail, mp_str, " != ", c_str); } // fail
+
+  if (c_str == mp_str) { setverdict(pass); }
+  else { setverdict(fail, c_str, " != ", mp_str); }
+
+  if (mp_str == mp_us) { setverdict(pass); }
+  else { setverdict(fail, mp_str, " != ", mp_us); } // fail
+
+  if (mp_us == mp_str) { setverdict(pass); }
+  else { setverdict(fail, mp_us, " != ", mp_str); }
+
+  if (mp_str == mp_uscs) { setverdict(pass); }
+  else { setverdict(fail, mp_str, " != ", mp_uscs); }
+
+  if (mp_uscs == mp_str) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs, " != ", mp_str); }
+
+  if (mp_us == mp_uscs) { setverdict(pass); }
+  else { setverdict(fail, mp_us, " != ", mp_uscs); }
+
+  if (mp_uscs == mp_us) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs, " != ", mp_us); }
+
+// elem on left
+  if (mp_str[0] == c_str0) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", c_str0); }
+
+  if (c_str[0] == mp_str0) { setverdict(pass); }
+  else { setverdict(fail, c_str[0], " != ", mp_str0); }
+
+  if (mp_str[0] == mp_us0) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", mp_us0); }
+
+  if (mp_us[0] == mp_str0) { setverdict(pass); }
+  else { setverdict(fail, mp_us[0], " != ", mp_str0); }
+
+  if (mp_str[0] == mp_uscs0) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", mp_uscs0); }
+
+  if (mp_uscs[0] == mp_str0) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs[0], " != ", mp_str0); }
+
+  if (mp_us[0] == mp_uscs0) { setverdict(pass); }
+  else { setverdict(fail, mp_us[0], " != ", mp_uscs0); }
+
+  if (mp_uscs[0] == mp_us0) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs[0], " != ", mp_us0); }
+
+// elem on right
+  if (mp_str0 == c_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str0, " != ", c_str[0]); }
+
+  if (c_str0 == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, c_str0, " != ", mp_str[0]); }
+
+  if (mp_str0 == mp_us[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str0, " != ", mp_us[0]); }
+
+  if (mp_us0 == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_us0, " != ", mp_str[0]); }
+
+  if (mp_str0 == mp_uscs[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str0, " != ", mp_uscs[0]); }
+
+  if (mp_uscs0 == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs0, " != ", mp_str[0]); }
+
+  if (mp_us0 == mp_uscs[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_us0, " != ", mp_uscs[0]); }
+
+  if (mp_uscs0 == mp_us[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs0, " != ", mp_us[0]); }
+
+// elem both
+  if (mp_str[0] == c_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", c_str[0]); }
+
+  if (c_str[0] == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, c_str[0], " != ", mp_str[0]); }
+
+  if (mp_str[0] == mp_us[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", mp_us[0]); }
+
+  if (mp_us[0] == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_us[0], " != ", mp_str[0]); }
+
+  if (mp_str[0] == mp_uscs[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_str[0], " != ", mp_uscs[0]); }
+
+  if (mp_uscs[0] == mp_str[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs[0], " != ", mp_str[0]); }
+
+  if (mp_us[0] == mp_uscs[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_us[0], " != ", mp_uscs[0]); }
+
+  if (mp_uscs[0] == mp_us[0]) { setverdict(pass); }
+  else { setverdict(fail, mp_uscs[0], " != ", mp_us[0]); }
+
+
+// This was the original error report
+//   var charstring vl_charSample := "\xC3\xA5";
+//   var universal charstring vl_cmp1 := "\xC3\xA5";
+//   var universal charstring vl_cmp2 := vl_charSample;
+//   if (match(vl_cmp1, vl_cmp2)) { setverdict(pass); }
+//   else { setverdict(fail, match(vl_cmp1, vl_cmp2)); }
+
+}
+
+// In Release 4.2 in June of 2014 the unichar behaviour significantly improved
+// From that point universal charstring can get utf-8 charstring which will be well mapped to unicode value
+// If the charstring cannot be identified as utf-8 charstring it will transformed byte by byte. It is tested 
+// in the prev. testcase tc_compareHN89648
+// If the charstring can be identified a utf-8 charstring it will be transformed to unicode according its rule i.e. on 1, 2, 3 or 4 byte basis.
+// If the charstring is concatenated with unicode chars e.g char(1,1,1,1) the utf-8 conversion is not applied.
+
+const           charstring c_str1  := "\xC3\xA5"; //hexa E5
+const universal charstring c_u1cs := c_str1;
+const universal charstring c_u1 := "\xC3\xA5" ;
+const universal charstring c_u1ch := char(0,0,0,229);
+
+template universal charstring t_u1cs := c_str1;
+template universal charstring t_u1 := "\xC3\xA5" ;
+template universal charstring t_u1ch := char(0,0,0,229);
+
+
+
+
+testcase tc_unichar_utf8_const() runs on empty {
+  //const vs literal
+  if ( c_u1 == c_u1cs) { setverdict(pass); }
+  else { setverdict(fail,   c_u1,"!=", c_u1cs); }
+
+  //const vs unicode
+  if ( c_u1 == c_u1ch) { setverdict(pass); }
+  else { setverdict(fail,   c_u1,"!=", c_u1ch); } //fail
+
+  //const vs unicode
+  if ( c_u1ch == c_u1) { setverdict(pass); }
+  else { setverdict(fail,   c_u1ch,"!=", c_u1); } //fail
+}
+
+testcase tc_unichar_utf8_var() runs on empty {
+  // var vs literal
+  var charstring vl_charSample := "\xC3\xA5";
+  var universal charstring vl_cmp1 := "\xC3\xA5";
+  var universal charstring vl_cmp2 := vl_charSample;
+
+  if (match(vl_cmp1, vl_cmp2)) { setverdict(pass); }
+  else { setverdict(fail, match(vl_cmp1, vl_cmp2)); }
+
+  if ( vl_cmp1 == vl_cmp2) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", vl_cmp2); }
+
+  if ( vl_cmp2 == vl_cmp1) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", vl_cmp2); }
+
+
+  if ( vl_cmp1 == c_u1ch) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", c_u1ch); }
+
+  if ( vl_cmp1 == c_u1) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", c_u1); }
+}
+
+
+const universal charstring c_arvizturo := char(0,0,0,193)&"rv"&char(0,0,0,237)&"zt"&char(0,0,1,113)&"r"&char(0,0,1,81) & " t" & char(0,0,0,252)&"k"&char(0,0,0,246)&"rf"&char(0,0,0,250)&"r"&char(0,0,0,243)&"g"&char(0,0,0,233)&"p";
+
+testcase tc_unichar_utf8_var_hungarian_text() runs on empty {
+  // var vs literal
+  //var charstring vl_charSample :=  "Árvíztűrő tükörfúrógép";
+  var universal charstring vl_cmp1 := "Árvíztűrő tükörfúrógép";
+  //var universal charstring vl_cmp2 := vl_charSample;
+
+  /*if (match(vl_cmp1, vl_cmp2)) { setverdict(pass); }
+  else { setverdict(fail, match(vl_cmp1, vl_cmp2)); }
+
+  if ( vl_cmp1 == vl_cmp2) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", vl_cmp2); }
+
+  if ( vl_cmp2 == vl_cmp1) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", vl_cmp2); }*/
+
+
+  if ( vl_cmp1 == c_arvizturo) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", c_arvizturo); }
+
+  /*if ( vl_cmp2 == c_arvizturo) { setverdict(pass); }
+  else { setverdict(fail,  vl_cmp1,"!=", c_arvizturo); }*/
+}
+
+
+modulepar {
+  charstring mp_str1  := "\xC3\xA5"; //hexa E5
+  universal charstring mp_u1cs := c_str1;
+  universal charstring mp_u1 := "\xC3\xA5" ;
+  universal charstring mp_u1ch := char(0,0,0,229);
+  
+  charstring mp_str2  := "\xC3\xA4"; //hexa E4, dec 228.ie wrong
+  universal charstring mp_u2cs := c_str1;
+  universal charstring mp_u2 := "\xC3\xA3" ;
+  universal charstring mp_u2ch := char(0,0,0,227);
+}
+
+testcase tc_unichar_utf8_mp1() runs on empty {
+  if (match(mp_u1cs, mp_u1)) { setverdict(pass); }
+  else { setverdict(fail, match(mp_u1cs, mp_u1)); }
+
+  if ( mp_u1cs == mp_u1ch) { setverdict(pass); }
+  else { setverdict(fail,  mp_u1cs,"!=", mp_u1ch); }
+
+  if ( mp_u1 == c_u1 ) { setverdict(pass,mp_u1,"==", c_u1); }
+  else { setverdict(fail,  mp_u1,"!=", c_u1); }
+
+  if ( mp_u1 == mp_u1ch ) { setverdict(pass, mp_u1,"==", mp_u1ch); }
+  else { setverdict(fail,  mp_u1,"!=", mp_u1ch); }
+}
+
+testcase tc_unichar_utf8_mp2() runs on empty {
+  if (match(mp_u2cs, mp_u2)) { setverdict(pass); }
+  else { setverdict(fail, match(mp_u2cs, mp_u2)); }
+
+  if ( mp_u2cs == mp_u2ch) { setverdict(pass,mp_u2cs,"==", mp_u2ch ); }
+  else { setverdict(fail,  mp_u2cs,"!=", mp_u2ch); } //fail
+
+  if ( mp_u2 == c_u1 ) { setverdict(pass, mp_u2,"==", c_u1); }
+  else { setverdict(fail,  mp_u2,"!=", c_u1); }
+
+  if ( mp_u2 == mp_u2ch ) { setverdict(pass,mp_u2,"==", mp_u2ch ); }
+  else { setverdict(fail,  mp_u2,"!=", mp_u2ch); }
+}
+
+testcase tc_unichar_utf8_template() runs on empty {
+  //t vs literal
+  if ( match(c_u1ch,t_u1cs)) { setverdict(pass); }
+  else { setverdict(fail,  match(c_u1ch,t_u1cs)  ); }
+
+  //t vs unicode
+  if ( valueof(t_u1) == valueof(t_u1ch) ) { setverdict(pass); }
+  else { setverdict(fail,   valueof(t_u1),"!=", valueof(t_u1ch)); }
+
+  //t vs unicode
+  if ( valueof(t_u1ch) == valueof(t_u1)) { setverdict(pass); }
+  else { setverdict(fail,   valueof(t_u1ch), "!=", valueof(t_u1)); }
+}
+
+// Fixed indexing errors when the string only contained ASCII characters (HT70680)
+function f_changeUnichar(in universal charstring pl_char)
+return universal charstring
+{
+  log("lengthof(pl_char): ", lengthof(pl_char))
+  log("pl_char: ", pl_char); // garbage here
+  return pl_char;
+}
+
+function f_modifyUnichar(in universal charstring pl_str)
+return universal charstring
+{
+  var integer vl_size := lengthof(pl_str);
+  var universal charstring vl_tmp;
+
+  for (var integer vl_i := 0; vl_i < vl_size; vl_i := vl_i + 1)
+  {
+    log("pl_str[vl_i]: ", pl_str[vl_i])
+    vl_tmp := f_changeUnichar(pl_str[vl_i]);
+    log("vl_tmp: ", vl_tmp); // garbage here
+    pl_str[vl_i] := vl_tmp; // segmentation fault here
+  }
+
+  return pl_str;
+}
+
+testcase tc_indexing_HT70680() runs on empty 
+{
+  // must contain only ASCII characters
+  var universal charstring v_str := "alma123";
+  var universal charstring v_res := f_modifyUnichar(v_str);
+  if (v_str == v_res) { setverdict(pass); }
+  else { setverdict(fail, "got: ", v_res, " expected: ", v_str); }
+}
+
+
+control {
+  execute(tc_charstring_content());
+  execute(tc_cpp_test());
+  execute(tc_compareHN89648());
+  execute(tc_unichar_utf8_const());//fail
+  execute(tc_unichar_utf8_var());
+  execute(tc_unichar_utf8_var_hungarian_text());
+  //execute(tc_unichar_utf8_mp1());
+  //execute(tc_unichar_utf8_mp2());
+  execute(tc_unichar_utf8_template());
+  execute(tc_indexing_HT70680());
+}
+
+}

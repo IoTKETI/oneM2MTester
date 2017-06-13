@@ -1,0 +1,94 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+/* Annex B Example 2
+
+XML Schema:
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="S1">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="S2">
+    <xs:restriction base="S1">
+      <xs:minInclusive value="-23"/>
+      <xs:maxInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="S3">
+    <xs:restriction base="S2">
+      <xs:minInclusive value="-3"/>
+      <xs:maxExclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="C1">
+    <xs:simpleContent>
+      <xs:extension base="S3">
+        <xs:attribute name="A1" type="xs:integer"/>
+        <xs:attribute name="A2" type="xs:float"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>
+
+TTCN-3 Module:
+
+*/
+module AnnexB2 {
+//import from XSD language "XML" all;
+
+type integer S1 (-infinity .. 2);
+type S1 S2 (-23 .. 1);
+type S2 S3 (-3 .. 0);
+
+type record C0 {
+  integer a1 optional,
+  float a2 optional,
+  S3 base
+} with {
+  variant(a1,a2) "name as capitalized";
+  variant(a1,a2) "attribute";
+  variant (base) "untagged "
+}
+
+type record Cu {
+    charstring one
+} with {
+    variant (one) "untagged"
+}
+
+type record Cru {
+    record of S1 smalls
+} with {
+    variant (smalls) "untagged"
+}
+
+/* * * * * */
+type record C0container {
+  C0 fld1
+}
+
+
+type record strings {
+    record of charstring inner
+}
+with { variant (inner) "untagged" }
+
+} with {
+encode "XML";
+}
+

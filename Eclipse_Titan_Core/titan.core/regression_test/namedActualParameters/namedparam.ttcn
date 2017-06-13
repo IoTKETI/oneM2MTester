@@ -1,0 +1,128 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module namedparam
+{
+    type component C1
+    {}
+
+    type record twints // two ints
+    {
+        integer i1,
+        integer i2
+    }
+
+    type record R1
+    {
+        integer i1,
+        integer i2,
+        integer i3,
+        integer i4
+    }
+
+    function f1( integer param1, boolean param2 := true )
+    {
+        // log( param1, param2 );
+    }
+
+    function f2( in template twints par )
+    {
+    }
+
+    testcase tc1() runs on C1
+    {
+        // f1(); // syntax error, param1 missing
+        f1( 1 ); // correct, param2=true
+        f1( 1, - );
+        //~ f1( 1, true ); // same as above
+        // f1( 0, true, - ); // too many parameters
+        f1( 1, param2 := false );
+
+        /*
+        This is _valid_ syntax but bad semantics
+        (unary minus cannot be applied to a record value)
+        f2( - { 1,1 } );
+        */
+        //f1( { param1 := 1 } );
+
+        setverdict( pass ); // whew !
+        f2( /*par =*/ {13,14} );
+    }
+
+    testcase tc2() runs on C1
+    {
+        var R1 r0 := {
+            42,-,-,- // incomplete, other elements are unbound
+        }
+        var R1 r1 := { // value-list notation
+            1,
+            2,
+            3,
+            4
+        }
+        var R1 r2 := { // assignment notation
+            i1 := 1,
+            i2 := 2,
+            i3 := 3,
+            i4 := 4
+        }
+        var template R1 tr1 := { // value-list notation
+            1,
+            2,
+            3,
+            4
+        }
+        var template R1 tr2 := { // assignment notation
+            i1 := 1,
+            i2 := 2,
+            i3 := 3,
+            i4 := 4
+        }
+        /*
+        error: Field `i1' cannot appear after field `i3'
+        var template R1 tr3 := { // assignment notation
+            i3 := 3,
+            i1 := 1,
+            i2 := 2,
+            i4 := 4
+        }
+        */
+
+        /*
+        Value-list notation and assignment notation cannot be mixed:
+
+        var R1 r_bad := {
+            //1,
+            i2 := 2,
+            3
+        }
+        */
+
+        setverdict(pass);
+    }
+
+    testcase tc3(integer i, float up) runs on C1
+    {
+      setverdict ( pass );
+
+    }
+
+    control {
+      execute(tc1());
+      execute(tc2());
+
+      execute(tc3(1, 2.3)); // unnamed only
+      execute(tc3(i:=2, up:=0.0)); // named only
+      execute(tc3(3, up:=6.66)); // mix (regression test for TR925)
+    }
+}

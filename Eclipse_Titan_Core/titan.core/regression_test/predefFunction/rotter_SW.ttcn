@@ -1,0 +1,435 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module rotter_SW {	//^In TTCN-3 module `rotter_SW'://
+
+type component PDTestComponent {};
+
+
+/*--- ROTATE ON BITSTRING --------------------------------------------------*/
+
+const bitstring rotconb := '0000000000'B
+const bitstring rotconb1 := '1000110001'B
+const bitstring rotconb2 := rotconb1 @> 2 // '0110001100'B
+const bitstring rotconb3 := rotconb1 <@ 2 // '0011000110'B
+const bitstring rotconb4 := rotconb1 <@ 5 // '1000110001'B
+const bitstring rotconb5 := rotconb1 @> 5 // '1000110001'B
+const bitstring rotconb6 := rotconb1 <@ 0 // '1000110001'B
+const bitstring rotconb7 := rotconb1 @> 0 // '1000110001'B
+const bitstring rotconb8 := rotconb1 <@ 11 // '0001100011'B
+const bitstring rotconb9 := rotconb1 @> 11 // '1100011000'B
+const bitstring rotconb10 := ''B
+const bitstring rotconb11 := ''B @> 2
+const bitstring rotconb12 := ''B <@ 2
+const bitstring rotconb13 := ''B @> 0
+const bitstring rotconb14 := ''B <@ 0
+const bitstring rotconb15 := rotconb1 @> -2 // '0011000110'B
+const bitstring rotconb16 := rotconb1 <@ -2 // '0110001100'B
+
+testcase rotate_bitstr() runs on PDTestComponent{ //In testcase definition//
+
+	if (rotconb1 == rotconb1 <@ lengthof(rotconb1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb1 @> lengthof(rotconb1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb2 <@ 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb3 @> 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb4 @> 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb5 <@ 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb6)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb1 == rotconb7)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb8 == '0001100011'B)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb9 == '1100011000'B)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconb10 == rotconb11)
+	and (rotconb10 == rotconb12))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconb10 == rotconb13)
+	and (rotconb10 == rotconb14))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb15 == rotconb3)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconb16 == rotconb2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- ROTATE ON HEXSTRING --------------------------------------------------*/
+
+const hexstring rotconh := '0000000000'H
+const hexstring rotconh1 := '1000110001'H
+const hexstring rotconh2 := rotconh1 @> 2 // '0110001100'H
+const hexstring rotconh3 := rotconh1 <@ 2 // '0011000110'H
+const hexstring rotconh4 := rotconh1 <@ 5 // '1000110001'H
+const hexstring rotconh5 := rotconh1 @> 5 // '1000110001'H
+const hexstring rotconh6 := rotconh1 <@ 0 // '1000110001'H
+const hexstring rotconh7 := rotconh1 @> 0 // '1000110001'H
+const hexstring rotconh8 := rotconh1 <@ 11 // '0001100011'H
+const hexstring rotconh9 := rotconh1 @> 11 // '1100011000'H
+const hexstring rotconh10 := ''H
+const hexstring rotconh11 := ''H @> 2
+const hexstring rotconh12 := ''H <@ 2
+const hexstring rotconh13 := ''H @> 0
+const hexstring rotconh14 := ''H <@ 0
+const hexstring rotconh15 := rotconh1 @> -2 // '0011000110'H
+const hexstring rotconh16 := rotconh1 <@ -2 // '0110001100'H
+
+testcase rotate_hexstr() runs on PDTestComponent{ //In testcase definition//
+	if (rotconh1 == rotconh1 <@ lengthof(rotconh1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh1 @> lengthof(rotconh1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh2 <@ 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh3 @> 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh4 @> 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh5 <@ 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh6)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh1 == rotconh7)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh8 == '0001100011'H)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh9 == '1100011000'H)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconh10 == rotconh11)
+	and (rotconh10 == rotconh12))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconh10 == rotconh13)
+	and (rotconh10 == rotconh14))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh15 == rotconh3)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconh16 == rotconh2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- ROTATE ON OCTETSTRING --------------------------------------------------*/
+
+const octetstring rotcono1 := 'AA00AA00AA'O
+const octetstring rotcono2 := rotcono1 @> 1 // 'AAAA00AA00'O
+const octetstring rotcono3 := rotcono1 <@ 1 // '00AA00AAAA'O
+const octetstring rotcono4 := rotcono1 <@ 5 // 'AA00AA00AA'O
+const octetstring rotcono5 := rotcono1 @> 5 // 'AA00AA00AA'O
+const octetstring rotcono6 := rotcono1 <@ 0 // 'AA00AA00AA'O
+const octetstring rotcono7 := rotcono1 @> 0 // 'AA00AA00AA'O
+const octetstring rotcono8 := rotcono1 <@ 11 // '00AA00AAAA'O
+const octetstring rotcono9 := rotcono1 @> 11 // 'AAAA00AA00'O
+const octetstring rotcono10 := ''O
+const octetstring rotcono11 := ''O @> 2
+const octetstring rotcono12 := ''O <@ 2
+const octetstring rotcono13 := ''O @> 0
+const octetstring rotcono14 := ''O <@ 0
+const octetstring rotcono15 := rotcono1 @> -1 // '00AA00AAAA'O
+const octetstring rotcono16 := rotcono1 <@ -1 // 'AAAA00AA00'O
+
+testcase rotate_octetstr() runs on PDTestComponent{ //In testcase definition//
+
+	if (rotcono1 == rotcono1 <@ lengthof(rotcono1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono1 @> lengthof(rotcono1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono2 <@ 1)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono3 @> 1)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono4 @> 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono5 <@ 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono6)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono1 == rotcono7)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono8 == '00AA00AAAA'O)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono9 == 'AAAA00AA00'O)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotcono10 == rotcono11)
+	and (rotcono10 == rotcono12))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotcono10 == rotcono13)
+	and (rotcono10 == rotcono14))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono15 == rotcono3)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotcono16 == rotcono2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+/*--- ROTATE ON CHARSTRING --------------------------------------------------*/
+
+const charstring rotconc := "0000000000"
+const charstring rotconc1 := "1000110001"
+const charstring rotconc2 := rotconc1 @> 2 // "0110001100"
+const charstring rotconc3 := rotconc1 <@ 2 // "0011000110"
+const charstring rotconc4 := rotconc1 <@ 5 // "1000110001"
+const charstring rotconc5 := rotconc1 @> 5 // "1000110001"
+const charstring rotconc6 := rotconc1 <@ 0 // "1000110001"
+const charstring rotconc7 := rotconc1 @> 0 // "1000110001"
+const charstring rotconc8 := rotconc1 <@ 11 // "0001100011"
+const charstring rotconc9 := rotconc1 @> 11 // "1100011000"
+const charstring rotconc10 := ""
+const charstring rotconc11 := "" @> 2
+const charstring rotconc12 := "" <@ 2
+const charstring rotconc13 := "" @> 0
+const charstring rotconc14 := "" <@ 0
+const charstring rotconc15 := rotconc1 @> -2 // "0011000110"
+const charstring rotconc16 := rotconc1 <@ -2 // "0110001100"
+
+testcase rotate_char() runs on PDTestComponent{ //In testcase definition//
+
+	if (rotconc1 == rotconc1 <@ lengthof(rotconc1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc1 @> lengthof(rotconc1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc2 <@ 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc3 @> 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc4 @> 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc5 <@ 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc6)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc1 == rotconc7)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc8 == "0001100011")
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc9 == "1100011000")
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconc10 == rotconc11)
+	and (rotconc10 == rotconc12))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconc10 == rotconc13)
+	and (rotconc10 == rotconc14))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc15 == rotconc3)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconc16 == rotconc2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+
+/*--- ROTATE ON UNIVERSAL CHARSTRING --------------------------------------------------*/
+
+const universal charstring rotconuc := "0000000000"
+const universal charstring rotconuc1 := char(0,0,0,65) & "000" & char(0,0,0,65) & char(0,0,0,65) & "000" & char(0,0,0,65) //A000AA000A
+const universal charstring rotconuc2 := rotconuc1 @> 2 		// "0AA000AA00"
+const universal charstring rotconuc3 := rotconuc1 <@ 2 		// "00AA000AA0"
+const universal charstring rotconuc4 := rotconuc1 <@ 5 		// "A000AA000A"
+const universal charstring rotconuc5 := rotconuc1 @> 5 		// "A000AA000A"
+const universal charstring rotconuc6 := rotconuc1 <@ 0 		// "A000AA000A"
+const universal charstring rotconuc7 := rotconuc1 @> 0 		// "A000AA000A"
+const universal charstring rotconuc8 := rotconuc1 <@ 11 	// "000AA000AA"
+const universal charstring rotconuc9 := rotconuc1 @> 11 	// "AA000AA000"
+const universal charstring rotconuc10 := ""
+const universal charstring rotconuc11 := "" @> 2
+const universal charstring rotconuc12 := "" <@ 2
+const universal charstring rotconuc13 := "" @> 0
+const universal charstring rotconuc14 := "" <@ 0
+const universal charstring rotconuc15 := rotconuc1 @> -2 	// "00AA000AA0"
+const universal charstring rotconuc16 := rotconuc1 <@ -2 	// "0AA000AA00"
+
+testcase rotate_uchar() runs on PDTestComponent{ //In testcase definition//
+
+	if (rotconuc1 == rotconuc1 <@ lengthof(rotconc1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc1 @> lengthof(rotconc1))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc2 <@ 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc3 @> 2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc4 @> 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc5 <@ 5)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc6)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc1 == rotconuc7)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc8 == "000AA000AA")
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc9 == "AA000AA000")
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconuc10 == rotconuc11)
+	and (rotconuc10 == rotconuc12))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if ((rotconuc10 == rotconuc13)
+	and (rotconuc10 == rotconuc14))
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc15 == rotconuc3)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+	if (rotconuc16 == rotconuc2)
+	     {setverdict(pass);}
+	else {setverdict(fail);} //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+control {
+	execute (rotate_bitstr());
+	execute (rotate_hexstr());
+	execute (rotate_octetstr());
+	execute (rotate_char());
+	execute (rotate_uchar());
+}
+
+}

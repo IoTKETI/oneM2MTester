@@ -1,0 +1,186 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Czerman, Oliver
+ *   Delic, Adam
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module Macros {
+
+modulepar charstring tsp_moduleScope := __SCOPE__;
+
+
+
+// ********** Type definitions  *********************
+
+
+type record MyRecord {
+  charstring field1,
+  charstring field2 (__SCOPE__) optional
+};
+
+type record MyRecord2 {
+  MyRecord field1,
+  charstring field2 (__SCOPE__)
+};
+
+type charstring Char_scope (__SCOPE__);
+
+//type enumerated Dummy { Dummy1, Dummy2, __SCOPE__ }; //NOK
+
+
+
+// *************** Constanst ***********************
+const charstring c_scope := __SCOPE__;
+
+
+
+
+// *************** Templates **********************
+
+//for __SCOPE__ macro
+template MyRecord t_MyTemplate := {
+  field1 := __SCOPE__,
+  //field2 := __SCOPE__ //NOK MyRecord not equal with t_MyTemplate
+  field2 := "MyRecord"
+}
+
+
+//for __SCOPE__ macro
+template MyRecord2 t_MyTemplate2 := {
+  field1 := {
+    field1 := __SCOPE__,
+    //field2 := __SCOPE__ //NOK MyRecord not equal with t_MyTemplate
+    field2 := "MyRecord"
+  },
+  field2 := "MyRecord2"
+}
+
+
+//************* Components ***************
+
+//for __SCOPE__ macro
+type component MyMtcType {
+  const charstring c_Scope:=__SCOPE__;
+  timer T_MyTimer:=0.001;
+}
+
+
+//for __SCOPE__ macro
+type component MyExtendedC extends MyMtcType {
+   const charstring c_ex := __SCOPE__;
+}
+
+//************* Altsteps *****************
+
+//for __SCOPE__ macro
+altstep as_MyAltstep() runs on MyMtcType{
+  []  T_MyTimer.timeout {if(__SCOPE__=="as_MyAltstep"){setverdict(pass);}else {setverdict(fail);}}
+}
+
+
+//for __SCOPE__ macro
+altstep as_MyAloneAltstep(){
+  []  any timer.timeout {if(__SCOPE__=="as_MyAloneAltstep"){setverdict(pass);}else {setverdict(fail);}}
+}
+
+
+
+
+// ************ Functions ****************
+
+//for __SCOPE__ macro
+function f_MyFunction()
+{
+  if(__SCOPE__=="f_MyFunction"){setverdict(pass);}else {setverdict(fail);}
+}
+
+
+//for __SCOPE__ macro
+function f_MyMtcFunction() runs on MyMtcType
+{
+  if(__SCOPE__=="f_MyMtcFunction"){setverdict(pass);}else {setverdict(fail);}
+}
+
+
+
+
+
+// *********** Testcases ******************
+
+//testcase for __SCOPE__ macro
+testcase tc_scope(charstring p_scope) runs on MyExtendedC{
+  log("/Testing of __SCOPE__ macro/");
+  log("*module name");
+  if(tsp_moduleScope=="Macros"){setverdict(pass);}else {setverdict(fail);}
+  if(c_scope=="Macros"){setverdict(pass);}else {setverdict(fail);}
+  log("*control");
+  if(p_scope=="control"){setverdict(pass);}else {setverdict(fail);}
+  log("*component type name");
+  if(c_Scope=="MyMtcType"){setverdict(pass);}else {setverdict(fail);}
+  if(c_ex=="MyExtendedC"){setverdict(pass);}else {setverdict(fail);}
+  log("*testcase name");
+  if(__SCOPE__=="tc_scope"){setverdict(pass);}else {setverdict(fail);}
+  log("*altstep name");
+  T_MyTimer.start;
+  alt{
+    [] as_MyAltstep();
+  }
+  T_MyTimer.start;
+  alt{
+    [] as_MyAloneAltstep();
+  }
+  log("*function name");
+  f_MyFunction();
+  f_MyMtcFunction();
+  var MyRecord v_record;
+  v_record.field1 := "t_MyTemplate";
+  v_record.field2 := "MyRecord";
+  var MyRecord2 v_record2;
+  v_record2.field1.field1:="t_MyTemplate2";
+  v_record2.field1.field2:="MyRecord";
+  v_record2.field2:="MyRecord2";
+  log("*template, record name");
+  if(match(v_record,t_MyTemplate)){setverdict(pass);}else {setverdict(fail);}
+  if(match(v_record2,t_MyTemplate2)){setverdict(pass);}else {setverdict(fail);}
+  log("*user defined named types");
+  var Char_scope v_charscope := "Char_scope";
+  if(v_charscope=="Char_scope"){setverdict(pass);}else {setverdict(fail);}
+}
+
+function f_testcaseId() runs on MyExtendedC {
+  var charstring vl_tcName := %testcaseId;
+  if (vl_tcName=="tc_testcaseId") {setverdict(pass);} else {setverdict(fail);}
+}
+
+function f_testcaseId2(boolean b:=true) runs on MyExtendedC {
+  var charstring  vl_tcName;
+  if (b) {
+    vl_tcName := %testcaseId;
+  }
+  if (vl_tcName=="tc_testcaseId") {setverdict(pass);} else {setverdict(fail);}
+}
+
+testcase tc_testcaseId() runs on MyExtendedC {
+  var charstring  vl_tcName;
+  vl_tcName := %testcaseId;
+  if (vl_tcName=="tc_testcaseId") {setverdict(pass);} else {setverdict(fail);}
+  f_testcaseId();
+  f_testcaseId2();
+}
+
+//*********** Control **********
+control {
+  execute(tc_scope(__SCOPE__));
+  execute(tc_testcaseId());
+}
+
+}

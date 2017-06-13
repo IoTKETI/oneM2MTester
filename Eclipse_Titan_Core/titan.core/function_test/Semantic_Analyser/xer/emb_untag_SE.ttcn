@@ -1,0 +1,32 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module emb_untag_SE {	//^In TTCN-3 module `emb_untag_SE'://
+
+// 25.2.3
+type record e1 { //^In type definition//
+  record of universal charstring field_1, //^error: All the other components should be ATTRIBUTE or ANY-ATTRIBUTE//
+
+  charstring field_2 //^Due to this UNTAGGED component// \
+  //^error: There shall be no UNTAGGED on any character-encodable component of a type with DEFAULT-FOR-EMPTY//
+}
+with {
+  variant "embedValues"
+  variant (field_2) "untagged"
+}
+
+
+
+}
+with {
+encode "XML"
+}

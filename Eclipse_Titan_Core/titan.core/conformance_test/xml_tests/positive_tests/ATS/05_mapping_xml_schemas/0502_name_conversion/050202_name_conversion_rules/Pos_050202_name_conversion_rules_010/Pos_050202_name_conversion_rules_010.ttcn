@@ -1,0 +1,82 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:5.2.2, Verify that prefixing enumerated items with "x" works correctly
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// Rule g:
+// if [a character string that is to be used as an identifier of an enumerated item]
+// starts with a digit (DIGIT ZERO to DIGIT NINE), it shall be prefixed with an "x" 
+// (LATIN SMALL LETTER X) character;
+module Pos_050202_name_conversion_rules_010 {
+
+   import from schema_Pos_050202_name_conversion_rules_010 language "XSD" all;
+
+   template MyType m_msg := x02_orange;
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout MyType, Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Pos_050202_name_conversion_rules_010() runs on C system C {
+        var Raw v_rcv;
+
+        var Raw  v_Raw:="<ns021:MyType xmlns:ns021='schema:Pos_050202_name_conversion_rules_010'>橙色02_orange</ns021:MyType>\n\n";
+
+        connect(self:p, self:p1);
+
+        // encode the message
+        p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_050202_name_conversion_rules_010(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

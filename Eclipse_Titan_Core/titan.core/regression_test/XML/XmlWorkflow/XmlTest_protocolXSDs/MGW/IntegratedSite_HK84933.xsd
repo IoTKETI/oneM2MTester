@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema      targetNamespace="http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02"
+           xmlns:IntegratedSite="http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02"
+                          xmlns="http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xml:lang="en">
+<!--
+        This is a cut-down version of IntegratedSite.xsd, just to illustrate
+        the bug in HK84933.
+        See regression_test/xsdConvert/MGW/IntegratedSite.xsd in its full
+        3700+ line glory.
+-->
+
+<!-- removed namespaces
+           xmlns:confd="http://tail-f.com/ns/confd/1.0"
+           xmlns:IsTypes="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02"
+-->
+
+<!--
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema" schemaLocation="XMLSchema.xsd"/>
+  <xs:import namespace="http://tail-f.com/ns/confd/1.0" schemaLocation="confd.xsd"/>
+  <xs:import namespace="http://www.ericsson.com/is/isco/IsTypes/R4L06/R4AB_1.02" schemaLocation="IsTypes.xsd"/>
+-->
+
+  <!-- This is the cut-down version of IntegratedSite. The original has 3200 lines!
+       This uses an unnamed (complex)type.
+  -->
+  <xs:element name="IntegratedSite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BladeSystems">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BladeSystem" minOccurs="0" maxOccurs="unbounded">
+                <!-- The unnamed type -->
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="number" type="xs:integer" minOccurs="0">
+                      <xs:annotation>
+                        <xs:appinfo/>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_Blade">
+                  <xs:selector xpath="IntegratedSite:Blade"/>
+                  <xs:field xpath="IntegratedSite:subrackId"/>
+                  <xs:field xpath="IntegratedSite:slotNo"/>
+                </xs:key>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem">
+            <xs:selector xpath="IntegratedSite:BladeSystem"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+        </xs:element>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- This is the reimplementation of IntegratedSite,
+       which uses a named top-level type.
+  -->
+  <xs:element name="IntegratedSite2">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BladeSystems2">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BladeSystem2" type="BladeSystem2" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:complexType name="BladeSystem2">
+    <xs:sequence>
+      <xs:element name="number" type="xs:integer" maxOccurs="1" minOccurs="0"></xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:this="www.example.org"
+targetNamespace="www.example.org">
+
+<annotation><documentation xml:lang="EN">base types</documentation></annotation>
+
+<element name="comment" type="string"/>
+
+  <complexType name="Items">
+    <sequence>
+      <element name="item" minOccurs="0" maxOccurs="unbounded">
+        <complexType>
+          <sequence>
+            <element name="productName" type="string"/>
+            <element name="quantity">
+              <simpleType>
+                <restriction base="positiveInteger">
+                  <maxExclusive value="100"/>
+                </restriction>
+              </simpleType>
+            </element>
+            <element name="USPrice"    type="decimal"/>
+            <element ref="this:comment" minOccurs="0"/>
+            <element name="shipDate"   type="date" minOccurs="0"/>
+          </sequence>
+          <attribute name="partNum" type="this:SKU" use="required"/>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+
+
+  <simpleType name="SKU">
+    <restriction base="string">
+      <pattern value="\d{3}-[A-Z]{2}"/>
+    </restriction>
+  </simpleType>
+
+<complexType name="PurchaseOrderType">
+    <sequence>
+      <element name="shipTo"     type="string"/>
+      <element name="billTo"     type="string"/>
+      <element ref="this:comment" minOccurs="0"/>
+      <element name="items"      type="this:Items"/>
+    </sequence>
+    <attribute name="shipDate" type="date"/>
+    <attribute name="orderDate" type="date"/>
+  </complexType>
+
+
+
+<annotation><documentation xml:lang="EN">restricting types</documentation></annotation>
+
+<complexType name="RestrictedPurchaseOrderType">
+  <complexContent>
+    <restriction base="this:PurchaseOrderType">
+      <sequence>
+        <element name="shipTo" type="string"/>
+        <element name="billTo" type="string"/>
+        <element ref="this:comment" minOccurs="1"/>
+        <element name="items"  type="this:Items"/>
+      </sequence>
+	<attribute name="shipDate" type="date" use="prohibited" />
+      	<attribute name="orderDate" type="date" use="required" />
+    </restriction>
+  </complexContent>
+</complexType>
+
+
+
+</schema>

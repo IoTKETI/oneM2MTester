@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="www.example.org/substitutiongroup/rename"
+  xmlns:this="www.example.org/substitutiongroup/rename">
+
+<xsd:complexType name="BaseElement_">
+	<xsd:sequence>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="Audit" mixed="false">
+	<xsd:complexContent mixed="false">
+		<xsd:extension base="this:BaseElement_">
+			<xsd:sequence>
+				<xsd:element ref="this:BaseElement" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:element name="Case" type="xsd:integer" abstract="true"/>
+
+<xsd:element name="BaseElement__" type="xsd:string" abstract="true"/>
+
+<xsd:element name="BaseElement" type="this:BaseElement_" abstract="true"/>
+
+<xsd:element name="Case_" type="this:Audit" substitutionGroup="this:BaseElement"/>
+
+</xsd:schema>
+

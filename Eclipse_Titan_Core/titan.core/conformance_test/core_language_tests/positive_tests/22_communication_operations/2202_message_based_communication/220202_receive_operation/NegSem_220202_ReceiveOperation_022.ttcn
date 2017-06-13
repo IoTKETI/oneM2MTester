@@ -1,0 +1,43 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:22.2.2, incompatible from and sender clause 
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirements are tested:
+// If the receive operation contains both from and sender clause, the variable or parameter
+// referenced in the sender clause shall be type compatible with the template in the from 
+// clause.
+
+module NegSem_220202_ReceiveOperation_022 {
+
+    type integer address;
+    
+    type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+    type component GeneralComp {
+		port P p;
+	}
+	    
+    testcase TC_NegSem_220202_ReceiveOperation_022() runs on GeneralComp {
+        var address v_addr;
+
+		connect(self:p, self:p);
+        p.send(100);
+        alt {
+            [] p.receive(integer:?) from GeneralComp:? -> sender v_addr { }
+            [] p.receive {}
+        }
+        setverdict(pass);
+    }
+
+    control {
+        execute(TC_NegSem_220202_ReceiveOperation_022(), 5.0);
+    }
+}

@@ -1,0 +1,49 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module untagged_noncharenc_OK {
+
+  type record R2 {
+    hexstring os
+  } with {
+    variant (os) "untagged";
+  }
+
+  type record R3 {
+    octetstring os
+  } with {
+    variant (os) "untagged";
+  }
+
+  type record R4 {
+    objid oid // objid doesn't have EXER
+  } with {
+    variant (oid) "untagged"
+  }
+
+  type boolean address;
+
+  type record R5 {
+    address a, // doesn't have EXER
+    default d, // ditto
+    integer last
+  } with {
+    variant (a) "untagged";
+    variant (d) "untagged";
+  }
+
+}
+with {
+encode "XML";
+}

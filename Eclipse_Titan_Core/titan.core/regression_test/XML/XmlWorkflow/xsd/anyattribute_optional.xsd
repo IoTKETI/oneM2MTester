@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:this="http://www.example.org/wildcards" targetNamespace="http://www.example.org/wildcards"> 
+<xs:element name="anyAttrAnyNamespace" type="this:e45"/>
+<xs:element name="anyAttrThisNamespace" type="this:e45b"/>
+
+<xs:complexType name="e45"> 
+	<xs:attribute name="attr" type="xs:string"/> 
+	<xs:attribute name="bb" type="xs:date"/> 
+	<xs:attribute name="aa" type="xs:date"/> 
+	<xs:anyAttribute namespace="##any"/> 
+</xs:complexType> 
+
+<xs:complexType name="e45a"> 
+	<xs:anyAttribute namespace="##other"/> 
+</xs:complexType> 
+
+<xs:complexType name="e45b"> 
+	<xs:anyAttribute namespace="##targetNamespace"/> 
+</xs:complexType>
+ 
+<xs:complexType name="e45c"> 
+	<xs:anyAttribute namespace="##local http://www.example.org/attribute"/> 
+</xs:complexType> 
+
+<xs:complexType name="e45d"> 
+	<xs:complexContent> 
+		<xs:extension base="this:e45c"> 
+			<xs:anyAttribute namespace="##targetNamespace"/> 
+		</xs:extension> 
+	</xs:complexContent> 
+</xs:complexType>
+ 
+</xs:schema>

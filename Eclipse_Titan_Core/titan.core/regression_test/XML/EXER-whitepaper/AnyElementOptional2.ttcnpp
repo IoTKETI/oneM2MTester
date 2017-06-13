@@ -1,0 +1,270 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module AnyElementOptional2 {
+
+// More complex tests for optional anyElement coding instructions
+// Testing if omitted anyElement fields (in a record) interpret the next field or
+// the next record as the anyElement.
+
+modulepar boolean AnyElement_verbose := false;
+
+#define verbose AnyElement_verbose
+#include "../macros.ttcnin"
+
+// Types
+
+type component AE {}
+
+type record any_elem_outer1 {
+  record of union {
+    any_elem_inner1 inner,
+    float ft
+  } elem_list
+} with {
+  variant(elem_list[-]) "name as 'elem'";
+}
+
+type record any_elem_inner1 {
+  integer id,
+  universal charstring any_elem optional,
+  integer ival
+} with {
+  variant (id) "attribute";
+  variant (any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+
+type record any_elem_outer2 {
+  record of union {
+    any_elem_inner2 inner,
+    float ft
+  } elem_list
+} with {
+  variant(elem_list[-]) "name as 'elem'";
+}
+
+type record any_elem_inner2 {
+  integer id,
+  universal charstring any_elem optional,
+  integer ival
+} with {
+  variant (any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+
+type record any_elem_outer3 {
+  record of union {
+    any_elem_inner3 inner,
+    float ft
+  } elem_list
+} with {
+  variant(elem_list[-]) "name as 'elem'";
+}
+
+type record any_elem_inner3 {
+  integer id,
+  universal charstring any_elem optional
+} with {
+  variant (id) "attribute";
+  variant (any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+
+type record any_elem_outer4 {
+  record of union {
+    any_elem_inner4 inner,
+    float ft
+  } elem_list
+} with {
+  variant(elem_list[-]) "name as 'elem'";
+}
+
+
+type record any_elem_inner4 {
+  integer id,
+  universal charstring any_elem optional
+} with {
+  variant (any_elem) "anyElement except 'http://www.somewhere.com'";
+}
+
+
+
+// Constants
+
+const any_elem_outer1 c_outer1 := { { 
+  { inner := { 11, "<something/>", 7 } }, 
+  { inner := { 2, omit, 19 } }, 
+  { ft := 6.1 } 
+} };
+
+const universal charstring c_outer1_enc := 
+"<psw:any_elem_outer1 xmlns:psw='http://www.somewhere.com'>\n" &
+"\t<psw:elem_list>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner id='11'>\n" &
+"\t\t\t\t<something/>\n" &
+"\t\t\t\t<psw:ival>7</psw:ival>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner id='2'>\n" &
+"\t\t\t\t<psw:ival>19</psw:ival>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:ft>6.100000</psw:ft>\n" &
+"\t\t</psw:elem>\n" &
+"\t</psw:elem_list>\n" &
+"</psw:any_elem_outer1>\n\n";
+
+
+const any_elem_outer2 c_outer2 := { { 
+  { inner := { 11, "<something/>", 7 } }, 
+  { inner := { 2, omit, 19 } }, 
+  { ft := 6.1 } 
+} };
+
+const universal charstring c_outer2_enc := 
+"<psw:any_elem_outer2 xmlns:psw='http://www.somewhere.com'>\n" &
+"\t<psw:elem_list>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner>\n" &
+"\t\t\t\t<psw:id>11</psw:id>\n" &
+"\t\t\t\t<something/>\n" &
+"\t\t\t\t<psw:ival>7</psw:ival>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner>\n" &
+"\t\t\t\t<psw:id>2</psw:id>\n" &
+"\t\t\t\t<psw:ival>19</psw:ival>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:ft>6.100000</psw:ft>\n" &
+"\t\t</psw:elem>\n" &
+"\t</psw:elem_list>\n" &
+"</psw:any_elem_outer2>\n\n";
+
+
+const any_elem_outer3 c_outer3 := { { 
+  { inner := { 11, "<something/>" } }, 
+  { inner := { 2, omit } }, 
+  { ft := 6.1 } 
+} };
+
+const universal charstring c_outer3_enc := 
+"<psw:any_elem_outer3 xmlns:psw='http://www.somewhere.com'>\n" &
+"\t<psw:elem_list>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner id='11'>\n" &
+"\t\t\t\t<something/>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner id='2'/>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:ft>6.100000</psw:ft>\n" &
+"\t\t</psw:elem>\n" &
+"\t</psw:elem_list>\n" &
+"</psw:any_elem_outer3>\n\n";
+
+
+const any_elem_outer4 c_outer4 := { { 
+  { inner := { 11, "<something/>" } }, 
+  { inner := { 2, omit } }, 
+  { ft := 6.1 } 
+} };
+
+const universal charstring c_outer4_enc :=
+"<psw:any_elem_outer4 xmlns:psw='http://www.somewhere.com'>\n" &
+"\t<psw:elem_list>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner>\n" &
+"\t\t\t\t<psw:id>11</psw:id>\n" &
+"\t\t\t\t<something/>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:inner>\n" &
+"\t\t\t\t<psw:id>2</psw:id>\n" &
+"\t\t\t</psw:inner>\n" &
+"\t\t</psw:elem>\n" &
+"\t\t<psw:elem>\n" &
+"\t\t\t<psw:ft>6.100000</psw:ft>\n" &
+"\t\t</psw:elem>\n" &
+"\t</psw:elem_list>\n" &
+"</psw:any_elem_outer4>\n\n";
+
+
+
+// Encoding & decoding functions
+
+DECLARE_EXER_ENCODERS(any_elem_outer1, outer1);
+DECLARE_EXER_ENCODERS(any_elem_outer2, outer2);
+DECLARE_EXER_ENCODERS(any_elem_outer3, outer3);
+DECLARE_EXER_ENCODERS(any_elem_outer4, outer4);
+
+// Test cases
+
+testcase encode_any_opt_complex1() runs on AE {
+  CHECK_METHOD(exer_enc_outer1, c_outer1, c_outer1_enc);
+}
+
+testcase decode_any_opt_complex1() runs on AE {
+  CHECK_DECODE(exer_dec_outer1, c_outer1_enc, any_elem_outer1, c_outer1);
+}
+
+testcase encode_any_opt_complex2() runs on AE {
+  CHECK_METHOD(exer_enc_outer2, c_outer2, c_outer2_enc);
+}
+
+testcase decode_any_opt_complex2() runs on AE {
+  CHECK_DECODE(exer_dec_outer2, c_outer2_enc, any_elem_outer2, c_outer2);
+}
+
+testcase encode_any_opt_complex3() runs on AE {
+  CHECK_METHOD(exer_enc_outer3, c_outer3, c_outer3_enc);
+}
+
+testcase decode_any_opt_complex3() runs on AE {
+  CHECK_DECODE(exer_dec_outer3, c_outer3_enc, any_elem_outer3, c_outer3);
+}
+
+testcase encode_any_opt_complex4() runs on AE {
+  CHECK_METHOD(exer_enc_outer4, c_outer4, c_outer4_enc);
+}
+
+testcase decode_any_opt_complex4() runs on AE {
+  CHECK_DECODE(exer_dec_outer4, c_outer4_enc, any_elem_outer4, c_outer4);
+}
+
+
+
+control {
+  execute(encode_any_opt_complex1());
+  execute(decode_any_opt_complex1());
+  execute(encode_any_opt_complex2());
+  execute(decode_any_opt_complex2());  
+  execute(encode_any_opt_complex3());
+  execute(decode_any_opt_complex3());
+  execute(encode_any_opt_complex4());
+  execute(decode_any_opt_complex4());
+}
+
+} with {
+  encode "XML";
+  variant "namespace as 'http://www.somewhere.com' prefix 'psw'";
+  variant "elementFormQualified";
+}

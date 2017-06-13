@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/simpletype/aliases"
+ targetNamespace="www.example.org/simpletype/aliases">
+
+
+<!-- Theese types needed to force the nameconversion -->
+<xsd:element name="Length_"/>
+<xsd:element name="ComplexSimpleNotAlias_"/>
+<xsd:element name="ComplexSimpleAlias3_"/>
+<xsd:element name="ComplexSimpleAlias4_"/>
+
+
+<xsd:simpleType name="Enumeration">
+	<xsd:restriction base="xsd:string">
+		<enumeration value="a"/>
+		<enumeration value="b"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the restriction element is not empty -->
+<xsd:simpleType name="EnumerationNotAlias">
+	<xsd:restriction base="this:Enumeration">
+		<enumeration value="a"/>
+		<enumeration value="b"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="EnumerationAlias2">
+	<xsd:restriction base="this:Enumeration">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="EnumerationAlias3">
+	<xsd:restriction base="this:EnumerationAlias2">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because it is restricted to 'a' -->
+<xsd:simpleType name="EnumerationNotAlias2">
+	<xsd:restriction base="this:EnumerationAlias2">
+		<enumeration value="a"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+
+<xsd:simpleType name="Pattern">
+	<xsd:restriction base="xsd:string">
+		<pattern value="abcd"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the restriction element is not empty -->
+<xsd:simpleType name="PatternNotAlias">
+	<xsd:restriction base="this:Pattern">
+		<pattern value="abcd"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="PatternAlias">
+	<xsd:restriction base="this:Pattern">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="PatternAlias2">
+	<xsd:restriction base="this:PatternAlias">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because it is restricted to 'abc' -->
+<xsd:simpleType name="PatternNotAlias2">
+	<xsd:restriction base="this:PatternAlias2">
+		<pattern value="abc"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+
+<xsd:simpleType name="Length">
+	<xsd:restriction base="xsd:string">
+		<minLength value="4"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the restriction element is not empty -->
+<xsd:simpleType name="LengthNotAlias">
+	<xsd:restriction base="this:Length">
+		<minLength value="4"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="LengthAlias">
+	<xsd:restriction base="this:Length">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="LengthAlias2">
+	<xsd:restriction base="this:LengthAlias">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the minLength is restricted to 5 -->
+<xsd:simpleType name="LengthNotAlias2">
+	<xsd:restriction base="this:LengthAlias2">
+		<minLength value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+
+<xsd:simpleType name="Value">
+	<xsd:restriction base="xsd:integer">
+		<minInclusive value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the restriction element is not empty -->
+<xsd:simpleType name="ValueNotAlias">
+	<xsd:restriction base="this:Value">
+		<minInclusive value="5"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="ValueAlias">
+	<xsd:restriction base="this:Value">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="ValueAlias2">
+	<xsd:restriction base="this:ValueAlias">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the minInclusiveness is restricted to 6 -->
+<xsd:simpleType name="ValueNotAlias2">
+	<xsd:restriction base="this:ValueAlias2">
+		<minInclusive value="6"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+
+<xsd:simpleType name="WhiteSpace">
+	<xsd:restriction base="xsd:string">
+		<xsd:whiteSpace value="preserve"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the restriction element is not empty -->
+<xsd:simpleType name="WhiteSpaceNotAlias">
+	<xsd:restriction base="this:WhiteSpace">
+		<xsd:whiteSpace value="preserve"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="WhiteSpaceAlias">
+	<xsd:restriction base="this:WhiteSpace">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="WhiteSpaceAlias2">
+	<xsd:restriction base="this:WhiteSpaceAlias">
+	</xsd:restriction>
+</xsd:simpleType>
+
+<!-- Not alias because the whiteSpace is restricted to replace -->
+<xsd:simpleType name="WhiteSpaceNotAlias2">
+	<xsd:restriction base="this:WhiteSpaceAlias2">
+		<xsd:whiteSpace value="replace"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+
+<xsd:complexType name="ComplexSimpleAlias">
+	<xsd:simpleContent>
+		<xsd:extension base="this:Length">
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+
+
+<xsd:attributeGroup name="AttrGroup">
+  <xsd:attribute name="attrgroup1" type="xsd:string"/>
+  <xsd:attribute name="attrgroup2" type="xsd:string"/>
+</xsd:attributeGroup>
+
+<!-- Not alias because extended with attributes -->
+<xsd:complexType name="ComplexSimpleNotAlias">
+	<xsd:simpleContent>
+		<xsd:extension base="this:Length">
+			<xsd:attributeGroup ref="this:AttrGroup"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexSimpleAlias2">
+	<xsd:simpleContent>
+		<xsd:extension base="this:LengthAlias2">
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with attribute -->
+<xsd:complexType name="ComplexSimpleNotAlias2">
+	<xsd:simpleContent>
+		<xsd:extension base="this:LengthAlias2">
+			<xsd:attribute name="attr" type="xsd:string"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexSimpleAlias3">
+	<xsd:simpleContent>
+		<xsd:extension base="this:ComplexSimpleNotAlias">
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with attribute -->
+<xsd:complexType name="ComplexSimpleNotAlias3">
+	<xsd:simpleContent>
+		<xsd:extension base="this:ComplexSimpleAlias3">
+			<xsd:attribute name="attr" type="xsd:string"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexSimpleAlias4">
+	<xsd:simpleContent>
+		<xsd:extension base="this:ComplexSimpleNotAlias3">
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with attribute -->
+<xsd:complexType name="ComplexSimpleNotAlias4">
+	<xsd:simpleContent>
+		<xsd:extension base="this:ComplexSimpleNotAlias3">
+			<xsd:attribute name="attr2" type="xsd:string"/>
+		</xsd:extension>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+
+
+<xsd:complexType name="ComplexSimpleRestrictionAlias">
+	<xsd:simpleContent>
+		<xsd:restriction base="this:ComplexSimpleNotAlias4"/>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexSimpleRestrictionAlias2">
+	<xsd:simpleContent>
+		<xsd:restriction base="this:ComplexSimpleRestrictionAlias"/>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<!-- Not alias because the minLength of the base is restricted to 5 -->
+<xsd:complexType name="ComplexSimpleRestrictionNotAlias">
+	<xsd:simpleContent>
+		<xsd:restriction base="this:ComplexSimpleNotAlias4">
+			<xsd:minLength value="5"/>
+		</xsd:restriction>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+<!-- Not alias because the attr attribute is required -->
+<xsd:complexType name="ComplexSimpleRestrictionNotAlias2">
+	<xsd:simpleContent>
+		<xsd:restriction base="this:ComplexSimpleRestrictionAlias2">
+			<xsd:attribute name="attr" type="xsd:string" use="required"/>
+		</xsd:restriction>
+	</xsd:simpleContent>
+</xsd:complexType>
+
+
+
+
+</xsd:schema>

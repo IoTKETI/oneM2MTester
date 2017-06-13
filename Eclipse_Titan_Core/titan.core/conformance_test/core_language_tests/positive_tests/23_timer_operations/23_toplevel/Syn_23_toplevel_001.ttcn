@@ -1,0 +1,87 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:23, Ensure timer allowed in module control, test case, function, altstep
+ ** @verdict  pass accept, noexecution
+ ***************************************************/
+// #reqname  /Requirements/23 Timer operations/Usage of timers is allowed in test cases, functions, altsteps, module control/Positive syntax test
+
+module Syn_23_toplevel_001 
+{
+    type port MyPort message {
+        inout integer;
+    } with {extension "internal"}
+    
+    type component TComp 
+    {
+    	port MyPort p_port;
+    }
+    
+    function f_function()
+    {
+        var float v_float;
+        timer t_timer;
+        
+        t_timer.start(1.0);
+        v_float := t_timer.read;
+        if (t_timer.running)
+        {
+            t_timer.timeout;
+        }
+        t_timer.stop;
+    }
+    
+    altstep a_step() runs on TComp
+    {
+        [] p_port.receive {
+            var float v_float;
+            timer t_timer;
+            
+            t_timer.start(1.0);
+            v_float := t_timer.read;
+            if (t_timer.running)
+            {
+           		t_timer.timeout;
+            }
+           	t_timer.stop;
+        }
+    }
+    
+    testcase TC_Syn_23_toplevel_001() runs on TComp
+    {
+		activate(a_step());
+
+        var float v_float;
+        timer t_timer;
+
+        t_timer.start(1.0);
+        v_float := t_timer.read;
+        if (t_timer.running)
+        {
+            t_timer.timeout;
+        }
+        t_timer.stop;
+
+		f_function();
+		setverdict(pass);
+	}
+	
+	control
+	{
+        var float v_float;
+        timer t_timer;
+
+        t_timer.start(1.0);
+        v_float := t_timer.read;
+        if (t_timer.running)
+        {
+            t_timer.timeout;
+        }
+        t_timer.stop;	
+
+		execute(TC_Syn_23_toplevel_001());   
+	}
+}

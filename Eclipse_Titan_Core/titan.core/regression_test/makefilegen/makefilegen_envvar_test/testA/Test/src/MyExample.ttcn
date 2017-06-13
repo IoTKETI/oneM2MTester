@@ -1,0 +1,39 @@
+// TTCN-3 version of "Hello, world!"
+module MyExample
+{
+type port PCOType message
+{
+  inout charstring;
+}
+
+type component MTCType
+{
+  port PCOType MyPCO_PT;
+}
+
+testcase tc_HelloW() runs on MTCType system MTCType
+{
+  map(mtc:MyPCO_PT, system:MyPCO_PT);
+  MyPCO_PT.send("Hello, world!");
+  setverdict(pass);
+}
+
+testcase tc_HelloW2() runs on MTCType system MTCType
+{
+  timer TL_T := 15.0;
+  map(mtc:MyPCO_PT, system:MyPCO_PT);
+  MyPCO_PT.send("Hello, world!");
+  TL_T.start;
+  alt {
+    [] MyPCO_PT.receive("Hello, TTCN-3!") { TL_T.stop; setverdict(pass); }
+    [] TL_T.timeout { setverdict(inconc); }
+    [] MyPCO_PT.receive { TL_T.stop; setverdict(fail); }
+  }
+}
+
+control
+{
+  execute(tc_HelloW());
+  execute(tc_HelloW2());
+}
+}

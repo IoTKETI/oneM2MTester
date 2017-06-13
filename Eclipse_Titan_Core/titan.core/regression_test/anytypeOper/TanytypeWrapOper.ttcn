@@ -1,0 +1,748 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module TanytypeWrapOper {
+// ********** Type definitions  *********************
+type component anytypeWrapOper_mycomp {};
+type enumerated anytypeWrapOper_myenum {xx1,xx2,xx3};
+type record anytypeWrapOper_trecord {
+	integer x1 optional,
+	float x2 };
+type record of octetstring anytypeWrapOper_trecof;
+type set anytypeWrapOper_tset {
+	integer x1,
+	float x2 optional };
+type set of charstring anytypeWrapOper_tsetof;
+
+type union anytypeWrapOper_tunion {
+	integer x1,
+	float x2 };
+type union anytypeWrapOper_myunion1 {integer x1, float x2}; 	// union of basic types
+type union anytypeWrapOper_myunion2 {  // union of enum
+	anytypeWrapOper_myenum x1,
+	integer x2};
+type union anytypeWrapOper_myunion3 {  // union of record
+	anytypeWrapOper_trecord x1,
+	integer x2};
+type union anytypeWrapOper_myunion4 { // union of record of
+	anytypeWrapOper_trecof x1,
+	integer x2};
+type union anytypeWrapOper_myunion5 {  // union of set
+	anytypeWrapOper_tset x1,
+	integer x2};
+type union anytypeWrapOper_myunion6 { // union of set of
+	anytypeWrapOper_tsetof x1,
+	integer x2};
+type union anytypeWrapOper_myunion7 { // union of union
+	anytypeWrapOper_tunion x1,
+	integer x2};
+type union anytypeWrapOper_myunion8 { // union of same types
+	integer x1,
+	integer x2};
+
+// *************** Constanst ***********************
+//const anytypeWrapOper_trecord anytypeWrapOper_temp1:={ x1:=omit, x2:=3.4 };
+//const anytypeWrapOper_trecof anytypeWrapOper_temp2:={ 'AF12'O };
+//const anytypeWrapOper_tset anytypeWrapOper_temp3:={ x1:=234, x2:=1.9};
+//const anytypeWrapOper_tsetof anytypeWrapOper_temp4:={"f","8"};
+//const anytypeWrapOper_tunion anytypeWrapOper_temp5:={ x2:=1.3 };
+const anytype anytypeWrapOper_const1:=
+{ anytypeWrapOper_myunion1 := { x1:=1 } }; 	//union with basic types
+
+const anytype anytypeWrapOper_const2:= { anytypeWrapOper_myunion2 := {	//union with enum
+  x1:=xx1 }};
+
+const anytype anytypeWrapOper_const3:= { anytypeWrapOper_myunion3 := {   //union from record
+  x1:={ x1:=1, x2:=1.2 } } };
+
+const anytype anytypeWrapOper_const4:={   //union from record of
+ anytypeWrapOper_myunion4 := { x1:={ '12AB'O, 'CD12'O } } };
+
+const anytype anytypeWrapOper_const5:={   //union from set
+ anytypeWrapOper_myunion5 := { x1:={ x1:=2, x2:=1.3} } };
+
+const anytype anytypeWrapOper_const6:={   //union from set of
+ anytypeWrapOper_myunion6 := { x1:={"a","b"} } };
+
+const anytype anytypeWrapOper_const7:={   //union from union
+ anytypeWrapOper_myunion7 := { x1:={ x1 :=3 } } };
+
+testcase anytypewrapAssign() runs on anytypeWrapOper_mycomp{
+var anytype x1:={	//union with basic types
+  anytypeWrapOper_myunion1 := { x1:=1} };
+var anytypeWrapOper_myunion1 x2,x3;
+x2:={ x2:=1.2 };
+if (x1.anytypeWrapOper_myunion1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.anytypeWrapOper_myunion1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.anytypeWrapOper_myunion1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==1.2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignEnum() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion2 x1:={	//union with enum
+  x1:=xx1};
+var anytypeWrapOper_myunion2 x2;
+x2:={ x1:=xx2 };
+if (x1.x1==xx1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1==xx2) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignRec() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytypeWrapOper_myunion3 x1:={   //union from record
+ x1:={ x1:=1, x2:=1.2 } };
+var anytypeWrapOper_myunion3 x2;
+x2:={ x1:={ x1:=1, x2:=1.2 } };
+if (x1.x1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignRecof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecof temp2:={'AF12'O};
+var anytypeWrapOper_myunion4 x1:={   //union from record of
+ x1:={ '12AB'O, 'CD12'O } };
+var anytypeWrapOper_myunion4 x2;
+x2:={  x1:={ '12AB'O, 'CD12'O } };
+if (x1.x1[0]=='12AB'O) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=='12AB'O) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapAssignSet() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tset temp1:={ x1:=2, x2:=omit };
+var anytypeWrapOper_myunion5 x1:={   //union from record
+ x1:={ x1:=1, x2:=1.2 } };
+var anytypeWrapOper_myunion5 x2;
+x2:={   x1:={ x1:=1, x2:=1.2 } };
+if (x1.x1.x1==1) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==1) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignSetof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tsetof temp2:={"a","7"};
+var anytypeWrapOper_myunion6 x1:={   //union from set of
+ x1:={ "1", "a" } };
+var anytypeWrapOper_myunion6 x2;
+x2:={  x1:={ "1", "a" } };
+if (x1.x1[0]=="1") {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (x1.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=="1") {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (x2.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignUnion() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_tunion temp5 := {x2:=1.3}
+var anytypeWrapOper_myunion7 x1:={   //union from union
+ x1:={ x1 :=3 } };
+var anytypeWrapOper_myunion7 x2;
+x2:={ x1:={ x1 :=3 } };
+if (x1.x1.x1==3) {setverdict(pass);}	//at declaration
+     else {setverdict(fail);}
+if (ischosen(x1.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x1==3) {setverdict(pass);}	//later
+     else {setverdict(fail);}
+if (ischosen(x2.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElem() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion1 x1, x2;	//union with basic types
+x1:={ x1:=1 };
+x2:= {x1:=2}
+x1.x1:=3;		// change value
+x2.x2:=3.2;		//choose other
+if (x1.x1==3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3.2) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElemEnum() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion2 x1, x2;	//union with enum
+x1:={ x1:=xx1 };
+x2:= {x1:=xx2}
+x1.x1:=xx3;		// change value
+x2.x2:=3;		//choose other
+if (x1.x1==xx3) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3) {setverdict(pass);}	//choose other
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElemRec() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytypeWrapOper_myunion3 x1,x2;	//union from record
+x1:={   x1:={ x1:=1, x2:=1.2 } };
+x2:={   x1:={ x1:=1, x2:=1.2 } };
+x1.x1.x1:=2;		//change value
+x2.x2:=2;		//change selection
+if (x1.x1.x1==2) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElemRecof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecof temp2:={'AF12'O};
+var anytypeWrapOper_myunion4 x1,x2;    //union from record of
+x1:={ x1:={ '12AB'O, 'CD12'O } };
+x2:={ x1:={ '12AB'O, 'CD12'O } };
+x1.x1[1]:='34AB'O;	//change value
+x2.x2:=2;		//change selection
+if (x1.x1[0]=='12AB'O) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1[1]=='34AB'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==2) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapAssignElemSet() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tset temp1:={ x1:=2, x2:=omit };
+var anytypeWrapOper_myunion5 x1,x2;   //union from record
+x1:= { x1:={ x1:=1, x2:=1.2 } };
+x2:= { x1:={ x1:=1, x2:=1.2 } };
+x1.x1.x2:=3.4;			//change value
+x2.x2:=3;			//change selection
+if (x1.x1.x1==1) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1.x2==3.4) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x2==3) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElemSetof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tsetof temp2:={"a","7"};
+var anytypeWrapOper_myunion6 x1,x2;   //union from record of
+x1:={ x1:={ "1", "a" } };
+x2:={ x2:=1 };
+x1.x1[0]:="h";		//change value
+x2.x1:={ "1", "a" };		//change selection
+if (x1.x1[0]=="h") {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (x1.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1[0]=="1") {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (x2.x1[1]=="a") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapAssignElemUnion() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tunion temp5 := {x2:=1.3}
+var anytypeWrapOper_myunion7 x1,x2;   //union from union
+x1:={ x1:={ x1 :=3 } };
+x2:={ x2:=2 };
+x1.x1.x2:=3.4;			//change value
+x2.x1:={ x2 :=3.4 };		//change selection
+if (x1.x1.x2==3.4) {setverdict(pass);}	//change value
+     else {setverdict(fail);}
+if (ischosen(x1.x1.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x1.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x2.x1.x2==3.4) {setverdict(pass);}	//change selection
+     else {setverdict(fail);}
+if (ischosen(x2.x1.x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x1.x1))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(x2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(x2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapConst() runs on anytypeWrapOper_mycomp{
+const anytype const1:={	//union with basic types
+ anytypeWrapOper_myunion1 := { x1:=1 } };
+if (anytypeWrapOper_const1.anytypeWrapOper_myunion1.x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const1.anytypeWrapOper_myunion1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const1.anytypeWrapOper_myunion1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const1.anytypeWrapOper_myunion1.x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const1.anytypeWrapOper_myunion1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const1.anytypeWrapOper_myunion1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapConstEnum() runs on anytypeWrapOper_mycomp{
+const anytype const2:={	//union with enum
+ anytypeWrapOper_myunion2 := {x1:=xx1} };
+if (anytypeWrapOper_const2.anytypeWrapOper_myunion2.x1==xx1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const2.anytypeWrapOper_myunion2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const2.anytypeWrapOper_myunion2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const2.anytypeWrapOper_myunion2.x1==xx1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const2.anytypeWrapOper_myunion2.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const2.anytypeWrapOper_myunion2.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapConstRec() runs on anytypeWrapOper_mycomp{
+const anytype const3:={   //union from record
+ anytypeWrapOper_myunion3 := { x1:={ x1:=1, x2:=1.2 } } };
+if (anytypeWrapOper_const3.anytypeWrapOper_myunion3.x1.x1==1) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeWrapOper_const3.anytypeWrapOper_myunion3.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const3.anytypeWrapOper_myunion3.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const3.anytypeWrapOper_myunion3.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const3.anytypeWrapOper_myunion3.x1.x1==1) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const3.anytypeWrapOper_myunion3.x1.x2==1.2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const3.anytypeWrapOper_myunion3.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const3.anytypeWrapOper_myunion3.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapConstRecof() runs on anytypeWrapOper_mycomp{
+const anytype const4:={   //union from record of
+ anytypeWrapOper_myunion4 := { x1:={ '12AB'O, 'CD12'O } } };
+if (anytypeWrapOper_const4.anytypeWrapOper_myunion4.x1[0]=='12AB'O) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeWrapOper_const4.anytypeWrapOper_myunion4.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const4.anytypeWrapOper_myunion4.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const4.anytypeWrapOper_myunion4.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const4.anytypeWrapOper_myunion4.x1[0]=='12AB'O) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const4.anytypeWrapOper_myunion4.x1[1]=='CD12'O) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const4.anytypeWrapOper_myunion4.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const4.anytypeWrapOper_myunion4.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapConstSet() runs on anytypeWrapOper_mycomp{
+const anytype const5:={   //union from set
+ anytypeWrapOper_myunion5 := { x1:={ x1:=2, x2:=1.3} } };
+if (anytypeWrapOper_const5.anytypeWrapOper_myunion5.x1.x1==2) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeWrapOper_const5.anytypeWrapOper_myunion5.x1.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const5.anytypeWrapOper_myunion5.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const5.anytypeWrapOper_myunion5.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const5.anytypeWrapOper_myunion5.x1.x1==2) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const5.anytypeWrapOper_myunion5.x1.x2==1.3) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const5.anytypeWrapOper_myunion5.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const5.anytypeWrapOper_myunion5.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapConstSetof() runs on anytypeWrapOper_mycomp{
+const anytype const6:={   //union from set of
+ anytypeWrapOper_myunion6 := { x1:={"a","b"} } };
+if (anytypeWrapOper_const6.anytypeWrapOper_myunion6.x1[0]=="a") {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (anytypeWrapOper_const6.anytypeWrapOper_myunion6.x1[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const6.anytypeWrapOper_myunion6.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const6.anytypeWrapOper_myunion6.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const6.anytypeWrapOper_myunion6.x1[0]=="a") {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (const6.anytypeWrapOper_myunion6.x1[1]=="b") {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const6.anytypeWrapOper_myunion6.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const6.anytypeWrapOper_myunion6.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapConstUnion() runs on anytypeWrapOper_mycomp{
+const anytype const7:={   //union from union
+ anytypeWrapOper_myunion7 := { x1:={ x1 :=3 } } };
+if (anytypeWrapOper_const7.anytypeWrapOper_myunion7.x1.x1==3) {setverdict(pass);}	//definition part
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const7.anytypeWrapOper_myunion7.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const7.anytypeWrapOper_myunion7.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(anytypeWrapOper_const7.anytypeWrapOper_myunion7.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(anytypeWrapOper_const7.anytypeWrapOper_myunion7.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (const7.anytypeWrapOper_myunion7.x1.x1==3) {setverdict(pass);}	//testcase
+     else {setverdict(fail);}
+if (ischosen(const7.anytypeWrapOper_myunion7.x1.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const7.anytypeWrapOper_myunion7.x1.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+if (ischosen(const7.anytypeWrapOper_myunion7.x1)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(ischosen(const7.anytypeWrapOper_myunion7.x2))) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapComp() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion1 x1,x2,x3,x4;
+x1:={ x1:=1  };
+x2:={ x1:=1 };
+x3:={ x1:=2 };		// different value
+x4:={ x2:=1.2 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapCompSame() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion8 x1,x2;
+x1:={ x1:=1  };			// same value, different selection
+x2:={ x2:=1 };
+if (x1!=x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapCompEnum() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_myunion2 x1,x2,x3,x4;
+x1:={ x1:=xx1  };
+x2:={ x1:=xx1 };
+x3:={ x1:=xx2 };		// different value
+x4:={ x2:=1 };	// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapCompRec() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecord temp1:={ x1:=omit, x2:=3.4 };
+var anytypeWrapOper_myunion3 x1,x2,x3,x4;
+x1 :={  x1:={ x1:=1, x2:=1.2 } };
+x2 :={  x1:={ x1:=1, x2:=1.2 } };
+x3 :={  x1:={ x1:=2, x2:=1.2 } }; // different value
+x4 :={  x2:=1 }; // different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapCompRecof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_trecof temp2:={'AF12'O};
+var anytypeWrapOper_myunion4 x1,x2,x3,x4;	//union from record of
+x1:={  x1:={ '12AB'O, 'CD12'O } };
+x2:={  x1:={ '12AB'O, 'CD12'O } };
+x3:={  x1:={ '12AB'O } };		//different value
+x4:={  x2:=12 };		//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+testcase anytypewrapCompSet() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tset temp1:={ x1:=2, x2:=omit };
+var anytypeWrapOper_myunion5 x1,x2,x3,x4; // union from set
+x1:={ x1:={ x1:=1, x2:=1.2 } };
+x2:={ x1:={ x1:=1, x2:=1.2 } };
+x3:={ x1:={ x1:=4, x2:=1.2 } }; // different value
+x4:={ x2:=4 }; 			// different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapCompSetof() runs on anytypeWrapOper_mycomp{
+//var anytypeWrapOper_tsetof temp2:={"a","7"};
+var anytypeWrapOper_myunion6 x1,x2,x3,x4;	//union from record of
+x1:={ x1:={ "1", "a" } };
+x2:={ x1:={ "1", "a" } };
+x3:={ x1:={ "1", "a", "k" } };	//different value
+x4:={ x2:=2 };			//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+testcase anytypewrapCompUnion() runs on anytypeWrapOper_mycomp{
+var anytypeWrapOper_tunion temp5 := {x2:=1.3}
+var anytypeWrapOper_myunion7 x1,x2,x3,x4;	// union form union
+x1:={  x1:={ x1 :=3 } };
+x2:={  x1:={ x1 :=3 } };
+x3:={  x1:={ x2 :=3.9 } };		//different value
+x4:={  x2:=3 };				//different selection
+if (x1==x2) {setverdict(pass);}
+     else {setverdict(fail);}
+if (not(x1==x3)) {setverdict(pass);}	// different value
+     else {setverdict(fail);}
+if (not(x4==x1)) {setverdict(pass);}	// different selection
+     else {setverdict(fail);}
+if (not(x1!=x2)) {setverdict(pass);}
+     else {setverdict(fail);}
+if (x1!=x3) {setverdict(pass);}		// different value
+     else {setverdict(fail);}
+if (x4!=x2) {setverdict(pass);}		// different selection
+     else {setverdict(fail);}
+}
+
+
+control {
+ execute(anytypewrapAssign());
+ execute(anytypewrapAssignEnum());
+ execute(anytypewrapAssignRec());
+ execute(anytypewrapAssignRecof());
+ execute(anytypewrapAssignSet());
+ execute(anytypewrapAssignSetof());
+ execute(anytypewrapAssignUnion());
+ execute(anytypewrapAssignElem());
+ execute(anytypewrapAssignElemEnum());
+ execute(anytypewrapAssignElemRec());
+ execute(anytypewrapAssignElemRecof());
+ execute(anytypewrapAssignElemSet());
+ execute(anytypewrapAssignElemSetof());
+ execute(anytypewrapAssignElemUnion());
+ execute(anytypewrapConst());
+ execute(anytypewrapConstEnum());
+ execute(anytypewrapConstRec());
+ execute(anytypewrapConstRecof());
+ execute(anytypewrapConstSet());
+ execute(anytypewrapConstSetof());
+ execute(anytypewrapConstUnion())
+ execute(anytypewrapComp());
+ execute(anytypewrapCompSame());
+ execute(anytypewrapCompEnum());
+ execute(anytypewrapCompRec());
+ execute(anytypewrapCompRecof());
+ execute(anytypewrapCompSet());
+ execute(anytypewrapCompSetof());
+ execute(anytypewrapCompUnion())
+}
+}
+with {
+extension "anytype anytypeWrapOper_tunion, anytypeWrapOper_myunion1, anytypeWrapOper_myunion2"
+extension "anytype anytypeWrapOper_myunion3, anytypeWrapOper_myunion4, anytypeWrapOper_myunion5"
+extension "anytype anytypeWrapOper_myunion6, anytypeWrapOper_myunion7, anytypeWrapOper_myunion8"
+}
+

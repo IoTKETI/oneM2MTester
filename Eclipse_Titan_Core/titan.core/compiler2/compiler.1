@@ -1,0 +1,425 @@
+.TH compiler 1 "October 2014" "Ericsson Telecom AB" "TTCN-3 Tools"
+.SH NAME
+compiler \- TTCN-3 and ASN.1 to C++ translator
+.SH SYNOPSIS
+.B compiler
+.RB "[\| " \-abcdEfgijlLMnpqrRsStuwxXyY " \|]"
+.RB "[\| " \-V
+.IR " verb_level" " \|]"
+.RB "[\| " \-K
+.IR " file" " \|]"
+.RB "[\| " \-z
+.IR " file" " \|]"
+.RB "[\| " \-o
+.IR " dir" " \|]"
+.RB "[\| " \-P
+.IR " top_level_pdu" " \|] ..."
+.RB "[\| " \-Q
+.IR "n" " \|] "
+.RB "[\| " \-U
+.IR "none|type|'number'" " \|] "
+.RB "[\| " \-T " \|]"
+module.ttcn ...
+.RB "[\| " \-A " \|]"
+module.asn ...
+[\| \- module.ttcn ... module.asn ... \|]
+.br
+or
+.br
+.B compiler
+.B \-v
+.br
+or
+.br
+.B compiler \-\-ttcn2json
+.RB "[\| " \-jf " \|]"
+.RB "[\| " \-T " \|]"
+module.ttcn ...
+.RB "[\| " \-A " \|]"
+module.asn ...
+.RB "[\| " \-
+schema.json
+.RB " \|]"
+.SH DESCRIPTION
+This manual page is a quick reference for the TTCN-3 and ASN.1 to C++ (or JSON schema)
+compiler of the TTCN-3 Test Executor. It only summarizes the meaning of
+all command line options. For more details please consult the
+.B Programmer's Technical Reference for TITAN TTCN-3 Test Executor.
+.SH OPTIONS
+The following options are supported (in alphabetical order):
+.TP 10
+.BI \-A " file"
+Forces the interpretation of
+.I file
+as an
+.I ASN.1 module.
+It is useful when automatic module type detection fails
+due to some strange language constructs. The option takes exactly one file
+name as argument. The option must be repeated when used with multiple files.
+See also: option
+.B \-T.
+.TP
+.B \-a
+Force
+.I XER
+in ASN.1 files
+.TP
+.B \-b
+Disables the generation of
+.I BER
+encoder/decoder routines for all ASN.1 types.
+.TP
+.B \-B
+Allows the selected field in a union value to be unbound, when setting module
+parameters (legacy behavior). A warning is displayed whenever a union value
+receives an unbound selected field and when a union with an unbound selected field
+is copied.
+.TP
+.B \-c
+Write out
+.I checksums
+in case of error
+.TP
+.B \-d
+Treat ASN.1
+.I SEQUENCE/SET
+fields with DEFAULT values as
+.I omit
+in TTCN-3.
+.TP
+.B \-E
+Instructs the variant attribute parser to display warnings instead of errors
+for unrecognized/erroneous attributes.
+.TP
+.B \-f
+Forces the compiler to
+.I overwrite
+the output files even if they exist or are unchanged.
+.TP
+.B \-g
+The compiler error/warning messages will contain only the starting
+line number and column, in a format compatible with th GNU compiler (gcc).
+.B \-g
+takes precedence over
+.B \-i
+if both are specified.
+.TP
+.B \-i
+The compiler error/warning messages
+will contain only the
+.I line numbers,
+the column numbers will remain hidden. This option provides backward
+compatibility with the error message format of earlier versions.
+.TP
+.B \-j
+Disables JSON encoder/decoder functions.
+.TP
+.BI \-K " file"
+Enables selective code coverage.
+.TP
+.B \-l
+Instructs the compiler to generate source file and line information (i.e.
+.I #line
+directives) into the output C++ code so that the C++ compiler error
+messages refer back to the lines of original TTCN-3 input module.
+.br
+This option is
+.I obsolete
+and will be removed in future versions as the
+compiler does not generate erroneous C++ code because of the full
+semantic analysis.
+.TP
+.B \-L
+Instructs the compiler to add source file and line
+.I source file
+and
+.I line number
+information into the generated code to be included in the
+.I log
+during execution.
+.br
+This option is only a prerequisite for logging the source code information.
+Options
+.I SourceInfoFormat
+and
+.I LogEntityName
+have also to be set appropriately in section
+.I [LOGGING]
+of the run-time configuration file.
+.br
+Usage of this option a bit enlarges the size of the generated code and slightly
+reduces execution speed. This flag is not recommended when the TTCN-3 test
+suite is used for load generation.
+.TP
+.B \-M
+Allows the use of the value
+.B omit
+in template lists and complemented template lists (legacy behavior).
+If set, an omitted field will match a template list, if the value
+.B omit
+appears in the list, and it will match a complemented template list, if
+.B omit
+is not in the list (the
+.B ifpresent
+attribute can still be used for matching omitted fields). This also affects the
+.B ispresent
+operation and the
+.B present
+template restriction accordingly.
+.TP
+.B \-n
+Activates the debugger and generates extra code for storing debug information.
+.TP
+.BI \-o " dir"
+The output files (including Test Port skeletons) will be placed into
+the directory specified by
+.I dir.
+The current working directory is the default otherwise.
+.TP
+.B \-p
+Instructs the compiler only to
+.I parse
+the given TTCN-3 and ASN.1 modules. This will detect only the syntax errors
+because semantic checkings are
+.I not
+performed. The presence of all imported modules is not necessary thus it is
+allowed (and recommended) to parse the modules one-by-one.
+.br
+All options that influence the code generation are silently ignored when used
+together with
+.B \-p.
+.br
+.B Note:
+This option includes complete syntax checks for TTCN-3 modules, but in ASN.1
+there are some special constructs (e.g. the user-defined syntaxes) that cannot
+be even parsed without semantic analysis. So there is no guarantee that an ASN.1
+module is free of syntax errors if it was analyzed with compiler using the
+.B -p
+flag.
+.TP
+.BI \-P " top_level_pdu" ...
+Defines a top-level pdu.
+.I top_level_pdu
+must have the following format:
+.I modulename.identifier.
+If this switch is used, then only the defined top-level PDU(s) and the
+referenced assignments are checked and included in code generation, the
+other ASN.1 assignments are skipped.
+.TP
+.B \-q
+.I Quiet
+mode. Equivalent with
+.B \-V 0.
+.TP
+.B \-Qn
+.I Quits
+after 
+.B n
+errors.
+.TP
+.B \-r
+Disables the generation of
+.I RAW
+encoder/decoder routines for all TTCN-3 types.
+.TP
+.B \-R
+Use function test runtime (TITAN_RUNTIME_2). The compiler will generate source
+code for use with function test runtime.
+.TP
+.B \-s
+Instructs the compiler to parse the given TTCN-3 and ASN.1 modules and perform
+.I semantic analysis
+on them, but
+.I not
+to generate C++ output. The list of given modules shall be complete so it is
+not allowed to import from a module that is not in the list. All options that
+influence the code generation are silently ignored when used together with
+.B \-s.
+.TP
+.B \-S
+.I Suppresses 
+context information.
+.TP
+.B \-t
+Generates
+.I Test Port
+skeleton header and source files for all port types that can be found in
+TTCN-3 modules. Existing Test Port files will not be overwritten unless the
+.B \-f
+option is used.
+.TP
+.BI \-T " file"
+Forces the interpretation of
+.I file
+as a
+.I TTCN-3 module.
+See also: option
+.B \-A.
+.TP
+.B \-u
+Forces the compiler to do
+.I duplicate underscore
+characters in all output file names. This option turns on the
+compatibility mode with versions 1.1 or earlier.
+.TP
+.BI \-U " none|type|'number'"
+Selects code splitting mode for the generated C++ code.
+The 'number' should be a positive number between 1 and 999999.
+If the 'number' is present the files will be sliced into 'number' files.
+.TP
+.B \-v
+Prints
+.I version
+and license key information and exits.
+.TP
+.BI \-V " verb_level"
+Sets the verbosity bit-mask directly to
+.I verb_level
+(where
+.I verb_level
+is a decimal value between 0 and 65535).
+.br
+.sp 1
+Meaning of bits:
+.P
+.RS 10
+.PD 0
+.TP 10
+.B 1:
+"NOT SUPPORTED" messages.
+.TP
+.B 2:
+WARNING messages.
+.TP
+.B 4:
+NOTIFY messages.
+.TP
+.B 32|16|8:
+DEBUG messages.
+.br
+The debug-bits act like a 3-bits-length number, so the debug level has
+a value between 0 and 7. It is useful in case of abnormal program termination.
+.PD
+.RE
+.P
+.TP 10
+.B \-w
+Suppresses all
+.I warning
+messages. Equivalent with
+.B \-V 4.
+.TP
+.B \-x
+Disables the generation of
+.I TEXT
+encoder/decoder routines for all TTCN-3 types.
+.TP
+.B \-X
+Disable
+.I XER
+encoder/decoder functions
+.TP
+.B \-y
+Disable
+.I subtype
+checking
+.TP
+.B \-Y
+Enforces legacy behaviour of the "out" function parameters (see refguide).
+.TP
+.BI \-z " file"
+Enables profiling and code coverage in the selected TTCN-3 files. The
+.I file
+argument contains a list of TTCN-3 files separated by new lines. Each TTCN-3 file must be among the compiler's TTCN-3 file arguments.
+.TP
+.B \-
+The single dash character as command line argument controls the
+.I selective code generation
+option.
+After the list of all TTCN-3 and ASN.1 modules a subset of these files can
+be given separated by a dash. This option instructs the compiler to parse all
+modules, perform the semantic analysis on the entire module hierarchy, but
+generate code
+.I only
+for those modules that are listed after the dash again.
+.br
+It is not allowed to specify a file name after the dash that was not present
+in the list before the dash. If the single dash is not present in the command
+line the compiler will generate code for
+.I all
+modules.
+.TP
+.B \-\-ttcn2json
+Generates a JSON schema from the types defined in the specified TTCN-3 and ASN.1 modules.
+Must always be the first compiler option. From the previously listed options only
+.B \-T
+and
+.B \-A
+can be used, instead the JSON schema generator has options of its own:
+.TP
+.B \-j
+Only types that have JSON coding enabled are included in the schema.
+.TP
+.B \-f
+The schema only validates types that have a JSON encoding or decoding method declared.
+.TP
+.BI \- " file"
+The single dash character as command line argument specifies the name of the generated
+JSON schema file. If it is not present, then the schema file name is generated from
+the name of the first input file (by replacing its suffix with
+.I \.json
+or appending
+.I \.json
+to the end of the file).
+.SH EXIT STATUS
+The compiler exits with a status of zero when no errors were encountered
+during its operation. A status of one will be returned if syntax or
+semantic errors were detected in the input modules.
+.SH ENVIRONMENT VARIABLES
+.TP
+.SM
+TTCN3_DIR
+The installation directory where the uncompressed binary package of
+TTCN-3 Test Executor can be found.
+.TP
+.SM
+TTCN3_LICENSE_FILE
+It shall point to the
+.I file
+.RB ( NB:
+.I not
+to its directory) that contains the personalized license key for the
+current user or host.
+.SH BUGS
+The compiler does not support all constructs of TTCN-3 Core Language and ASN.1.
+It reports an error when encountering an unsupported language element.
+The detailed list of deficiencies and language extensions can be found in the
+referenced documentation.
+.LP
+For trouble reporting use the tool
+.BR "MHWEB" "."
+For TR writers guide please visit the web page:
+.I http://ttcn.ericsson.se.
+.SH SEE ALSO
+.TP
+.SM
+Ericsson document 2/198 17-CRL 113 200 Uen:
+.B Programmer's Technical Reference for TITAN TTCN-3 Test Executor
+.TP
+.SM
+ETSI Standard ES 201-873-1:
+.B Testing and Test Control Notation: TTCN-3 Core Language
+.TP
+.SM
+ITU-T Recommendations X.680-683:
+.B Abstract Syntax Notation One (ASN.1)
+.SH AUTHOR
+This manpage is written by Janos Zoltan Szabo, Ericsson Telecom AB
+.br
+Copyright (c) 2000-2017 Ericsson Telecom AB
+.br
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+.br
+http://www.eclipse.org/legal/epl-v10.html

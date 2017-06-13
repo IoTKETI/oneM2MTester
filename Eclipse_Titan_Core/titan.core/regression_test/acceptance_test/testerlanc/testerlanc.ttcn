@@ -1,0 +1,74 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Gecse, Roland
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module testerlanc {
+
+type component mycomptype {
+	port myporttype Aport, Bport
+}
+
+type port myporttype message {
+	inout charstring;
+} with { extension "internal" }
+
+type record starter {
+	charstring str optional
+}
+
+function f(in starter init, in float tout, in mycomptype dest)
+runs on mycomptype {
+	var charstring c;
+	timer t := tout;
+
+	t.start;
+	if(ispresent(init.str)) {
+		Aport.send(charstring:init.str);
+	}
+	alt {
+	[] Bport.receive(charstring:?) -> value c
+	   {
+	   		if(dest.running) {
+				Aport.send(c);
+				repeat;
+			}
+	   }
+	[] t.timeout { setverdict(pass); stop; }
+	}
+}
+
+testcase tc(in charstring str, in float tout) runs on mycomptype {
+	var mycomptype ptc[100];
+	var integer r;
+	var starter init := { str := str };
+	var starter noinit := { str := omit };
+
+	ptc[0] := mycomptype.create;
+	for(r := 1; r < N; r := r + 1) {
+		ptc[r] := mycomptype.create;
+		connect(ptc[r]:Aport, ptc[r-1]:Bport)
+		ptc[r].start(f(noinit, tout, ptc[r-1]));
+	}
+	connect(ptc[0]:Aport, ptc[N-1]:Bport)
+	ptc[0].start(f(init, tout, ptc[N-1]));
+
+	all component.done;
+	setverdict(pass);
+}
+
+const integer N := 100;
+
+control {
+	execute(tc("Hello!", 30));
+}
+
+}

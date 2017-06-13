@@ -1,0 +1,87 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:6, Verify conversion of simpleType based on built-in XSD type
+ ** @verdict  pass accept, ttcn3verdict:pass
+***************************************************/
+// The following requirements are tested:
+// XSD built-in data types may be primitive or derived types. The latter are 
+// gained from primitive types by means of a restriction mechanism called 
+// facets. For the mapping of primitive types, a specific TTCN-3 module XSD is 
+// provided by the present document, which defines the relation of XSD primitive 
+// types to TTCN-3 types. Whenever a new simpleType is defined, with 
+// a built-in XSD type as its base type, it shall be mapped directly from types 
+// defined in the module XSD.
+
+module Pos_06_top_level_001 {
+
+   import from schema_Pos_06_top_level_001 language "XSD" all;
+
+   template E1 m_base := 5;
+   template MyType m_msg := m_base;
+
+	external function enc_MyType(in MyType pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return MyType
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout MyType, Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Pos_06_top_level_001() runs on C system C {
+        var Raw v_rcv;
+
+        var Raw  v_Raw:="<ns040:MyType xmlns:ns040='schema:Pos_06_top_level_001'>5</ns040:MyType>\n";
+
+        connect(self:p, self:p1);
+
+        // encode the message
+        p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+
+        alt {
+            // compare the encoded message with the reference XML file
+            [] p1.check(receive(Raw:?) -> value v_rcv) {
+                log("XML message ", v_rcv);
+                if (match(v_rcv, v_Raw) ) {
+					alt {
+                     	[] p1.receive(Raw:?) {
+							if(match(dec_MyType(unichar2oct(v_rcv)),m_msg))	{
+								setverdict(pass, "Decoded value matches encoded template and reference XML");
+							}
+							else 
+								{setverdict(fail, "XML decoding failure, reason:", dec_MyType(unichar2oct(v_rcv)));}	
+						}
+					}
+                } else {
+                    setverdict(fail, "Unexpected message: ", v_rcv, " expected: ", v_Raw);
+                }
+            }
+            [] p1.receive {
+                setverdict(fail, "Raw decoding failure");
+            }
+        }
+    }
+
+    control {
+        execute(TC_Pos_06_top_level_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+
+}

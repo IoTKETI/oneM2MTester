@@ -1,0 +1,173 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module logcontrol {
+
+import from TitanLoggerControl all;
+
+//const Severities log_nothing := {};
+
+type component L {}
+
+testcase read_settings() runs on L
+{
+  var Severities actual_file_mask := TitanLoggerControl.get_file_mask("LegacyLogger");
+  if (                    match(actual_file_mask, TitanLoggerControl.log_all)) { setverdict(pass); }
+  else { setverdict(fail, match(actual_file_mask, TitanLoggerControl.log_all)); }
+
+  var Severities actual_console_mask := TitanLoggerControl.get_console_mask("LegacyLogger");
+  if (                    match(actual_console_mask, TitanLoggerControl.log_console_default)) { setverdict(pass); }
+  else { setverdict(fail, match(actual_console_mask, TitanLoggerControl.log_console_default)); }
+}
+
+template Severities LeChuck := {
+  EXECUTOR_RUNTIME, EXECUTOR_CONFIGDATA, EXECUTOR_EXTCOMMAND, EXECUTOR_COMPONENT,
+  EXECUTOR_LOGOPTIONS, EXECUTOR_UNQUALIFIED
+}
+
+template Severities portevent_all := {
+    PORTEVENT_PQUEUE, PORTEVENT_MQUEUE, PORTEVENT_STATE,
+    PORTEVENT_PMIN, PORTEVENT_PMOUT, PORTEVENT_PCIN, PORTEVENT_PCOUT,
+    PORTEVENT_MMRECV, PORTEVENT_MMSEND, PORTEVENT_MCRECV, PORTEVENT_MCSEND,
+    PORTEVENT_DUALRECV, PORTEVENT_DUALSEND, PORTEVENT_UNQUALIFIED
+}
+
+template Severities aew := {
+    ACTION_UNQUALIFIED,
+    ERROR_UNQUALIFIED,
+    WARNING_UNQUALIFIED
+}
+
+testcase on_off() runs on L
+{
+  var Severities user_log_only := { USER_UNQUALIFIED }
+  TitanLoggerControl.add_to_console_mask("LegacyLogger", log_all);
+  // makes sure user logs are visible on the console
+
+  // Start printouts for the test
+  log("You should see this from ", __LINE__); // 1
+
+  log("console default: ", log_console_default);
+  TitanLoggerControl.set_file_mask("LegacyLogger", log_nothing);
+  log("You should not see this (in the log file) from ", __LINE__);
+
+  // VERDICTOP is off, this line will not be logged
+  setverdict(none, "You should not see this either, from ", __LINE__);
+
+  var Severities actual_file_mask0 := TitanLoggerControl.get_file_mask("LegacyLogger");
+
+  // set it back to LOG_ALL
+  TitanLoggerControl.set_file_mask("LegacyLogger", log_all);
+  log("You should see this again, from ", __LINE__); // 2
+
+  setverdict(pass, "We're back! at ", __LINE__); // this should be visible
+
+  // now check the previously retrieved logger setting
+  if (                    match(actual_file_mask0, TitanLoggerControl.log_nothing)) { setverdict(pass); }
+  else { setverdict(fail, match(actual_file_mask0, TitanLoggerControl.log_nothing)); }
+
+  TitanLoggerControl.set_file_mask("LegacyLogger", log_everything);
+  log("You should see this too, from ", __LINE__); // 3
+
+  var Severities actual_file_mask_everything := TitanLoggerControl.get_file_mask("LegacyLogger");
+  if (                    match(actual_file_mask_everything, TitanLoggerControl.log_everything)) { setverdict(pass); }
+  else { setverdict(fail, match(actual_file_mask_everything, TitanLoggerControl.log_everything)); }
+
+  TitanLoggerControl.remove_from_file_mask("LegacyLogger", user_log_only);
+  log("Again, you should not see this from ", __LINE__);
+
+  TitanLoggerControl.add_to_file_mask("LegacyLogger", user_log_only);
+  log("And, you should see this from ", __LINE__); // 4
+
+  action("speaks louder than words, so you can see this at ", __LINE__); // 5
+  TitanLoggerControl.remove_from_file_mask("LegacyLogger", valueof(aew));
+  action("You should not see this action at ", __LINE__);
+}
+
+testcase entity() runs on L
+{
+  //
+  var boolean log_entity_name := TitanLoggerControl.get_log_entity_name("LegacyLogger");
+  if (log_entity_name) { setverdict(fail, "LogEntityName should default to FALSE"); }
+  else { setverdict(pass); }
+
+  TitanLoggerControl.set_log_entity_name("LegacyLogger", true);
+  log_entity_name := TitanLoggerControl.get_log_entity_name("LegacyLogger");
+  if (log_entity_name) { setverdict(pass); }
+  else { setverdict(fail, "LogEntityName should be TRUE now"); }
+
+  log("The tc should be mentioned in this log line");
+
+  // set it back
+  TitanLoggerControl.set_log_entity_name("LegacyLogger", false);
+  log("The entity should not be logged anymore");
+}
+
+type set of record { integer field1, charstring field2 } rr;
+
+template rr t_rr := {
+  {
+    field1 := 42, field2 := "fourty-two"
+  },
+  {
+    field1 := 13, field2 := "Hail Eris!"
+  }
+}
+
+const rr c_rr := {
+  {
+    field1 := 42, field2 := "forty-two" // 'u' is missing
+  },
+  {
+    field1 := 13, field2 := "Hail Eris!"
+  }
+}
+
+testcase hints() runs on L
+{
+  //
+  var verbosity v := TitanLoggerControl.get_matching_verbosity("LegacyLogger");
+  if (v == compact) { setverdict(pass); }
+  else { setverdict(fail, "Matching verbosity should default to compact"); }
+
+  log("Compact:", match(c_rr, t_rr));
+
+  TitanLoggerControl.set_matching_verbosity("LegacyLogger", full);
+  v := TitanLoggerControl.get_matching_verbosity("LegacyLogger");
+  if (v == full) { setverdict(pass); }
+  else { setverdict(fail, "Matching verbosity should now be full"); }
+
+  log("Full   :", match(c_rr, t_rr));
+}
+
+testcase changename() runs on L
+{
+  TitanLoggerControl.set_log_file("LegacyLogger", "changed_name-%c-%t.log");
+  log("New log in a new file");
+  setverdict(pass);
+}
+
+control {
+  // first!
+  execute(read_settings());
+
+  execute(on_off());
+  execute(entity());
+  execute(hints());
+
+  // last but not least
+  execute(changename());
+}
+
+}
+

@@ -1,0 +1,164 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module smallany {
+type component Small {}
+
+type record of anytype anysequence;
+type record address { integer i }
+template address t_a := { 1 }
+
+type integer pie(3, 14, 15, 9, 26);
+
+type record of integer intlist_0;
+type intlist_0 intlist;
+
+template anytype anytemp   := { intlist := { 1, 2, 3 } }
+const    anytype anyconst  := { intlist := { 1, 2, 3 } }
+template anytype anytemp2  := { level2 := { level1 := { 1, 2, 3 } } }
+const    anytype anyconst2 := { level2 := { level1 := { 1, 2, 3 } } }
+type record level2 {
+  intlist level1
+}
+
+type record level3 {
+  level2 level_2 optional
+}
+
+function dummy(in level3 p3_in, out level3 p3_out, inout level3 p3_inout)
+{
+  var level3 v_l3;
+  v_l3.level_2.level1[0] := 17;
+
+  var integer a := 42;
+  p3_out  .level_2.level1[0] := a;
+  p3_in   .level_2.level1[0] := a;
+  p3_inout.level_2.level1[0] := a;
+}
+// These two functions are "compile-only"
+function dummy_template(in template level3 p3_in, out template level3 p3_out, inout template level3 p3_inout)
+{
+  var template level3 v_l3;
+  v_l3.level_2.level1[0] := 17;
+
+  var integer a := 42;
+  var template integer b;
+  p3_out  .level_2.level1[a] := a;
+  p3_in   .level_2.level1[a+1] := a;
+  p3_inout.level_2.level1[-a] := a; // it would be nice to flag this indexing as an error (a is still 42, even though it's not a const)
+
+  b := p3_out  .level_2.level1[a];
+  b := p3_in   .level_2.level1[a+1];
+  b := p3_inout.level_2.level1[-a]; // if a is const, this _is_ flagged as error
+
+}
+
+function fval(in anytype any_in, out anytype any_out) return anytype
+{
+  any_out := any_in;
+  var integer local := any_in.anysequence[3].anysequence[0].integer;
+  if (local == 13) { setverdict(pass); }
+  else { setverdict(fail); }
+
+  var level3 l3 := { level_2 := anyconst2.level2 }
+  var level3 l4;
+  l4 := { level_2 := anyconst2.level2 }
+  if (l3 == l4) { setverdict(pass); }
+  else { setverdict(fail); }
+  if (l3 == { level_2 := anyconst2.level2 }) { setverdict(pass); }
+  else { setverdict(fail); }
+  return any_out;
+}
+
+function ftmpl(in template anytype anytempl_in, out template anytype anytempl_out) return template anytype
+{
+  anytempl_out := anytempl_in;
+  if (ischosen(anytempl_in.intlist)) {
+    var template intlist local_template := anytempl_in.intlist;
+    if( match(valueof(anytemp.intlist), local_template) ) { setverdict(pass); }
+    else { setverdict(fail); }
+
+    local_template := anytempl_in.intlist; // assign, not init
+  }
+  else {
+    var template level3 l3 := { level_2 := anytempl_in.level2 }
+    var template level3 l4;
+    l4 := { level_2 := anytempl_in.level2 } // assign, not init
+  }
+  return anytempl_out;
+}
+
+testcase values() runs on Small
+{
+  var anytype anyvar;
+  // partial init is not enough anymore, checks became stricter due to HL51459
+  anyvar.anysequence[0] := { integer := 0 }
+  anyvar.anysequence[1] := { integer := 1 }
+  anyvar.anysequence[2] := { integer := 2 }
+  anyvar.anysequence[3] := { anysequence := { { integer := 13 } } }
+  //anyvar.address.i := 3;
+  var anytype anyout;
+  var anytype anyret := fval(anyvar, anyout);
+
+  if (anyout == anyret) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+testcase templates() runs on Small
+{
+  var template anytype anytemplout;
+  var template anytype anytemplret := ftmpl(anytemp, anytemplout);
+
+  if (valueof(anytemplout) == valueof(anytemplret)) { setverdict(pass); }
+  else { setverdict(fail); }
+
+  anytemplret := ftmpl(anytemp2, anytemplout);
+  if (valueof(anytemplout) == valueof(anytemplret)) { setverdict(pass); }
+  else { setverdict(fail); }
+}
+
+control{
+  var anytype anyvar;
+  var template intlist myvtemplist := anytemp.intlist
+  template intlist mytemplist := anytemp.intlist  // Needs "AT_" prefix.
+  template intlist mytemplist2 := anytemp2.level2.level1  // Needs "AT_" prefix on level2, but not leve1
+  anyvar.anysequence[3] := { anysequence := { } }
+  anyvar.address.i := 3;
+  //(interpreted as module.function)  anyvar.pie(2);
+  var integer io := anyvar.address.i
+
+
+  template anytype t_aa := { integer   := 3 };
+  // PredefinedType----------^^^^^^^
+  // StructFieldRef----------^^^^^^^
+  // FieldReference----------^^^^^^^
+  //--------------------------------------^----- SimpleSpec as TemplateBody
+  //                         FieldRefce:= TemplateBody
+  //                         FieldSpec------
+  //                       \-FieldSpecList--/
+  //                       \-TemplateBody---/
+
+  //template address t_ii := { pie(13) }
+
+  execute(values());
+  execute(templates());
+}
+
+}
+with {
+encode "XML"
+extension "anytype anysequence,address,integer,intlist,level2"
+/*syntax error belongs to function_test  extension "anytype boolean,
+integer,address,boolean intreg"*/
+}

@@ -1,0 +1,462 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module WhitespaceTest {
+
+/* Tests for the WHITESPACE encoding instruction.
+** WHITESPACE has no effect on the encoder, so only decoding is tested.
+*/
+
+modulepar boolean WhitespaceTest_verbose := false;
+#define verbose WhitespaceTest_verbose
+#include "../macros.ttcnin"
+
+type component Snow {}
+
+type charstring preserver
+with { variant "whiteSpace preserve" }
+
+type charstring replacer
+with { variant "whiteSpace replace" }
+
+type charstring collapser
+with { variant "whiteSpace collapse" }
+
+type universal charstring upreserver
+with { variant "whiteSpace preserve" }
+
+type universal charstring ureplacer
+with { variant "whiteSpace replace" }
+
+type universal charstring ucollapser
+with { variant "whiteSpace collapse" }
+
+
+const charstring hello :=
+"Say hello.   \n" &
+"   \t  \t   \n" &
+"\t\t    \t\n" &
+"   \t\t  \t \t\n" &
+"\t\t    \t \n" &
+"   \t\t \t\t  \n" &
+"\t\t    \t\t\n" &
+"   \t\t \t\t  \n" &
+"\t\t    \t  \n" &
+"   \t\t \t\t\t\t\n" &
+"\t\t    \t \t\n" &
+"   \t \t\t  \n" &
+"\t\t    \t\t \n" &
+"   \t     \n" &
+"\t\t    \t\t\t\n" &
+"   \t\t\t \t\t\t\n" &
+"\t\t    \t   \n" &
+"   \t\t \t\t\t\t\n" &
+"\t\t    \t  \t\n" &
+"   \t\t\t  \t \n" &
+"\t\t    \t \t \n" &
+"   \t\t \t\t  \n" &
+"\t\t    \t \t\t\n" &
+"   \t\t  \t  \n" &
+"\t\t    \t\t  \n" &
+"   \t     \n" &
+"\t\t    \t\t \t\n" &
+"   \t\t \t\t\t\t\n" &
+"\t\t    \t\t\t \n" &
+"   \t\t  \t\t \n" &
+"\t\t    \t\t\t\t\n" &
+"   \t     \n" &
+"\t\t    \t    \n" &
+"   \t\t\t  \t\t\n" &
+"\t\t    \t   \t\n" &
+"   \t\t\t    \n" &
+"\t\t    \t  \t \n" &
+"   \t\t    \t\n" &
+"\t\t    \t  \t\t\n" &
+"   \t\t   \t\t\n" &
+"\t\t    \t \t  \n" &
+"   \t\t  \t \t\n" &
+"\t\t    \t \t \t\n" &
+"   \t\t\t  \t\t\n" &
+"\t\t    \t \t\t \n" &
+"   \t    \t\n" &
+"\t\t    \t \t\t\t\n" &
+"    \n" &
+"\t\t     \n" &
+"\n" &
+" \t \t\t\t \t\t\t \t\t\t  \t  \t\t \t  \t \t\t\t \t   \t\t  \t \t\n" &
+"\n" &
+" \t \t\t \t\t\t  \t\t  \t \t \t\t\t \t\t\t \t\t \t\t   \t\t \t  \t \t\t \t\t\t  \t\t  \t \t\n" &
+"\n" &
+"\n" &
+"\n" &
+"\n" &
+"   \t\t    \t \t\t  \t   \t\t  \t  \n" &
+"\t   \n" &
+"\t\n" &
+"\n" &
+"   \t\t\t \t\t\t \t\t\t  \t  \t\t \t  \t \t\t\t \t   \t\t  \t \t\n" &
+" \n" &
+" \t\t\t \n" &
+" \n" &
+"\t  \t\t\t \t\t\t \t\t\t  \t  \t\t \t  \t \t\t\t \t   \t\t  \t \t \t \t\t\t\t\t \t\t  \t \t \t\t \t\t\t  \t\t  \t  \n" &
+"\t\n" &
+"     \t\n" &
+"\t   \n" &
+" \n" &
+" \t\t\t \t\t\t \t\t\t  \t  \t\t \t  \t \t\t\t \t   \t\t  \t \t\n" &
+"\n" &
+"   \t\t\t \t\t\t \t\t\t  \t  \t\t \t  \t \t\t\t \t   \t\t  \t \t \t \t\t\t\t\t \t\t  \t \t \t\t \t\t\t  \t\t  \t  \n" &
+" \n" &
+"\n" &
+" \n" &
+"\n" &
+"\n" &
+"\t\n" &
+"\n" &
+"   \t\t\t  \t  \t\t  \t \t \t\t    \t \t\t  \t  \n" &
+" \n" &
+"  \n" &
+" \t\n" &
+"\t \t\t\t \n" &
+"    \t \t \n" &
+"\t  \t\n" &
+"\t  \t\t\t  \t  \t\t  \t \t \t\t    \t \t\t  \t   \t \t\t\t\t\t \t\t  \t \t \t\t \t\t\t  \t\t  \t  \n" &
+" \n" &
+"\n" &
+"   \t\n" &
+"\t   \n" &
+" \n" &
+" \t\t\t  \t  \t\t  \t \t \t\t    \t \t\t  \t  \n" &
+"\n" &
+"   \t\t\t  \t  \t\t  \t \t \t\t    \t \t\t  \t   \t \t\t\t\t\t \t\t  \t \t \t\t \t\t\t  \t\t  \t  \n" &
+" \n" &
+"\n" &
+"   \t\n" &
+"\t       \n" &
+"\t\t \n" &
+"\t\n" &
+"\n" &
+"   \t\t \t\t\t  \t\t  \t \t \t\t\t \t\t\t \t\t \t\t   \t\t \t  \t \t\t \t\t\t  \t\t  \t \t\n" &
+"   \t \t \n" &
+"   \t\t \t\n" &
+"\t\n" &
+"  \t\n" &
+"  \n" &
+"\t\n";
+
+// hello with tabs and newlines converted to a space
+const charstring flathello :=
+"Say hello.    " &
+"           " &
+"        " &
+"           " &
+"         " &
+"           " &
+"         " &
+"           " &
+"          " &
+"           " &
+"          " &
+"          " &
+"          " &
+"          " &
+"          " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"          " &
+"           " &
+"           " &
+"           " &
+"           " &
+"           " &
+"          " &
+"            " &
+"           " &
+"            " &
+"           " &
+"            " &
+"           " &
+"            " &
+"           " &
+"            " &
+"           " &
+"            " &
+"           " &
+"            " &
+"          " &
+"            " &
+"     " &
+"        " &
+" " &
+"                                           " &
+" " &
+"                                                           " &
+" " &
+" " &
+" " &
+" " &
+"                           " &
+"     " &
+"  " &
+" " &
+"                                           " &
+"  " &
+"      " &
+"  " &
+"                                                                           " &
+"  " &
+"       " &
+"     " &
+"  " &
+"                                         " &
+" " &
+"                                                                           " &
+"  " &
+" " &
+"  " &
+" " &
+" " &
+"  " &
+" " &
+"                                   " &
+"  " &
+"   " &
+"   " &
+"       " &
+"         " &
+"     " &
+"                                                                   " &
+"  " &
+" " &
+"     " &
+"     " &
+"  " &
+"                                 " &
+" " &
+"                                                                   " &
+"  " &
+" " &
+"     " &
+"         " &
+"    " &
+"  " &
+" " &
+"                                                           " &
+"        " &
+"        " &
+"  " &
+"    " &
+"   " &
+"  ";
+
+// hello with consecutive spaces and newlines converted to a single space
+const charstring smallhello := "Say hello.";
+
+DECLARE_XER_ENCODERS(preserver, pres)
+DECLARE_EXER_ENCODERS(preserver, pres)
+
+DECLARE_XER_ENCODERS(replacer, rpl)
+DECLARE_EXER_ENCODERS(replacer, rpl)
+
+DECLARE_XER_ENCODERS(collapser, col)
+DECLARE_EXER_ENCODERS(collapser, col)
+
+testcase dec_whitespace_preserve() runs on Snow
+{
+    var charstring expected := hello;
+    var octetstring tmp := bxer_enc_pres(hello);
+    var universal charstring input := fromUTF8(tmp);
+
+    // BXER & CXER just give back the input.
+    CHECK_DECODE(bxer_dec_pres, input, preserver, expected);
+    CHECK_DECODE(cxer_dec_pres, input, preserver, expected);
+
+    // EXER brings WHITESPACE REPLACE to life.
+    expected := hello;
+    CHECK_DECODE(exer_dec_pres, input, preserver, expected);
+
+    // When the input does not end in whitespace, the behavior is the same.
+    tmp := bxer_enc_pres(hello & "!");
+    input := fromUTF8(tmp);
+    CHECK_DECODE(bxer_dec_pres, input, preserver, hello & "!");
+    CHECK_DECODE(cxer_dec_pres, input, preserver, hello & "!");
+    expected := hello & "!";
+    CHECK_DECODE(exer_dec_pres, input, preserver, expected);
+}
+
+testcase dec_whitespace_replace() runs on Snow
+{
+    var charstring expected := hello;
+    // Encode the string to produce the input for the decoder.
+    // (WHITESPACE applies no change on Titan's XER *encoder* )
+    var octetstring tmp := bxer_enc_rpl(hello);
+    var universal charstring input := fromUTF8(tmp);
+
+    // BXER & CXER just give back the input.
+    CHECK_DECODE(bxer_dec_rpl, input, replacer, expected);
+    CHECK_DECODE(cxer_dec_rpl, input, replacer, expected);
+
+    // EXER brings WHITESPACE REPLACE to life.
+    expected := flathello;
+    CHECK_DECODE(exer_dec_rpl, input, replacer, expected);
+
+    // When the input does not end in whitespace, the behavior is the same.
+    tmp := bxer_enc_rpl(hello & "!");
+    input := fromUTF8(tmp);
+    CHECK_DECODE(bxer_dec_rpl, input, replacer, hello & "!");
+    CHECK_DECODE(cxer_dec_rpl, input, replacer, hello & "!");
+    expected := flathello & "!";
+    CHECK_DECODE(exer_dec_rpl, input, replacer, expected);
+}
+
+testcase dec_whitespace_collapse() runs on Snow
+{
+    var charstring expected := hello;
+    // Encode the string to produce the input for the decoder.
+    var octetstring tmp := bxer_enc_col(hello);
+    var universal charstring input := fromUTF8(tmp);
+
+    // BXER & CXER just give back the input.
+    CHECK_DECODE(bxer_dec_col, input, collapser, expected);
+    CHECK_DECODE(cxer_dec_col, input, collapser, expected);
+
+    // WHITESPACE COLLAPSE makes all the whitespace at the end disappear.
+    expected := smallhello;
+    CHECK_DECODE(exer_dec_col, input, collapser, expected);
+
+    input := fromUTF8( bxer_enc_col(hello & "!") );
+    // Now the input does not end in whitespace. Nothing exciting from BXER/CXER.
+    CHECK_DECODE(bxer_dec_col, input, replacer, hello & "!");
+    CHECK_DECODE(cxer_dec_col, input, replacer, hello & "!");
+    // WHITESPACE COLLAPSE transforms whitespace in the middle into a single space.
+    // Note that we append a space before the exclamation mark.
+    // This space is the output from all that whitespace in the input.
+    expected := smallhello & " !";
+    CHECK_DECODE(exer_dec_col, input, collapser, expected);
+}
+
+
+DECLARE_XER_ENCODERS(upreserver, upres)
+DECLARE_EXER_ENCODERS(upreserver, upres)
+
+DECLARE_XER_ENCODERS(ureplacer, urpl)
+DECLARE_EXER_ENCODERS(ureplacer, urpl)
+
+DECLARE_XER_ENCODERS(ucollapser, ucol)
+DECLARE_EXER_ENCODERS(ucollapser, ucol)
+
+// These strings check that characters with cell values of 9, 13 or 32
+// (but different plane,group,row values) are not accidentally identified
+// as HORIZONTAL TAB, CARRIAGE RETURN or SPACE. 
+
+const universal charstring tricky :=
+"  \t " & char(0,1,2,9) & char(0,1,2,13) & char(0,1,2,32) & "\t\t\tThe end\t\n\n";
+
+const universal charstring flat_tricky :=
+"    "  & char(0,1,2,9) & char(0,1,2,13) & char(0,1,2,32) & "   The end   ";
+
+const universal charstring small_tricky :=
+char(0,1,2,9) & char(0,1,2,13) & char(0,1,2,32) & " The end";
+
+testcase dec_whitespace_upreserve() runs on Snow
+{
+    var universal charstring expected := hello;
+    var universal charstring input := fromUTF8( bxer_enc_upres(hello) );
+
+    CHECK_DECODE(bxer_dec_upres, input, upreserver, expected);
+    CHECK_DECODE(cxer_dec_upres, input, upreserver, expected);
+    
+    expected := hello;
+    CHECK_DECODE(exer_dec_upres, input, upreserver, expected);
+
+    input := fromUTF8( bxer_enc_upres(tricky) );
+    expected := tricky;
+    CHECK_DECODE(exer_dec_upres, input, upreserver, expected);
+    
+    input := fromUTF8( bxer_enc_upres(tricky & "!") );
+    expected := tricky & "!";
+    CHECK_DECODE(exer_dec_upres, input, upreserver, expected);
+    
+}
+
+testcase dec_whitespace_ureplace() runs on Snow
+{
+    var universal charstring expected := hello;
+    var universal charstring input := fromUTF8( bxer_enc_urpl(hello) );
+
+    CHECK_DECODE(bxer_dec_urpl, input, ureplacer, expected);
+    CHECK_DECODE(cxer_dec_urpl, input, ureplacer, expected);
+    
+    expected := flathello;
+    CHECK_DECODE(exer_dec_urpl, input, ureplacer, expected);
+
+    input := fromUTF8( bxer_enc_urpl(tricky) );
+    expected := flat_tricky;
+    CHECK_DECODE(exer_dec_urpl, input, ureplacer, expected);
+    
+    input := fromUTF8( bxer_enc_urpl(tricky & "!") );
+    expected := flat_tricky & "!";
+    CHECK_DECODE(exer_dec_urpl, input, ureplacer, expected);
+    
+}
+
+testcase dec_whitespace_ucollapse() runs on Snow
+{
+    var universal charstring expected := hello;
+    var universal charstring input := fromUTF8( bxer_enc_ucol(hello) );
+
+    CHECK_DECODE(bxer_dec_ucol, input, ucollapser, expected);
+    CHECK_DECODE(cxer_dec_ucol, input, ucollapser, expected);
+    
+    expected := smallhello;
+    CHECK_DECODE(exer_dec_ucol, input, ucollapser, expected);
+
+    input := fromUTF8( bxer_enc_ucol(tricky) );
+    expected := small_tricky;
+    CHECK_DECODE(exer_dec_ucol, input, ucollapser, expected);
+
+    input := fromUTF8( bxer_enc_ucol(tricky & "!") );
+    expected := small_tricky & " !";
+    // whitespace is no longer at the end, it is collapsed instead of being eliminated
+    // Note: a space, then '!'
+    CHECK_DECODE(exer_dec_ucol, input, ucollapser, expected);
+    
+    input := fromUTF8( bxer_enc_ucol("?" & tricky) );
+    expected := "? " & small_tricky;
+    // whitespace is no longer at the beginning, it is collapsed instead of being eliminated
+    // Note: '?', then a spaec
+    CHECK_DECODE(exer_dec_ucol, input, ucollapser, expected);
+}
+
+
+control {
+    execute(dec_whitespace_preserve())
+    execute(dec_whitespace_replace())
+    execute(dec_whitespace_collapse())
+
+    execute(dec_whitespace_upreserve())
+    execute(dec_whitespace_ureplace())
+    execute(dec_whitespace_ucollapse())
+}
+ 
+}
+with {
+encode "XER"
+}

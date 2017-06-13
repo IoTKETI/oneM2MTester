@@ -1,0 +1,80 @@
+/**
+ *  Copyright Notification
+ *  No part of this document may be reproduced, in an electronic retrieval system or otherwise, except as authorized by written permission.
+ *  The copyright and the foregoing restriction extend to reproduction in all media.
+ *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
+ *  All rights reserved.
+ *  
+ *  @author     oneM2M
+ *  @version    $URL: https://forge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/OneM2M_Pixits.ttcn $
+ *              $Id: OneM2M_Pixits.ttcn 288 2017-05-19 07:18:08Z reinaortega $
+ *  @desc       Module containing Pixits for oneM2M
+ *
+ */
+module OneM2M_Pixits {
+	
+	import from XSD all;
+	import from OneM2M_Types all;
+	
+	group TestAdapterParameters {}
+
+	modulepar boolean PX_DELETE_CREATED_RESOURCES 	:= true;
+	
+	modulepar XSD.AnyURI PX_RESOURCE_TO_BE_DELETED 	:= "/ae_test";
+	
+	modulepar XSD.IDREFS PX_RESOURCES_TO_BE_DELETED := {"/ae_test", "/MyAcp"};
+	
+	modulepar charstring PX_SUT_ADDRESS 			:= "127.0.0.1:8080";
+		
+	modulepar charstring PX_AE1_ADDRESS				:= "127.0.0.1:3131";
+	
+	modulepar charstring PX_AE2_ADDRESS				:= "127.0.0.1:3132";
+	
+	modulepar charstring PX_CSE1_ADDRESS			:= "127.0.0.1:3141";
+	
+	modulepar charstring PX_XML_NAMESPACE 			:= "m2m=""http://www.onem2m.org/xml/protocols""";
+	
+	modulepar XSD.ID PX_CSE_NAME 				:= "cseName";
+		
+	modulepar XSD.ID PX_CSE_ID 					:= "cseId";
+	
+	modulepar XSD.ID PX_CSE_RESOURCE_ID			:= "cseResourceId";
+	
+	modulepar boolean PX_UNSTRUCTURED 				:= false;
+	
+	modulepar XSD.ID PX_AE1_ID_STEM				:= "";
+	
+	modulepar XSD.ID PX_AE2_ID_STEM				:= "";
+	
+	modulepar XSD.ID PX_SUPER_USER				:= "admin:admin";
+	
+	modulepar XSD.ID PX_APP_ID 					:= "myAppId";
+	
+	modulepar boolean PX_RUN_POSTAMBLE 				:= true;
+	
+	modulepar ListOfURIs PX_ACOR 					:= {"*"};
+	
+	modulepar AddressingFormat PX_ADDRESSING_FORMAT := e_cseRelative;
+	
+	modulepar charstring PX_SERIALIZATION			:= "XML";
+	
+	modulepar charstring PX_PROTOCOL_BINDING 		:= "HTTP";
+	
+	modulepar boolean PX_FROM_IS_AE_ID 				:= true;
+	
+	//for checking whether the locationPolicy creation request is originated from a ASN-AE
+	//NOTE: Apply to Device-based location request, and this requires Test System (TS) to activate ASN-AE mode to test IUT  	
+	modulepar boolean PX_IUT_IS_ASN_CSE				:= false; //default //set it to true when running Device-based location testcases 	
+	modulepar boolean PX_IUT_IS_MN_CSE				:= false; //default //set it to true when running Share-based location testcases
+	
+	//constant parameters for LOC  
+	modulepar XSD.Token PX_LOCATION_TARGET_ID				:= "{LOCATION-TARGET-ID}"; //SUPPOSE TO BE RECEIVED FROM LOCATION SERVER
+	modulepar XSD.AnyURI PX_LOCATION_SERVER_ADDRESS		:= "{LOCATION-SERVER-ADDRESS}";
+	
+	modulepar charstring PX_LOCATION_UPDATE_PERIOD			:= "PT10M10S" ;//10 Minute 10 Seconds
+	modulepar charstring PX_LOCATION_CONTAINER_NAME		:= "myLoContainer";
+	
+	modulepar Labels PX_LABELS := {"VALUE_1"}; 	
+	modulepar boolean PX_IS_LOC_CONTAINER	:= false;//default //set it to true when the container is created to store location information
+	
+}  // end of module

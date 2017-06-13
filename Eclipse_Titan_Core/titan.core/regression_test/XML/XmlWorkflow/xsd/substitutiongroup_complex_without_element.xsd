@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/substitutiongroup/complex/without/element"
+ targetNamespace="www.example.org/substitutiongroup/complex/without/element"
+ blockDefault="#all">
+
+<xsd:element name="Head_group" type="string" />
+
+<xsd:element name="member" type="string" substitutionGroup="this:head"/>
+
+<xsd:element name="stringEnum" substitutionGroup="this:head">
+	<xsd:simpleType>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="something"/>
+			<xsd:enumeration value="else"/>
+		</xsd:restriction>
+	</xsd:simpleType> 
+</xsd:element>
+
+<xsd:element name="head"  abstract="true">
+	<xsd:complexType >
+		<xsd:sequence>
+			<xsd:element name="Something" type="string" />
+		</xsd:sequence>
+		<xsd:attribute name="headAttrib" type="xsd:string"/>
+	</xsd:complexType>
+</xsd:element>
+
+
+<xsd:element name="member2" type="this:e26seq" substitutionGroup="this:head" />
+
+<xsd:complexType name="e26seq">
+	<xsd:complexContent>
+		<xsd:extension base="this:head">
+			<xsd:sequence>
+				<xsd:element name="ageElemExt" type="xsd:integer"/>
+			</xsd:sequence>
+			<xsd:attribute name="unitOfAge" type="xsd:string"/>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType> 
+
+<xsd:element name="ize">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref="this:head" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+
+
+</xsd:schema>

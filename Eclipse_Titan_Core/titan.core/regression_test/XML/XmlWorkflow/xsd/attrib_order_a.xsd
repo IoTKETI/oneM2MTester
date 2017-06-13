@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/attrib/order/a"
+ xmlns:A="www.example.org/attrib/order/b"
+ xmlns:B="NoTargetNamespace"
+ targetNamespace="www.example.org/attrib/order/a"> 
+
+<xsd:import namespace="www.example.org/attrib/order/b"/>
+
+<xsd:import namespace="NoTargetNamespace"/>
+
+
+<xsd:attribute name="local1" type="xsd:string" fixed="fixed"/>
+<xsd:attribute name="local2" type="xsd:string"/>
+
+<xsd:complexType name="e17A">
+	<xsd:attributeGroup ref="A:Agroup" />
+	<xsd:attribute ref="this:local2"/>
+	<xsd:attribute ref="A:Attr1" />
+	<xsd:attribute ref="B:AttrNoTargetNamespace"/>
+	<xsd:attribute ref="this:local1" />
+	<xsd:attribute ref="B:AttrNoTargetNamespace2"/>
+	<xsd:attribute ref="this:lang"/>
+</xsd:complexType> 
+
+<xsd:attribute name="lang">
+	<xsd:simpleType>
+		<xsd:union memberTypes="xsd:language">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value=""/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+</xsd:attribute>
+
+
+</xsd:schema>

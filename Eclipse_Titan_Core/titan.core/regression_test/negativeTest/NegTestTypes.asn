@@ -1,0 +1,342 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--
+--/////////////////////////////////////////////////////////////////////////////
+NegTestTypes
+DEFINITIONS
+::= BEGIN
+IMPORTS ;
+
+-- Last modified:2011-02-22
+
+-- 0. Elementary Types
+
+MyInteger10 ::= INTEGER (1..10)
+
+MyInteger ::= INTEGER 
+
+MyCharstring10 ::= PrintableString ( SIZE( 2..5) )
+
+MyCharstring ::= VisibleString
+
+MyEnum ::= ENUMERATED { first(1), second(2), third(3) }
+
+-- 1. Sequence (record_
+
+MySeqEmpty ::= SEQUENCE { }
+MySeqBool ::= SEQUENCE { b BOOLEAN }
+MySeqNull ::= SEQUENCE { n NULL }
+MySeqInt ::= SEQUENCE { i INTEGER }
+MySeqMyEnum ::= SEQUENCE { e MyEnum }
+MySeqInt2 ::= SEQUENCE { i INTEGER, j INTEGER }
+
+MySeqInt2opt ::= SEQUENCE {
+ i INTEGER, 
+ j INTEGER OPTIONAL
+}
+MySeqInt3opt ::= SEQUENCE {
+ i INTEGER, 
+ j INTEGER,
+ k INTEGER OPTIONAL
+}
+
+MySeqIntSeqInt2 ::= SEQUENCE {
+ i INTEGER,
+ jk MySeqInt2
+}
+
+MySeqIntSeqInt2opt ::= SEQUENCE {
+ i INTEGER OPTIONAL,
+ jk MySeqInt2
+}
+
+MySeqIntSeqInt2optopt ::= SEQUENCE {
+ i INTEGER OPTIONAL,
+ jk MySeqInt2opt
+}
+
+MySeqInt3 ::= SEQUENCE { i INTEGER, j INTEGER, k INTEGER }
+MySeqInt4 ::= SEQUENCE { i INTEGER, j INTEGER, k INTEGER, l INTEGER }
+MySeqInt4opt ::= SEQUENCE { i INTEGER, j INTEGER, k INTEGER, l INTEGER OPTIONAL}
+MySeqInt5opt ::= SEQUENCE { i INTEGER, j INTEGER, k INTEGER, l INTEGER, m INTEGER OPTIONAL}
+
+MySeqReal  ::= SEQUENCE { x REAL }
+MySeqReal2 ::= SEQUENCE { x REAL, y REAL OPTIONAL}
+MySeqStr   ::= SEQUENCE { s VisibleString }
+MySeqStr2  ::= SEQUENCE { s VisibleString, t VisibleString }
+MySeqBitStr ::= SEQUENCE { b BIT STRING }
+MySeqBitStr2 ::= SEQUENCE { a BIT STRING, b BIT STRING }
+MySeqIntReal ::= SEQUENCE {i INTEGER, x REAL}
+MySeqIntStr ::= SEQUENCE {i INTEGER, s MyCharstring }
+MySeqIntBitStr ::= SEQUENCE {i INTEGER, b BIT STRING }
+MySeqOctStr ::= SEQUENCE {o OCTET STRING }
+MySeqOJKL ::= SEQUENCE { o OCTET STRING, j INTEGER, k INTEGER, l INTEGER }
+MySeqIOKL ::= SEQUENCE {  i INTEGER,o OCTET STRING, k INTEGER, l INTEGER }
+
+MySeqISKL ::= SEQUENCE { i INTEGER, s  MySeqInt4, k INTEGER, l INTEGER }
+
+--===== sequence of sequence of sequence ====
+MySeqIntSeqIntSeqInt2SeqReal2 ::=SEQUENCE {
+  i INTEGER OPTIONAL,
+  jkl MySeqIntSeqInt2,
+  xy  MySeqReal2
+}
+
+MySeqIntSeqIntSeqInt2optoptSeqReal2 ::=SEQUENCE {
+  i INTEGER OPTIONAL,
+  jkl MySeqIntSeqInt2optopt,
+  xy  MySeqReal2
+}
+--subtypes:
+
+MySeqIntSeqReal2 ::= SEQUENCE {
+  i INTEGER OPTIONAL,
+  xy  MySeqReal2
+}
+
+MySeqIntSeqIntSeqInt2 ::=SEQUENCE {
+  i INTEGER OPTIONAL,
+  jkl MySeqIntSeqInt2
+}
+
+
+
+MySeqSeqIntSeqInt2SeqReal2 ::=SEQUENCE {
+  jkl MySeqIntSeqInt2,
+  xy  MySeqReal2
+}
+
+MySeq-SeqSeqIntSeqInt2SeqReal2-SeqSeqIntSeqInt2SeqReal2 ::= SEQUENCE {
+  s1 MySeqSeqIntSeqInt2SeqReal2,
+  s2 MySeqSeqIntSeqInt2SeqReal2
+}
+
+MySeq-SeqSeqIntSeqInt2optoptSeqReal2-SeqSeqIntSeqInt2optoptSeqReal2 ::= SEQUENCE {
+  s1 MySeqIntSeqIntSeqInt2optoptSeqReal2,
+  s2 MySeqIntSeqIntSeqInt2optoptSeqReal2
+}
+
+MySeqBasicTypes ::= SEQUENCE {
+  b BOOLEAN,
+  n NULL,
+  i INTEGER,
+  e MyEnum,
+  r REAL,
+  bs BIT STRING,
+  os OCTET STRING,
+  oi OBJECT IDENTIFIER,
+  roi RELATIVE-OID
+}
+
+MySeqEnum ::= SEQUENCE {
+ e MyEnum
+}
+
+
+-- 2. Sequence of (record of)
+MySeqOfBool   ::= SEQUENCE OF BOOLEAN
+MySeqOfNull   ::= SEQUENCE OF NULL
+MySeqOfInt    ::= SEQUENCE OF INTEGER
+MySeqOfMyEnum ::= SEQUENCE OF MyEnum
+MySeqOfEnum   ::= SEQUENCE OF ENUMERATED { one(1), two(2), three(3) }
+MySeqOfReal   ::= SEQUENCE OF REAL
+MySeqOfBitStr ::= SEQUENCE OF BIT STRING
+MySeqOfOctStr ::= SEQUENCE OF OCTET STRING
+MySeqOfObjId  ::= SEQUENCE OF OBJECT IDENTIFIER
+
+MySeqOfMyUnionBT ::= SEQUENCE OF MyUnionBasicTypes
+
+MySeqOfSeqSeqIntSeqInt2SeqReal2 ::= SEQUENCE OF MySeqSeqIntSeqInt2SeqReal2
+MySeqOfMySeqIntSeqIntSeqInt2optoptSeqReal2 ::= SEQUENCE OF MySeqIntSeqIntSeqInt2optoptSeqReal2
+
+-- 3. Set
+
+MySet3 ::= SET { 
+  i [1] INTEGER ,
+  j [2] INTEGER OPTIONAL,
+  k [3] INTEGER OPTIONAL
+}
+
+
+MySetEmpty ::= SET { }
+MySetBool ::= SET { b BOOLEAN }
+MySetNull ::= SET { n NULL }
+MySetInt ::= SET { i INTEGER }
+MySetMyEnum ::= SET { e MyEnum }
+MySetInt2 ::= SET { i [0] INTEGER, j [1] INTEGER }
+
+MySetInt2opt ::= SET {
+ i [0] INTEGER OPTIONAL, 
+ j [1] INTEGER OPTIONAL
+}
+MySetInt3opt ::= SET {
+ i [0] INTEGER, 
+ j [1] INTEGER,
+ k [2] INTEGER OPTIONAL
+}
+
+MySetIntSeqInt2 ::= SET {
+ i INTEGER,
+ jk MySeqInt2
+}
+
+--tagged:
+MySetIntSeqInt2T ::= SET {
+ i [0] INTEGER,
+ jk MySeqInt2
+}
+
+MySetIntSeqInt2opt ::= SET {
+ i INTEGER OPTIONAL,
+ jk MySeqInt2
+}
+--tagged:
+MySetIntSeqInt2Topt ::= SET {
+ i [0] INTEGER OPTIONAL,
+ jk MySeqInt2
+}
+
+MySetIntSeqInt2optopt ::= SET {
+ i INTEGER OPTIONAL,
+ jk MySeqInt2opt
+}
+
+--tagged:
+MySetIntSeqInt2Toptopt ::= SET {
+ i [0] INTEGER OPTIONAL,
+ jk MySeqInt2opt
+}
+
+MySetInt3 ::= SET { i [0] INTEGER OPTIONAL, j [1] INTEGER OPTIONAL, k [2] INTEGER OPTIONAL }
+MySetInt4 ::= SET { i [0] INTEGER, j [1] INTEGER, k [2] INTEGER, l [3] INTEGER }
+MySetInt4opt ::= SET { i [0] INTEGER OPTIONAL, j [1] INTEGER OPTIONAL, k [2] INTEGER OPTIONAL, l [3] INTEGER OPTIONAL}
+MySetReal  ::= SET { x REAL }
+MySetReal2 ::= SET { x [0] REAL, y [1] REAL OPTIONAL}
+MySetStr   ::= SET { s VisibleString }
+MySetStr2  ::= SET { s [0] VisibleString, t [1] VisibleString }
+MySetBitStr ::= SET { b BIT STRING }
+MySetBitStr2 ::= SET { a [0] BIT STRING, b [1] BIT STRING }
+MySetIntReal ::= SET {i [0] INTEGER, x REAL}
+MySetIntStr ::= SET {i [0] INTEGER, s MyCharstring }
+MySetIntBitStr ::= SET {i [0] INTEGER, b BIT STRING }
+MySetOctStr ::= SET {o OCTET STRING }
+MySetOJKL ::= SET { o OCTET STRING, j [1] INTEGER, k [2] INTEGER, l [3] INTEGER }
+MySetIOKL ::= SET {  i [0] INTEGER, o OCTET STRING, k [2] INTEGER, l [3]INTEGER }
+
+MySetISKL ::= SET { i [0] INTEGER, s  MySeqInt4, k [2] INTEGER, l [3] INTEGER }
+MySetISKLopt ::= SET { i [0] INTEGER OPTIONAL, s  MySeqInt4opt OPTIONAL, k [2] INTEGER OPTIONAL, l [3] INTEGER OPTIONAL }
+
+MySetIS2KLopt ::= SET { i [0] INTEGER OPTIONAL, s  MySeqInt2 OPTIONAL, k [2] INTEGER OPTIONAL, l [3] INTEGER OPTIONAL }
+
+MySetISOKL ::= SET { i [0] INTEGER, s  MySeqInt4, o OCTET STRING,  k [2] INTEGER, l [3] INTEGER }
+MySetISOKLopt ::= SET { i [0] INTEGER OPTIONAL, s  MySeqInt4opt OPTIONAL, o OCTET STRING OPTIONAL,  k [2] INTEGER OPTIONAL, l [3] INTEGER OPTIONAL }
+
+MySetIOSKL ::= SET { i [0] INTEGER, o OCTET STRING, s  MySeqInt4,  k [2] INTEGER, l [3] INTEGER }
+MySetIOSKLopt ::= SET { i [0] INTEGER OPTIONAL,  o OCTET STRING OPTIONAL, s  MySeqInt4opt OPTIONAL,  k [2] INTEGER OPTIONAL, l [3] INTEGER OPTIONAL }
+--===== set of sequence of sequence ====
+MySetIntSeqIntSeqInt2SeqReal2 ::=SET {
+  i INTEGER OPTIONAL,
+  jkl [0] MySeqIntSeqInt2,
+  xy  [1] MySeqReal2
+}
+
+MySetIntSeqIntSeqInt2optoptSeqReal2 ::=SET {
+  i INTEGER OPTIONAL,
+  jkl [0] MySeqIntSeqInt2optopt,
+  xy  MySeqReal2
+}
+--subtypes:
+
+MySetIntSeqReal2 ::= SET {
+  i INTEGER OPTIONAL,
+  xy  MySeqReal2
+}
+
+MySetIntSeqIntSeqInt2 ::=SET {
+  i INTEGER OPTIONAL,
+  jkl MySeqIntSeqInt2
+}
+
+
+
+MySetSeqIntSeqInt2SeqReal2 ::=SET {
+  jkl [0] MySeqIntSeqInt2,
+  xy  [1] MySeqReal2
+}
+
+MySet-SeqSeqIntSeqInt2SeqReal2-SeqSeqIntSeqInt2SeqReal2 ::= SET {
+  s1 [0] MySeqSeqIntSeqInt2SeqReal2,
+  s2 [1] MySeqSeqIntSeqInt2SeqReal2
+}
+
+MySet-SeqSeqIntSeqInt2optoptSeqReal2-SeqSeqIntSeqInt2optoptSeqReal2 ::= SET {
+  s1 [0] MySeqIntSeqIntSeqInt2optoptSeqReal2,
+  s2 [1] MySeqIntSeqIntSeqInt2optoptSeqReal2
+}
+
+MySetBasicTypes ::= SET {
+  b BOOLEAN,
+  n NULL,
+  i INTEGER,
+  e MyEnum,
+  r REAL,
+  bs BIT STRING,
+  os OCTET STRING,
+  oi OBJECT IDENTIFIER,
+  roi RELATIVE-OID
+}
+
+MySetEnum ::= SET {
+ e MyEnum
+}
+
+
+-- 4. Set of
+
+MySetOfBool   ::= SET OF BOOLEAN
+MySetOfNull   ::= SET OF NULL
+MySetOfInt    ::= SET OF INTEGER
+MySetOfMyEnum ::= SET OF MyEnum
+MySetOfEnum   ::= SET OF ENUMERATED { one(1), two(2), three(3) }
+MySetOfReal   ::= SET OF REAL
+MySetOfBitStr ::= SET OF BIT STRING
+MySetOfOctStr ::= SET OF OCTET STRING
+MySetOfObjId  ::= SET OF OBJECT IDENTIFIER
+
+MySetOfMyUnionBT ::= SET OF MyUnionBasicTypes
+
+MySetOfSeqSeqIntSeqInt2SeqReal2 ::= SEQUENCE OF MySeqSeqIntSeqInt2SeqReal2
+MySetOfMySeqIntSeqIntSeqInt2optoptSeqReal2 ::= SEQUENCE OF MySeqIntSeqIntSeqInt2optoptSeqReal2
+
+-- 5. Union
+
+
+
+MyUnionBasicTypes ::= CHOICE {
+  b BOOLEAN,
+  n NULL,
+  i INTEGER,
+  e MyEnum,
+  r REAL,
+  bs BIT STRING,
+  os OCTET STRING,
+  oi OBJECT IDENTIFIER,
+  roi RELATIVE-OID
+  --s MySeqIntSeqReal2
+  -- sofi MySeqOfInt
+}
+
+MyUnionComplexTypes ::= CHOICE {
+  u       MyUnionBasicTypes,
+  --s       MySeqIntSeqReal2
+  sofreal MySeqOfReal
+}
+
+END

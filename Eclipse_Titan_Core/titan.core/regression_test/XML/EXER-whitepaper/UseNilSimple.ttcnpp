@@ -1,0 +1,280 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module UseNilSimple {
+modulepar boolean UseNilSimple_verbose := false;
+#define verbose UseNilSimple_verbose
+#include "../macros.ttcnin"
+
+type component Nilus {}
+
+const universal charstring nil_attr := "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:nil='true'";
+
+type record unbool {
+  boolean field optional
+}
+with {
+  variant "useNil";
+}
+
+DECLARE_XER_ENCODERS(unbool, ub);
+DECLARE_EXER_ENCODERS(unbool, ub);
+
+const unbool cub := { true }
+const unbool cubo:= { omit }
+
+const universal charstring bstr_ub :=
+"<unbool>\n" &
+"\t<field><true/></field>\n" &
+"</unbool>\n\n";
+
+const universal charstring bstr_ubo :=
+"<unbool/>\n\n";
+
+const universal charstring estr_ub :=
+"<unbool>true</unbool>\n\n";
+
+const universal charstring estr_ubo :=
+"<unbool " & nil_attr & "/>\n\n";
+
+testcase tc_enc_unbool() runs on Nilus
+{
+  CHECK_METHOD(exer_enc_ub, cub, estr_ub);
+  CHECK_METHOD(bxer_enc_ub, cub, bstr_ub);
+
+  CHECK_METHOD(exer_enc_ub, cubo, estr_ubo);
+  CHECK_METHOD(bxer_enc_ub, cubo, bstr_ubo);
+}
+
+testcase tc_dec_unbool() runs on Nilus
+{
+  CHECK_DECODE(exer_dec_ub, estr_ub, unbool, cub);
+  CHECK_DECODE(bxer_dec_ub, bstr_ub, unbool, cub);
+
+  CHECK_DECODE(exer_dec_ub, estr_ubo, unbool, cubo);
+  CHECK_DECODE(bxer_dec_ub, bstr_ubo, unbool, cubo);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+type record uncs {
+  charstring field optional
+}
+with {
+  variant "useNil";
+}
+
+DECLARE_XER_ENCODERS(uncs, ucs);
+DECLARE_EXER_ENCODERS(uncs, ucs);
+
+const uncs cucs := { "Unpossible" }
+const uncs cucso:= { omit }
+
+const universal charstring bstr_ucs :=
+"<uncs>\n" &
+"\t<field>Unpossible</field>\n" &
+"</uncs>\n\n";
+
+const universal charstring bstr_ucso :=
+"<uncs/>\n\n";
+
+const universal charstring estr_ucs :=
+"<uncs>Unpossible</uncs>\n\n";
+
+const universal charstring estr_ucso :=
+"<uncs " & nil_attr & "/>\n\n";
+
+testcase tc_enc_uncs() runs on Nilus
+{
+  CHECK_METHOD(exer_enc_ucs, cucs, estr_ucs);
+  CHECK_METHOD(bxer_enc_ucs, cucs, bstr_ucs);
+
+  CHECK_METHOD(exer_enc_ucs, cucso, estr_ucso);
+  CHECK_METHOD(bxer_enc_ucs, cucso, bstr_ucso);
+}
+
+testcase tc_dec_uncs() runs on Nilus
+{
+  CHECK_DECODE(exer_dec_ucs, estr_ucs, uncs, cucs);
+  CHECK_DECODE(bxer_dec_ucs, bstr_ucs, uncs, cucs);
+
+  CHECK_DECODE(exer_dec_ucs, estr_ucso, uncs, cucso);
+  CHECK_DECODE(bxer_dec_ucs, bstr_ucso, uncs, cucso);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+type record unf {
+  float field optional
+}
+with {
+  variant "useNil";
+}
+
+DECLARE_XER_ENCODERS(unf, uf);
+DECLARE_EXER_ENCODERS(unf, uf);
+
+const unf cuf := { 3.141592 }
+
+const universal charstring bstr_uf :=
+"<unf>\n" &
+"\t<field>3.141592</field>\n" &
+"</unf>\n\n";
+
+const universal charstring estr_uf :=
+"<unf>3.141592</unf>\n\n";
+
+testcase tc_enc_unf() runs on Nilus
+{
+  CHECK_METHOD(bxer_enc_uf, cuf, bstr_uf);
+  CHECK_METHOD(exer_enc_uf, cuf, estr_uf);
+}
+
+testcase tc_dec_unf() runs on Nilus
+{
+  CHECK_DECODE(bxer_dec_uf, bstr_uf, unf, cuf);
+  CHECK_DECODE(exer_dec_uf, estr_uf, unf, cuf);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+type record uni {
+  integer field optional
+}
+with {
+  variant "useNil";
+}
+
+DECLARE_XER_ENCODERS(uni, ui);
+DECLARE_EXER_ENCODERS(uni, ui);
+
+const uni cui := { 42 }
+const uni cuia:= { 6022141793000000000000000 } // Avogadro, 6.022 * 10^23
+
+const universal charstring bstr_ui :=
+"<uni>\n" &
+"\t<field>42</field>\n" &
+"</uni>\n\n";
+
+const universal charstring estr_ui :=
+"<uni>42</uni>\n\n";
+
+const universal charstring bstr_uia :=
+"<uni>\n" &
+"\t<field>6022141793000000000000000</field>\n" &
+"</uni>\n\n";
+
+const universal charstring estr_uia :=
+"<uni>6022141793000000000000000</uni>\n\n";
+
+testcase tc_enc_uni() runs on Nilus
+{
+  CHECK_METHOD(bxer_enc_ui, cui, bstr_ui);
+  CHECK_METHOD(exer_enc_ui, cui, estr_ui);
+
+  CHECK_METHOD(bxer_enc_ui, cuia, bstr_uia);
+  CHECK_METHOD(exer_enc_ui, cuia, estr_uia);
+}
+
+testcase tc_dec_uni() runs on Nilus
+{
+  CHECK_DECODE(bxer_dec_ui, bstr_ui, uni, cui);
+  CHECK_DECODE(exer_dec_ui, estr_ui, uni, cui);
+
+  CHECK_DECODE(bxer_dec_ui, bstr_uia, uni, cuia);
+  CHECK_DECODE(exer_dec_ui, estr_uia, uni, cuia);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+type record unos {
+  octetstring field optional
+}
+with {
+  variant "useNil";
+  variant (field) "XSD:base64Binary" // required for octetstring to be "character-encodable"
+}
+
+DECLARE_XER_ENCODERS(unos, uos);
+DECLARE_EXER_ENCODERS(unos, uos);
+
+// Text from Thomas Hobbes's Leviathan, quoted in Wikipedia's article about base64
+const unos cuos := { char2oct("Man is distinguished, not only by his reason, " &
+"but by this singular passion from other animals, which is a lust of the mind, " &
+"that by a perseverance of delight in the continued and indefatigable " &
+"generation of knowledge, exceeds the short vehemence of any carnal pleasure.") }
+
+const universal charstring TWFu := // also from Wikipedia
+"TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz" &
+"IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg" &
+"dGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu" &
+"dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo" &
+"ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
+
+const universal charstring octets := 
+"4D616E2069732064697374696E677569736865642C206E6F74206F6E6C792062"&
+"792068697320726561736F6E2C2062757420627920746869732073696E67756C"&
+"61722070617373696F6E2066726F6D206F7468657220616E696D616C732C2077"&
+"686963682069732061206C757374206F6620746865206D696E642C2074686174"&
+"2062792061207065727365766572616E6365206F662064656C6967687420696E"&
+"2074686520636F6E74696E75656420616E6420696E6465666174696761626C65"&
+"2067656E65726174696F6E206F66206B6E6F776C656467652C20657863656564"&
+"73207468652073686F727420766568656D656E6365206F6620616E7920636172"&
+"6E616C20706C6561737572652E";
+
+const universal charstring bstr_uos :=
+"<unos>\n" &
+"\t<field>" & octets & "</field>\n" &
+"</unos>\n\n";
+
+const universal charstring estr_uos :=
+"<unos>" & TWFu & "</unos>\n\n";
+
+testcase tc_enc_unos() runs on Nilus
+{
+  //log(cuos);
+  CHECK_METHOD(bxer_enc_uos, cuos, bstr_uos);
+  CHECK_METHOD(exer_enc_uos, cuos, estr_uos);
+}
+
+testcase tc_dec_unos() runs on Nilus
+{
+  CHECK_DECODE(bxer_dec_uos, bstr_uos, unos, cuos);
+  CHECK_DECODE(exer_dec_uos, estr_uos, unos, cuos);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+control {
+  execute(tc_enc_unbool());
+  execute(tc_dec_unbool());
+
+  execute(tc_enc_uncs());
+  execute(tc_dec_uncs());
+
+  execute(tc_enc_unf());
+  execute(tc_dec_unf());
+
+  execute(tc_enc_uni());
+  execute(tc_dec_uni());
+
+  execute(tc_enc_unos());
+  execute(tc_dec_unos());
+}
+
+}
+with {
+  encode "XML";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'"
+  variant "elementFormQualified";
+  variant "attributeFormQualified";
+}

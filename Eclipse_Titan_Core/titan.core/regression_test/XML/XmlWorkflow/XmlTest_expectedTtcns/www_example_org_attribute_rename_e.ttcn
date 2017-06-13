@@ -1,0 +1,94 @@
+/*******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Szabo, Bence Janos
+*
+*******************************************************************************/
+//
+//  File:          www_example_org_attribute_rename.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Jan 18 10:31:58 2017
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//  Generated from file(s):
+//  - attribute_rename.xsd
+//      /* xml version = "1.0" encoding = "UTF-8" */
+//      /* targetnamespace = "www.example.org/attribute/rename" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_attribute_rename {
+
+
+import from XSD all;
+
+
+type XSD.AnyType GlobalAttrib
+with {
+  variant "name as 'GlobalAttrib_'";
+  variant "element";
+};
+
+
+type XSD.AnyType MyString
+with {
+  variant "name as 'MyString_'";
+  variant "element";
+};
+
+
+type XSD.String MyString_1
+with {
+  variant "name as 'MyString'";
+};
+
+
+type MyString_1 GlobalAttrib_1
+with {
+  variant "name as 'GlobalAttrib'";
+  variant "attribute";
+};
+
+
+type record Complex
+{
+  MyString_1 attrfixedMyString optional,
+  GlobalAttrib_1 globalAttrib optional,
+  MyString_1 birthPlaceAttrGroup optional
+}
+with {
+  variant (attrfixedMyString) "name as capitalized";
+  variant (attrfixedMyString) "attribute";
+  variant (globalAttrib) "name as capitalized";
+  variant (globalAttrib) "attribute";
+  variant (birthPlaceAttrGroup) "attribute";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/attribute/rename' prefix 'attrename'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

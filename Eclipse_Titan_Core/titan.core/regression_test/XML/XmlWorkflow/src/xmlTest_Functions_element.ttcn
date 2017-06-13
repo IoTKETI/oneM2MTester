@@ -1,0 +1,1310 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module xmlTest_Functions_element
+{
+import from www_XmlTest_org_element_anyType all;
+import from www_XmlTest_org_element_recordOfElements all;
+import from www_XmlTest_org_element_recordOfElements3 all;
+import from www_XmlTest_org_element_recordOfElements4 all;
+import from www_XmlTest_org_element_recordOfElements5 all;
+import from www_XmlTest_org_element_nameInheritance all;
+import from www_ericsson_com_is_isco_Tgc_R6A48_R6H01  all;
+import from www_example_org_substitutiongroup all;
+import from www_example_org_type_substitution all;
+import from XmlTest_imsike all;
+import from xmlTest_Shell all;
+//==============================================================================
+//  External functions
+//==============================================================================
+external function f_enc_Anything1(in Anything1 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_Anything1(in octetstring stream, out Anything1 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_PersonInfo1(in PersonInfo1 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_PersonInfo1(in octetstring stream, out PersonInfo1 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_PersonInfo2(in PersonInfo2 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_PersonInfo2(in octetstring stream, out PersonInfo2 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_PersonInfo3(in PersonInfo3 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_PersonInfo3(in octetstring stream, out PersonInfo3 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_PersonInfo4(in PersonInfo4 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_PersonInfo4(in octetstring stream, out PersonInfo4 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_PersonInfo5(in PersonInfo5 pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_PersonInfo5(in octetstring stream, out PersonInfo5 pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_IndividualTrigger(in IndividualTrigger pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_IndividualTrigger(in octetstring stream, out IndividualTrigger pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_Isp(in Isp pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_Isp(in octetstring stream, out Isp pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_RemarkNillable(in RemarkNillable pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_RemarkNillable(in octetstring stream, out RemarkNillable pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_NameInheritance(in NameInheritance pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_NameInheritance(in octetstring stream, out NameInheritance pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_Tgc(in Tgc pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_Tgc(in octetstring stream, out Tgc pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_ize_subs(in Ize pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_ize_subs(in octetstring stream, out Ize pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+external function f_enc_type_subs(in Submit pdu, out octetstring stream)
+with { extension "prototype(fast) encode(XER:XER_EXTENDED)" }
+
+external function f_dec_type_subs(in octetstring stream, out Submit pdu) return integer
+with { extension "prototype(backtrack) decode(XER:XER_EXTENDED)" }
+
+//==============================================================================
+//   Encoding decoding test
+//==============================================================================
+
+//==========================================
+// f_encDecTest_Anything1 general
+//==========================================
+function f_encDecTest_Anything1(in Anything1 pl_pdu, in charstring pl_expectedEncodedPdu, in Anything1 pl_expectedDecodedPdu) {
+  var Anything1 vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:= char2oct(pl_expectedEncodedPdu);
+  var octetstring vl_stream:=''O;
+
+  f_enc_Anything1(pl_pdu,vl_stream);
+  if( match(vl_stream,vl_expectedEncodedPdu)) {
+    setverdict(pass);
+  } else {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail)
+  }
+
+  //log("===Checking value decoded from the encoded value vs expected value===");
+
+  if(f_dec_Anything1(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+
+    if(isvalue(vl_decodedPdu)){
+      if(match(pl_expectedDecodedPdu,vl_decodedPdu)) {
+        setverdict(pass);
+      } else {
+        log("Pdu differs from the expected value");
+        log(match(pl_expectedDecodedPdu,vl_decodedPdu));
+        setverdict(fail);
+      }
+    }else{
+      log("The decoded value contains unbounded values");
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+
+  if(f_dec_Anything1(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(isvalue(vl_decodedPdu)){
+      if(match(pl_expectedDecodedPdu,vl_decodedPdu)) {
+        setverdict(pass);
+      } else {
+        log("Pdu differs from the expected value");
+        log(match(pl_expectedDecodedPdu,vl_decodedPdu));
+        setverdict(fail);
+      }
+    }else{
+      log("The decoded value contains unbounded values");
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_PersonInfo1
+//==========================================
+function f_encDecTest_PersonInfo1() {
+  var PersonInfo1 vl_pdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=82,
+    degree:=omit
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct("<PersonInfo1>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<age>82</age>\n</PersonInfo1>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo1(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  if(f_dec_PersonInfo1(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo1(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }
+}
+
+//==========================================
+// f_encDecTest_PersonInfo1_defaultElement
+//==========================================
+function f_encDecTest_PersonInfo1_defaultElement() {
+  var PersonInfo1 vl_pdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=82,
+    degree:=omit
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct("<PersonInfo1>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<age>82</age>\n</PersonInfo1>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo1(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  if(f_dec_PersonInfo1(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo1(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+
+  //log("===Empty default value test 1===");
+  var octetstring vl_xmlWithEmptyDefaultValue
+    :=char2oct("<PersonInfo1>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<age>82</age>\n<degree></degree>\n</PersonInfo1>\n\n");
+
+  var PersonInfo1 vl_expectedPdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=82,
+    degree:="Msc"
+  };
+
+  if(f_dec_PersonInfo1(vl_xmlWithEmptyDefaultValue, vl_decodedPdu)==0) {
+    if(match(vl_expectedPdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("The value to be decoded: ",vl_xmlWithEmptyDefaultValue);
+      log("The decoded pdu: ", vl_decodedPdu);
+      log("Pdu differs from the expected value");
+      log(match(vl_expectedPdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+
+  //log("===Empty default value test 2===");
+  vl_xmlWithEmptyDefaultValue
+  :=char2oct("<PersonInfo1>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<age>82</age>\n<degree/>\n</PersonInfo1>\n\n");
+
+  vl_expectedPdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=82,
+    degree:="Msc"
+  };
+
+  if(f_dec_PersonInfo1(vl_xmlWithEmptyDefaultValue, vl_decodedPdu)==0) {
+    if(match(vl_expectedPdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("The value to be decoded: ",vl_xmlWithEmptyDefaultValue);
+      log("The decoded pdu: ", vl_decodedPdu);
+      log("Pdu differs from the expected value");
+      log(match(vl_expectedPdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_PersonInfo2
+//==========================================
+function f_encDecTest_PersonInfo2() {
+  var PersonInfo2 vl_pdu:= {
+    nationality:="Hungarian",
+    title:="Mr",
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=88
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct("<PersonInfo2 nationality='Hungarian' title='Mr'>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<age>88</age>\n</PersonInfo2>\n\n");
+
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo2(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  if(f_dec_PersonInfo2(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded");
+      log(match(vl_pdu,vl_decodedPdu));
+    }
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo2(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+    }
+  }
+}
+//==========================================
+// f_encDecTest_PersonInfo2_omitOptionals
+//==========================================
+function f_encDecTest_PersonInfo2_omitOptionals() {
+  var PersonInfo2 vl_pdu:= {
+    nationality:="Hungarian",
+    title:="Mr",
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=omit
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=
+    char2oct("<PersonInfo2 nationality='Hungarian' title='Mr'>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n</PersonInfo2>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo2(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  if(f_dec_PersonInfo2(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+    }
+  }else {
+    setverdict(fail);
+    log("Pdu could not decoded");
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo2(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}
+
+//==========================================
+// f_encDecTest_PersonInfo2_defaultAttribute
+//==========================================
+function f_encDecTest_PersonInfo2_defaultAttribute() {
+  var PersonInfo2 vl_expectedPdu:= {
+    nationality:="American",
+    title:=omit,
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=omit
+  },vl_decodedPdu;
+  var octetstring vl_encodedPduToBeDecoded:=char2oct("<PersonInfo2>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n</PersonInfo2>\n\n")
+
+  //log("===Checking decoded value vs expected value===");
+  if( f_dec_PersonInfo2( vl_encodedPduToBeDecoded, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if( isvalue(vl_decodedPdu) and match(vl_expectedPdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+      log("Pdu decoded is not the expected one");
+      if(isvalue(vl_decodedPdu)){ log(match(vl_expectedPdu,vl_decodedPdu)) };
+    }
+  }else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}
+
+//==========================================
+// f_encDecTest_PersonInfo3
+//==========================================
+function f_encDecTest_PersonInfo3() {
+  var PersonInfo3 vl_pdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    child_list:={ "Catherine", "Jackie"}
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=
+    char2oct("<PersonInfo3>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<child>Catherine</child>\n\t<child>Jackie</child>\n</PersonInfo3>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo3(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_PersonInfo3(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_PersonInfo3(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo3(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_PersonInfo4
+//==========================================
+function f_encDecTest_PersonInfo4() {
+  var PersonInfo4 vl_pdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=omit,
+    degree_list:={"MSc", "MA","BSc"}
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<PersonInfo4>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<Degree>MSc</Degree>\n\t<Degree>MA</Degree>\n\t<Degree>BSc</Degree>\n</PersonInfo4>\n\n");
+
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo4(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_PersonInfo4(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_PersonInfo4(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo4(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_PersonInfo5
+//==========================================
+function f_encDecTest_PersonInfo5() {
+  var PersonInfo5 vl_pdu:= {
+    firstName:="Peter",
+    lastName:="Falk",
+    age:=omit,
+    degree_list:={
+      {year:="1980",base:="MSc"},
+      {year:="1986",base:= "MA"},
+      {year:="2004",base:="Bsc"}
+    }
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<PersonInfo5>\n\t<firstName>Peter</firstName>\n\t<lastName>Falk</lastName>\n\t<Degree Year='1980'>MSc</Degree>\n\t<Degree Year='1986'>MA</Degree>\n\t<Degree Year='2004'>Bsc</Degree>\n</PersonInfo5>\n\n");
+  
+  var octetstring vl_stream:=''O;
+  f_enc_PersonInfo5(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_PersonInfo5(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_PersonInfo5(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_PersonInfo5(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_IndividualTrigger1
+//==========================================
+function f_encDecTest_IndividualTrigger1() {
+  var IndividualTrigger vl_pdu:= {
+    triggerDescriptionA:="myTriggerDescriptionAttr",
+    content:={ triggerDescription:="TriggerDescription" }
+  },vl_decodedPdu;
+  //  var octetstring vl_expectedEncodedPdu:=char2oct("<ns:individualTrigger xmlns:ns='urn:XmlTest.imsike' triggerDescriptionA='myTriggerDescriptionAttr'>\n\t<triggerDescription>TriggerDescription</triggerDescription>\n</ns:individualTrigger>\n\n");
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:individualTrigger xmlns:ns50='urn:XmlTest.imsike' triggerDescriptionA='myTriggerDescriptionAttr'>\n\t" &
+    "<ns50:triggerDescription>TriggerDescription</ns50:triggerDescription>\n" &
+    "</ns50:individualTrigger>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_IndividualTrigger(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_IndividualTrigger(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_IndividualTrigger(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_IndividualTrigger(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_IndividualTrigger2
+//==========================================
+function f_encDecTest_IndividualTrigger2() {
+  var IndividualTrigger vl_pdu:= {
+    triggerDescriptionA:="myTriggerDescriptionAttr",
+    content:=omit
+  },vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:individualTrigger xmlns:ns50='urn:XmlTest.imsike' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' triggerDescriptionA='myTriggerDescriptionAttr' xsi:nil='true'/>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_IndividualTrigger(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_IndividualTrigger(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_IndividualTrigger(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_IndividualTrigger(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+//==========================================
+// f_encDecTest_Isp1
+//==========================================
+function f_encDecTest_Isp1() {
+  var Isp vl_pdu:= {
+    individualTrigger_list := {
+      {
+        triggerDescriptionA:="myTriggerDescriptionAttr",
+        content:={ triggerDescription:="MyTriggerDescription" }
+      }
+    }
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:isp xmlns:ns50='urn:XmlTest.imsike'>\n\t"&
+    "<ns50:individualTrigger triggerDescriptionA='myTriggerDescriptionAttr'>\n\t\t" &
+    "<ns50:triggerDescription>MyTriggerDescription</ns50:triggerDescription>\n\t"&
+    "</ns50:individualTrigger>\n"&
+    "</ns50:isp>\n\n");
+
+  var octetstring vl_stream:=''O;
+  f_enc_Isp(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_Isp(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_Isp(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_Isp(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_Isp2
+//==========================================
+function f_encDecTest_Isp2() {
+  var Isp vl_pdu:= {
+    individualTrigger_list := {
+      {
+        triggerDescriptionA:="myTriggerDescriptionAttr",
+        content:=omit
+      }
+    }
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:isp xmlns:ns50='urn:XmlTest.imsike' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>\n\t"&
+    "<ns50:individualTrigger triggerDescriptionA='myTriggerDescriptionAttr' xsi:nil='true'/>\n"&
+    "</ns50:isp>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_Isp(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_Isp(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_Isp(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_Isp(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+
+//==========================================
+// f_encDecTest_RemarkNillable1
+//==========================================
+function f_encDecTest_RemarkNillable1() {
+  var RemarkNillable vl_pdu:= {
+    content:= "MyRemarkNillable"
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:remarkNillable xmlns:ns50='urn:XmlTest.imsike'>"&
+    "MyRemarkNillable" &
+    "</ns50:remarkNillable>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_RemarkNillable(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_RemarkNillable(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_RemarkNillable(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_RemarkNillable(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+// f_encDecTest_RemarkNillable2
+//==========================================
+function f_encDecTest_RemarkNillable2() {
+  var RemarkNillable vl_pdu:= {
+    content:= omit
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<ns50:remarkNillable xmlns:ns50='urn:XmlTest.imsike' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:nil='true'/>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_RemarkNillable(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_RemarkNillable(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_RemarkNillable(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_RemarkNillable(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//==========================================
+//f_encDecTest_nameInheritance
+//==========================================
+function f_encDecTest_nameInheritance() runs on Shell_CT{
+  var NameInheritance vl_pdu:= {
+    code:= 13,
+    second:= "This is the second field"
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<xs:nameInheritance xmlns:xs='www.XmlTest.org/element_nameInheritance'>\n\t"&
+    "<code>13</code>\n\t"&
+    "<second>This is the second field</second>\n"&
+    "</xs:nameInheritance>\n\n");
+  var octetstring vl_stream:=''O;
+  f_enc_NameInheritance(vl_pdu,vl_stream);
+
+  if( not match(vl_stream,vl_expectedEncodedPdu)) {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking encoded value (xml) against the xsd file by xmllint ===");
+  var boolean vl_success:=false;
+  f_shell_validateXml(vl_stream,"XmlTest_element_nameInheritance.xsd", c_shell_successWithoutWarningAndError, vl_success);
+  if(vl_success) {
+    setverdict(pass);
+  }else{
+    log("Xml validation against xsd failed");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_NameInheritance(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_NameInheritance(vl_stream, vl_decodedPdu)==0) {
+    log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_NameInheritance(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+//========= TEMPORARY - To test Tgc =====
+
+//==========================================
+//f_encDecTest_Tgc
+//==========================================
+function f_encDecTest_Tgc() runs on Shell_CT {
+
+  var Tgc vl_pdu := {
+    blade_list := {},
+    system_ := omit,
+    network := omit,
+    tgcApp := {
+      omit,
+      omit,
+      omit,
+      omit,
+      omit,
+      omit,
+/* announcementSet_list */ {{
+          name := "al",
+          announcement_list := {{
+              code := 17,
+              name := "sweet seventeen"
+            }}
+        }},
+/* bgwInterfaceParameterSet_list */ {},
+/* defaultPointAssociation */ {
+        omit,
+        omit,
+        omit,
+        omit
+      },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      omit,
+      {},
+      {},
+      {},
+      {},
+      {},
+      {}
+    },
+    tispReport := omit
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<tgc:Tgc xmlns:tgc='http://www.ericsson.com/is/isco/Tgc/R6A48/R6H01'>\n"&
+    "\t<tgc:TgcApp>\n"&
+    "\t\t<tgc:AnnouncementSet>\n"&
+    "\t\t\t<tgc:name>al</tgc:name>\n"&
+    "\t\t\t<tgc:Announcement>\n"&
+    "\t\t\t\t<tgc:code>17</tgc:code>\n"&
+    "\t\t\t\t<tgc:name>sweet seventeen</tgc:name>\n"&
+    "\t\t\t</tgc:Announcement>\n"&
+    "\t\t</tgc:AnnouncementSet>\n"&
+    "\t\t<tgc:DefaultPointAssociation/>\n"&
+    "\t</tgc:TgcApp>\n"&
+    "</tgc:Tgc>\n\n"
+  );
+
+  var octetstring vl_stream:=''O;
+  f_enc_Tgc(vl_pdu,vl_stream);
+
+  if( match(vl_stream,vl_expectedEncodedPdu)) {
+    setverdict(pass);
+  } else {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking encoded value (xml) against the xsd file by xmllint ===");
+  var boolean vl_success:=false;
+  f_shell_validateXml(vl_stream,"Tgc.xsd", c_shell_successWithoutWarningAndError, vl_success);
+  if(vl_success) {
+    setverdict(pass);
+  }else{
+    log("Xml validation against xsd failed");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_Tgc(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_Tgc(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_Tgc(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+
+//==========================================
+//f_encDecTest_Ize
+//==========================================
+function f_encDecTest_ize_subs() runs on Shell_CT {
+
+  var Ize vl_pdu := { head_list := {
+     { head := "anything" },
+     { member1 := "any thing" },
+     { member2 := something },
+     { member3 := { bar:= 5, foo := omit, base := "anything else" } } }
+  },
+  vl_decodedPdu;
+
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+ "<subs:ize "&
+ "xmlns:subs='www.example.org/substitutiongroup'>\n"&
+ "\t<subs:head>anything</subs:head>\n"&
+ "\t<subs:member1>any thing</subs:member1>\n"&
+ "\t<subs:member2>something</subs:member2>\n"&
+ "\t<subs:member3 bar='5'>anything else</subs:member3>\n"&
+ "</subs:ize>\n\n");
+
+  var octetstring vl_stream:=''O;
+  f_enc_ize_subs(vl_pdu,vl_stream);
+
+  if( match(vl_stream,vl_expectedEncodedPdu)) {
+    setverdict(pass);
+  } else {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking encoded value (xml) against the xsd file by xmllint ===");
+  var boolean vl_success:=false;
+  f_shell_validateXml(vl_stream,"substitutiongroup.xsd", c_shell_successWithoutWarningAndError, vl_success);
+  if(vl_success) {
+    setverdict(pass);
+  }else{
+    log("Xml validation against xsd failed");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_ize_subs(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_ize_subs(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_ize_subs(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+
+//==========================================
+//f_encDecTest_type_subs
+//==========================================
+function f_encDecTest_type_subs() runs on Shell_CT {
+
+  var Submit vl_pdu := { 
+    request1 := {
+      restrictedType := {
+        foo_list := { "string1", "string2", "string3" },
+        bar := "bar"
+      }
+    },
+    request2 := {
+      parentType := {
+        foo_list := { "parentstring1", "parentstring2", "parentstring3" },
+        bar := "parentbar"
+      }
+    }
+  },
+  vl_decodedPdu;
+  var octetstring vl_expectedEncodedPdu:=char2oct(
+    "<tysub:Submit xmlns:tysub='www.example.org/type/substitution' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>\n"&
+    "\t<request1 xsi:type='tysub:restrictedType'>\n"&
+    "\t\t<foo>string1</foo>\n"&
+    "\t\t<foo>string2</foo>\n"&
+    "\t\t<foo>string3</foo>\n"&
+    "\t\t<bar>bar</bar>\n"&
+    "\t</request1>\n"&
+    "\t<request2>\n"&
+    "\t\t<foo>parentstring1</foo>\n"&
+    "\t\t<foo>parentstring2</foo>\n"&
+    "\t\t<foo>parentstring3</foo>\n"&
+    "\t\t<bar>parentbar</bar>\n"&
+    "\t</request2>\n"&
+    "</tysub:Submit>\n\n");
+
+  var octetstring vl_stream:=''O;
+  f_enc_type_subs(vl_pdu,vl_stream);
+
+  if( match(vl_stream,vl_expectedEncodedPdu)) {
+    setverdict(pass);
+  } else {
+    log("Expected encoded value: ",vl_expectedEncodedPdu);
+    log("Actual encoded value:   ", vl_stream);
+    setverdict(fail);
+  }
+
+  //log("===Checking encoded value (xml) against the xsd file by xmllint ===");
+  var boolean vl_success:=false;
+  f_shell_validateXml(vl_stream,"type_substitution.xsd", c_shell_successWithoutWarningAndError, vl_success);
+  if(vl_success) {
+    setverdict(pass);
+  }else{
+    log("Xml validation against xsd failed");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the encoded value vs original value===");
+  var integer vl_retval:=f_dec_type_subs(vl_stream, vl_decodedPdu);
+  //log("retval:",vl_retval);
+  if(f_dec_type_subs(vl_stream, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu differs from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  }else{
+    log("Pdu could not decoded");
+    setverdict(fail);
+  }
+
+  //log("===Checking value decoded from the expected value vs original value===");
+  if( f_dec_type_subs(vl_expectedEncodedPdu, vl_decodedPdu)==0) {
+    //log("The decoded pdu: ", vl_decodedPdu);
+    if(match(vl_pdu,vl_decodedPdu)) {
+      setverdict(pass);
+    } else {
+      log("Pdu could not decoded from the expected value");
+      log(match(vl_pdu,vl_decodedPdu));
+      setverdict(fail);
+    }
+  } else {
+    log("Pdu could not decoded from the expected value");
+    setverdict(fail);
+  }
+}//f_
+
+
+}//module

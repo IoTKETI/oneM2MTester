@@ -1,0 +1,42 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Kulcsar, Endre
+--   Szabados, Kristof
+--
+--/////////////////////////////////////////////////////////////////////////////
+Test84
+
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+MySetType1 ::= SET {
+  			     field1 INTEGER,
+			     field2 BOOLEAN  OPTIONAL,
+			     field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a,b,c} DEFAULT a,
+			     field7 REAL OPTIONAL
+		   }
+
+mySetValue1 MySetType1 ::=  {
+       			     field7  {mantissa 10,base 2, exponent 2},  --REAL
+			     field2 TRUE,              -- BOOLEAN,
+			     field3 NULL,
+			     field4 'FF00'H,           -- OCTET STRING,
+			     field5 '01010'B,          -- BIT STRING,
+			     field6  b                --ENUMERATED {a,b,c)
+			     }
+END

@@ -1,0 +1,4571 @@
+.******************************************************************************
+.* Copyright (C) 2017 ETSI  All Rights Reserved.
+.*
+.* Contributors:
+.*   Adrien Kirjak 
+.*
+.******************************************************************************/
+text.
+:lang eng.
+.*
+:docname.Test Description
+:docno.xz/152 91-CRL 113 200 Uen
+:rev.PA1
+:date.2016-04-04
+.*
+:prep.ETH/XZ EADRKIR
+:subresp.EADRKIR
+:appr.ETH/XZ (Elemer Lelik)
+:checked.
+.*
+:title.ETSI TTCN3 Negative Conformance Test
+:contents level=3.
+.*---------------------------------------------------------------------*
+:h1.PREREQUISITES AND PREPARATIONS
+.*---------------------------------------------------------------------*	
+.*---------------------------------------------------------------------*
+:h2.Scope of the Test Object
+.*---------------------------------------------------------------------*
+:xmp tab=1 nokeep.
+This TD contains negative tests from ETSI TTCN3 Conformance Test's 16_functions_altsteps_testcases, 19_basic_program_statements and 20_statement_and_operations_for_alt folders. 
+
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h2.Test Tools
+.*---------------------------------------------------------------------*
+:p.:us.Software Tools:eus.
+:xmp tab=2 nokeep.
+
+	SAtester.pl
+
+:exmp.
+:np.
+
+.*---------------------------------------------------------------------*
+:h1.REQUIREMENT-BASED TESTS
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2. 16_functions_altsteps_testcases folder
+.*---------------------------------------------------------------------*
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_001 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_001 NegSem_1601_toplevel_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_001 {
+
+	type component GeneralComp {	    	    
+	}
+	
+	function f_test ( integer p_integer := 0 ) return float {
+
+	 return p_integer+1;		// mismatch between return type and argument type
+	 return p_integer+2;
+	}
+
+	testcase TC_NegSem_1601_toplevel_001 () runs on GeneralComp {
+
+	 	if(f_test(1)==2) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+
+	}
+
+	control{
+
+		execute(TC_NegSem_1601_toplevel_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The operands of operation `==' should be of compatible types
+<END_RESULT>
+<RESULT COUNT 2>
+error: Incompatible value: `float' value was expected
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_002 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_002 NegSem_1601_toplevel_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_002 {
+
+	type component GeneralComp {	    	    
+	}
+	
+	function f_test ( template octetstring p_ostring ) return octetstring {
+		return p_ostring; // mismatch between return type and template argument
+	}
+
+	testcase TC_NegSem_1601_toplevel_002 () runs on GeneralComp {
+		if( match('FFFFFF'O, f_test('FF??'O)) ) {
+		    setverdict(pass);
+		} else {
+		    setverdict(fail);
+		}		
+	}
+
+	control{
+		execute(TC_NegSem_1601_toplevel_002());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a value was expected instead of template parameter `p_ostring'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_003 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_003 NegSem_1601_toplevel_003.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_003 {
+
+	type component GeneralComp {	
+		var integer v_comp:=1;    	    
+	}
+	
+	function f_test ( integer p_integer := 0 ) return integer {	
+
+	 return f_two(p_integer);  	//against restriction 16.1 / a)
+	}
+
+	function f_two ( integer p_integer := 0 ) runs on GeneralComp return integer {
+
+	 return p_integer+v_comp;
+	}
+
+	testcase TC_NegSem_1601_toplevel_003 () runs on GeneralComp {
+
+	 	if(f_test(1)==2) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1601_toplevel_003());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A definition without `runs on' clause cannot call function `@NegSem_1601_toplevel_003.f_two', which runs on component type `@NegSem_1601_toplevel_003.GeneralComp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_004 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_004 NegSem_1601_toplevel_004.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_004 {
+
+	type component GeneralComp {	    	    
+	}
+	
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+
+	 return p_integer+1;
+	}
+
+	testcase TC_NegSem_1601_toplevel_004 () runs on GeneralComp {
+
+	 	if(f_test(1)==2) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+	 
+	}
+
+	control{
+
+		f_test(1);	//attempt to invoke a function with runs on clause
+		execute(TC_NegSem_1601_toplevel_004());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A definition without `runs on' clause cannot call function `@NegSem_1601_toplevel_004.f_test', which runs on component type `@NegSem_1601_toplevel_004.GeneralComp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_005 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_005 NegSem_1601_toplevel_005.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_005 {
+
+	type component GeneralComp {	    	    
+	}
+	
+	function f_test (in integer p_integer := 10 ) return integer {
+	  	if (p_integer > 5) {  
+			p_integer := 5;  
+		    return p_integer;  
+	  	}
+	 // there is no return value if comparison is false
+
+	}
+
+	testcase TC_NegSem_1601_toplevel_005 () runs on GeneralComp {
+
+	 	if(f_test(2)==2) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1601_toplevel_005());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The function has return type, but control might leave it without reaching a return statement
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1601_toplevel_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1601_006 Ensure that the IUT correctly handles function definitions >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1601_toplevel_006 NegSem_1601_toplevel_006.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1, Ensure that the IUT correctly handles function definitions
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1601_toplevel_006 {
+
+	type component GeneralComp {	
+		var integer v_comp:=1;    	    
+	}
+	
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+	 	return f_two(p_integer);
+	}
+
+	function f_two ( integer p_integer := 0 ) return integer {
+	 	return p_integer+v_comp; //use of variable from a component but missing 'runs on' clause
+	}
+
+	testcase TC_NegSem_1601_toplevel_006 () runs on GeneralComp {
+
+	 	if(f_test(1)==2) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1601_toplevel_006());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There is no local or imported definition with name `v_comp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_001 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_001 NegSem_160102_predefined_functions_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_001 {
+
+    type component GeneralComp {
+    }
+
+    testcase TC_NegSem_160102_predefined_functions_001 () runs on GeneralComp {
+        var charstring v_i;
+
+        v_i:=int2char(128);
+    }
+
+    control{
+        execute(TC_NegSem_160102_predefined_functions_001());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The operand of operation `int2char\(\)' should be in range 0..127
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_002 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_002 NegSem_160102_predefined_functions_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_002 {
+
+    type component GeneralComp {
+    }
+
+    testcase TC_NegSem_160102_predefined_functions_002 () runs on GeneralComp {
+        var charstring v_i;
+
+        v_i:=int2char(-1);
+    }
+
+    control {
+        execute(TC_NegSem_160102_predefined_functions_002());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The operand of operation `int2char\(\)' should be in range 0..127
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_003 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_003 NegSem_160102_predefined_functions_003.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_003 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_003 () runs on GeneralComp {
+		var universal charstring v_i;
+
+	 	v_i:=int2char(2147483648);	
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_003());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The operand of operation `int2char\(\)' should be in range 0..127
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_004 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_004 NegSem_160102_predefined_functions_004.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_004 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_004 () runs on GeneralComp {
+		var hexstring v_i;
+
+	 	v_i:=int2hex(256,2);	//mismatch of string length	
+	  	setverdict(pass);
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_004());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Value 256 does not fit in length 2
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_005 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_005 NegSem_160102_predefined_functions_005.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_005 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_005 () runs on GeneralComp {
+		var integer v_i;
+
+	 	v_i:=char2int("blabla");		//mismatch of string length	
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_005());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The operand of operation `char2int\(\)' should be of length 1
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_006 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_006 NegSem_160102_predefined_functions_006.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_006 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_006 () runs on GeneralComp {
+		var integer v_i;
+
+	 	v_i:=lengthof('1*F'H);		//undetermined string length	
+	 	setverdict(pass);
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_006());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing lengthof\(\) operation on a hexstring template with no exact length.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_007 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_007 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_007 NegSem_160102_predefined_functions_007.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_007 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_007 () runs on GeneralComp {
+		var integer v_i;
+
+	 	v_i:=lengthof('1'B length(3));		//undetermined string length	
+	  	setverdict(pass);
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_007());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There are fewer \(1\) elements in the string than it is allowed by the length restriction \(3\)
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_008 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_008 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_008 NegSem_160102_predefined_functions_008.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_008 {
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_008 () runs on GeneralComp {
+		var integer v_i;
+
+	 	v_i:=lengthof('1*0'B length(3..6));		//undetermined string length	
+	 	setverdict(pass);
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_008());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing lengthof\(\) operation on a bitstring template with no exact length.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_010 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_010 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_010 NegSem_160102_predefined_functions_010.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_010 {
+	type record of integer IntegerList;
+
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_010 () runs on GeneralComp {
+		template IntegerList template1 := { 1, 2, 3, * } length(1..2) ; 		//incorrect template length	
+		var integer v_i;
+
+	 	v_i:=lengthof(template1);
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_010());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There are more \(at least 3\) elements in the template than it is allowed by the length restriction \(at most 2\)
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_017 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_017 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_017 NegSem_160102_predefined_functions_017.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_017 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_017 () runs on GeneralComp {
+		var charstring v_example:="example text string";
+		var charstring v_i;
+
+	 	v_i:=regexp(v_example,charstring:"?+(text)?+",1);		//wrong group index
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_017());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: The third argument \(groupno\) of function regexp\(\) is too large: The requested group index is 1, but the pattern contains only 1 group.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_018 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_018 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_018 NegSem_160102_predefined_functions_018.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_018 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_018 () runs on GeneralComp {
+		var charstring v_example:="example text string";
+		var charstring v_i;
+
+	 	v_i:=regexp(v_example,charstring:"?+(text)?+",-1);		//wrong group index
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_018());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Third operand of operation `regexp\(\)' should not be negative
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_019 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_019 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_019 NegSem_160102_predefined_functions_019.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_019 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_019 () runs on GeneralComp {
+		var charstring v_example:="example text string";
+		var charstring v_i;
+
+	 	v_i:=regexp(v_example,charstring:"?+(text)?+");		//missing group index
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_019());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `\)': syntax error, unexpected '\)', expecting ','
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_021 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_021 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_021 NegSem_160102_predefined_functions_021.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_021 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_021 () runs on GeneralComp {
+		var bitstring v_i;
+
+	 	v_i:=substr('00100110'B,-3,4);	//wrong index value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_021());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Second operand of operation `substr\(\)' should not be negative
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_022 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_022 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_022 NegSem_160102_predefined_functions_022.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_022 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_022 () runs on GeneralComp {
+		var charstring v_i;
+
+	 	v_i:=substr('00100110'B,3,-4);		//wrong length value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_022());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Third operand of operation `substr\(\)' should not be negative
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_023 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_023 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_023 NegSem_160102_predefined_functions_023.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_023 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_023 () runs on GeneralComp {
+		var charstring v_i;
+
+	 	v_i:=substr('00100110'B,3,14);		//too large length value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_023());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The sum of second operand `index' \(3\) and third operand `returncount' \(14\) is greater than the length of the first operand \(8\)
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_024 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_024 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_024 NegSem_160102_predefined_functions_024.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_024 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_024 () runs on GeneralComp {
+		var bitstring v_i;
+
+	 	v_i:=replace('00000110'B,-1,3,'111'B);		//wrong index value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_024());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Second operand of operation `replace\(\)' should not be negative
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_025 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_025 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_025 NegSem_160102_predefined_functions_025.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_025 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_025 () runs on GeneralComp {
+		var bitstring v_i;
+
+	 	v_i:=replace('00000110'B,1,-3,'111'B);		//wrong length value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_025());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Third operand of operation `replace\(\)' should not be negative
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_026 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_026 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_026 NegSem_160102_predefined_functions_026.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_026 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_026 () runs on GeneralComp {
+		var bitstring v_i;
+
+	 	v_i:=replace('00000110'B,1,13,'111'B);		//too large length value
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_026());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The sum of second operand `index' \(1\) and third operand `len' \(13\) is greater than the length of the first operand \(8\)
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_027 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_027 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_027 NegSem_160102_predefined_functions_027.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_027 {
+	
+	type component GeneralComp {	
+	}
+
+	testcase TC_NegSem_160102_predefined_functions_027 () runs on GeneralComp {
+		var bitstring v_i;
+
+	 	v_i:=replace('00000110'B,1,4,'8'H);		//incompatible replacement type
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_027());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Fourth operand of operation `replace\(\)' is of type `hexstring', but a value of type `bitstring' was expected here
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_029 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_029 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_029 NegSem_160102_predefined_functions_029.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_029 {
+    type enumerated EnumeratedType {e_black, e_white};
+    type enumerated EnumeratedTypeWithLabels1 {e_black (1), e_white};
+    type enumerated EnumeratedTypeWithLabels2 {e_black (-1), e_white};
+    type enumerated EnumeratedTypeWithLabels3 {e_black (-1), e_white , e_yellow (0) };
+    type enumerated Fruits {e_apple, e_peach, e_cherry};
+
+	type component GeneralComp {	
+	}
+
+
+	testcase TC_NegSem_160102_predefined_functions_029 () runs on GeneralComp {
+
+		 var EnumeratedType vl_enum_black := e_black;	
+		 var EnumeratedType vl_enum_white := e_white;	
+		 var EnumeratedTypeWithLabels1 vl_enum1_black := e_black;	
+		 var EnumeratedTypeWithLabels1 vl_enum1_white := e_white;	
+		 var EnumeratedTypeWithLabels2 vl_enum2_black := e_black;	
+		 var EnumeratedTypeWithLabels2 vl_enum2_white := e_white;	
+		 var EnumeratedTypeWithLabels3 vl_enum3_black := e_black;	
+		 var EnumeratedTypeWithLabels3 vl_enum3_white := e_white;	
+		 var EnumeratedTypeWithLabels3 vl_enum3_yellow := e_yellow;	
+
+
+		if( match(enum2int(EnumeratedTypeWithLabels1.e_black), 0)	//not allowed selection
+		  ) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}
+		
+		   
+	}
+
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_029());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a value was expected instead of type `@NegSem_160102_predefined_functions_029.EnumeratedTypeWithLabels1'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_030 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_030 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_030 NegSem_160102_predefined_functions_030.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_030 {
+    type enumerated EnumeratedType {e_black, e_white};
+    type enumerated EnumeratedTypeWithLabels1 {e_black (1), e_white};
+    type enumerated EnumeratedTypeWithLabels2 {e_black (-1), e_white};
+    type enumerated EnumeratedTypeWithLabels3 {e_black (-1), e_white , e_yellow (0) };
+    type enumerated Fruits {e_apple, e_peach, e_cherry};
+
+	type component GeneralComp {	
+	}
+
+
+	testcase TC_NegSem_160102_predefined_functions_030 () runs on GeneralComp {
+
+		var EnumeratedType vl_enum_black := e_black;	
+		var EnumeratedType vl_enum_white := e_white;	
+		var EnumeratedTypeWithLabels1 vl_enum1_black := e_black;	
+		var EnumeratedTypeWithLabels1 vl_enum1_white := e_white;	
+		var EnumeratedTypeWithLabels2 vl_enum2_black := e_black;	
+		var EnumeratedTypeWithLabels2 vl_enum2_white := e_white;	
+		var EnumeratedTypeWithLabels3 vl_enum3_black := e_black;	
+		var EnumeratedTypeWithLabels3 vl_enum3_white := e_white;	
+		var EnumeratedTypeWithLabels3 vl_enum3_yellow := e_yellow;	
+		const EnumeratedTypeWithLabels1 c_enum1_black := e_black;	
+
+		int2enum(4,vl_enum1_black); //not existing label
+
+		//if( match(int2enum(4,vl_enum1_black), c_enum1_black) // int2enum isn't a return type function
+		if( match(vl_enum1_black, c_enum1_black)	
+		  ) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}
+		
+		   
+	}
+
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_030());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Assigning invalid numeric value 4 to a variable of enumerated type @NegSem_160102_predefined_functions_030.EnumeratedTypeWithLabels1.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_031 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_031 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_031 NegSem_160102_predefined_functions_031.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160102_predefined_functions_031 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_031 () runs on GeneralComp {
+		var float v_random1;
+
+		v_random1:=rnd(infinity);		//cannot have infinity as a seed
+	 	if( match(rnd(infinity), v_random1) and not match(rnd(1.0), v_random1) ) {
+		    setverdict(pass);
+		}
+		else {
+		    setverdict(fail);
+		}		
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_031());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 2>
+error: The operand of operation `rnd \(seed\)' cannot be INF, it must be a numeric value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_032 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_032 Ensure that an error is generated when the parameter of the encvalue function contains a matching symbol >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160102_predefined_functions_032 NegSem_160102_predefined_functions_032.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that an error is generated when the parameter of the encvalue function contains a matching symbol
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirements are tested:
+// (C.5.1) When the actual parameter that is passed to inpar is a template, it shall resolve to 
+// a specific value (the same restrictions apply as for the argument of the send statement).
+
+module NegSem_160102_predefined_functions_032 {
+	
+	type integer I with { variant "32 bit"};
+	
+	type component GeneralComp {	
+	}
+	
+
+	testcase TC_NegSem_160102_predefined_functions_032 () runs on GeneralComp {
+		template I v_test := ?;
+		var bitstring v_res := encvalue(v_test);
+		setverdict(fail, "The previous encvalue call should have caused an error"); 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_032());
+
+	}
+
+} with { encode "RAW"}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A specific value was expected instead of any value
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_033 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_033 Ensure that an error is detected when the parameter of the encvalue function contains an unitialized value >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_033 NegSem_160102_predefined_functions_033.ttcn >
+/****************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that an error is detected when the parameter of the encvalue function contains an unitialized value
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirements are tested:
+// 16.1.2, restriction a.3: all actual in and inout parameters shall be initialized
+
+module NegSem_160102_predefined_functions_033 {
+	
+	type integer I with { variant "32 bit"};
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_033 () runs on GeneralComp {
+		var template I v_test;
+		var bitstring v_res := encvalue(v_test);
+		setverdict(fail, "The previous encvalue call should have caused an error"); 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_033());
+
+	}
+
+} with { encode "RAW"}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_034 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_034 Ensure that an error is detected when the parameter of the encvalue function contains a partially initialized value >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_034 NegSem_160102_predefined_functions_034.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that an error is detected when the parameter of the encvalue function contains a partially initialized value
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirements are tested:
+// 16.1.2, restriction a.3: all actual in and inout parameters shall be initialized
+
+module NegSem_160102_predefined_functions_034 {
+	
+	type record R 
+	{
+		integer field1,
+		integer field2
+	} with { variant "" }
+	
+	type component GeneralComp {	
+	}
+	
+
+	testcase TC_NegSem_160102_predefined_functions_034 () runs on GeneralComp {
+		template R v_test := { field1 := 1, field2 := - }
+		var bitstring v_res := encvalue(v_test);
+		setverdict(fail, "The previous encvalue call should have caused an error"); 
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_034());
+
+	}
+
+} with { encode "RAW"}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a valueof or send operation on a non-specific integer template.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_035 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_035 Ensure that an error is detected when the first parameter of the decvalue function contains an uninitialized value >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_035 NegSem_160102_predefined_functions_035.ttcn >
+/****************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that an error is detected when the first parameter of the decvalue function contains an uninitialized value
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirements are tested:
+// 16.1.2, restriction a.3: all actual in and inout parameters shall be initialized
+
+module NegSem_160102_predefined_functions_035 {
+	type integer I with { variant "32 bit"};
+
+    type component GeneralComp {
+    }
+
+    testcase TC_NegSem_160102_predefined_functions_035 () runs on GeneralComp {
+        var bitstring v_test;
+		var I v_decoded;
+		var integer v_res := decvalue(v_test, v_decoded);
+		setverdict(fail, "The previous decvalue call should have caused an error"); 
+    }
+
+    control{
+        execute(TC_NegSem_160102_predefined_functions_035());
+    }
+} with {encode "RAW"}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: The argument of function bit2oct\(\) is an unbound bitstring value.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_036 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_036 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_036 NegSem_160102_predefined_functions_036.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+
+/* The following requirements are tested:
+ *In addition to the general error causes in clause 16.1.2, error causes are:
+ * inpar is a template of a character string type and contains a matching mechanism other than AnyElement or
+AnyElementsOrNone; */
+
+module NegSem_160102_predefined_functions_036 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_036 () runs on GeneralComp {
+		
+		const universal charstring m_Ref:="abc?def?";
+		
+		var template universal charstring Mytemp := pattern "{m_Ref}\q{0,0,1,113}";
+		var universal charstring v_i;
+
+	 	v_i:=substr(Mytemp,1,2);		//error: non allowed matching mechanism
+
+
+	}
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_036());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: The first argument of function substr\(\) is a template with non-specific value.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160102_predefined_functions_037 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160102_037 Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C) >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_160102_predefined_functions_037 NegSem_160102_predefined_functions_037.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.1.2, Ensure that the IUT recognizes predefined functions and correctly evaluates them (as specified by Annex C)
+ ** @verdict  pass reject
+ ***************************************************/
+
+/* The following requirements are tested:
+ *In addition to the general error causes in clause 16.1.2, error causes are:
+ * inpar is a template of a binary string or sequence type or array and it contains other matching mechanism as 
+ * specific value and AnyElement;
+ */
+
+module NegSem_160102_predefined_functions_037 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_160102_predefined_functions_037 () runs on GeneralComp {
+		
+		
+		var template bitstring Mytemp := '00101*'B;
+		var bitstring v_i;
+
+	 	v_i:=substr(Mytemp,1,2); //error: contains a matching mechanism other than AnyElement
+
+	}
+
+
+	control{
+
+		execute(TC_NegSem_160102_predefined_functions_037());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: The first argument of function substr\(\) is a template with non-specific value.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1602_toplevel_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1602_005 Ensure that the IUT recognizes altstep definitions and correctly evaluates them >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1602_toplevel_005 NegSem_1602_toplevel_005.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.2, Ensure that the IUT recognizes altstep definitions and correctly evaluates them
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1602_toplevel_005 {
+
+    type record MessageType {
+        integer  		field1,
+        charstring  	field2
+    }
+
+    type port loopbackPort message {
+        inout MessageType
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port loopbackPort messagePort
+    }
+
+	
+    altstep AltSet1() { 	//altstep port operations without corresponding component reference
+  
+        [] messagePort.receive {
+            setverdict(pass);
+        }
+     
+    }
+
+    testcase TC_NegSem_1602_toplevel_005 () runs on GeneralComp {
+        var MessageType v_testMessage;
+        v_testMessage:=  {
+            field1 := 1,
+            field2 := "test string"
+        }
+
+		connect(self:messagePort,self:messagePort);
+
+        messagePort.send(v_testMessage);
+
+        AltSet1();
+ 
+    }
+
+    control{
+
+        execute(TC_NegSem_1602_toplevel_005());
+
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There is no local or imported definition with name `messagePort'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1602_toplevel_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1602_006 Ensure that the IUT recognizes altstep definitions and correctly evaluates them >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1602_toplevel_006 NegSem_1602_toplevel_006.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.2, Ensure that the IUT recognizes altstep definitions and correctly evaluates them
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1602_toplevel_006 {
+
+    type record MessageType {
+        integer  		field1,
+        charstring  	field2
+    }
+
+    type port loopbackPort message {
+        inout MessageType
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port loopbackPort messagePort
+    }
+
+    function f_test(integer p_int) runs on GeneralComp return boolean { 	
+	//use of a function with runs on clause from an altstep without a runs on clause
+        if (p_int==1) 
+		{ return true; }
+		else
+		{ return false; }
+    }
+
+	
+    altstep AltSet1() {
+        var integer v_LocalVar1 := 1;
+		timer t_timer := 1.0;
+
+        [f_test(v_LocalVar1)] t_timer.timeout {
+
+            setverdict(pass);
+        }
+     
+    }
+
+    testcase TC_NegSem_1602_toplevel_006 () runs on GeneralComp {
+        var MessageType v_testMessage;
+        v_testMessage:=  {
+            field1 := 1,
+            field2 := "test string"
+        }
+		
+		connect(self:messagePort,self:messagePort);
+
+        messagePort.send(v_testMessage);
+
+        AltSet1();
+ 
+    }
+
+    control{
+
+        execute(TC_NegSem_1602_toplevel_006());
+
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A definition without `runs on' clause cannot call function `@NegSem_1602_toplevel_006.f_test', which runs on component type `@NegSem_1602_toplevel_006.GeneralComp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1602_toplevel_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1602_001 Ensure that the IUT recognizes altstep definitions and correctly evaluates them >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1602_toplevel_001 NegSyn_1602_toplevel_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.2, Ensure that the IUT recognizes altstep definitions and correctly evaluates them
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSyn_1602_toplevel_001 {
+
+    type record MessageType {
+        integer  		field1,
+        charstring  	field2
+    }
+
+    type port loopbackPort message {
+        inout MessageType
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port loopbackPort messagePort
+    }
+
+    function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+
+        return p_integer+1;
+    }
+
+	
+    altstep AltSet1() runs on GeneralComp {
+  
+        [] messagePort.receive {
+            setverdict(pass);
+        }
+
+        var integer v_LocalVar := f_test();   //late definition of a local variable
+     
+    }
+
+    testcase TC_NegSyn_1602_toplevel_001 () runs on GeneralComp {
+        var MessageType v_testMessage;
+        v_testMessage:=  {
+            field1 := 1,
+            field2 := "test string"
+        }
+
+		connect(self:messagePort,self:messagePort);
+
+        messagePort.send(v_testMessage);
+
+        AltSet1();
+ 
+    }
+
+    control{
+
+        execute(TC_NegSyn_1602_toplevel_001());
+
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `var': syntax error, unexpected VarKeyword, expecting '\}' or '\['
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_160201_invoking_altsteps_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 160201_001 Ensure that the IUT recognizes altstep definitions and correctly evaluates them >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_160201_invoking_altsteps_001 NegSem_160201_invoking_altsteps_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.2.1, Ensure that the IUT recognizes altstep definitions and correctly evaluates them
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_160201_invoking_altsteps_001 {
+
+	type record MessageType {
+  	 integer  		field1, 
+  	 charstring  	field2
+	}
+
+    type port loopbackPort message {
+	  inout MessageType
+	} with {extension "internal"}
+
+    type port simplePort message {
+	  inout integer
+	} with {extension "internal"}
+
+	type component GeneralComp {	    	    
+	  	port loopbackPort messagePort
+	}	
+
+	type component AltComp {	    	    
+	  	port simplePort messagePort
+	}	
+
+
+	
+	altstep AltSet1() runs on AltComp { 	//incompatible component with GeneralComp
+  
+     	[] messagePort.receive {
+       	 	setverdict(pass);
+     	}
+     
+	}
+
+	testcase TC_NegSem_160201_invoking_altsteps_001 () runs on GeneralComp {
+		var MessageType v_testMessage;
+		timer t_timer;
+
+		v_testMessage:=  {  
+		  	field1 := 1,
+		  	field2 := "test string"
+		} 
+
+		connect(self:messagePort,self:messagePort);
+
+		messagePort.send(v_testMessage);
+		t_timer.start( 1.0 );
+
+		alt {
+		  	[] AltSet1();
+		  	[] t_timer.timeout {
+					setverdict(pass);
+			}
+		}
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_160201_invoking_altsteps_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Runs on clause mismatch: A definition that runs on component type `@NegSem_160201_invoking_altsteps_001.GeneralComp' cannot call altstep `@NegSem_160201_invoking_altsteps_001.AltSet1', which runs on `@NegSem_160201_invoking_altsteps_001.AltComp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. 1603_testcases folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1603_testcases_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1603_001 Ensure that the IUT properly evaluates invocation of testcases >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1603_testcases_001 NegSem_1603_testcases_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.3, Ensure that the IUT properly evaluates invocation of testcases
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1603_testcases_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1603_testcases_001 () runs on GeneralComp {
+	 	execute(TC_fail());		//testcases can only be invoked from the control part
+	 	setverdict(pass);
+	}
+
+	testcase TC_fail () runs on GeneralComp {
+	 	setverdict(fail);
+	}
+
+	control{
+
+		execute(TC_NegSem_1603_testcases_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A definition that has `runs on' clause cannot execute testcases
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1603_testcases_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1603_002 Ensure that the IUT properly evaluates invocation of testcases >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1603_testcases_002 NegSem_1603_testcases_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:16.3, Ensure that the IUT properly evaluates invocation of testcases
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1603_testcases_002 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1603_testcases_002 () runs on GeneralComp {
+	 	TC_fail();		//testcases can only be invoked from the control part
+	 	setverdict(pass);
+	}
+
+	testcase TC_fail () runs on GeneralComp {
+	 	setverdict(fail);
+	}
+
+	control{
+		execute(TC_NegSem_1603_testcases_002());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a function or altstep was expected instead of testcase `@NegSem_1603_testcases_002.TC_fail', which cannot be invoked
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 19_basic_program_statements folder
+.*---------------------------------------------------------------------*
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_001 Ensure that the IUT properly evaluates assignment statements >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_1901_assignments_001 NegSem_1901_assignments_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that the IUT properly evaluates assignment statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1901_assignments_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1901_assignments_001 () runs on GeneralComp system GeneralComp {
+		var integer v_i;
+		var integer v_j;
+
+		v_j:=v_i;	//assignment of unbounded expression
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Assignment of an unbound integer value. 
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_002 Ensure that the IUT properly evaluates assignment statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1901_assignments_002 NegSem_1901_assignments_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that the IUT properly evaluates assignment statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1901_assignments_002 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1901_assignments_002 () runs on GeneralComp system GeneralComp {
+	 	var integer v_i;
+
+	 	v_i:=1.5;	//assignment of incompatible expression
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_002());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: integer value was expected 
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_003 Ensure that the IUT properly evaluates assignment statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1901_assignments_003 NegSem_1901_assignments_003.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that the IUT properly evaluates assignment statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1901_assignments_003 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1901_assignments_003 () runs on GeneralComp system GeneralComp {
+		var charstring v_i;
+
+		v_i:=pattern "a??b";	//assignment of incompatible expression
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_003());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A template body with matching symbols cannot be assigned to a variable
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_004 Ensure that omit assignment to a record non-optional value is not allowed >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1901_assignments_004 NegSem_1901_assignments_004.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that omit assignment to a record non-optional value is not allowed 
+ ** @verdict  pass  reject
+ ***************************************************/
+
+//Restriction c)	
+/*If the left-hand side of the assignment is a reference to a non-optional value object (i.e. a value definition, a mandatory field, a record/set of/array element, a union alternative, a value parameter),
+ * the right-hand side shall not be a reference to an omitted field or the omit symbol.*/
+
+module NegSem_1901_assignments_004{
+	
+	type component GeneralComp {	
+	}
+		
+	 type record Myrec{
+		 integer field1,
+		 float   field2
+	 };
+	
+	testcase TC_NegSem_1901_assignments_004 () runs on GeneralComp system GeneralComp {
+		 
+	 	var Myrec v_i;        
+
+	   	v_i:={11,omit};	//assignment not allowed
+	   
+		setverdict(pass,v_i);
+
+	}
+
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_004());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: `omit' value is not allowed in this context
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_005 Ensure that omit assignment to set of non-optional value is not allowed >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1901_assignments_005 NegSem_1901_assignments_005.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that omit assignment to set of non-optional value is not allowed
+ ** @verdict  pass  reject
+ ***************************************************/
+
+ //Restriction c)	
+/*If the left-hand side of the assignment is a reference to a non-optional value object (i.e. a value definition, a mandatory field, a record/set of/array element, a union alternative, a value parameter),
+the right-hand side shall not be a reference to an omitted field or the omit symbol.*/
+
+module NegSem_1901_assignments_005{
+	
+	type component GeneralComp {	
+	}
+    
+ 	type set of integer Myset;
+	
+	testcase TC_NegSem_1901_assignments_005 () runs on GeneralComp system GeneralComp {
+		 
+	 	var Myset v_i;        
+
+	   	v_i:={11,omit};	//assignment not allowed
+	   
+		setverdict(pass,v_i);
+
+	}
+
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_005());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: `omit' value is not allowed in this context
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1901_assignments_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_006 Ensure that omit assignment to an array is not allowed  >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1901_assignments_006 NegSem_1901_assignments_006.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that omit assignment to an array is not allowed 
+ ** @verdict  pass  reject
+ ***************************************************/
+
+//Restriction c)	
+/*If the left-hand side of the assignment is a reference to a non-optional value object (i.e. a value definition, a mandatory field, a record/set of/array element, a union alternative, a value parameter),
+the right-hand side shall not be a reference to an omitted field or the omit symbol.*/
+
+module NegSem_1901_assignments_006{
+	
+	type component GeneralComp {	
+	}
+		
+
+	
+	testcase TC_NegSem_1901_assignments_006 () runs on GeneralComp system GeneralComp {
+		 
+	 	var integer v_i[2];        
+
+	   	v_i:={11,omit};	//assignment not allowed
+	   
+		setverdict(pass,v_i);
+
+	}
+
+
+	control{
+
+		execute(TC_NegSem_1901_assignments_006());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: `omit' value is not allowed in this context
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1901_assignments_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1901_001 Ensure that the IUT properly evaluates assignment statements syntaxis >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1901_assignments_001 NegSyn_1901_assignments_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.1, Ensure that the IUT properly evaluates assignment statements syntaxis
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSyn_1901_assignments_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSyn_1901_assignments_001 () runs on GeneralComp system GeneralComp {
+	 	var integer v_i;
+	 	var integer v_j;
+	 	var integer v_k;
+	 	v_i:=1;	
+	 	v_k:=(v_j:=v_i);	//such sequential assignments are not allowed by the syntax
+	 
+	}
+
+
+	control{
+
+		execute(TC_NegSyn_1901_assignments_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `:=': syntax error, unexpected :=, expecting '\)' or ','
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1902_if_else_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1902_001 Ensure that the IUT properly evaluates assignment statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1902_if_else_statement_001 NegSyn_1902_if_else_statement_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.2, If statement requires curly brackets for the body 
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSyn_1902_if_else_statement_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSyn_1902_if_else_statement_001 () runs on GeneralComp{
+	 
+	 	for(var integer v_i:=1; v_i<10; v_i:= j+1) {}
+	 
+	  	if(v_i==10)
+	  		setverdict(pass);		// missing { } as defined by grammar rule 175 StatementBlock
+	 
+	}
+
+	control{
+
+		execute(TC_NegSyn_1902_if_else_statement_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `setverdict': syntax error, unexpected SetVerdictKeyword, expecting '\{'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_190302_select_union_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 190302_001 verify that header part of select-union statements cannot contain anything else than union instances >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_190302_select_union_statement_001 NegSem_190302_select_union_statement_001.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.3.2, verify that header part of select-union statements cannot contain anything else than union instances
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// In the header part of the select union statement a template instance of union 
+// type shall be given.
+
+module NegSem_190302_select_union_statement_001 { 
+
+    type component GeneralComp {
+	}	
+    
+    type record R {
+        integer intOption optional,
+        charstring strOption optional,
+        boolean boolOption optional
+    }
+
+    testcase TC_NegSem_190302_select_union_statement_001() runs on GeneralComp {
+        var R v_rec := { intOption := omit, strOption := "abc", boolOption := omit }
+
+        select union (v_rec) {
+            case (intOption) {
+                setverdict(pass);
+            } case (strOption) {
+                setverdict(pass);
+            } case (boolOption) {
+                setverdict(pass);
+            }
+        }
+	}
+
+	control {
+		execute(TC_NegSem_190302_select_union_statement_001());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The head must be of a union type or anytype
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_190302_select_union_statement_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 190302_002 verify that uninitialized value cannot be used in select union header >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_190302_select_union_statement_002 NegSem_190302_select_union_statement_002.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.3.2, verify that uninitialized value cannot be used in select union header
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// [The TemplateInstance in the header of the select union statement] shall be 
+// at least partially initialized.
+
+module NegSem_190302_select_union_statement_002 { 
+
+    type component GeneralComp {
+	}	
+    
+    type union U {
+        integer intOption,
+        charstring strOption,
+        record {
+            integer field1,
+            integer field2
+        } recOption
+    }
+    
+    type record R {
+        U field1,
+        integer field2
+    }
+
+    testcase TC_NegSem_190302_select_union_statement_002() runs on GeneralComp {
+        var R v_rec;
+        v_rec.field2 := 3;
+        select union (v_rec.field1) {
+            case (intOption) {
+                setverdict(fail);
+            } case (strOption) {
+                setverdict(fail);
+            } case (recOption) {
+                setverdict(pass);
+            }
+        }
+	}
+
+	control {
+		execute(TC_NegSem_190302_select_union_statement_002());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: The union in the head shall be initialized
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_190302_select_union_statement_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 190302_003 verify that unknown alternatives cannot be use in case statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_190302_select_union_statement_003 NegSem_190302_select_union_statement_003.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.3.2, verify that unknown alternatives cannot be use in case statements
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// Every Identifier in a case of the select union statement shall be an identifier 
+// of an alternative of the union type of the template instance given to the 
+// statement's header.
+
+module NegSem_190302_select_union_statement_003 { 
+
+    type component GeneralComp {
+	}	
+    
+    type union U {
+        integer intOption,
+        charstring strOption,
+        record {
+            integer field1,
+            integer field2
+        } recOption
+    }
+
+    testcase TC_NegSem_190302_select_union_statement_003() runs on GeneralComp {
+        var U v_un := { intOption := 5 }
+        select union (v_un) {
+            case (intOption) {
+                setverdict(pass);
+            } case (strOption) {
+                setverdict(fail);
+            } case (recOption) {
+                setverdict(fail);
+            } case (boolOption) {
+                setverdict(fail);
+            }
+        }
+	}
+
+	control {
+		execute(TC_NegSem_190302_select_union_statement_003());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: In the 4. branch: 'boolOption' is not an alternative of union type '@NegSem_190302_select_union_statement_003.U'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_190302_select_union_statement_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 190302_004 verify that the same alternative cannot be used in two case statements (simple case) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_190302_select_union_statement_004 NegSem_190302_select_union_statement_004.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.3.2, verify that the same alternative cannot be used in two case statements (simple case)
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// No two cases in a select union statement shall have the same case Identifier.
+
+module NegSem_190302_select_union_statement_004 { 
+
+    type component GeneralComp {
+	}	
+    
+    type union U {
+        integer intOption,
+        charstring strOption,
+        record {
+            integer field1,
+            integer field2
+        } recOption
+    }
+
+    testcase TC_NegSem_190302_select_union_statement_004() runs on GeneralComp {
+        var U v_un := { recOption := { field1 := 1, field2 := 2 } }
+
+        select union (v_un) {
+            case (intOption) {
+                setverdict(pass);
+            } case (strOption) {
+                setverdict(fail);
+            } case (recOption) {
+                setverdict(fail);
+            } case (intOption) {
+                setverdict(pass);
+            }
+        }
+	}
+
+	control {
+		execute(TC_NegSem_190302_select_union_statement_004());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The 'intOption' is already present in the 1. branch of select union
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_190302_select_union_statement_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 190302_005 verify that the same alternative cannot be used in two case statements (list item) >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_190302_select_union_statement_005 NegSem_190302_select_union_statement_005.ttcn >
+/******************************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.3.2, verify that the same alternative cannot be used in two case statements (list item)
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// No two cases in a select union statement shall have the same case Identifier.
+
+module NegSem_190302_select_union_statement_005 { 
+
+    type component GeneralComp {
+	}	
+    
+    type union U {
+        integer intOption,
+        charstring strOption,
+        record {
+            integer field1,
+            integer field2
+        } recOption
+    }
+
+    testcase TC_NegSem_190302_select_union_statement_005() runs on GeneralComp {
+        var U v_un := { intOption := 10 }
+        select union (v_un) {
+            case (intOption, strOption) {
+                setverdict(pass);
+            } case (recOption, intOption) {
+                setverdict(fail);
+            }
+        }
+	}
+
+	control {
+		execute(TC_NegSem_190302_select_union_statement_005());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: The 'intOption' is already present in the 1. branch of select union
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1904_for_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1904_001 Ensure that the IUT properly evaluates for statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1904_for_statement_001 NegSem_1904_for_statement_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.4, Ensure that the IUT properly evaluates for statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1904_for_statement_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1904_for_statement_001 () runs on GeneralComp{
+	 
+	 	for(var integer v_i:=1; v_i<10; v_i:= v_i+1) {}
+	 
+	  	if(v_i==10) { setverdict(pass); }		//v_i is not accessible from outside the loop
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1904_for_statement_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There is no local or imported definition with name `v_i'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1905_while_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1905_001 Ensure that the IUT properly evaluates while statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1905_while_statement_001 NegSem_1905_while_statement_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.5, Ensure that the IUT properly evaluates while statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1905_while_statement_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1905_while_statement_001 () runs on GeneralComp{
+		var integer v_i:=1;
+		 
+		while(v_i<10) {	
+			var integer v_j:=1;
+		  	v_i:=v_i+1;	
+		}
+		 
+		if(v_j==1) { setverdict(pass); } //v_j is not accessible from outside the loop
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1905_while_statement_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There is no local or imported definition with name `v_j'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1906_do_while_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1906_001 Ensure that the IUT properly evaluates do-while statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1906_do_while_statement_001 NegSem_1906_do_while_statement_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.6, Ensure that the IUT properly evaluates do-while statements
+ ** @verdict  pass  reject
+ ***************************************************/
+module NegSem_1906_do_while_statement_001 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1906_do_while_statement_001 () runs on GeneralComp{
+		 var integer v_i:=1;
+		 
+		 do {	
+		  	var integer v_j:=1;
+		  	v_i:=v_i+1;	
+		 } while(v_i<10);
+		 
+		 if(v_j==1) { setverdict(pass); } //v_j is not accessible from outside the loop
+	 
+	}
+
+
+	control{
+
+		execute(TC_NegSem_1906_do_while_statement_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: There is no local or imported definition with name `v_j'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1907_label_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1907_001 Ensure that the IUT correctly handles label naming uniqueness. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1907_label_statement_001 NegSem_1907_label_statement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.7, Ensure that the IUT correctly handles label naming uniqueness.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1907_label_statement_001 {
+
+
+	type record MessageType {
+  	 	integer  		field1, 
+  	 	charstring  	field2
+	}
+
+    type port loopbackPort message {
+	  	inout MessageType
+	} with {extension "internal"}
+
+	type component GeneralComp {	    	    
+		  port loopbackPort messagePort
+	}	
+
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+	 	label L1;
+	 	return p_integer+1;
+	}
+
+	
+	altstep AltSet1() runs on GeneralComp { 
+	  	var integer v_LocalVar := f_test();   // local variable 
+	  
+		[] messagePort.receive {
+			label L_A;
+		    setverdict(pass);
+		  	label L_B;
+		}
+		 
+	}
+
+	testcase TC_NegSem_1907_label_statement_001 () runs on GeneralComp {
+		var MessageType v_testMessage;
+		timer t_timer;
+		 
+		v_testMessage:=  {  
+		  	field1 := 1,
+		  	field2 := "test string"
+		} 
+
+		connect(self:messagePort,self:messagePort);
+		
+		messagePort.send(v_testMessage);
+		t_timer.start( 1.0 );
+		label L1;
+		 
+		alt {
+		  	[] AltSet1();		
+		  	[] messagePort.receive {
+			  	label L2;
+			  	setverdict(pass);
+			}
+		  	[] t_timer.timeout {
+			  	label L3;
+			}
+		}
+		label L1;		//conflicting label names
+	}			
+
+	control{
+		execute(TC_NegSem_1907_label_statement_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Duplicate label `L1'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1907_label_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1907_001 Ensure that the IUT correctly handles label syntax. >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1907_label_statement_001 NegSyn_1907_label_statement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.7, Ensure that the IUT correctly handles label syntax.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSyn_1907_label_statement_001 {
+
+
+	type record MessageType {
+  	 	integer  		field1, 
+  	 	charstring  	field2
+	}
+
+    type port loopbackPort message {
+	  	inout MessageType
+	} with {extension "internal"}
+
+	type component GeneralComp {	    	    
+		port loopbackPort messagePort
+	}	
+
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+	 	label L1;
+	 	return p_integer+1;
+	}
+
+	
+	altstep AltSet1() runs on GeneralComp { 
+	  	var integer v_LocalVar := f_test();   // local variable 
+	  
+		[] messagePort.receive {
+		  	label L_A;
+		    setverdict(pass);
+		  	label L_B;
+		}
+		 
+	}
+
+	testcase TC_NegSyn_1907_label_statement_001 () runs on GeneralComp {
+	 	var MessageType v_testMessage;
+	 	timer t_timer;
+	 
+	 	v_testMessage:=  {  
+	  		field1 := 1,
+	  		field2 := "test string"
+	 	} 
+	
+		connect(self:messagePort,self:messagePort);
+
+	 	messagePort.send(v_testMessage);
+	 	t_timer.start( 1.0 );
+	 	label L1;
+	 
+	 	alt {
+		  	[] AltSet1();	
+	
+		  	label L_wrong;	//wrong label on the alt toplevel
+
+		  	[] messagePort.receive {
+			  	label L2;
+			  	setverdict(pass);
+			}
+		  	[] t_timer.timeout {
+			  	label L3;
+			}
+		}
+
+	 	label L4;
+	}			
+
+	control{
+		execute(TC_NegSyn_1907_label_statement_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `label': syntax error, unexpected LabelKeyword, expecting '\}' or '\[
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_1907_label_statement_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1907_002 Ensure that the IUT correctly handles label syntax. >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_1907_label_statement_002 NegSyn_1907_label_statement_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.7, Ensure that the IUT correctly handles label syntax.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSyn_1907_label_statement_002 {
+
+
+	type record MessageType {
+  	 	integer  		field1, 
+  	 	charstring  	field2
+	}
+
+    type port loopbackPort message {
+	  	inout MessageType
+	} with {extension "internal"}
+
+	type component GeneralComp {	    	    
+		port loopbackPort messagePort
+	}	
+
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+	 	label L1;
+	 	return p_integer+1;
+	}
+
+	
+	altstep AltSet1() runs on GeneralComp { 
+	  	var integer v_LocalVar := f_test();   // local variable 
+
+	  	label L_wrong;	//wrong label on the altstep toplevel
+	  
+		[] messagePort.receive {
+		  	label L_A;
+		    setverdict(pass);
+		  	label L_B;
+		}
+		 
+	}
+
+	testcase TC_NegSyn_1907_label_statement_002 () runs on GeneralComp {
+	 	var MessageType v_testMessage;
+	 	timer t_timer;
+	 
+		 v_testMessage:=  {  
+	  		field1 := 1,
+	  		field2 := "test string"
+	 	} 
+
+		connect(self:messagePort,self:messagePort);
+
+	 	messagePort.send(v_testMessage);
+	 	t_timer.start( 1.0 );
+	 	label L1;
+	 
+		alt {
+		  	[] AltSet1();		
+		  	[] messagePort.receive {
+			  	label L2;
+			  	setverdict(pass);
+			}
+		  	[] t_timer.timeout {
+			  	label L3;
+			}
+		}
+
+		label L4;
+	}			
+
+	control{
+		execute(TC_NegSyn_1907_label_statement_002());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `label': syntax error, unexpected LabelKeyword
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1908_goto_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1908_001 Ensure that the IUT correctly handles goto statements. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1908_goto_statement_001 NegSem_1908_goto_statement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.8, Ensure that the IUT correctly handles goto statements.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_1908_goto_statement_001 {
+
+	type record MessageType {
+  	 	integer  		field1, 
+  	 	charstring  	field2
+	}
+
+    type port loopbackPort message {
+	  	inout MessageType
+	} with {extension "internal"}
+
+	type component GeneralComp {	    	    
+		port loopbackPort messagePort
+	}	
+
+	function f_test ( integer p_integer := 0 ) runs on GeneralComp return integer {
+	 	label L1;
+	 	return p_integer+1;
+	}
+
+	
+	altstep AltSet1() runs on GeneralComp { 
+	  	var integer v_LocalVar := f_test();   // local variable 
+	  
+		[] messagePort.receive {
+		  	label L_A;
+		  	label L_B;
+		}
+		 
+	}
+
+	testcase TC_NegSem_1908_goto_statement_001 () runs on GeneralComp {
+	 	var MessageType v_testMessage;
+	 	timer t_timer;
+	 
+	 	v_testMessage:=  {  
+	  		field1 := 1,
+	  		field2 := "test string"
+	 	} 
+		
+		connect(self:messagePort,self:messagePort);
+
+	 	messagePort.send(v_testMessage);
+	 	t_timer.start( 1.0 );
+	 	label L1;
+	 	goto L2;	//cannot jump into alt statements
+	 
+	 	alt {
+	  		[] AltSet1();		
+	  		[] messagePort.receive {
+		  		label L2;
+		  		setverdict(pass);
+		 	}
+	  		[] t_timer.timeout {
+		 	 	label L2;
+		 	}
+	 	}
+
+	 	label L3;
+		setverdict(pass);
+	 
+	}			
+
+	control{
+		execute(TC_NegSem_1908_goto_statement_001());
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Label `L2' is used, but not defined
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1908_goto_statement_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1908_002 Ensure that the IUT correctly handles goto statements. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1908_goto_statement_002 NegSem_1908_goto_statement_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.8, Ensure that the IUT correctly handles goto statements.
+ ** @verdict  pass reject
+ *****************************************************************/
+module NegSem_1908_goto_statement_002 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1908_goto_statement_002 () runs on GeneralComp{
+	 	var integer v_i;
+	 	goto L1; 	//forbidden jump into a loop
+
+	 	for(v_i:=1; v_i<10; v_i:= v_i+1) {
+	  		label L1;  
+	  		if(v_i==5) { break; }
+	 	}
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1908_goto_statement_002());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Label `L1' is used, but not defined
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1908_goto_statement_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1908_003 Ensure that the IUT correctly handles goto statements. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1908_goto_statement_003 NegSem_1908_goto_statement_003.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.8, Ensure that the IUT correctly handles goto statements.
+ ** @verdict  pass reject
+ *****************************************************************/
+module NegSem_1908_goto_statement_003 {
+	
+	type component GeneralComp {	
+	}
+	
+	testcase TC_NegSem_1908_goto_statement_003 () runs on GeneralComp{
+	 	var integer v_i:=1;
+	 	goto L1; 	//forbidden jump into a loop
+
+	 	if(v_i==2) {
+	  		label L1;  
+	  		v_i:=1;
+	 	}
+	 	else {
+	  		v_i:=2;
+	  		goto L1; 	//forbidden jump into an if-else statement
+	 	}
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1908_goto_statement_003());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 2>
+error: Label `L1' is used, but not defined
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1910_return_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1910_001 Ensure that the IUT correctly handles return statements. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1910_return_statement_001 NegSem_1910_return_statement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.10, Ensure that the IUT correctly handles return statements.
+ ** @verdict  pass reject
+ *****************************************************************/
+module NegSem_1910_return_statement_001 {
+	
+    type component GeneralComp {
+    }
+
+    testcase TC_NegSem_1910_return_statement_001 () runs on GeneralComp{
+        setverdict(pass);
+        return 0;	//testcase cannot have a return statement
+ 
+    }
+
+    control{
+
+        execute(TC_NegSem_1910_return_statement_001());
+
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Return statement cannot be used in a testcase. It is allowed only in functions and altsteps
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_1911_log_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 1911_001 Ensure that the IUT properly evaluates log statements. >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_1911_log_statement_001 NegSem_1911_log_statement_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:19.11, Ensure that the IUT properly evaluates log statements
+ ** @verdict  pass reject
+ ***************************************************/
+module NegSem_1911_log_statement_001 {
+	
+	type component GeneralComp {	
+	}
+
+	function f_no_return(integer p_arg) {
+	 	var integer v_f;
+	 	v_f:=p_arg;
+	}
+	
+	testcase TC_NegSem_1911_log_statement_001 () runs on GeneralComp{
+	 	var integer v_i;
+	 
+	 	for(v_i:=1; v_i<10; v_i:= v_i+1) {
+	  		log("Function without return value: ", f_no_return(v_i) );	
+			//not allowed to use function without return value
+	 	}
+	 
+	}
+
+	control{
+
+		execute(TC_NegSem_1911_log_statement_001());
+
+	}
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to a value, template, timer or port was expected instead of a call of function `@NegSem_1911_log_statement_001.f_no_return', which does not have return type
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h2. 20_statement_and_operations_for_alt folder
+.*---------------------------------------------------------------------*
+*---------------------------------------------------------------------*
+:h3. NegSem_2002_TheAltStatement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2002_001 dynamic error if a test component is completely blocked >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_2002_TheAltStatement_001 NegSem_2002_TheAltStatement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.2, dynamic error if a test component is completely blocked
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// The test case shall stop and indicate a dynamic error if a test component is 
+// completely blocked. This means none of the alternatives can be chosen, no 
+// relevant test component is running, no relevant timer is running and all 
+// relevant ports contain at least one message, call, reply or exception that 
+// do not match.
+
+module NegSem_2002_TheAltStatement_001 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+    
+    type component GeneralComp { 
+	    port MyPort p;
+    }
+    
+    template charstring m_test := "ping";
+    
+    testcase TC_NegSem_2002_TheAltStatement_001() runs on GeneralComp {
+        timer t_tmr1;
+
+		connect(self:p,self:p);	
+
+	    p.send(m_test);
+	    alt {
+		    [] p.receive("abc") {
+			    setverdict(pass);
+		    }
+            [] t_tmr1.timeout {
+                setverdict(pass);
+            }
+	    }
+    }
+    
+    control {
+	    execute(TC_NegSem_2002_TheAltStatement_001());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: None of the branches can be chosen in the alt statement in file NegSem_2002_TheAltStatement_001.ttcn 
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_2003_the_repeat_statement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2003_001 Ensure that the IUT correctly processes repeat statements >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_2003_the_repeat_statement_001 NegSem_2003_the_repeat_statement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.3, Ensure that the IUT correctly processes repeat statements
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSem_2003_the_repeat_statement_001 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyPort p;
+    }
+
+    template charstring m_test := "ping";
+
+    testcase TC_NegSem_2003_the_repeat_statement_001() runs on GeneralComp {
+        var integer counter := 1;
+
+		connect(self:p, self:p);
+        p.send(m_test);
+        p.send(m_test);
+
+        alt {
+            [counter == 1] p.receive(m_test) {
+                counter := 2;
+                repeat;
+            }
+            [counter == 2] p.receive(m_test) {
+                setverdict(pass);
+            }
+        }
+        repeat;		//repeat statement is used outside of an alt or call structure
+    }
+
+    control {
+        execute(TC_NegSem_2003_the_repeat_statement_001());
+    }
+
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Repeat statement cannot be used outside alt statements, altsteps or response and exception handling part of call operations
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_2004_InterleaveStatement_004 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_004 goto inside interleave >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_2004_InterleaveStatement_004 NegSem_2004_InterleaveStatement_004.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, goto inside interleave
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Control transfer statements for, while, do-while, goto, activate, 
+// deactivate, stop, repeat, return, direct call of altsteps as alternatives
+// and (direct and indirect) calls of user-defined functions, which include 
+// reception statements, shall not be used in interleave statements.
+
+module NegSem_2004_InterleaveStatement_004 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyPort p;
+    }    
+    
+    testcase TC_NegSem_2004_InterleaveStatement_004() runs on GeneralComp {
+
+		connect(self:p, self:p);
+
+        p.send(charstring:"foo");
+        p.send(charstring:"bar");
+    
+        interleave {
+            [] p.receive(charstring:"bar") {
+                goto L1;
+            }
+            [] p.receive(charstring:"foo") {
+            }
+        }
+        label L1;
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_NegSem_2004_InterleaveStatement_004());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Goto statement is not allowed within an interleave statement
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_2004_InterleaveStatement_008 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_008 repeat inside interleave >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_2004_InterleaveStatement_008 NegSem_2004_InterleaveStatement_008.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, repeat inside interleave
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Control transfer statements for, while, do-while, goto, activate, 
+// deactivate, stop, repeat, return, direct call of altsteps as alternatives
+// and (direct and indirect) calls of user-defined functions, which include 
+// reception statements, shall not be used in interleave statements.
+
+module NegSem_2004_InterleaveStatement_008 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyPort p;
+    }    
+    
+    testcase TC_NegSem_2004_InterleaveStatement_008() runs on GeneralComp {
+
+		connect(self:p, self:p);
+
+        p.send(charstring:"foo");
+        p.send(charstring:"bar");
+    
+        interleave {
+            [] p.receive(charstring:"bar") {
+                repeat;
+            }
+            [] p.receive(charstring:"foo") {
+            }
+        }
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_NegSem_2004_InterleaveStatement_008());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Repeat statement is not allowed within an interleave statement
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_2004_InterleaveStatement_009 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_009 return inside interleave >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_2004_InterleaveStatement_009 NegSem_2004_InterleaveStatement_009.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, return inside interleave
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Control transfer statements for, while, do-while, goto, activate, 
+// deactivate, stop, repeat, return, direct call of altsteps as alternatives
+// and (direct and indirect) calls of user-defined functions, which include 
+// reception statements, shall not be used in interleave statements.
+
+module NegSem_2004_InterleaveStatement_009 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyPort p;
+    }    
+    
+    function f_interleave() runs on GeneralComp {
+        interleave {
+            [] p.receive(charstring:"bar") {
+                setverdict(pass);
+                return;
+            }
+            [] p.receive(charstring:"foo") {
+            }
+        }
+    }
+    
+    testcase TC_NegSem_2004_InterleaveStatement_009() runs on GeneralComp {
+
+		connect(self:p, self:p);
+
+        p.send(charstring:"foo");
+        p.send(charstring:"bar");
+        f_interleave();
+    }
+
+    control{
+        execute(TC_NegSem_2004_InterleaveStatement_009());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Return statement is not allowed within an interleave statement
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_2004_InterleaveStatement_010 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_010 explicit altstep call inside interleave >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_2004_InterleaveStatement_010 NegSem_2004_InterleaveStatement_010.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, explicit altstep call inside interleave
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirement is tested:
+// Control transfer statements for, while, do-while, goto, activate, 
+// deactivate, stop, repeat, return, direct call of altsteps as alternatives
+// and (direct and indirect) calls of user-defined functions, which include 
+// reception statements, shall not be used in interleave statements.
+
+module NegSem_2004_InterleaveStatement_010 {
+
+    type port MyPort message {
+        inout charstring
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port MyPort p;
+    }    
+    
+    altstep a_receive() runs on GeneralComp {
+        [] p.receive(charstring:?) {
+        }
+    }
+    
+    testcase TC_NegSem_2004_InterleaveStatement_010() runs on GeneralComp {
+
+		connect(self:p, self:p);
+
+        p.send(charstring:"foo");
+        p.send(charstring:"bar");
+        p.send(charstring:"ding");
+    
+        interleave {
+            [] p.receive(charstring:"bar") {
+                a_receive();
+            }
+            [] p.receive(charstring:"foo") {
+            }
+        }
+        setverdict(pass);
+    }
+
+    control{
+        execute(TC_NegSem_2004_InterleaveStatement_010());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Invocation of an altstep is not allowed within an interleave statement
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_2004_InterleaveStatement_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_001 Validate that interleave statements are properly handled. >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_2004_InterleaveStatement_001 NegSyn_2004_InterleaveStatement_001.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, Validate that interleave statements are properly handled.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSyn_2004_InterleaveStatement_001 {
+
+    type port loopbackPort message {
+        inout MyMessageType
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port loopbackPort pt_myPort1,pt_myPort2;
+    }
+
+    type record MyMessageType {
+        integer field1,
+        charstring field2,
+        boolean field3
+    }
+
+    testcase TC_NegSyn_2004_InterleaveStatement_001() runs on GeneralComp {
+
+		connect(self:pt_myPort1, self:pt_myPort1);
+		connect(self:pt_myPort2, self:pt_myPort2);
+
+        pt_myPort1.send(MyMessageType:{1, "aaa", true});
+    
+        template MyMessageType MySig1 := {1,"aaa",true};
+        template MyMessageType MySig2 := {2,"bbb",true};
+        template MyMessageType MySig3 := {3,"ccc",true};
+    
+        timer t_timer;
+        t_timer.start(1.0);
+    
+        interleave {
+            [] pt_myPort1.receive(MySig1)
+            {
+                pt_myPort2.send(MySig2);
+                alt {
+                    [] pt_myPort1.receive(MySig3) {
+                        setverdict(pass);
+                    }
+                    [] t_timer.timeout {
+                        setverdict(fail);
+                    }
+                }
+            }
+            [] pt_myPort2.receive(MySig2)
+            {
+                pt_myPort1.send(MySig3);
+            }
+			[else] {
+				setverdict(pass);
+			}  
+        }
+
+    
+    }
+
+    control{
+        execute(TC_NegSyn_2004_InterleaveStatement_001());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: at or before token `else': syntax error, unexpected ElseKeyword, expecting '\]'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSyn_2004_InterleaveStatement_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 2004_002 Validate that interleave statements are properly handled. >
+
+<COMPILE>
+
+<MODULE TTCN NegSyn_2004_InterleaveStatement_002 NegSyn_2004_InterleaveStatement_002.ttcn >
+/*****************************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.4, Validate that interleave statements are properly handled.
+ ** @verdict  pass reject
+ *****************************************************************/
+
+module NegSyn_2004_InterleaveStatement_002 {
+
+    type port loopbackPort message {
+        inout MyMessageType
+    } with {extension "internal"}
+
+    type component GeneralComp {
+        port loopbackPort pt_myPort1,pt_myPort2;
+    }
+
+    type record MyMessageType {
+        integer field1,
+        charstring field2,
+        boolean field3
+    }
+
+    testcase TC_NegSyn_2004_InterleaveStatement_002() runs on GeneralComp {
+
+		connect(self:pt_myPort1, self:pt_myPort1);
+		connect(self:pt_myPort2, self:pt_myPort2);
+
+        pt_myPort1.send(MyMessageType:{1, "aaa", true});
+    
+        template MyMessageType MySig1 := {1,"aaa",true};
+        template MyMessageType MySig2 := {2,"bbb",true};
+        template MyMessageType MySig3 := {3,"ccc",true};
+    
+        timer t_timer;
+        t_timer.start(1.0);
+        var integer v:=1;
+    
+        interleave {
+            [v>0] pt_myPort1.receive(MySig1)      //boolean guard must be empty
+            {
+                pt_myPort2.send(MySig2);
+                alt {
+                    [] pt_myPort1.receive(MySig3) {
+                        setverdict(pass);
+                    }
+                    [] t_timer.timeout {
+                        setverdict(fail);
+                    }
+                }
+            }
+            [v<0] pt_myPort2.receive(MySig2) 		//boolean guard must be empty
+            {
+                pt_myPort1.send(MySig3);
+            }
+ 
+        }
+
+    
+    }
+
+    control{
+        execute(TC_NegSyn_2004_InterleaveStatement_002());
+    }
+}
+<END_MODULE>
+
+<RESULT COUNT 2>
+error: at or before token `v': syntax error, unexpected Identifier, expecting '\]'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200501_the_default_mechanism_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200501_004 verify unsuccessful default termination >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_200501_the_default_mechanism_001 NegSem_200501_the_default_mechanism_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.1, verify unsuccessful default termination
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// For each test component the defaults, i.e. activated altsteps, are stored as an ordered 
+// list. The defaults are listed in the reversed order of their activation i.e. the last 
+// activated default is the first element in the list of active defaults. 
+
+// The default mechanism is evoked at the end of each alt statement, if due to the 
+// actual snapshot none of the specified alternatives could be executed. An evoked 
+// default mechanism invokes the first altstep in the list of defaults, i.e. the last
+// activated default, and waits for the result of its termination. The termination can 
+// be successful or unsuccessful.
+
+// In the case of an unsuccessful termination, the default mechanism invokes the next 
+// default in the list. If the last default in the list has terminated unsuccessfully, 
+// the default mechanism will return to the place in the alt statement in which it
+// has been invoked, i.e. at the end of the alt statement, and indicate an unsuccessful 
+// default execution. An unsuccessful default execution will also be indicated if the list 
+// of defaults is empty. An unsuccessful default execution may cause a new snapshot or 
+// a dynamic error if the test component is blocked.
+
+module NegSem_200501_the_default_mechanism_001 { 
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+	type component GeneralComp {
+		port P p;
+	}
+	
+	altstep a1() runs on GeneralComp {
+		[] p.receive(integer:2) { // no match
+			setverdict(pass, "First default");
+		}
+	}
+
+	altstep a2() runs on GeneralComp {
+		[] p.receive(integer:1) { // no match
+			setverdict(fail, "Last default");
+		}
+	}
+	
+	testcase TC_NegSem_200501_the_default_mechanism_001() runs on GeneralComp {
+		activate(a1());
+		activate(a2());
+
+		connect(self:p, self:p);
+
+		p.send(integer:5);
+		alt {
+			[] p.receive(integer:0) { // not expected: leads to default invocation
+				setverdict(fail);
+			}
+		} // defaults are terminated unsuccessfully -> dynamic test case error
+	}
+
+	control{
+		execute(TC_NegSem_200501_the_default_mechanism_001(), 1.0);
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: None of the branches can be chosen in the alt statement in file NegSem_200501_the_default_mechanism_001.ttcn
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200502_the_activate_operation_001 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200502_001 verify error is generated if activated alstep runs on incompatible component >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200502_the_activate_operation_001 NegSem_200502_the_activate_operation_001.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.2, verify error is generated if activated alstep runs on incompatible component
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// An activate operation will put the referenced altstep as the first element into the list 
+// of defaults and return a default reference.
+// The effect of an activate operation is local to the test component in which it is called. 
+
+module NegSem_200502_the_activate_operation_001 { 
+
+	type component GeneralComp {
+	}	
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+		
+	type component TestComp {
+		port P p;
+	}	
+	
+	altstep a() runs on TestComp {
+		[] p.receive {}
+	}
+	
+	testcase TC_NegSem_200502_the_activate_operation_001() runs on GeneralComp {
+		activate(a());
+		setverdict(pass);
+	}
+
+	control{
+		execute(TC_NegSem_200502_the_activate_operation_001());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Runs on clause mismatch: A definition that runs on component type `@NegSem_200502_the_activate_operation_001.GeneralComp' cannot activate altstep `@NegSem_200502_the_activate_operation_001.a', which runs on `@NegSem_200502_the_activate_operation_001.TestComp'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200502_the_activate_operation_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200502_002 verify error is generated when passing local timer >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200502_the_activate_operation_002 NegSem_200502_the_activate_operation_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.2, verify error is generated when passing local timer
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// All timer instances in the actual parameter list shall be declared as component type local timers. 
+
+module NegSem_200502_the_activate_operation_002 { 
+
+	type component GeneralComp {
+	} 	
+	
+	altstep a(timer t_tmr) runs on GeneralComp {
+		[] t_tmr.timeout {}
+	}
+	
+	testcase TC_NegSem_200502_the_activate_operation_002() runs on GeneralComp {
+		if (true) {
+			timer t_local := 0.5;
+			t_local.start;
+			activate(a(t_local));
+		}
+		any port.receive;
+		setverdict(pass);
+	}
+
+	control{
+		execute(TC_NegSem_200502_the_activate_operation_002());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Parameter #1 of altstep `@NegSem_200502_the_activate_operation_002.a' refers to timer `t_local', which is a local definition within a statement block and may have shorter lifespan than the activated default. Only references to variables and timers defined in the component type can be passed to activated defaults
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200502_the_activate_operation_005 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200502_005 verify error is generated when activating function >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200502_the_activate_operation_005 NegSem_200502_the_activate_operation_005.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.2, verify error is generated when activating function
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// An activate operation will put the referenced altstep as the first element into the list of defaults 
+// and return a default reference. 
+
+module NegSem_200502_the_activate_operation_005 { 
+
+	type component GeneralComp {
+	}	
+	
+	function f() runs on GeneralComp {
+		alt {
+			[] any port.receive {}
+		}
+	}
+
+	testcase TC_NegSem_200502_the_activate_operation_005() runs on GeneralComp {
+		activate(f());
+		setverdict(pass);
+	}
+
+	control{
+		execute(TC_NegSem_200502_the_activate_operation_005());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Reference to an altstep was expected in the argument instead of function `@NegSem_200502_the_activate_operation_005.f'
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200502_the_activate_operation_006 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200502_006 local timer as a parameter of activated altstep in module control >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200502_the_activate_operation_006 NegSem_200502_the_activate_operation_006.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.2, local timer as a parameter of activated altstep in module control
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// For altsteps activated in module control or in functions or altsteps invoked
+// directly or indirectly from module control, all timer instances in the actual 
+// parameter list shall be declared in the highest scope of the module control 
+// part (see clause 26.2). Timers from lower scopes of the module control part 
+// (i.e. from the nested statement blocks) are not allowed to occur in the actual
+// parameter list.
+
+module NegSem_200502_the_activate_operation_006 { 
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+	type component GeneralComp {
+		port P p;
+	}
+	
+	altstep a(timer t_tmr) {
+		[] t_tmr.timeout { log ("Timeout in default"); }
+	}
+	
+	testcase TC_NegSem_200502_the_activate_operation_006() runs on GeneralComp {
+        setverdict(pass);
+	}
+
+    function f_test() {
+        timer t_tmr := 1.0, t_tmr2;
+        t_tmr.start;
+        activate(a(t_tmr));
+        alt {
+            [] t_tmr2.timeout { }
+        }
+    }
+    
+	control{
+        f_test();
+		execute(TC_NegSem_200502_the_activate_operation_006());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Parameter #1 of altstep `@NegSem_200502_the_activate_operation_006.a' refers to timer `t_tmr', which is a local definition within a statement block and may have shorter lifespan than the activated default. Only references to variables and timers defined in the component type can be passed to activated defaults
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200502_the_activate_operation_007 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200502_007 local timer (referenced through timer parameter) as a parameter of activated altstep in module control >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200502_the_activate_operation_007 NegSem_200502_the_activate_operation_007.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.2, local timer (referenced through timer parameter) as a parameter of activated altstep in module control
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// For altsteps activated in module control or in functions or altsteps invoked
+// directly or indirectly from module control, all timer instances in the actual 
+// parameter list shall be declared in the highest scope of the module control 
+// part (see clause 26.2). Timers from lower scopes of the module control part 
+// (i.e. from the nested statement blocks) are not allowed to occur in the actual
+// parameter list.
+
+module NegSem_200502_the_activate_operation_007 { 
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+	type component GeneralComp {
+		port P p;
+	}
+	
+	altstep a(timer t_tmr) {
+		[] t_tmr.timeout { log ("Timeout in default"); }
+	}
+	
+	testcase TC_NegSem_200502_the_activate_operation_007() runs on GeneralComp {
+        setverdict(pass);
+	}
+
+    function f_activate(timer t_tmr) {
+        activate(a(t_tmr));
+    }
+    
+    function f_test() {
+        timer t_tmr := 1.0;
+        t_tmr.start;
+        f_activate(t_tmr); // t_tmr is a local timer, this should lead to an activation error in f_activate
+    }
+    
+	control{
+        timer t_tmr2;
+        f_test();
+        alt {
+            [] t_tmr2.timeout { }
+        }
+		execute(TC_NegSem_200502_the_activate_operation_007());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: Parameter #1 of altstep `@NegSem_200502_the_activate_operation_007.a' refers to timer parameter `t_tmr', which may have shorter lifespan than the activated default. Only references to variables and timers defined in the component type can be passed to activated defaults
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200503_the_deactivate_operation_002 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200503_002 verify that deactivate uninitialized default causes error >
+
+<COMPILE>
+<EXECUTE_PARALLEL>
+
+<MODULE TTCN NegSem_200503_the_deactivate_operation_002 NegSem_200503_the_deactivate_operation_002.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.1, verify that deactivate uninitialized default causes error
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// Calling a deactivate operation with an uninitialized default reference variable 
+// shall cause a runtime error.
+
+module NegSem_200503_the_deactivate_operation_002 { 
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+	type component GeneralComp {
+		port P p;
+	}
+	
+	altstep a1() runs on GeneralComp {
+		[] p.receive(integer:?) {
+			setverdict(pass);
+		}
+	}
+	
+	testcase TC_NegSem_200503_the_deactivate_operation_002() runs on GeneralComp {
+		var default v_default;
+		var boolean v_flag := false;
+		if (v_flag) {
+			v_default := activate(a1());		
+		}
+		
+		connect(self:p, self:p);
+		p.send(integer:1);
+
+		deactivate(v_default); // uninitialized -> runtime error
+
+		alt {
+			[] p.receive(integer:0) { // not expected: leads to default invocation
+				setverdict(fail);
+			}
+		}
+	}
+
+	control{
+		execute(TC_NegSem_200503_the_deactivate_operation_002(), 1.0);
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+Dynamic test case error: Performing a deactivate operation on an unbound default reference.
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+*---------------------------------------------------------------------*
+:h3. NegSem_200503_the_deactivate_operation_003 negative test
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+
+<TC - 200503_003 verify that error is generated when deactivated reference is on incorrect type >
+
+<COMPILE>
+
+<MODULE TTCN NegSem_200503_the_deactivate_operation_003 NegSem_200503_the_deactivate_operation_003.ttcn >
+/***************************************************
+ ** @version  0.0.1
+ ** @purpose  1:20.5.1, verify that error is generated when deactivated reference is on incorrect type
+ ** @verdict  pass reject
+ ***************************************************/
+
+// The following requirement is tested:
+// A deactivate operation will remove the referenced default from the list of defaults.
+
+module NegSem_200503_the_deactivate_operation_003 { 
+
+	type port P message {
+		inout integer;
+	} with {extension "internal"}
+	
+	type component GeneralComp {
+		port P p;
+	}
+	
+	altstep a1() runs on GeneralComp {
+		[] p.receive(integer:?) {
+			setverdict(pass);
+		}
+	}	
+	
+	testcase TC_NegSem_200503_the_deactivate_operation_003() runs on GeneralComp {
+		var GeneralComp v_ptc := null;
+
+		connect(self:p, self:p);
+		p.send(integer:1);
+
+		deactivate(v_ptc); // incorrect type -> error
+
+		alt {
+			[] p.receive(integer:0) { // not expected: leads to default invocation
+				setverdict(fail);
+			}
+		}
+	}
+
+	control{
+		execute(TC_NegSem_200503_the_deactivate_operation_003());
+	}
+}
+<END_MODULE>
+
+<RESULT COUNT 1>
+error: A value or expression of type default was expected
+<END_RESULT>
+
+<END_TC>
+:exmp
+
+.*---------------------------------------------------------------------*
+:h1.References
+.*---------------------------------------------------------------------*
+:list.
+:li D='[1]'.1/174 02-CRL 113 200/5 Uen
+:nl.Statement of Compliance for TITAN project
+:li D='[2]'.ETSI ES 201 873-1, v4.7.1 Mockup v1 (2015-06):
+:nl.Testing and Test Control Notation version 3.,
+:nl.Part 1: TTCN-3 Core Language
+:elist.

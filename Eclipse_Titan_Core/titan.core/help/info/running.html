@@ -1,0 +1,197 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Gecse, Roland
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>running</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="rnd.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="runs.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>running</h1>
+<blockquote>
+<p>1. <a href="#Checking components">Checking components</a></p>
+<p>2. <a href="#timer">Checking timers</a></p>
+<p>3. <a href="profiler.html#2">Starting the profiler</a></p>
+</blockquote>
+<hr align="left" width="75%">
+<h3>1. <a name="Checking components">Checking components</a></h3>
+<hr align="left" width="50%">
+<p>The operation is used to <a href="#Example 1a">check</a> whether a given parallel test component is running (i.e., has neither timed out nor been stopped). The Boolean value true is returned if
+the component have been started but not yet terminated or stopped, false otherwise.</p>
+<ul>
+  <li>The operation does not block TTCN-3 program execution, i.e., it reflects the momentary state of the parallel test component and does not wait for its termination.</li>
+  <li>When the <a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a> keyword is used with the operation, it will return true if all parallel
+  test components started are executing their behavior.</li>
+  <li>When the <a href="any.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a> keyword is used with the operation, it will return true if at least one
+  parallel test component is executing its behavior.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="alive.html"><b><font face="Courier New" color="#003258" size="4">alive</font></b></a></li>
+  <li><a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a></li>
+  <li><a href="any.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a></li>
+  <li><a href="component.html"> <b><font face="Courier New" color="#003258" size="4">component</font></b> </a></li>
+  <li><a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a></li>
+  <li><a href="profiler.html"><b><font face="Courier New" color="#003258" size="4">@profiler</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><i>component_reference</i><font face="Courier New" color="#003258" size="5"><b>.running;</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <i>component_reference</i> is one of the following:</p>
+  <ul>
+    <li>a reference returned by the <a href="create.html"><b><font face="Courier New" color="#003258" size="4">create</font></b></a> operation to refer to a given parallel test
+    component,</li>
+    <li>the keyword pair <a href="all.html"><b><font face="Courier New" color="#003258" size="4">all</font></b></a> <a href="component.html"> <b><font
+      face="Courier New" color="#003258" size="4">component</font></b> </a> to check whether all parallel test components are still running,</li>
+    <li>
+    <p>the keyword pair <a href="mtc.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a> <a href="component.html"> <b><font
+      face="Courier New" color="#003258" size="4">component</font></b></a>&nbsp; to check whether at least one parallel test component is still running</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p>The <b><font face="Courier New" color="#003258" size="4">running</font> </b> keyword denotes that (a) component(s) should be checked.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>See <a href="#Example 1a">Examples</a></p>
+<hr align="left" width="75%">
+<h3>2. <a name="timer">Checking&nbsp; timers</a></h3>
+<hr align="left" width="50%">
+<p>The operation is used to <a href="#timer_start">check</a> whether a given timer is running (i.e., has neither timed out nor been stopped). The Boolean value true is returned if the timer is
+running, false otherwise.</p>
+<ul>
+  <li>The operation does not block TTCN-3 program execution, i.e., it reflects the momentarily state of the timer and does not wait for timeout.</li>
+  <li><a name="stop_all">The</a> keyword <a href="any.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a> may be used to check whether <a href="#default">at least
+  one timer</a> is running.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="any.html"><b><font face="Courier New" color="#003258" size="4">any</font></b></a></li>
+  <li><a href="read.html"><b><font face="Courier New" color="#003258" size="4">read</font></b></a></li>
+  <li><a href="start.html"><b><font face="Courier New" color="#003258" size="4">start</font></b></a></li>
+  <li><a href="stop.html"><b><font face="Courier New" color="#003258" size="4">stop</font></b></a></li>
+  <li><a href="timer.html"><b><font face="Courier New" color="#003258" size="4">timer</font></b></a></li>
+  <li><a href="timeout.html"><b><font face="Courier New" color="#003258" size="4">timeout</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center">( <i>timer_identifier</i> | <font face="Courier New" color="#003258" size="5"><b>any timer</b></font> )<font face="Courier New" color="#003258" size="5"><b>.running</b></font>
+    <font face="Courier New" color="#003258" size="5"><b>;</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p><i>timer_identifier</i> is the&nbsp;name used to refer to the timer. It must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>It is possible to check a member of a <a href="#array">timer array</a>.</p>
+<hr align="left" width="50%">
+<p>See <a href="#Example 1c">Example 1c</a></p>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b></b></font> &nbsp; <i>timer_identifier</i><font face="Courier New" color="#003258" size="5"><b>[</b></font><i>array_index</i><font
+      face="Courier New" color="#003258" size="5"><b>].running; </b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<div align="center"></div>
+<ul>
+  <li>
+  <p><i>timer_identifier</i> is the&nbsp;name used to refer to the timer. It must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+  <li>
+  <p><i>array_index</i> points out the timer to be checked.</p>
+  </li>
+</ul>
+<hr align="left" width="75%">
+<h3>Examples</h3>
+<p><a name="Example 1a">Example 1a</a>:</p>
+<p><font face="Courier New">var boolean v_Tbana := vc_metro.running;<br>
+</font>
+<p>The variable v_Tbana gets the value true if the component with the reference vc_metro is running.</p>
+<hr align="left" width="50%">
+
+<p>Example 1b:</p>
+<p><font face="Courier New">var boolean v_Ubahn := all component.running;</font>
+<p>The variable v_Ubahn will true if all started parallel components are still running.</p>
+<hr align="left" width="50%">
+<p><a href="#Example 1c">Example 1c</a></p>
+<p><font face="Courier New">var boolean v_metropolitain := any component.running;&nbsp;<br>
+</font>
+<p>The variable v_metropolitain is true if at least one parallel component is still running.</p>
+<hr align="left" width="50%">
+<p><a name="timer_start">Example 2a</a>:
+<p><font face="Courier New">var boolean v_coureur := T_hledat.running;<br>
+</font>
+<p>The variable v_coureur gets the value true if the global timer T_hledat is running.</p>
+<hr align="left" width="50%">
+<p><a name="default">Example 2b:</a>
+<p><font face="Courier New">var boolean v_forlasu := any timer.running;&nbsp;<br>
+</font>
+<p>The variable v_forlasu is true if at least one timer is running in the scope unit where the command have been issued.</p>
+<hr align="left" width="50%">
+<p><a name="array">Example 2c:</a>
+<p><font face="Courier New">var boolean v_medlem := Tl_Odeon[3].running;</font>
+<p>The variable v_medlem will true if the fourth timer of the array Tl_Odeon is still running.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#runningop">BNF definition</a> of <font face="Courier New">component running</font></p>
+<p><a HREF="BNF.html#runningtimerop">BNF definition</a> of <font face="Courier New">timer runnnig</font></p>
+</body>
+</html>

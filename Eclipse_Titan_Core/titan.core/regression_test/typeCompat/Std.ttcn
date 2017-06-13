@@ -1,0 +1,222 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *
+ ******************************************************************************/
+// Examples from the standard.
+module Std {
+
+import from Ext all
+import from Ext2 all
+
+type component Empty { }
+
+//** ENUMS **//
+type enumerated MyEnum1 { E1, E2 }
+type MyEnum1 MyEnum2
+
+// 6.3.2.1 enumerated types are only compatible with their synonym types.  It
+// worked already in TITAN.  It's just a "typedef".
+testcase tc_Enums() runs on Empty {
+  var MyEnum1 enum1 := E1
+  var MyEnum2 enum2 := E2
+  if (enum1 == enum2 and enum2 == enum1) { setverdict(fail) } else { setverdict(pass) }
+  if (enum1 != enum2 and enum2 != enum1) { setverdict(pass) } else { setverdict(fail) }
+  enum1 := enum2
+  enum2 := enum1
+  if (enum1 == enum2 and enum2 == enum1) { setverdict(pass) } else { setverdict(fail) }
+  if (enum1 != enum2 and enum2 != enum1) { setverdict(fail) } else { setverdict(pass) }
+}
+
+
+//** RECORDS **//
+type record AType {
+  integer a(0..10) optional,
+  integer b(0..10) optional,
+  boolean c
+}
+
+type record BType {
+  integer a optional,
+  integer b(0..10) optional,
+  boolean c
+}
+
+// Field names doesn't matter.
+type record CType {
+  integer d optional,
+  integer e optional,
+  boolean f
+}
+
+type record DType {
+  integer a optional,
+  integer b optional,
+  boolean c optional
+}
+
+type record EType {
+  integer a optional,
+  integer b optional,
+  boolean c,
+  float d optional
+}
+
+type record HType {
+  integer a,
+  integer b optional,
+  integer c
+}
+
+type record JType {
+  HType H,
+  integer b optional,
+  integer c
+}
+
+// 6.3.2.2 the # of fields and the optionality must be the same.  Restrictions
+// on basic-type fields are not checked at run-time.
+testcase tc_Records() runs on Empty {
+  var AType MyVarA := { -, 1, true }
+  var BType MyVarB := { omit, 2, true }
+  var CType MyVarC := { 3, omit, true }
+  var DType MyVarD := { 4, 4, true }
+  var EType MyVarE := { 5, 5, true, omit }
+
+  MyVarA := MyVarB
+  MyVarC := MyVarB
+  if (MyVarA == { omit, 2, true }) { setverdict(pass) } else { setverdict(fail) }
+  if (MyVarC == { omit, 2, true }) { setverdict(pass) } else { setverdict(fail) }
+
+  // "MyVarA := MyVarD"  (Compile-time error, optionality doesn't match.)
+  // "MyVarA := MyVarE"  (Compile-time error, # of fields doesn't match.)
+  MyVarC := { d := 20 }
+  MyVarA := MyVarC  // TITAN won't check it at run-time.
+}
+
+
+//** RECORDOFS **//
+type record of integer IType
+
+// 6.3.2.2 missing optional fields of records won't be assigned to record ofs
+// or arrays.  Checking for OMIT_VALUE seems to be good for templates as well.
+// Omit fields will stay unbound in list types.  Since adding an omitted record
+// field into the initialization list of a list type causes error, it seems to
+// be the right thing to do.
+testcase tc_RecordOfsArrays() runs on Empty {
+  var HType MyVarH := { 1, omit, 3 }
+  var IType MyVarI
+  var integer MyArrayVar[2]
+
+  MyArrayVar := MyVarH
+  MyVarH := { -, 2, - }  // Avoid unbound error.
+  MyVarI := MyVarH
+  MyVarI[__LINE__] := __LINE__
+  if (not isvalue(MyVarI) and MyVarI[0] == MyVarI[1] - 1) { setverdict(pass) } else { setverdict(fail) }
+  if (isvalue(MyVarI) and not MyVarI[0] == MyVarI[1] - 1) { setverdict(fail) } else { setverdict(pass) }
+  MyVarI := { 3, 4 }
+  // "MyVarH := MyVarI" is a run-time error.  The record of doesn't have enough elements.
+}
+
+
+//** SETS **//
+type set FType {
+  integer a optional,
+  integer b optional,
+  boolean c
+}
+
+type set GType {
+  integer d optional,
+  integer e optional,
+  boolean f
+}
+
+// Examples from section 6.3.2.3.
+testcase tc_SetsSetOfs() runs on Empty {
+  var FType MyVarF := { a := 1, c := true }
+  var GType MyVarG := { f := true, d := 7 }
+  var AType MyVarA := { -, 1, true }
+
+  // "MyVarF := MyVarG" is a bug in the standard.  The unbound optional field
+  // will cause run-time error.  We don't replace optional fields with
+  // OMIT_VALUE in this case.
+  if (not isvalue(MyVarF) and MyVarF.a == 1 and MyVarF.c == true) { setverdict(pass) } else { setverdict(fail) }
+  if (isvalue(MyVarF) and not MyVarF.a == 1 and MyVarF.c == true) { setverdict(fail) } else { setverdict(pass) }
+  MyVarG.e := omit  // Complete the example.
+  MyVarF := MyVarG
+  if (MyVarF == MyVarG and MyVarG == MyVarF) { setverdict(pass) } else { setverdict(fail) }
+  if (MyVarF != MyVarG and MyVarG != MyVarF) { setverdict(fail) } else { setverdict(pass) }
+  // "MyVarF := MyVarA" is a compile-time error.
+}
+
+
+//** UNIONS **//
+type union U1 { integer i }
+type union U2 { integer i, boolean b }
+type union U {
+  integer I (0..2)
+}
+
+testcase tc_Unions() runs on Empty {
+  var U1 u1 := { i := 1 }
+  var U2 u2 := u1
+  u1 := u2
+
+  u1 := u2
+  if (u1 == u2 and u2 == u1) { setverdict(pass) } else { setverdict(fail) }
+  if (u1 != u2 and u2 != u1) { setverdict(fail) } else { setverdict(pass) }
+  if (ischosen(u1.i)) { setverdict(pass) } else { setverdict(fail) }
+  if (ischosen(u2.i)) { setverdict(pass) } else { setverdict(fail) }
+  u2 := { b := true }
+  // "u1 := u2" is a run-time error.  No compatible alternative with the same name.
+  // "var anytype x := u1" is a compile-time error.
+}
+
+
+testcase tc_Anytypes() runs on Empty {
+  var Ext.Atype Exta
+  var Ext.Atype ExtaI := { I := 1 }
+  var Ext.Atype ExtaF := { F := 1.0 }
+  // In 6.3.2.5 "integer" was not added, only "I".  So, I added it manually.
+  // By default all basic types are included in anytype, but not for us.
+  var Ext2.Atype Ext2a := { integer := 1 }
+  var Ext2.Atype Ext2aI := { I := 1 }
+  var U u := { I := 1 }
+
+  Exta := Ext2a
+  if (Exta == Ext2a and Ext2a == Exta) { setverdict(pass) } else { setverdict(fail) }
+  if (Exta != Ext2a and Ext2a != Exta) { setverdict(fail) } else { setverdict(pass) }
+  if (Exta.integer == Ext2a.integer) { setverdict(pass) } else { setverdict(fail) }
+  // "Exta := u" is a compile-time error.
+  // "Exta := Ext2aI" is a run-time error, since the name of the module counts.
+  Ext2a := { float := 1.0 }
+  // "Exta := Ext2aI" same run-time error as above.
+  // "Ext2a := ExtaF" ditto.
+}
+
+testcase tc_Substruct() runs on Empty {
+  var JType MyVarJ
+  var HType MyVarH := { 1, omit, 3 }
+  var IType MyVarI
+
+  MyVarJ.H := MyVarH
+  // HL51459 related changes.
+  MyVarJ.H := { -, 2, - }
+  MyVarI := MyVarJ.H
+  MyVarH := MyVarI
+  if (MyVarJ.H == MyVarH and MyVarH == MyVarJ.H) { setverdict(pass) } else { setverdict(fail) }
+  if (MyVarJ.H != MyVarH and MyVarH != MyVarJ.H) { setverdict(fail) } else { setverdict(pass) }
+  // "MyVarI == MyVarJ.H" would be a run-time error, since the right operand
+  // has an unbound field.
+  if ({ 1, 2, 3 } == MyVarJ.H) { setverdict(pass) } else { setverdict(fail) }
+}
+
+}

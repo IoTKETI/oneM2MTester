@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Basic host identification for platform dependent tests.
+
+host_pattern_=tcclab1
+host_=
+inet6_local_=fe80::215:17ff:fe48:23d0
+inet6_=fd0a:f452:f524::7
+inet_=172.31.21.7
+inet_eth2_=192.168.1.1
+if [ -x `which uname` ] && [ -f /etc/hosts ]; then
+host_=`uname -a | grep ${host_pattern_}`
+hosts_=`cat /etc/hosts | grep ${host_pattern_}`
+if [ -n "${host_}" ] && [ -n "${hosts_}" ]; then
+inet6_local_=`/sbin/ifconfig | grep "${inet6_local_}"`
+inet6_=`/sbin/ifconfig | grep "${inet6_}"`
+inet_eth2_=`/sbin/ifconfig | grep "${inet_eth2_}"`
+inet_=`/sbin/ifconfig | grep "${inet_}"`
+if [ -n "${inet6_local_}" ] && [ -n "${inet6_}" ] && [ -n "${inet_eth2_}" ] && [ -n "${inet_}" ]; then
+exit 0
+else
+exit 1 # Addresses not configured properly.
+fi
+else
+exit 1 # tcclab1 string not found.
+fi
+else
+exit 1 # No uname or /etc/hosts.
+fi

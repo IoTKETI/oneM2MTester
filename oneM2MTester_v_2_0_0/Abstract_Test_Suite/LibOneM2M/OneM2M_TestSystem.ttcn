@@ -1,0 +1,72 @@
+/**
+ *  Copyright Notification
+ *  No part of this document may be reproduced, in an electronic retrieval system or otherwise, except as authorized by written permission.
+ *  The copyright and the foregoing restriction extend to reproduction in all media.
+ *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
+ *  All rights reserved.
+ *  
+ *  @author     oneM2M
+ *  @version    $URL: https://forge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/OneM2M_TestSystem.ttcn $
+ *              $Id: OneM2M_TestSystem.ttcn 234 2017-03-20 16:37:29Z reinaortega $
+ *  @desc       Test System module for oneM2M
+ *
+ */
+module OneM2M_TestSystem {
+
+	import from OneM2M_Types all;
+	import from OneM2M_TypesAndValues all;
+	import from LibCommon_Time {modulepar all};
+	import from OneM2M_Ports all;
+
+/* ***************************************
+ * 		Test System Components 
+ * ***************************************
+ */	
+	type component Tester {
+		port AdapterControlPort acPort;
+		//timers
+		timer tc_ac := PX_TAC;
+		timer tc_wait;
+		//global variables
+		var Configurations vc_config;
+		var MyResourcesList vc_resourcesList;
+		var IntegerList vc_resourcesIndexToBeDeleted := {};
+	}
+		
+	type component CseTester extends Tester {
+		port OneM2MPort mcaPort;
+		port OneM2MPort mccPort;
+
+		//global variables
+		var AE_optional vc_aeAux;//TODO To be removed
+		var AccessControlPolicy_optional vc_acpAux;
+		var integer vc_acpAuxIndex := -1;
+
+	}
+	
+	type component AeTester extends Tester {
+		port OneM2MPort mcaPort;
+
+		//global variables
+	}
+			
+	type component CseSystem {
+		port OneM2MPort mcaPort;
+		port OneM2MPort mccPort;
+		port AdapterControlPort acPort;
+	}	
+	
+	type component AeSystem {
+		port OneM2MPort mcaPort;
+		port AdapterControlPort acPort;
+	}		
+	
+			
+	
+	
+
+}// end of module
+with {
+	extension "anytype charstring"
+
+}

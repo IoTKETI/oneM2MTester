@@ -1,0 +1,37 @@
+#!/bin/bash
+
+SCRIPTFLAGS=
+while [ $# -gt 0 ]; do
+case $1 in
+"-coverage") SCRIPTFLAGS+=" -coverage"; shift 1 ;;
+"-rt2") SCRIPTFLAGS=" -rt2"; shift 1 ;;
+*) echo "Usage: $0 [-rt2] [-coverage]"; exit 1 ;;
+esac
+done
+
+echo "Batch execution of SA tests: creating 1 report for each script file"
+echo "You must have a symlink in this directory named perl and pointing to perl 5.6.0 or higher"
+
+SCRIPTS="ASN_SA_1_TD ASN_SA_asn1adhoc_TD TTCN3_SA_1_TD TTCN3_SA_3_TD TTCN3_SA_4_TD TTCN3_SA_5_TD TTCN3_SA_6_TD TTCN3_SA_7_TD TTCN3_SA_9_TD TTCN3_SA_10_TD TTCN3_SA_ttcn3adhoc_TD TTCN3_SA_11_TD TTCN3_SA_13_TD"
+
+#TODO: TTCN3_SA_12_TD is machine dependent, cannot be executed on any platform. Modify it to be machine independent, if it is possible!
+
+for PREFIX in $SCRIPTS
+do
+    echo "./perl ../Tools/SAtester.pl $SCRIPTFLAGS -log $PREFIX.report $PREFIX.script"
+    ./perl ../Tools/SAtester.pl $SCRIPTFLAGS -log "$PREFIX.report" "$PREFIX.script"
+done
+
+echo "Finished. Reports are generated with .report extension."
+
+echo
+echo "==============================================================="
+echo "======================= total summary ========================="
+echo "==============================================================="
+echo
+tail -v -n 11 *.report
+# grep returns success if found; invert the return value
+if egrep 'test cases: [1-9]' *.report | egrep -v 'PASSED|Total'
+then echo WHOOPS; false
+else true
+fi

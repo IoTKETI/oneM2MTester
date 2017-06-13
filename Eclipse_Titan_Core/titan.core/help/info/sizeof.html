@@ -1,0 +1,106 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Csorba, Mate
+  Forstner, Matyas
+  Kovacs, Ferenc
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>sizeof</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a alt="previous" href="signature.html"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a alt="next" href="start.html"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>sizeof</h1>
+<hr align="left" width="75%">
+<p>This function returns the declared number of elements of a <b><font face="Courier New">record, record of, set, set of</font></b> type or the actual number of elements of a constant, variable, <b><font
+  face="Courier New">template</font></b> of these types or array. In the case of <b><font face="Courier New">record of</font></b> and <b><font face="Courier New">set of</font></b> values or templates or
+arrays, the actual value to be returned is the sequential number of the last defined element (index of that element plus 1).
+<hr align="left" width="50%">
+<p>Related keyword:</p>
+<ul>
+  <li><b><font face="Courier New" size="4" color="#003258"><a href="integer.html">integer</a></font></b></li>
+  <li><b><a href="record.html"><font face="Courier New" size="4" color="#003258">record</font></a></b></li>
+  <li><b><a href="set.html"><font face="Courier New" size="4" color="#003258">set</font></a></b></li>
+  <li><b><a href="template.html"><font face="Courier New" size="4" color="#003258">template</font></a></b></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>sizeof</b></font><font face="Courier New" color="#003258" size="5"><b>(</b></font><i>structured_type value</i><font
+      face="Courier New" color="#003258" size="5"><b>) return integer</b></font></h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>Only elements of the TTCN-3 object, which is the parameter of the function are calculated; i.e. no elements of nested types/values are taken into account at determining the return value.</p>
+  </li>
+</ul>
+<hr align="left" width="25%">
+<p>Example 1:</p>
+<p><font face="Courier New"> &nbsp;&nbsp;type record MyPDU<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;boolean field1 optional,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;integer field2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};<br>
+&nbsp;&nbsp;type record of integer MyPDU1;<br>
+<br>
+&nbsp;&nbsp;const MyPDU MyConst :=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;field1 := true,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;field2 := 29<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};<br>
+<br>
+&nbsp;&nbsp;template MyPDU MyTemplate :=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;field1 := omit,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;field2 := 5<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};<br>
+<br>
+&nbsp;&nbsp;var integer numElements;<br>
+<br>
+<p>...
+<p>&nbsp;&nbsp;numElements := sizeof(MyConst); // returns 2<br>
+&nbsp;&nbsp;numElements := sizeof(MyTemplate); // returns 1<br>
+</font></p>
+<p>Example 2:</p>
+<p><font face="Courier New"> &nbsp;&nbsp;type record of integer MyRecord;<br>
+&nbsp;&nbsp;var MyRecord MyRecordVar;<br>
+&nbsp;&nbsp;MyRecordVar := { 0, 1, -, 2 };<br>
+<br>
+<p>...
+<p>&nbsp;&nbsp;numElements := sizeof(MyRecordVar);<br>
+&nbsp;&nbsp;// returns 4 without respect to the fact, that the element MyRecordVar[2] is undefined
+</font></p>
+<hr align="left" width="25%">
+</body>
+</html>

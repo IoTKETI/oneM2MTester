@@ -1,0 +1,145 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module oi{
+
+modulepar {
+  //integer tsp_i:=0;
+  charstring tsp_c:="tsp_c_default";
+  charstring tsp_c0:="tsp_c_default0";
+  charstring tsp_c1:="tsp_c_default1";
+  charstring tsp_c2:="tsp_c_default2";
+  
+}
+
+type component MyComp {}
+
+function f_setverdict_C(in charstring p_value,in charstring p_expected){
+   if(p_value == p_expected) { setverdict(pass) } else{ setverdict(fail, match(p_expected,p_value));};
+}
+with { extension "transparent" }
+
+
+
+//***** Testcases for ordered include *****
+//Goal: tsp_c is filled in in [ORDERED_INCLUDE] twice _before_ the [MODULE_PARAMETERS] section. Double depth
+//See oi_before1.cfg
+testcase tc_1() runs on MyComp{
+  f_setverdict_C(tsp_c,"0");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//Goal: tsp_c is filled in inside [ORDERED_INCLUDE] _before_ the [MODULE_PARAMETERS] section in oi_before2.cfg but 
+// after the [MODULE_PARAMETERS] section in oi1_after1.cfg
+//See oi_before2.cfg
+testcase tc_2() runs on MyComp{
+  f_setverdict_C(tsp_c,"0");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//Goal: tsp_c is filled in inside [ORDERED_INCLUDE] _after_ the [MODULE_PARAMETERS] section in oi_after1.cfg but 
+// before the [MODULE_PARAMETERS] section in oi1_before1.cfg
+//See oi_after1.cfg
+testcase tc_3() runs on MyComp{
+  f_setverdict_C(tsp_c,"1"); 
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//Goal: tsp_c is filled in inside [ORDERED_INCLUDE] _after_ the [MODULE_PARAMETERS] section in oi_after1.cfg but 
+// after the [MODULE_PARAMETERS] section in oi1_after1.cfg
+//See oi_after2.cfg
+testcase tc_4() runs on MyComp{
+  f_setverdict_C(tsp_c,"2"); 
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//last: [ORDERED_INCLUDE] is the last section in the main
+//See oi_last1.cfg
+testcase tc_5() runs on MyComp{
+  f_setverdict_C(tsp_c,"1");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//last: [ORDERED_INCLUDE] is the last section in the main
+//See oi_last2.cfg
+testcase tc_6() runs on MyComp{
+  f_setverdict_C(tsp_c,"1");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//last: [ORDERED_INCLUDE] is the last section in the main
+//See oi_last3.cfg
+testcase tc_7() runs on MyComp{
+  f_setverdict_C(tsp_c,"2_nomacro");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"tsp_c_default1");
+  f_setverdict_C(tsp_c2,"2_nomacro");
+}
+
+//last: [ORDERED_INCLUDE] is the last section in the main
+//See oi_last3.cfg
+testcase tc_8() runs on MyComp{
+  f_setverdict_C(tsp_c,"2_nomacro");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"13");
+  f_setverdict_C(tsp_c2,"2_nomacro");
+}
+
+// List of [ORDERED_INCLUDE]
+//See oi_after_list1.cfg
+testcase tc_9() runs on MyComp{
+  f_setverdict_C(tsp_c,"23");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"13");
+  f_setverdict_C(tsp_c2,"23");
+}
+
+//see ../oi_subfolder1.cfg
+testcase tc_10() runs on MyComp{
+  f_setverdict_C(tsp_c,"2_sub");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"1_sub");
+  f_setverdict_C(tsp_c2,"2_sub");
+}
+
+//see ../oi_include_mix.cfg
+testcase tc_11() runs on MyComp{
+  f_setverdict_C(tsp_c,"2");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"2");
+  f_setverdict_C(tsp_c2,"2");
+}
+
+//see ../oi_before5.cfg
+testcase tc_12() runs on MyComp{
+  f_setverdict_C(tsp_c,"1");  
+  f_setverdict_C(tsp_c0,"0");
+  f_setverdict_C(tsp_c1,"2");
+  f_setverdict_C(tsp_c2,"2");
+}
+control{
+  execute(tc_1());
+  
+}
+
+}

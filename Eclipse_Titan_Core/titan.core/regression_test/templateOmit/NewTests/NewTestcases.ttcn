@@ -1,0 +1,428 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+ 
+module NewTestcases {
+// This module contains tests related to the matching of omitted fields.
+// New behavior (after change request artf564824):
+// - 'omit' can no longer be used in value list and complement list templates
+//   e.g.: 't := (1, 2, omit)' and 't := complement(1, 2, omit)' are not allowed
+// - value list and complement list templates do not match the value 'omit',
+//   the 'ifpresent' clause should be used instead
+
+import from Types all;
+import from Templates all;
+
+// Testing the matching of an omitted field
+// A different field is omitted in each of the 6 tested values.
+// Both the value list template and the complement list template should not match
+// any of the values.
+testcase tc_match_omit() runs on CT
+{
+  if (match(c_int_omitted, t_every_value_list)) { 
+    setverdict(fail, c_int_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_int_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_int_omitted, " should not match ", t_every_comp_list);
+  }
+  if (match(c_char_omitted, t_every_value_list)) { 
+    setverdict(fail, c_char_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_char_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_char_omitted, " should not match ", t_every_comp_list);
+  }
+  if (match(c_rec_omitted, t_every_value_list)) { 
+    setverdict(fail, c_rec_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_rec_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_rec_omitted, " should not match ", t_every_comp_list);
+  }
+  if (match(c_setof_omitted, t_every_value_list)) { 
+    setverdict(fail, c_setof_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_setof_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_setof_omitted, " should not match ", t_every_comp_list);
+  }
+  if (match(c_uni_omitted, t_every_value_list)) { 
+    setverdict(fail, c_uni_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_uni_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_uni_omitted, " should not match ", t_every_comp_list);
+  }
+  if (match(c_enum_omitted, t_every_value_list)) { 
+    setverdict(fail, c_enum_omitted, " should not match ", t_every_value_list);
+  }
+  if (match(c_enum_omitted, t_every_comp_list)) { 
+    setverdict(fail, c_enum_omitted, " should not match ", t_every_comp_list);
+  }
+  setverdict(pass);
+}
+
+// Testing the 'ispresent' clause on templates
+// All of the tested templates are 'present', as none of them match the 'omit' value.
+testcase tc_ispresent() runs on CT
+{
+  if (not ispresent(t_int_value_list)) {
+    setverdict(fail, t_int_value_list, " should be present");
+  }
+  if (not ispresent(t_char_value_list)) {
+    setverdict(fail, t_char_value_list, " should be present");
+  }
+  if (not ispresent(t_rec_value_list)) {
+    setverdict(fail, t_rec_value_list, " should be present");
+  }
+  if (not ispresent(t_setof_value_list)) {
+    setverdict(fail, t_setof_value_list, " should be present");
+  }
+  if (not ispresent(t_uni_value_list)) {
+    setverdict(fail, t_uni_value_list, " should be present");
+  }
+  if (not ispresent(t_enum_value_list)) {
+    setverdict(fail, t_enum_value_list, " should be present");
+  }
+  if (not ispresent(t_int_comp_list)) {
+    setverdict(fail, t_int_comp_list, " should be present");
+  }
+  if (not ispresent(t_char_comp_list)) {
+    setverdict(fail, t_char_comp_list, " should be present");
+  }
+  if (not ispresent(t_rec_comp_list)) {
+    setverdict(fail, t_rec_comp_list, " should be present");
+  }
+  if (not ispresent(t_setof_comp_list)) {
+    setverdict(fail, t_setof_comp_list, " should be present");
+  }
+  if (not ispresent(t_uni_comp_list)) {
+    setverdict(fail, t_uni_comp_list, " should be present");
+  }
+  if (not ispresent(t_enum_comp_list)) {
+    setverdict(fail, t_enum_comp_list, " should be present");
+  }
+  setverdict(pass);
+}
+
+// Testing the logging of matching an omitted field
+// The results should be the same as with the matching tests
+// (this is needed, because a different function is called when logging a match operation)
+testcase tc_log_match() runs on CT
+{
+  // omitted integer
+  var charstring v_log_match_res := log2str(match(c_int_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_int_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_int_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_int_omitted, " should not match ", t_every_comp_list);
+  }
+  
+  // omitted charstring
+  v_log_match_res := log2str(match(c_char_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_char_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_char_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_char_omitted, " should not match ", t_every_comp_list);
+  }
+  
+  // omitted record
+  v_log_match_res := log2str(match(c_rec_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_rec_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_rec_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_rec_omitted, " should not match ", t_every_comp_list);
+  }
+  
+  // omitted set of
+  v_log_match_res := log2str(match(c_setof_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_setof_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_setof_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_setof_omitted, " should not match ", t_every_comp_list);
+  }
+  
+  // omitted union
+  v_log_match_res := log2str(match(c_uni_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_uni_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_uni_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_uni_omitted, " should not match ", t_every_comp_list);
+  }
+  
+  // omitted enumerated
+  v_log_match_res := log2str(match(c_enum_omitted, t_every_value_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_enum_omitted, " should not match ", t_every_value_list);
+  }
+  v_log_match_res := log2str(match(c_enum_omitted, t_every_comp_list));
+  if (not match(v_log_match_res, t_unmatched)) {
+    setverdict(fail, c_enum_omitted, " should not match ", t_every_comp_list);
+  }
+  setverdict(pass);
+}
+
+// A component's behavior function for the procedure-based port matching test
+// Tests matching of 'omit' values in the 'getcall' operation:
+// - on success replies with or raises an exception with one of the test values
+// - on failure replies with a specific template containing an error message
+function f_behavior_proc() runs on CT
+{
+  var template Everything vt_bad := t_bad_call;
+  timer t1 := 1.0;
+  t1.start;
+  alt {
+    [] proc.getcall(Sig:{t_every_value_list, -}) {
+      vt_bad.cs := log2str("getcall parameters should not match ", t_every_value_list);
+      proc.reply(Sig:{-, vt_bad});
+    }
+    [] proc.getcall(Sig:{?, -}) {
+      // this is the expected behavior, since the incomming call is not supposed to match the template
+      proc.reply(Sig:{-, c_rec_omitted});
+    }
+    [] t1.timeout {
+      vt_bad.cs := "getcall timed out";
+      proc.reply(Sig:{-, vt_bad});
+    }
+  }
+  
+  timer t2 := 1.0;
+  t2.start;
+  alt {
+    [] proc.getcall(Sig:{t_every_comp_list, -}) {
+      vt_bad.cs := log2str("getcall parameters should not match ", t_every_comp_list);
+      proc.reply(Sig:{-, vt_bad});
+    }
+    [] proc.getcall(Sig:{?, -}) {
+      // this is the expected behavior, since the incomming call is not supposed to match the template
+      proc.reply(Sig:{-, c_setof_omitted});
+    }
+    [] t2.timeout {
+      vt_bad.cs := "getcall timed out";
+      proc.reply(Sig:{-, vt_bad});
+    }
+  }
+  
+  timer t3 := 1.0;
+  t3.start;
+  alt {
+    [] proc.getcall(Sig:{t_every_value_list, -}) {
+      vt_bad.cs := log2str("getcall parameters should not match ", t_every_value_list);
+      proc.reply(Sig:{-, vt_bad});
+    }
+    [] proc.getcall(Sig:{?, -}) {
+      // this is the expected behavior, since the incomming call is not supposed to match the template
+      proc.raise(Sig, c_uni_omitted);
+    }
+    [] t2.timeout {
+      vt_bad.cs := "getcall timed out";
+      proc.reply(Sig:{-, vt_bad});
+    }
+  }
+  
+  timer t4 := 1.0;
+  t4.start;
+  alt {
+    [] proc.getcall(Sig:{t_every_comp_list, -}) {
+      vt_bad.cs := log2str("getcall parameters should not match ", t_every_comp_list);
+      proc.reply(Sig:{-, vt_bad});
+    }
+    [] proc.getcall(Sig:{?, -}) {
+      // this is the expected behavior, since the incomming call is not supposed to match the template
+      proc.raise(Sig, c_char_omitted);
+    }
+    [] t2.timeout {
+      vt_bad.cs := "getcall timed out";
+      proc.reply(Sig:{-, vt_bad});
+    }
+  }
+}
+
+// Tests the matching of 'omit' values in procedure-based port operations
+// ('getcall' is tested in the newly created component's behavior function,
+// 'getreply' and 'catch' are tested here).
+testcase tc_proc_port_match() runs on CT
+{
+  var CT v_comp := CT.create;
+  connect(v_comp:proc, self:proc);
+  v_comp.start(f_behavior_proc());
+
+  // testing 'getcall' and 'getreply' with the value list template
+  var Everything v_pars;
+  proc.call(Sig:{c_int_omitted, -}, 1.0) {
+    [] proc.getreply(Sig:{-, t_every_value_list}) {
+      setverdict(fail, "getreply parameters should not match ", t_every_value_list);
+    }
+    [] proc.getreply(Sig:{-, t_bad_call}) -> param (v_pars) {
+      // the 'getcall' operation did not succeed, display the received error message
+      setverdict(fail, v_pars.cs);
+    }
+    [] proc.getreply(Sig:{-, ?}) {
+      // this is the expected behavior, since the incomming reply is not supposed to match the template
+      setverdict(pass);
+    }
+    [] proc.catch(Sig, ?) {
+      setverdict(fail, "caught unexpected exception");
+    }
+    [] proc.catch(timeout) {
+      setverdict(fail, "getreply timed out");
+    }
+  }
+  
+  // testing 'getcall' and 'getreply' with the complement list template
+  proc.call(Sig:{c_enum_omitted, -}, 1.0) {
+    [] proc.getreply(Sig:{-, t_every_comp_list}) {
+      setverdict(fail, "getreply parameters should not match ", t_every_comp_list);
+    }
+    [] proc.getreply(Sig:{-, t_bad_call}) -> param (v_pars) {
+      // the 'getcall' operation did not succeed, display the received error message
+      setverdict(fail, v_pars.cs);
+    }
+    [] proc.getreply(Sig:{-, ?}) {
+      // this is the expected behavior, since the incomming reply is not supposed to match the template
+      setverdict(pass);
+    }
+    [] proc.catch(Sig, ?) {
+      setverdict(fail, "caught unexpected exception");
+    }
+    [] proc.catch(timeout) {
+      setverdict(fail, "getreply timed out");
+    }
+  }
+  
+  // testing 'getcall' and 'catch' with the value list template
+  proc.call(Sig:{c_char_omitted, -}, 1.0) {
+    [] proc.getreply(Sig:{-, t_bad_call}) -> param (v_pars) {
+      // the 'getcall' operation did not succeed, display the received error message
+      setverdict(fail, v_pars.cs);
+    }
+    [] proc.getreply(Sig:{-, ?}) {
+      setverdict(fail, "received unexpected reply");
+    }
+    [] proc.catch(Sig, t_every_value_list) {
+      setverdict(fail, "caught exception should not match ", t_every_value_list);
+    }
+    [] proc.catch(Sig, ?) {
+      // this is the expected behavior, since the incomming exception is not supposed to match the template
+      setverdict(pass);
+    }
+    [] proc.catch(timeout) {
+      setverdict(fail, "catch timed out");
+    }
+  }
+  
+  // testing 'getcall' and 'catch' with the complement list template
+  proc.call(Sig:{c_uni_omitted, -}, 1.0) {
+    [] proc.getreply(Sig:{-, t_bad_call}) -> param (v_pars) {
+      // the 'getcall' operation did not succeed, display the received error message
+      setverdict(fail, v_pars.cs);
+    }
+    [] proc.getreply(Sig:{-, ?}) {
+      setverdict(fail, "received unexpected reply");
+    }
+    [] proc.catch(Sig, t_every_comp_list) {
+      setverdict(fail, "caught exception should not match ", t_every_comp_list);
+    }
+    [] proc.catch(Sig, ?) {
+      // this is the expected behavior, since the incomming exception is not supposed to match the template
+      setverdict(pass);
+    }
+    [] proc.catch(timeout) {
+      setverdict(fail, "catch timed out");
+    }
+  }
+  
+  v_comp.done;
+}
+
+// A component's behavior function for the message-based port matching test
+// Sends test messages to the caller test case for matching.
+function f_behavior_msg() runs on CT
+{
+  msg.send(c_int_omitted);
+  msg.send(c_char_omitted);
+  msg.send(c_rec_omitted);
+  msg.send(c_setof_omitted);
+  msg.send(c_uni_omitted);
+  msg.send(c_enum_omitted);
+}
+
+// Tests the matching of 'omit' values in message-based port operations
+// (the newly created component's behavior function sends us 6 test messages,
+// these are matched against value list and complement list templates).
+testcase tc_msg_port_match() runs on CT
+{
+  var CT v_comp := CT.create;
+  connect(v_comp:msg, self:msg);
+  v_comp.start(f_behavior_msg());
+  
+  var integer v_msg_count := 1;
+  timer t := 1.0;
+  t.start;
+  alt {
+    [] msg.receive(t_every_value_list) {
+      setverdict(fail, "Message ", v_msg_count, " should not match ", t_every_value_list);
+    }
+    [] msg.receive(t_every_comp_list) {
+      setverdict(fail, "Message ", v_msg_count, " should not match ", t_every_comp_list);
+    }
+    [] msg.receive(?) {
+      // this is the expected behavior, since the incomming messages should not match
+      // either of the templates
+      if (v_msg_count < 6) {
+        // repeat until all 6 messages have been received
+        v_msg_count := v_msg_count + 1;
+        repeat;
+      }
+    }
+    [] t.timeout {
+      setverdict(fail, "receive timed out");
+    }
+  }
+  
+  v_comp.done;
+  msg.clear;
+  setverdict(pass);
+}
+
+// Testing the 'present' template restriction
+// (all value list and complement list templates are 'present')
+testcase tc_present_template() runs on CT
+{
+  template(present) integer t_present_value_list := (1, 2, 3);
+  template(present) integer t_present_comp_list := complement (1, 2, 3);
+  
+  var template(present) integer vt_present_value_list := (1, 2, 3);
+  var template(present) integer vt_present_comp_list := complement (1, 2, 3);
+  
+  vt_present_value_list := (4, 5, 6);
+  vt_present_comp_list := complement (4, 5, 6);
+  
+  setverdict(pass);
+}
+
+control {
+  execute(tc_match_omit());
+  execute(tc_ispresent());
+  execute(tc_log_match());
+  execute(tc_proc_port_match());
+  execute(tc_msg_port_match());
+  execute(tc_present_template());
+}
+
+}

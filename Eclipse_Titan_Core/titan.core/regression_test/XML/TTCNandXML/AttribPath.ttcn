@@ -1,0 +1,62 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AttribPath {
+
+group G_up { // all members get variant "name as uppercased", unless overridden
+    
+    type record pozicio {
+        float x, // with { variant "name as 'Horiz.' " }
+        float y,
+        float z
+    }
+    with {
+        //variant "name as "
+        variant (x) "name as 'width' ";
+        variant (y) "name as 'depth' ";
+        variant (z) "name as 'height' ";
+    }
+    
+    
+    type record length(3) of float vector
+    with { variant "list" }
+    
+    type record length(3) of vector vector2
+    with {
+        variant "list"
+        variant "name as 'Vectra' "
+    }
+    
+}
+with { variant "name as uppercased" }
+
+type pozicio poz2;
+type pozicio bigpoz with { variant "name as capitalized" }
+
+group G_lo { // all members get variant "name as lowercased", unless overridden
+    
+    type pozicio LOWpoz;
+    type vector  LOWvec;
+    type vector2 LOWvec2;
+
+    type LOWpoz SMallpoz with { variant "name as uncapitalized" }
+}
+with { variant "name as lowercased" }
+
+type record of charstring stringlist with { variant "list"; variant ([-]) "namespace as 'urn:foo:bar' " }
+type record of universal charstring ustringlist with { variant "list"; variant ([-]) "namespace as 'urn:foo:bar' " }
+
+
+}
+with {
+encode "XML"
+}

@@ -1,0 +1,186 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Beres, Szabolcs
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module size_of_OK {	//^In TTCN-3 module `size_of_OK'://
+
+type component PDTestComponent {};
+
+/*--- SIZEOF ON RECORDOF  --------------------------------------------------*/
+
+type record of integer sirortype1
+type record of sirortype1 sirortype2
+
+const sirortype1 siro1 := {}
+const sirortype1 siro2 := {1}
+const sirortype1 siro3 := {1,2}
+
+const sirortype2 siro4 := {{}}
+const sirortype2 siro5 := {{},{}}
+const sirortype2 siro6 := {{1},{1,2}}
+
+modulepar integer sirocon1 := sizeof(siro1)
+modulepar integer sirocon2 := sizeof(siro2)
+modulepar integer sirocon3 := sizeof(siro3)
+
+modulepar integer sirocon4 := sizeof(siro4)
+modulepar integer sirocon5 := sizeof(siro5)
+modulepar integer sirocon6 := sizeof(siro5[1])
+modulepar integer sirocon7 := sizeof(siro6[1])
+
+
+testcase sizeof_recof() runs on PDTestComponent{
+
+	if ((sirocon1 == 0)
+	and (sirocon1 == sizeof(siro1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon2 == 1)
+	and (sirocon2 == sizeof(siro2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon3 == 2)
+	and (sirocon3 == sizeof(siro3)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon4 == 1)
+	and (sirocon4 == sizeof(siro4)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon5 == 2)
+	and (sirocon5 == sizeof(siro5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon6 == 0)
+	and (sirocon6 == sizeof(siro5[1])))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sirocon7 == 2)
+	and (sirocon7 == sizeof(siro6[1])))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var template sirortype1 tr_sirortype1 := {1, 2, 3}
+	if (sizeof(tr_sirortype1) == 3) {
+		setverdict(pass);
+	} else {
+		setverdict(fail);
+	}
+
+}
+
+
+/*--- SIZEOF ON SETOF  --------------------------------------------------*/
+
+type set of integer sisostype1
+type set of sisostype1 sisostype2
+
+const sisostype1 siso1 := {}
+const sisostype1 siso2 := {1}
+const sisostype1 siso3 := {1,2}
+const sisostype2 siso4 := {{}}
+const sisostype2 siso5 := {{},{}}
+const sisostype2 siso6 := {{1},{1,2}}
+
+modulepar integer sisocon1 := sizeof(siso1)
+modulepar integer sisocon2 := sizeof(siso2)
+modulepar integer sisocon3 := sizeof(siso3)
+
+modulepar integer sisocon4 := sizeof(siso4)
+modulepar integer sisocon5 := sizeof(siso5)
+modulepar integer sisocon6 := sizeof(siso5[1])
+modulepar integer sisocon7 := sizeof(siso6[1])
+
+
+testcase sizeof_setof() runs on PDTestComponent{ //In testcase definition//
+
+	if ((sisocon1 == 0)
+	and (sisocon1 == sizeof(siso1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon2 == 1)
+	and (sisocon2 == sizeof(siso2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon3 == 2)
+	and (sisocon3 == sizeof(siso3)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon4 == 1)
+	and (sisocon4 == sizeof(siso4)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon5 == 2)
+	and (sisocon5 == sizeof(siso5)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon6 == 0)
+	and (sisocon6 == sizeof(siso5[1])))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((sisocon7 == 2)
+	and (sisocon7 == sizeof(siso6[1])))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+  var template sisostype1 sisot1 := subset( 1, 2 , 3) length (3..10);
+  var template sisostype1 sisot2 := superset( 1, 2 , 3) length (1..3);
+  var template sisostype1 sisot3 := subset( 1, * , 3) length (1000); //In template variable definition// \
+    //In element 2 of subset//   //warning: `\*' in subset\. This template will match everything//
+  if (sizeof(sisot1)==3)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+  if (sizeof(sisot2)==3)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+  if (sizeof(sisot3)==1000)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+}
+
+/*--- SIZEOF ON ARRAY  --------------------------------------------------*/
+
+type record of integer siarrtype
+
+const siarrtype siar1[1] := {{}}
+const siarrtype siar2[1] := {{1}}
+const siarrtype siar3[3] := {{},{1},{1,2}}
+
+
+modulepar integer siarcon1 := sizeof(siar1)
+modulepar integer siarcon2 := sizeof(siar2)
+modulepar integer siarcon3 := sizeof(siar3)
+
+testcase sizeof_array() runs on PDTestComponent{
+
+	if ((siarcon1 == 1)
+	and (siarcon1 == sizeof(siar1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((siarcon2 == 1)
+	and (siarcon2 == sizeof(siar2)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((siarcon3 == 3)
+	and (siarcon3 == sizeof(siar3)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+
+control {
+	execute (sizeof_recof());
+	execute (sizeof_setof());
+	execute (sizeof_array());
+}
+
+}

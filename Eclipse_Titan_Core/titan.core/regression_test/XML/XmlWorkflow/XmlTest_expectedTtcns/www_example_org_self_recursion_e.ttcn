@@ -1,0 +1,71 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_self_recursion.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Sep  6 11:11:31 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- complex_self_recursion.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/self/recursion" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_self_recursion {
+
+
+import from XSD all;
+
+
+type record X
+{
+	XSD.String attr2 optional,
+	XSD.String x,
+	record {
+		XSD.String attr1 optional,
+		XSD.String attr2 optional,
+		XSD.String x,
+		X.y y optional,
+		XSD.String z
+	} y optional
+}
+with {
+  variant (attr2) "attribute";
+  variant (y.attr1) "attribute";
+  variant (y.attr2) "attribute";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/self/recursion' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

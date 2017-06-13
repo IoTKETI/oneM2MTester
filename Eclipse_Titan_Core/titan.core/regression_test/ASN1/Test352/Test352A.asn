@@ -1,0 +1,134 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Kulcsar, Endre
+--   Raduly, Csaba
+--   Szabados, Kristof
+--
+--/////////////////////////////////////////////////////////////////////////////
+Test352A
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+
+IMPORTS ; -- nothing
+
+MySequenceType2 ::= SEQUENCE {
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			    -- field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a1,b1,c1}
+			   --  field7 REAL   NOT SUPP
+			    }
+
+
+
+MySetType2 ::= SET{
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			    -- field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a2,b2,c2}
+			    -- field7 REAL   NOT SUPP
+			    }
+MyChoiceType2 ::= CHOICE{
+  			     field1 INTEGER,
+			     field2 BOOLEAN,
+			   --  field3 NULL,
+			     field4 OCTET STRING,
+			     field5 BIT STRING,
+			     field6 ENUMERATED {a3,b3,c3}
+			    --  field7 REAL NOT SUPP
+			    }
+
+MySequenceOfType1 ::= SEQUENCE OF INTEGER
+
+mySequenceOfValue1A MySequenceOfType1 ::= {3,664,234,-1 ,0}
+
+MySequenceOfType2 ::= SEQUENCE OF BIT STRING
+
+mySequenceOfValue2A MySequenceOfType2 ::= {'0011'B, '1'B, '00'B}
+
+MySequenceOfType3 ::= SEQUENCE OF OCTET STRING
+
+mySequenceOfValue3A MySequenceOfType3 ::= {'FFAA'H, '1234'H, '00'H}
+
+MySequenceOfType4 ::= SEQUENCE OF BOOLEAN
+
+mySequenceOfValue4A MySequenceOfType4 ::= {TRUE, FALSE, TRUE}
+
+MySequenceOfType5 ::= SEQUENCE OF MySequenceType2
+
+mySequenceOfValue5A MySequenceOfType5 ::=
+ {
+     {
+     field1   5,
+     field2   TRUE,
+     field4   '1234567890FF'H,
+     field5   '10'B,
+     field6    a1
+      },
+
+       {
+       field1   77,
+       field2   FALSE,
+       field4    '1234AA'H,
+       field5    '01'B,
+       field6    c1
+       }
+
+  }
+
+
+MySequenceOfType6 ::= SEQUENCE OF MySetType2
+
+mySequenceOfValue6A MySequenceOfType6 ::=
+ {
+     {
+     field1   5,
+     field4   '1234567890FF'H,
+     field2   TRUE,
+     field5   '10'B,
+     field6    a2
+      },
+
+       {
+       field5    '01'B,
+       field1   77,
+       field2   FALSE,
+       field4    '1234AA'H,
+       field6    c2
+       }
+
+  }
+
+
+
+ MySequenceOfType7 ::= SEQUENCE OF MyChoiceType2
+
+mySequenceOfValue7A MySequenceOfType7 ::=
+  {
+
+       field1  :  5
+       ,
+
+
+       field2  :  FALSE
+
+  }
+
+END

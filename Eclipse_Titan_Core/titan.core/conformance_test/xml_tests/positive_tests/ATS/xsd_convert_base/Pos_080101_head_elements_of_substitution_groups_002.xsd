@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="schema:Pos_080101_head_elements_of_substitution_groups_002"
+    xmlns:ns228="schema:Pos_080101_head_elements_of_substitution_groups_002">
+  <!-- THE HEAD ELEMENT -->
+  <element name="head" type="string" block="restriction" abstract="true"/>
+  <!-- SUBSTITUTION ELEMENT OF THE SAME TYPE AS THE HEAD -->
+  <element name="member1" type="string" substitutionGroup="ns228:head"/>
+  <!-- SUBSTITUTION ELEMENT OF A TYPE RESTRICTING THE TYPE OF THE HEAD -->
+  <simpleType name="stringEnum">
+    <restriction base="string">
+      <enumeration value="something"/>
+      <enumeration value="else"/>
+    </restriction>
+  </simpleType>
+  <element name="member2" type="ns228:stringEnum" substitutionGroup="ns228:head"/>
+  <!-- SUBSTITUTION ELEMENT OF A TYPE EXTENDING THE TYPE OF THE HEAD -->
+  <complexType name="complexEnum">
+    <simpleContent>
+      <extension base="string">
+        <attribute name="foo" type="float"/>
+        <attribute name="bar" type="integer"/>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <element name="member3" type="ns228:complexEnum" substitutionGroup="ns228:head"/>
+  <!-- TOP LEVEL ELEMENT TO DEMONSTRATE SUBSTITUTION -->
+  <element name="ize">
+    <complexType>
+      <sequence>
+        <element ref="ns228:head" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+  </element>
+</schema>

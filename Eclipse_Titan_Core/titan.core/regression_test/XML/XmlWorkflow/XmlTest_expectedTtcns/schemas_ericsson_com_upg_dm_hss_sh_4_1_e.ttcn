@@ -1,0 +1,826 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          schemas_ericsson_com_upg_dm_hss_sh_4_1.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- ShDataType.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "http://schemas.ericsson.com/upg/dm/hss-sh/4.1" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module schemas_ericsson_com_upg_dm_hss_sh_4_1 {
+
+
+import from XSD all;
+
+
+type XSD.AnyURI TSIP_URL
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.AnyURI TTEL_URL
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.AnyURI TDiameterURI
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* PUBLIC_USER_IDENTITY */
+/* DEFINITION: */
+/* Identity is a Public User Identity. */
+/* LABEL: */
+/* DISTINCT_PSI */
+/* DEFINITION: */
+/* Identity is a distinct Public Service Identity. */
+/* LABEL: */
+/* WILDCARDED_PSI */
+/* DEFINITION: */
+/* Identity matches a wildcarded Public Service Identity. */
+type enumerated TIdentityType
+{
+	int0(0),
+	int1(1),
+	int2(2)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+type union TIMSPublicIdentity
+{
+	TSIP_URL tSIP_URL,
+	TTEL_URL tTEL_URL
+}
+with {
+  variant "name as uncapitalized";
+  variant "useUnion";
+};
+
+
+/* LABEL: */
+/* REGISTERED */
+/* DEFINITION: */
+/* iFC is part of the registered profile */
+/* LABEL: */
+/* UNREGISTERED */
+/* DEFINITION: */
+/* iFC is part of the unregistered profile */
+type enumerated TProfilePartIndicator
+{
+	int0(0),
+	int1(1)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TServiceInfo length(0 .. infinity)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TString length(0 .. infinity)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TMSISDN length(0 .. infinity)
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* NOT_REGISTERED */
+/* DEFINITION: */
+/* Not registered */
+/* LABEL: */
+/* REGISTERED */
+/* DEFINITION: */
+/* Registered */
+/* LABEL: */
+/* REGISTERED_UNREG_SERVICES */
+/* DEFINITION: */
+/* Registered, with services for unregistered */
+/* LABEL: */
+/* AUTHENTICATION_PENDING */
+/* DEFINITION: */
+/* Pending of authentication */
+type enumerated TIMSUserState
+{
+	int0(0),
+	int1(1),
+	int2(2),
+	int3(3)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* CAMELBusy */
+/* LABEL: */
+/* NetworkDeterminedNotReachable */
+/* LABEL: */
+/* AssumedIdle */
+/* LABEL: */
+/* NotProvidedFromVLR */
+type enumerated TCSUserState
+{
+	int0(0),
+	int1(1),
+	int2(2),
+	int3(3)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* Detached */
+/* LABEL: */
+/* AttachedNotReachableForPaging */
+/* LABEL: */
+/* AttachedReachableForPaging */
+/* LABEL: */
+/* ConnectedNotReachableForPaging */
+/* LABEL: */
+/* ConnectedReachableForPaging */
+/* LABEL: */
+/* notProvidedFromSGSN */
+/* LABEL: */
+/* networkDeterminedNotReachable */
+type enumerated TPSUserState
+{
+	int0(0),
+	int1(1),
+	int2(2),
+	int3(3),
+	int4(4),
+	int5(5),
+	int6(6)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* INACTIVE */
+/* DEFINITION: */
+/* The PSI is not available for incoming traffic. */
+/* LABEL: */
+/* ACTIVE */
+/* DEFINITION: */
+/* The PSI is available for incoming traffic. */
+type enumerated TPSIActivation
+{
+	int0(0),
+	int1(1)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TLocationNumber length(4 .. 16)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TCellGlobalId length(12)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TServiceAreaId length(12)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TLocationAreaId length(8)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TRoutingAreaId length(8)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TGeographicalInformation length(12)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TGeodeticInformation length(16)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TAddressString length(4 .. 28)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.String TSelectedLSAIdentity length(4)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Int TPriority (0 .. 2147483647)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Int TGroupID (0 .. 2147483647)
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* INITIAL_REGISTRATION */
+/* DEFINITION: */
+/* Matches to REGISTER messages that are relater to initial registration. */
+/* LABEL: */
+/* RE-REGISTRATION */
+/* DEFINITION: */
+/* Matches to REGISTER messages that are relater to re-registration. */
+/* LABEL: */
+/* DE-REGISTRATION */
+/* DEFINITION: */
+/* Matches to REGISTER messages that are relater to de-registration. */
+type enumerated TRegistrationType
+{
+	int0(0),
+	int1(1),
+	int2(2)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Int TID (0 .. 2147483647)
+with {
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* ORIGINATING_SESSION */
+/* DEFINITION: */
+/* Originating Session */
+/* LABEL: */
+/* TERMINATING_SESSION */
+/* DEFINITION: */
+/* Terminating Session */
+/* LABEL: */
+/* TERMINATING_UNREGISTERED */
+/* DEFINITION: */
+/* Terminating Session for unregistered user */
+type enumerated TDirectionOfRequest
+{
+	int0(0),
+	int1(1),
+	int2(2)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+/* LABEL: */
+/* SESSION_CONTINUED */
+/* DEFINITION: */
+/* Session Continued */
+/* LABEL: */
+/* SESSION_TERMINATED */
+/* DEFINITION: */
+/* Session Terminated */
+type enumerated TDefaultHandling
+{
+	int0(0),
+	int1(1)
+}
+with {
+  variant "useNumber";
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Int TAgeOfLocationInformation (0 .. 32767)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Boolean TBool
+with {
+  variant "name as uncapitalized";
+};
+
+
+type XSD.Int TSequenceNumber (0 .. 65535)
+with {
+  variant "name as uncapitalized";
+};
+
+
+type record TExtension
+{
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement";
+};
+
+
+type record TShIMSDataExtension
+{
+	TPSIActivation pSIActivation optional,
+	TExtension extension_ optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (pSIActivation) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+};
+
+
+type record TSePoTriExtension
+{
+	record length(0 .. 2) of TRegistrationType registrationType_list,
+	TExtension extension_ optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (registrationType_list) "untagged";
+  variant (registrationType_list[-]) "name as 'RegistrationType'";
+  variant (extension_) "name as 'Extension'";
+};
+
+
+type record TPublicIdentityExtension
+{
+	TIdentityType identityType optional,
+	XSD.AnyURI wildcardedPSI optional,
+	TExtension extension_ optional
+}
+with {
+  variant "name as uncapitalized";
+  variant (identityType) "name as capitalized";
+  variant (wildcardedPSI) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+};
+
+
+type record TSh_Data
+{
+	TPublicIdentity publicIdentifiers optional,
+	TTransparentData repositoryData optional,
+	TShIMSData sh_IMS_Data optional,
+	TCSLocationInformation cSLocationInformation optional,
+	TPSLocationInformation pSLocationInformation optional,
+	TCSUserState cSUserState optional,
+	TPSUserState pSUserState optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as 'tSh-Data'";
+  variant (publicIdentifiers) "name as capitalized";
+  variant (repositoryData) "name as capitalized";
+  variant (sh_IMS_Data) "name as 'Sh-IMS-Data'";
+  variant (cSLocationInformation) "name as capitalized";
+  variant (pSLocationInformation) "name as capitalized";
+  variant (cSUserState) "name as capitalized";
+  variant (pSUserState) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TTransparentData
+{
+	TString serviceIndication,
+	TSequenceNumber sequenceNumber,
+	TServiceData serviceData optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (serviceIndication) "name as capitalized";
+  variant (sequenceNumber) "name as capitalized";
+  variant (serviceData) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TServiceData
+{
+	XSD.String elem
+}
+with {
+  variant "name as uncapitalized";
+  variant (elem) "anyElement";
+};
+
+
+type record TShIMSData
+{
+	TSIP_URL sCSCFName optional,
+	TIFCs iFCs optional,
+	TIMSUserState iMSUserState optional,
+	TChargingInformation chargingInformation optional,
+	TShIMSDataExtension extension_ optional,
+	TBool ericssonUserBarringInfo optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (sCSCFName) "name as capitalized";
+  variant (iFCs) "name as capitalized";
+  variant (iMSUserState) "name as capitalized";
+  variant (chargingInformation) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (ericssonUserBarringInfo) "name as capitalized";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TIFCs
+{
+	record of TInitialFilterCriteria initialFilterCriteria_list,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (initialFilterCriteria_list) "untagged";
+  variant (initialFilterCriteria_list[-]) "name as 'InitialFilterCriteria'";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TCSLocationInformation
+{
+	TLocationNumber locationNumber optional,
+	union {
+		record length(0 .. 1) of TCellGlobalId cellGlobalId_list,
+		record length(0 .. 1) of TServiceAreaId serviceAreaId_list,
+		record length(0 .. 1) of TLocationAreaId locationAreaId_list
+	} choice,
+	TGeographicalInformation geographicalInformation optional,
+	TGeodeticInformation geodeticInformation optional,
+	TISDNAddress vLRNumber optional,
+	TISDNAddress mSCNumber optional,
+	TBool currentLocationRetrieved optional,
+	TAgeOfLocationInformation ageOfLocationInformation optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (locationNumber) "name as capitalized";
+  variant (choice) "untagged";
+  variant (choice.cellGlobalId_list) "untagged";
+  variant (choice.cellGlobalId_list[-]) "name as 'CellGlobalId'";
+  variant (choice.serviceAreaId_list) "untagged";
+  variant (choice.serviceAreaId_list[-]) "name as 'ServiceAreaId'";
+  variant (choice.locationAreaId_list) "untagged";
+  variant (choice.locationAreaId_list[-]) "name as 'LocationAreaId'";
+  variant (geographicalInformation) "name as capitalized";
+  variant (geodeticInformation) "name as capitalized";
+  variant (vLRNumber) "name as capitalized";
+  variant (mSCNumber) "name as capitalized";
+  variant (currentLocationRetrieved) "name as capitalized";
+  variant (ageOfLocationInformation) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TPSLocationInformation
+{
+	union {
+		record length(0 .. 1) of TCellGlobalId cellGlobalId_list,
+		record length(0 .. 1) of TServiceAreaId serviceAreaId_list,
+		record length(0 .. 1) of TLocationAreaId locationAreaId_list
+	} choice,
+	TRoutingAreaId routingAreaId optional,
+	TGeographicalInformation geographicalInformation optional,
+	TGeodeticInformation geodeticInformation optional,
+	TISDNAddress sGSNNumber optional,
+	TBool currentLocationRetrieved optional,
+	TAgeOfLocationInformation ageOfLocationInformation optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (choice) "untagged";
+  variant (choice.cellGlobalId_list) "untagged";
+  variant (choice.cellGlobalId_list[-]) "name as 'CellGlobalId'";
+  variant (choice.serviceAreaId_list) "untagged";
+  variant (choice.serviceAreaId_list[-]) "name as 'ServiceAreaId'";
+  variant (choice.locationAreaId_list) "untagged";
+  variant (choice.locationAreaId_list[-]) "name as 'LocationAreaId'";
+  variant (routingAreaId) "name as capitalized";
+  variant (geographicalInformation) "name as capitalized";
+  variant (geodeticInformation) "name as capitalized";
+  variant (sGSNNumber) "name as capitalized";
+  variant (currentLocationRetrieved) "name as capitalized";
+  variant (ageOfLocationInformation) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TISDNAddress
+{
+	record length(1 .. 9) of TAddressString address_list,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (address_list) "untagged";
+  variant (address_list[-]) "name as 'Address'";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TIdentitySet
+{
+	record of TIMSPublicIdentity iMSPublicIdentity_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (iMSPublicIdentity_list) "untagged";
+  variant (iMSPublicIdentity_list[-]) "name as 'IMSPublicIdentity'";
+};
+
+
+type record TPublicIdentity
+{
+	union {
+		record length(0 .. 1) of TIdentitySet allIdentities_list,
+		record length(0 .. 1) of TIdentitySet registeredIdentities_list,
+		record length(0 .. 1) of TIdentitySet implicitIdentities_list,
+		record length(0 .. 1) of TIdentitySet aliasIdentities_list
+	} choice,
+	record of TMSISDN mSISDN_list,
+	TPublicIdentityExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (choice) "untagged";
+  variant (choice.allIdentities_list) "untagged";
+  variant (choice.allIdentities_list[-]) "name as 'AllIdentities'";
+  variant (choice.registeredIdentities_list) "untagged";
+  variant (choice.registeredIdentities_list[-]) "name as 'RegisteredIdentities'";
+  variant (choice.implicitIdentities_list) "untagged";
+  variant (choice.implicitIdentities_list[-]) "name as 'ImplicitIdentities'";
+  variant (choice.aliasIdentities_list) "untagged";
+  variant (choice.aliasIdentities_list[-]) "name as 'AliasIdentities'";
+  variant (mSISDN_list) "untagged";
+  variant (mSISDN_list[-]) "name as 'MSISDN'";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TInitialFilterCriteria
+{
+	TPriority priority,
+	TTrigger triggerPoint optional,
+	TApplicationServer applicationServer,
+	TExtension extension_ optional,
+	TSIP_URL applicationServerName,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (priority) "name as capitalized";
+  variant (triggerPoint) "name as capitalized";
+  variant (applicationServer) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (applicationServerName) "name as capitalized";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TTrigger
+{
+	TBool conditionTypeCNF,
+	record of TSePoTri sPT_list,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (conditionTypeCNF) "name as capitalized";
+  variant (sPT_list) "untagged";
+  variant (sPT_list[-]) "name as 'SPT'";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TSePoTri
+{
+	TBool conditionNegated optional,
+	record length(1 .. infinity) of TGroupID group_list,
+	union {
+		TString requestURI,
+		TString method,
+		THeader sIPHeader,
+		TDirectionOfRequest sessionCase,
+		TSessionDescription sessionDescription
+	} choice,
+	TSePoTriExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (conditionNegated) "name as capitalized";
+  variant (group_list) "untagged";
+  variant (group_list[-]) "name as 'Group'";
+  variant (choice) "untagged";
+  variant (choice.requestURI) "name as capitalized";
+  variant (choice.method) "name as capitalized";
+  variant (choice.sIPHeader) "name as capitalized";
+  variant (choice.sessionCase) "name as capitalized";
+  variant (choice.sessionDescription) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TSessionDescription
+{
+	TString line,
+	TString content optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (line) "name as capitalized";
+  variant (content) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record THeader
+{
+	TString header,
+	TString content optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (header) "name as capitalized";
+  variant (content) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TApplicationServer
+{
+	TSIP_URL serverName,
+	TDefaultHandling defaultHandling optional,
+	TServiceInfo serviceInfo optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (serverName) "name as capitalized";
+  variant (defaultHandling) "name as capitalized";
+  variant (serviceInfo) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type record TChargingInformation
+{
+	TDiameterURI primaryEventChargingFunctionName optional,
+	TDiameterURI secondaryEventChargingFunctionName optional,
+	TDiameterURI primaryChargingCollectionFunctionName optional,
+	TDiameterURI secondaryChargingCollectionFunctionName optional,
+	TExtension extension_ optional,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (primaryEventChargingFunctionName) "name as capitalized";
+  variant (secondaryEventChargingFunctionName) "name as capitalized";
+  variant (primaryChargingCollectionFunctionName) "name as capitalized";
+  variant (secondaryChargingCollectionFunctionName) "name as capitalized";
+  variant (extension_) "name as 'Extension'";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+};
+
+
+type TSh_Data Sh_Data
+with {
+  variant "name as 'Sh-Data'";
+  variant "element";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'http://schemas.ericsson.com/upg/dm/hss-sh/4.1'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

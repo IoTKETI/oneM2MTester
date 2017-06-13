@@ -1,0 +1,112 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Koppany, Csaba
+--   Kulcsar, Endre
+--   Szabados, Kristof
+--   Szabo, Janos Zoltan – initial implementation
+--
+--/////////////////////////////////////////////////////////////////////////////
+Test4-known-errors
+
+-- some parametrizable fields are not implemented in May 2003 for Object Classes
+-- &FixedTypeValueSetField , &objectField, &ObjectSetField
+
+DEFINITIONS
+
+AUTOMATIC TAGS
+
+::=
+
+BEGIN
+
+ASN1-Type5  ::= ENUMERATED {a(3) ,b, ..., c}
+
+MY-PARAMETRIZED-OBJECT-CLASS2
+{PAR-ASN1-Type1,
+ INTEGER : par-Value1,
+ INTEGER : par-Value3,
+ INTEGER : par-Value4,
+ INTEGER : par-Value5,
+ INTEGER : par-Value6,
+ PAR-ASN1-Type2,
+ PAR-OBJECTCLASS1
+ }
+::= CLASS
+{
+&TypeField OPTIONAL,
+&fixedTypeValueField                 PAR-ASN1-Type1   UNIQUE OPTIONAL,
+&additionalFieldforValueField1       INTEGER DEFAULT par-Value1,
+&additionalFieldforValueField3       BIT STRING { first(par-Value3), second (1), last-in-first-octet(7) },
+&additionalFieldforValueField4       ASN1-Type5,
+&additionalFieldforValueField5       INTEGER (par-Value5..par-Value6),
+
+&FixedTypeValueSetField              PAR-ASN1-Type2,
+&objectField                         PAR-OBJECTCLASS1 OPTIONAL,
+&ObjectSetField                      PAR-OBJECTCLASS1 OPTIONAL
+}
+
+MY-PARAMETRIZED-OBJECT-CLASS2-INSTANCE ::= MY-PARAMETRIZED-OBJECT-CLASS2
+{
+INTEGER,
+111,
+0,
+2,
+10,
+18,
+
+OCTET STRING,
+RANAP-ELEMENTARY-PROCEDURE
+}
+
+-- ****************************************************************************
+myParametrizedObject-2
+
+{PAR-ASN1-Type3, -- BIT STRING
+INTEGER : par-int,
+INTEGER : par-int2,
+BIT STRING : par-bitstring,
+ASN1-Type5 : par-enum,
+INTEGER : par-int3,
+
+OCTET STRING : Par-OctetStringValueSet,
+RANAP-ELEMENTARY-PROCEDURE : par-ObjectClass1,
+RANAP-ELEMENTARY-PROCEDURE : PAR-ObjectSet1
+}
+MY-PARAMETRIZED-OBJECT-CLASS2-INSTANCE
+::=
+{
+&TypeField                       PAR-ASN1-Type3,   -- BIT STRING
+&fixedTypeValueField             par-int,
+&additionalFieldforValueField1   par-int2,
+&additionalFieldforValueField3   par-bitstring,
+&additionalFieldforValueField4   par-enum,
+&additionalFieldforValueField5   par-int3,
+
+&FixedTypeValueSetField         Par-OctetStringValueSet,
+&objectField                    par-ObjectClass1,
+&ObjectSetField                 PAR-ObjectSet1
+}
+
+myObject-3  MY-PARAMETRIZED-OBJECT-CLASS2-INSTANCE
+::=
+myParametrizedObject-2
+{
+  ASN1-Type3,
+  66,
+  88,
+ '001100'B,
+  a,
+  6,
+  {'FF'H | 'AA'H | '01'H },
+  reset,
+ { reset | resetResource }
+}
+
+END

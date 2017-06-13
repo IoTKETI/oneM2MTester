@@ -1,0 +1,86 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Baranyi, Botond
+--
+--/////////////////////////////////////////////////////////////////////////////
+
+MiniRanap
+
+-- This module contains a simplified version of the type DirectTransferInformationList-RANAP-RelocInf
+-- from the RANAP protocol module and any elements needed to recreate it.
+-- Used for tesing the JSON schema generator on an ASN.1 ellipsis type
+
+DEFINITIONS 
+
+AUTOMATIC TAGS ::=
+
+BEGIN
+
+IMPORTS ;
+
+-- RANAP-CommonDataTypes
+Criticality		::= ENUMERATED { reject, ignore, notify }
+
+Presence		::= ENUMERATED { optionalValue, conditional, mandatory }
+
+ProtocolIE-ID		::= INTEGER (0..65535)
+
+-- RANAP-Containers
+RANAP-PROTOCOL-IES ::= CLASS {
+	&id				ProtocolIE-ID 					UNIQUE,
+	&criticality			Criticality,
+	&Value,
+	&presence			Presence
+}
+WITH SYNTAX {
+	ID				&id
+	CRITICALITY			&criticality
+	TYPE				&Value
+	PRESENCE			&presence
+}
+
+ProtocolIE-ContainerList {INTEGER : lowerBound, INTEGER : upperBound, RANAP-PROTOCOL-IES : IEsSetParam} ::=
+	SEQUENCE (SIZE (lowerBound..upperBound)) OF
+	ProtocolIE-Container {{IEsSetParam}}
+
+ProtocolIE-Container {RANAP-PROTOCOL-IES : IEsSetParam} ::=
+	SEQUENCE (SIZE (0..maxProtocolIEs)) OF
+	ProtocolIE-Field {{IEsSetParam}}
+
+ProtocolIE-Field {RANAP-PROTOCOL-IES : IEsSetParam} ::= SEQUENCE {
+	id				RANAP-PROTOCOL-IES.&id				({IEsSetParam}),
+	criticality			RANAP-PROTOCOL-IES.&criticality			({IEsSetParam}{@id}),
+	valueField				RANAP-PROTOCOL-IES.&Value			({IEsSetParam}{@id})
+}
+
+-- RANAP-PDU-Contents
+DirectTransfer-IE-ContainerList	{ RANAP-PROTOCOL-IES		: IEsSetParam }	::=
+  ProtocolIE-ContainerList		{ 1, maxNrOfDTs,				{IEsSetParam} }
+
+DirectTransferInformationList-RANAP-RelocInf		::=
+  DirectTransfer-IE-ContainerList { {DirectTransferInformationItemIEs-RANAP-RelocInf} }
+
+DirectTransferInformationItemIEs-RANAP-RelocInf RANAP-PROTOCOL-IES ::= {
+	{ ID id-DirectTransferInformationItem-RANAP-RelocInf
+							CRITICALITY ignore	TYPE INTEGER --DirectTransferInformationItem-RANAP-RelocInf
+																PRESENCE mandatory	},
+	...
+}
+
+-- RABAP-Constants
+maxNrOfDTs							INTEGER ::= 15
+
+id-DirectTransferInformationItem-RANAP-RelocInf	INTEGER ::= 80
+
+maxProtocolIEs						INTEGER ::= 65535
+
+END
+
+

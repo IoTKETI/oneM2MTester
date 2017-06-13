@@ -1,0 +1,1728 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:        
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- IntegratedSite.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_ericsson_com_is_isco_IntegratedSite_R4L06_R4AB_1_02 {
+
+
+import from XSD all;
+
+
+import from tail_f_com_ns_confd_1_0_e all;
+
+
+import from www_ericsson_com_is_isco_IsTypes_R4L06_R4AB_1_02_e all;
+
+
+type record DataModelVersionType_10
+{
+	XSD.Integer major,
+	XSD.Integer minor
+}
+with {
+  variant "name as 'dataModelVersionType-10'";
+};
+
+
+/* Data to specify FTP server info. */
+/* Hostname to FTP server. */
+/* Username to FTP server. */
+/* Password to FTP server. */
+/* Absolute path including filename. */
+type record FtpData
+{
+	XSD.Token host,
+	XSD.Token user,
+	XSD.Token password,
+	XSD.Token path
+};
+
+
+/* The blade system product number (CSA product number). */
+/* The revision of the blade system product (CSA product revision). */
+type record BsProdFilterType_1
+{
+	XSD.Token prodNo,
+	XSD.Token prodRev
+}
+with {
+  variant "name as 'bsProdFilterType-1'";
+};
+
+
+/* Data to specify job status during its execution.
+	A description of "jobs" can be found in the document "Service Guide - Software", 
+	6/154 43-CNA 113 13 Uen. */
+/* Date and time when the job was ordered. */
+/* Indicator of job status. */
+/* Possible result of a job action. */
+/* Textual description of additional info about the job. */
+/* Current progress step of the job. This parameter is used 
+	    together with jobLastStep to 
+	    be able to present rough progress tracking to the user.
+	    For example: "'jobProgress' of 'jobLastStep' steps complete" */
+/* Last progress step of the job. This parameter is used 
+	    together with jobProgress to 
+	    be able to present rough progress tracking to the user.
+	    For example: "'jobProgress' of 'jobLastStep' steps complete" */
+/* Determines if progress reports should be issued during the job.
+	    If this parameter is true, progress reports will be issued at 
+	    each step of the job. If this parameter is false, no progress 
+	    reports are issued. When a job finishes, a report describing 
+	    the result of the job is however always issued. */
+type record JobData
+{
+	XSD.DateTime jobDateOrdered,
+	JobStatusType_34 jobStatus,
+	JobResultType_35 jobResult,
+	XSD.Token jobInfo,
+	XSD.UnsignedInt jobProgress,
+	XSD.UnsignedInt jobLastStep,
+	XSD.Boolean jobProgressReport
+};
+
+
+type XSD.Token DnsDomainType_14 (pattern "[a-zA-Z]+(.[a-zA-Z]*)*")
+with {
+  variant "name as 'dnsDomainType-14'";
+};
+
+
+/* Inter-subrack link type definition. The valid values 
+      corresponds to using a inter-subrack link board
+      or connecting the subracks using MXB front ports. */
+type XSD.Token InterSubrackLink_HwmIslType (pattern "islb|frontPort");
+
+
+/* The knock-out preference of a blade.
+       \"protected\" reflects a mode where the blade 
+       is immune to shutdown or lock requests. */
+type XSD.Token HwmKnockOutPreference (pattern "normal|protected");
+
+
+type XSD.Token UpdateModeType_9 (pattern "unsafe|readOnly|safe|preliminary")
+with {
+  variant "name as 'updateModeType-9'";
+};
+
+
+/* This datatype defines the valid redundancy groups for bs blades. */
+type XSD.Token HwmRedundancyGroups (pattern "0|1|2|3|4|5|6|7|8|9");
+
+
+/* HwmSlotState type definition. This type describes the different slot states.
+      Used and unused corresponds to whether the slot is assigned to a blade within 
+      a blade system and vice versa.Occupied and empty corresponds to whether a 
+      physical blade is inserted in the slot and vice versa. */
+type XSD.Token Slot_HwmSlotState (pattern "unusedEmpty|usedEmpty|unusedOccupied|usedOccupied");
+
+
+type record of ObjectRef RelatedSDPsType_32
+with {
+  variant "name as 'relatedSDPsType-32'";
+  variant "list";
+};
+
+
+type XSD.Integer Subrack1IdType_22 (0 .. 31)
+with {
+  variant "name as 'subrack1IdType-22'";
+};
+
+
+type XSD.Integer RlspLinkDownThresholdType_12 (0 .. 65535)
+with {
+  variant "name as 'rlspLinkDownThresholdType-12'";
+};
+
+
+type XSD.Integer SubrackIdType_3 (0 .. 31)
+with {
+  variant "name as 'subrackIdType-3'";
+};
+
+
+type XSD.Integer Subrack2IdType_26 (0 .. 31)
+with {
+  variant "name as 'subrack2IdType-26'";
+};
+
+
+type XSD.Integer IdentityType_7 (0 .. 4096)
+with {
+  variant "name as 'identityType-7'";
+};
+
+
+type XSD.Integer NumberType_21 (0 .. 25)
+with {
+  variant "name as 'numberType-21'";
+};
+
+
+type XSD.Integer SlotNoType_4 (0 .. 25)
+with {
+  variant "name as 'slotNoType-4'";
+};
+
+
+type XSD.Integer PhysicalAddrPlug0Type_18 (0 .. 15)
+with {
+  variant "name as 'physicalAddrPlug0Type-18'";
+};
+
+
+/* The operational state of blades and blade systems.
+      This state reflects if the entity is on or off. */
+type XSD.Token HwmOperationalState (pattern "disabled|enabled");
+
+
+type XSD.Integer PhysicalAddrPlug1Type_19 (0 .. 15)
+with {
+  variant "name as 'physicalAddrPlug1Type-19'";
+};
+
+
+/* Describes how to interpret a given file name and path when
+	downloading files.
+	For exact file match strategy, all files that exactly
+	match the given file name will match.
+	For prefix file match strategy, all files that match
+	the given prefix will match.
+	If exact or prefix has been selected and if the path ends
+	with a directory name, all files in that directory will match.
+	The value unknown is deprecated. */
+type XSD.Token SwmMatchStrategy (pattern "exact|prefix|unknown");
+
+
+type record of ObjectRef BladeSwgRefsType_2
+with {
+  variant "name as 'bladeSwgRefsType-2'";
+  variant "list";
+};
+
+
+/* This datatype defines the valid characters of name attributes. */
+type XSD.Token HwmValidNameCharacters (pattern "[-a-zA-Z0-9_\\\(\) .:;]*");
+
+
+/* The bus type used by a blade. */
+type XSD.Token HwmBusType (pattern "ipmi|mbus");
+
+
+type enumerated Subrack1XslotType_23
+{
+	int0(0),
+	int25(25)
+}
+with {
+  variant "useNumber";
+  variant "name as 'subrack1XslotType-23'";
+};
+
+
+type XSD.Integer Subrack1PslotType_24 (0 .. 25)
+with {
+  variant "name as 'subrack1PslotType-24'";
+};
+
+
+type XSD.Token JobResultType_35 (pattern "ok|inputError|executionError|unknown")
+with {
+  variant "name as 'jobResultType-35'";
+};
+
+
+type enumerated Subrack2XslotType_27
+{
+	int0(0),
+	int25(25)
+}
+with {
+  variant "useNumber";
+  variant "name as 'subrack2XslotType-27'";
+};
+
+
+type XSD.Integer Subrack2PslotType_28 (0 .. 25)
+with {
+  variant "name as 'subrack2PslotType-28'";
+};
+
+
+type XSD.Integer PhysicalAddrPlug3Type_20 (0 .. 15)
+with {
+  variant "name as 'physicalAddrPlug3Type-20'";
+};
+
+
+type XSD.Token StatusType_33 (pattern "complete|incomplete|inconsistent")
+with {
+  variant "name as 'statusType-33'";
+};
+
+
+type XSD.Token JobStatusType_34 (pattern "notStarted|ongoing|complete")
+with {
+  variant "name as 'jobStatusType-34'";
+};
+
+
+type enumerated DummyEmptyType
+{
+	x
+}
+with {
+  variant "text 'x' as ''";
+};
+
+
+type XSD.Integer WidthType_16 (1 .. 12)
+with {
+  variant "name as 'widthType-16'";
+};
+
+
+type XSD.Integer MaskType_5 (0 .. 32)
+with {
+  variant "name as 'maskType-5'";
+};
+
+
+type XSD.Integer MaskType_6 (0 .. 32)
+with {
+  variant "name as 'maskType-6'";
+};
+
+
+type XSD.Integer RlspLinkUpThresholdType_13 (0 .. 65535)
+with {
+  variant "name as 'rlspLinkUpThresholdType-13'";
+};
+
+
+/* The availability status of blades and blade systems.
+       This status is set by the system, depending on the 
+       availability conditions of the concerned unit. */
+type XSD.Token HwmAvailabilityStatus (pattern "available|failed|offLine|dependency|degraded|upgrading|startingUp|goingOffLine|notInstalled|powerOff");
+
+
+/* The administrative state of blades and blade systems.
+      This state reflects what the administrator has done. */
+type XSD.Token HwmAdministrativeState (pattern "locked|shuttingDown|unlocked");
+
+
+type XSD.Integer PbitsType_8 (0 .. 7)
+with {
+  variant "name as 'pbitsType-8'";
+};
+
+
+type XSD.Token IslTypeType_30 (pattern "islb|frontPort")
+with {
+  variant "name as 'islTypeType-30'";
+};
+
+
+type XSD.Token TypeType_31 (pattern "bladeSystemInformation|bladeInformation|application|rootFileSystem|kernel|correction|ipmi")
+with {
+  variant "name as 'typeType-31'";
+};
+
+
+type XSD.Integer Subrack1PortType_25 (1 .. 6)
+with {
+  variant "name as 'subrack1PortType-25'";
+};
+
+
+type XSD.Integer IdType_17 (0 .. 31)
+with {
+  variant "name as 'idType-17'";
+};
+
+
+type XSD.Integer Subrack2PortType_29 (1 .. 6)
+with {
+  variant "name as 'subrack2PortType-29'";
+};
+
+
+type XSD.Token ModeType_15 (pattern "prepare|publish|accept|reject|purge")
+with {
+  variant "name as 'modeType-15'";
+};
+
+
+type XSD.Integer RlspMarkerGenerateIntervalType_11 (10 .. 200)
+with {
+  variant "name as 'rlspMarkerGenerateIntervalType-11'";
+};
+
+
+/* Management information model for the integrated site.
+    This also the top model in the configuration structure under which all
+    blade system specific models are mounted.
+
+    Hardware management, software management and network configuration are the
+    services that are available through this model in IS 2.0 perspective. */
+/* A collection of administrative data for the entire site. */
+/* Human-readable name for the site. */
+/* IS Customer identification code. */
+/* System restart. */
+/* Returns true if a SIS sequential restart is ongoing, otherwise false. */
+/* Parent of all blade systems. */
+/* This class describes a blade system. 
+      It serves as a mount point for the blade system specific model. */
+/* A required user friendly blade system name. The name must be unique within the site
+        and can only be set once. */
+/* An optional blade system alias. The default value of the alias is the blade system name.
+        The alias can be updated as long as the blade system state is enabled/available. */
+/* An identifier for the blade system. This number increases in steps of 1 for each
+        created blade system. */
+/* Name of the blade system type. */
+/* Reference to the software group (SWG) that the blade system implements. */
+/* Optional reference to the software correction package (SCP) applied to the software group. */
+/* The administrative state of the blade system. */
+/* The operational state of the blade system. */
+/* The availability status of the blade system. */
+/* Optional reference to the blade system domain that the blade system belongs to.
+        A blade system domain is a purely logical concept that enables 
+        grouping of  blade systems. */
+/* IP address of the blade system OAM Master. */
+/* The reference to the external boot server class (if any) that
+    		this blade system has:
+            /IntegratedSite/NetworkConfiguration/ExternalBootServer */
+/* A flag which tells if a private network should be
+    		automatically created when the bladesystem is created. */
+/* If the blade system has a management information model, this
+			  attributes shows the namespace for the currently active software
+			  on the blade system. If the blade system does not have a management 
+                          information model, this attribute does not have a value. */
+/* This class describes a blade. 
+      A blade is identified by a subrack number and a slot number. */
+/* A reference to the associated subrack, which is the value of 'subrackId' 
+	for the associated subrack. The subrack identifier, where the blade is located at. */
+/* The slot number for this blade within the subrack. */
+/* The slot label of the blade. It will only be set at creation.
+	This should be used in alarms related to the slot to inform the
+	operator of what position in the subrack the blade is localised.
+	For E-GEM (Enhanced Generic Ericsson Magazine) subracks it will result in 
+        a string, for example X02 for slot 0 up to X80 for slot 25. */
+/* Reference to the type of the blade. */
+/* Reference to the software group with the lowest allowed revision for the blade. */
+/* Reference to the software group installed on the blade. */
+/* Indicates if this blade is a BSOM candidate. */
+/* Set to protected if the  blade should not be locked or shutdown before the 
+	main switch blade. */
+/* An optional user friendly blade name, which is always possible to set.
+	Default value for non-infrastructure blades is an empty string.
+        MXB blade user label defaults to blade type and subrack-slot, for example
+        \"MXB 0-0\" */
+/* The administrative state of the blade. */
+/* The operational state of the blade. */
+/* The availability status of the blade. */
+/* The type of maintenance bus on the connected blade. */
+/* The product number of the blade. */
+/* The product revision of the blade. */
+/* The serial number of the blade. */
+/* The product name of the blade. */
+/* The vendor name of the blade. */
+/* The manufacturing date of the blade. */
+/* The aggregated MAC address of the blade. */
+/* The left link MAC address of the blade. Only used by some blades. */
+/* The right link MAC address of the found Blade. Only used by some blades. */
+/* The date when the blade was last changed. */
+/* The redundancy group for this blade within the blade system.
+        This parameter is used to protect the last blade in the blade system 
+        from getting restarted by LanFM. */
+/* IP address on the IS Boot (ISBS) subnet. */
+/* IP address on the IS OAM Boot (ISOB) subnet. */
+/* IP address on the IS Local Craft (ISLCT) subnet. */
+/* A Blade may have one or more resilient interfaces
+      to the backplane. Such an interface is called a
+      Link Service Access Point, which is the
+      point where you access layer 2. Link Service Access Points are
+      automatically created and deleted along with the
+      hosting blade. */
+/* The id of a LinkSap is a number from 0 to X within the slot. */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_Blade_LinkSap">
+                        <xs:selector xpath="IntegratedSite:LinkSap"/>
+                        <xs:field xpath="IntegratedSite:id"/>
+                      </xs:key> */
+/* The MO branch where the blade system specific
+      Network resources are mapped to common Integrated Site
+      resources. This mapping activity must be performed before
+      a new blade or blade system successfully can be
+      unlocked via the Hardware service. Some blade
+      systems have partly pre-registered 
+      network requirements, while others demand that
+      you read the corresponding information from
+      separate Operation Procedure Instructions and
+      manually register the blade system network
+      requirements. The pre-registered network
+      requirements automates parts of the blade
+      system-specific configuration activity.
+
+      In an Integrated Site, the blade systems obtain
+      their actual network configuration dynamically in
+      runtime. When you change the network
+      configuration it will affect blade systems. In
+      order to minimize the disturbance of active blade
+      systems, the changes are normally applied in a
+      separate storage which is not visible to the
+      blade systems. In order to make use of the new
+      unpublished configuration, it must explicitly be
+      published by altering the updateMode. If the new
+      settings introduces severe problems the
+      configuration can be reverted to the old settings
+      by altering the updateMode.
+
+      The common Network configuration including
+      updateMode and its publish mechanism is specified
+      in class /IntegratedSite/NetworkConfiguration. */
+/* A BS IP Traffic Class is the
+       requirement a blade system has of an IS IP
+       Traffic Class.
+
+       BS IP Traffic Classes can either be created
+       manually by the operator or they can be automatically
+       created from pre-registered network requirements
+       bundled with the blade system software. Regardless 
+       of how they are created, each one needs to be
+       mapped to an IS IP Traffic Class before the blades
+       can be unlocked via the Hardware service. The
+       mapping is done with the 'isIpTrafficClassRef'
+       attribute.
+
+       Different instances of a blade system type may
+       call their BS IP Traffic Classes the same thing but
+       in the end the IS Site Designer may choose to
+       map them to the same or different IS IP Traffic
+       Classes. */
+/* The name of the BS IP Traffic Class. It is
+         unique within the blade system. */
+/* A short description of The BS IP Traffic Class. */
+/* The mapping to a corresponding IS IP Traffic
+	Class. This mapping must be done before the
+	blades of the blade system can be unlocked.
+    Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsIpTrafficClass */
+/* A BS LAN Traffic Class is the
+	requirement a blade system has of an IS LAN
+	Traffic Class. Different instances of a Blade
+	System type may call their BS Traffic Classes
+	the same thing but in the end the IS Site
+	Designer may choose to map them to the same or
+	different IS LAN Traffic Classes.
+
+       	BS LAN Traffic Classes can either be created
+       	manually by the operator or they can be automatically
+       	created from pre-registered network requirements
+       	bundled with the blade system software. Regardless 
+       	of how they are created, each one needs to be
+       	mapped to an IS LAN Traffic Class before the blades
+       	can be unlocked via the Hardware service. The
+       	mapping is done with the 'isLanTrafficClassRef'
+       	attribute. */
+/* Name of the BS LAN Traffic Class. It is unique within the blade system. */
+/* Short description of the BS LAN Traffic Class. */
+/* The mapping to a corresponding IS LAN Traffic
+	Class. This mapping must be done before the
+	blades of the blade system can be unlocked.
+    Mapped to:
+    /IntegratedSite/NetworkConfiguration/IsLanTrafficClass */
+/* A BS Logical Network is associated to
+       one IS Logical Network. A BS Logical Network
+       is the requirement a blade system has of an
+       IS Logical Network.
+
+       BS Logical Networks can either be created
+       manually by the operator or they can be
+       automatically created from pre-registered
+       network requirements bundled with the Blade
+       System software. Regardless of how they are
+       created, each one needs to be mapped to an IS
+       Logical Network before the blades can be
+       unlocked. The mapping is done with the
+       'isLogicalNetworkRef' attribute.
+
+       Different instances of a blade system type may call
+       their BS Logical Networks the same thing but in
+       the end the IS Site Designer can choose to map
+       them to the same or different IS Logical
+       Network. */
+/* Name of the BS logical network. It is unique within the blade system. */
+/* Short description of the BS Logical Network. */
+/* Flag that shows whether the BS Logical Network
+	is private for this blade system or if it may
+	be shared among several blade systems. */
+/* The mapping to a corresponding IS Logical Network. This
+	mapping must be done before the blades of the
+	blade system can be unlocked.
+	Mapped to:
+      /IntegratedSite/NetworkConfiguration/IsLogicalNetwork */
+/* A BS Subnet is associated to one IS
+       Subnet. A BS Subnet is the requirement a
+       blade system has of an IS Subnet.
+
+       BS Subnets can either be created manually by the
+       operator or they can be automatically created
+       from pre-registered network requirements bundled
+       with the blade system software. Regardless of
+       how they are created, each one needs to be
+       mapped to both a BS VLan and an IS Subnet before
+       blades can be unlocked via the Hardware servic */
+/* e.
+       The mappings are done with the
+       'bsVlanRef' and 'isSubnetRef' attributes.Each BS 
+       Subnet contains one or more BS Subnet
+       Segments.
+
+       Different instances of a blade system type may
+       call their BS Subnets the same thing but in the
+       end the IS Site Designer can choose to map them
+       to the same or different IS Subnet. */
+/* Name of the BS Subnet. It is unique within the BS Logical Network. */
+/* Short description of the BS Subnet. */
+/* The mapping to a corresponding BS Vlan. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to class:
+     /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsVlan */
+/* The mapping to a corresponding IS Subnet. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsLogicalNetwork/IsSubnet */
+/* A BS Subnet Segment is associated to one
+       IS Subnet Segment. A BS Subnet Segment is the
+       requirement a blade system has of an IS Subnet
+       Segment.
+
+       BS Subnet Segments can either be created manually
+       by the operator or they can be automatically created from
+       pre-registered network requirements bundled with
+       the blade system software. Regardless of how they
+       are created, each one needs to be mapped to an IS
+       Subnet Segment before the blades can be unlocked
+       via the Hardware service.  The mapping is done
+       with the 'isSubnetSegmentRef' attribute.
+
+       Different instances of a blade system type may
+       call their BS Subnet Segments the same thing but
+       in the end the IS Site Designer can choose to
+       map them to the same or different IS Subnet
+       Segment. */
+/* Name of the BS Subnet Segment. It is unique within the BS Subnet. */
+/* Short description of the BS Subnet Segment. */
+/* Required number of IP addresses in the corresponding IS Subnet Segment. */
+/* Flag that controls whether the corresponding IS
+	Subnet Segment is required to have DHCP enabled
+	or not. */
+/* Flag that controls whether the corresponding IS
+	Subnet Segment is required to have a router
+	configured or not. */
+/* The mapping to a corresponding IS Subnet
+	Segment. The mapping here must be done before
+	the blades of the blade system can be unlocked.
+    Mapped to:
+     /IntegratedSite/NetworkConfiguration/IsLogicalNetwork/IsSubnet/IsSubnetSegment */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork_BsSubnet_BsSubnetSegment">
+                                    <xs:selector xpath="IntegratedSite:BsSubnetSegment"/>
+                                    <xs:field xpath="IntegratedSite:name"/>
+                                  </xs:key> */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork_BsSubnet">
+                              <xs:selector xpath="IntegratedSite:BsSubnet"/>
+                              <xs:field xpath="IntegratedSite:name"/>
+                            </xs:key> */
+/* A BS VLAN is mapped to one IS VLAN. A BS VLAN is
+       the requirement a blade system has of an IS
+       VLAN. Different instances of a blade system type
+       may call their BS VLANs the same thing but in the
+       end the IS Site Designer can choose to map them
+       to the same or different IS VLAN.
+
+       BS VLANs can either be created manually by the
+       operator or they can be automatically created
+       from pre-registered network requirements bundled
+       with the blade system software.  Regardless of
+       how they are created, each one needs to be
+       mapped to an IS VLAN before the blades can be
+       unlocked. The mapping is done with the
+       'isVlanRef' attribute. */
+/* Name of the BS VLAN. It is unique within the blade system. */
+/* Short description of the BS VLAN. */
+/* Setting the private attribute to true, means
+          that the corresponding IS VLAN can not be
+          used by other blade systems. The IS VLAN is
+          private for this particular blade system. */
+/* The mapping to a corresponding IS VLAN. This
+	mapping must be done before the blades of the
+	blade system can be unlocked. Mapped to class:
+     /IntegratedSite/NetworkConfiguration/IsVlan */
+/* There is a BS VLAN Service Access Point (BSVSAP)
+      for each Link Service Access Point that an IS
+      VLAN straddles. It is per BS VLAN Service Access
+      Point that certain VLAN properties are configured
+      (such as if it is mandatory to enable isolation protection).
+
+      BS VLAN Service Access Points can either be
+      created manually by the operator or they can be
+      automatically created from pre-registered network
+      requirements bundled with the blade system
+      software. Regardless of how they are created,
+      each one needs to be mapped to a Link SAP before
+      the blades can be unlocked.  The mapping is done
+      with the 'linkSapRef' attribute. */
+/* Name of the BS VLAN SAP. It is unique within the BS VLAN. */
+/* Short description of the BS VLAN SAP. */
+/* Flag which controls whether this BS VLAN SAP
+	makes static or dynamic use of the
+	corresponding IS VLAN. */
+/* Flag which controls whether this BS VLAN SAP should be 
+	isolation protected or not. */
+/* A mapping to the corresponding Link Service Access Point.
+    Mapped to:
+     /IntegratedSite/BladeSystems/BladeSystem/Blade/LinkSap */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsVlan_BsVlanSap">
+                              <xs:selector xpath="IntegratedSite:BsVlanSap"/>
+                              <xs:field xpath="IntegratedSite:name"/>
+                            </xs:key> */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsIpTrafficClass">
+                        <xs:selector xpath="IntegratedSite:BsIpTrafficClass"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLanTrafficClass">
+                        <xs:selector xpath="IntegratedSite:BsLanTrafficClass"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsLogicalNetwork">
+                        <xs:selector xpath="IntegratedSite:BsLogicalNetwork"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key>
+                      <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_BsNetworkConfiguration_BsVlan">
+                        <xs:selector xpath="IntegratedSite:BsVlan"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key> */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem_Blade">
+                  <xs:selector xpath="IntegratedSite:Blade"/>
+                  <xs:field xpath="IntegratedSite:subrackId"/>
+                  <xs:field xpath="IntegratedSite:slotNo"/>
+                </xs:key> */
+/* <xs:key name="key_IntegratedSite_BladeSystems_BladeSystem">
+            <xs:selector xpath="IntegratedSite:BladeSystem"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key> */
+/* The purpose of the Hardware Management function is to make it possible to manage 
+     the Hardware Inventory (HWI) for the Integrated Site and to present its content via ISM
+     and Common Management Framework (CMF). */
+/* The subrack and slot of the active SIS (OM role). The format is "subrack.slot". */
+/* This class describes a blade system domain.A blade system domain 
+      is a purely logical concept that enables grouping of blade systems. */
+/* The blade system domain name. */
+/* The description of the blade system domain. */
+/* This class describes a blade type. A blade type points out pairs of blade hardware product 
+      identity (ROJ-number) and blade software groups (BL-SWG) comprising the kernel and 
+      root file system. Blade types are registered when downloading blade system software. */
+/* The blade type product number, for example \"CNA12801\" */
+/* The blade software group identifier, for example \"CXS10138\" */
+/* The blade software group revision, for example \"R4A01\" */
+/* Reference to corresponding blade software group,
+       for example with id \"CXS10138\" and revision \"R4A01\". This is the installed
+       software of the blade type but not necessarily the active software. */
+/* The name of the blade type, for example \"EXB\" */
+/* The width of the blade. The data type unit is number of slots */
+/* The 1G links used by the blade type, for example \"0,1\". Start counting from the leftmost backplane position. */
+/* The 1G links used for link aggregation by the blade type, for example \"0-1\". Start counting from the leftmost backplane position. */
+/* The 10G links used by the blade type, for example \"0,1\". Start counting from the leftmost backplane position. */
+/* True if possible to read product info via the maintenance bus. */
+/* True if this is a MXB type. */
+/* Deprecated. Kept for backwards compatibility.
+	Only valid for MXBs. A list of slots that have 1G links. 
+	Could be a single slot or a range or a combination thereof. 
+	Examples: \"1-24\" or \"1,3-13,15-24\". */
+/* Deprecated. Kept for backwards compatibility.
+	Only valid for MXBs. Specifies which slots can be used 
+	for link aggregation. Ranges are specified in the form \"1-12,13-24\". */
+/* True if the blade uses external boot server. */
+/* This class describes an inter-subrack link. */
+/* The identifier of the first subrack. */
+/* The position of the main switch board that terminates
+         the inter-subrack link in the first subrack. */
+/* The position of the physical board that terminates
+        the inter-subrack link in the first subrack. The value
+        of this attribute is equal to subrack1Xslot if the link
+        is configured with MXB front ports. */
+/* The termination port on the physical board indentified
+        by subrack1Pslot. */
+/* The identifier of the second subrack. */
+/* The position of the main switch board that terminates
+                   the inter-subrack link in the second subrack. */
+/* The position of the physical board that terminates
+        the inter-subrack link in the second subrack. The value
+        of this attribute is equal to subrack2Xslot if the link
+        is configured with MXB front ports. */
+/* The termination port on the physical board indentified
+         by subrack2Pslot. */
+/* Type definition of the inter-subrack link. */
+/* An optional user friendly inter-subrack link name. */
+/* This class describes a subrack. */
+/* The subrack identifier. */
+/* The subrack type, for example \"EGEM\" */
+/* An optional user friendly subrack name. */
+/* The subrack position in the cabinet. */
+/* The cabinet position in the site. */
+/* The site location, for example the visiting address. */
+/* Available slots for 1G switch links. Information is read from the type 
+	of MXB that is created in the subrack. */
+/* Available slots for 10G switch links. Information is read from the type 
+	of MXB that is created in the subrack. */
+/* Links ranges for (1G) link aggregation. Information is read from the
+	type of MXB that is created in the subrack. */
+/* The value of the physical plug 0. */
+/* The value of the physical plug 1. */
+/* The value of the physical plug 3. */
+/* Reference to the blade system SWG of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0. */
+/* Optional reference to the blade system SCP of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0. */
+/* Reference to the blade SWG of the left MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0. */
+/* Reference to the blade system SWG of the right MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0. */
+/* Optional reference to the blade system SCP of the right 
+        MXB in the subrack. If not given the system will use 
+        the same as the MXB in subrack 0. */
+/* Reference to the blade SWG of the right MXB in the subrack.
+        If not given the system will use the same as the
+        MXB in subrack 0. */
+/* This class corresponds to slots, there is one instance 
+      for each slot. The slots are grouped per subrack. A slot is
+      identified by the subrack identifier and slot number. */
+/* The value of this attribute identifies the
+	slot position within the subrack. */
+/* See HwmSlotState description. */
+/* Optional reference to the blade system that uses this 
+	slot. The value of this attribute will only have meaning in a 
+	conceptual row if the value of hwmSlotState instance is either
+	usedOccupied  or usedEmpty in the same conceptual row,
+	which means that there is a blade system created using this slot. */
+/* <xs:key name="key_IntegratedSite_Hardware_Subrack_Slot">
+                  <xs:selector xpath="IntegratedSite:Slot"/>
+                  <xs:field xpath="IntegratedSite:number"/>
+                </xs:key> */
+/* <xs:key name="key_IntegratedSite_Hardware_BladeSystemDomain">
+            <xs:selector xpath="IntegratedSite:BladeSystemDomain"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_BladeType">
+            <xs:selector xpath="IntegratedSite:BladeType"/>
+            <xs:field xpath="IntegratedSite:type"/>
+            <xs:field xpath="IntegratedSite:swgProdNo"/>
+            <xs:field xpath="IntegratedSite:swgProdRev"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_InterSubrackLink">
+            <xs:selector xpath="IntegratedSite:InterSubrackLink"/>
+            <xs:field xpath="IntegratedSite:subrack1Id"/>
+            <xs:field xpath="IntegratedSite:subrack1Xslot"/>
+            <xs:field xpath="IntegratedSite:subrack1Pslot"/>
+            <xs:field xpath="IntegratedSite:subrack1Port"/>
+            <xs:field xpath="IntegratedSite:subrack2Id"/>
+            <xs:field xpath="IntegratedSite:subrack2Xslot"/>
+            <xs:field xpath="IntegratedSite:subrack2Pslot"/>
+            <xs:field xpath="IntegratedSite:subrack2Port"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_Hardware_Subrack">
+            <xs:selector xpath="IntegratedSite:Subrack"/>
+            <xs:field xpath="IntegratedSite:id"/>
+          </xs:key> */
+/* The MO branch where the common Network resources are configured.
+
+      The Network configuration service provides support for
+      configuration of various network properties of an
+      Integrated Site. It contains the following configuration
+      parts: */
+/* * Blade system specific configuration - mapping blade
+         system network requirements to common Integrated Site
+         resources.  This activity must be performed before a
+         new blade or blade system successfully can be unlocked
+         via the Hardware service. Some blade systems
+         have partly pre-registered network requirements,
+         while others demand that you read the corresponding
+         information from separate BS specific
+         instructions and manually configure the blade system
+         network requirements. The pre-registered network
+         requirements automates parts of the blade
+         system-specific configuration activity. The blade
+         system specific configuration is specified in a
+         separate class, BladeSystems/BladeSystem/BsNetworkConfiguration.
+
+       * Common configuration - configuration of common
+         Integrated Site resources, such as subnets, VLANs,
+         traffic classes, and so on. Blade system network requirements
+         are mapped to these common resources.
+
+       * Publish configuration changes - publish updated
+         configuration. In an Integrated Site, the blade
+         systems obtain their actual network configuration
+         dynamically in runtime. When you change the network
+         configuration it will affect blade systems. In order to
+         minimize the disturbance of active blade systems, the
+         changes are normally applied in a separate storage,
+         which is not visible to the blade systems. In order to
+         make use of the new unpublished configuration, it must be
+         explicitly published by altering the updateMode. If
+         the new settings introduce severe problems, the
+         configuration can be reverted to the old settings by
+         altering the updateMode.
+
+       * External Boot Server - configuration of External Boot Server 
+         for Blade Systems that do not want to boot from the SIS, but 
+         instead fetch their boot files from a server outside the IS
+         rack. */
+/* An external boot server is a concept for blade systems
+  		that do not want to download boot files internally from the SIS
+  		TFTP server. Instead, they download the files from an external
+  		server, via a proxy agent implemented in SIS. */
+/* A unique name of the boot server */
+/* Short description of the boot server. */
+/* The path to the files on the external boot server. Must start with /. */
+/* The name of the file to download. */
+/* The ip address to use when accessing the external server. This is generated automatically. */
+/* At what interval SIS pings the external boot server,
+  			for supervising the connection to it. */
+/* The A side IP address for the external server. */
+/* The A side IP address for the IS. */
+/* The A side subnet segment for the IS.
+            A reference to a Managed Object of type
+             /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsLogicalNetwork/BsSubnet/BsSubnetSegment */
+/* The B side IP address for the external server. */
+/* The B side IP address for the IS. */
+/* The B side subnet segment for the IS. 
+            A reference to a Managed Object of type
+             /IntegratedSite/BladeSystems/BladeSystem/BsNetworkConfiguration/BsLogicalNetwork/BsSubnet/BsSubnetSegment */
+/* An IS IP Traffic Class is a homogenous type of
+         (layer 3) traffic that has consistent requirements for
+         Quality of Service and security, for example circuit switched
+         payload. One Integrated Site constitutes one DiffServ
+         domain. For each DiffServ code point that will be used
+         within the site, there should be a configured mapping
+         to corresponding priori */
+/* ty bits (pbits) to be used
+         within the site. All traffic of the same class uses the
+         same priority bits (pbits). The pbits is defined in an
+         IS LAN Traffic Class. Each DiffServ code point that is
+         used within the site shall be defined in an IS IP
+         Traffic Class. When the traffic is routed outside the
+         site the routers may remap the DiffServ code points to
+         values valid in other DiffServ domains. An IS IP
+         Traffic Class has a site unique name. IS IP Traffic
+         Classes and IS Subnets are orthogonal concepts. */
+/* Name of the IS IP Traffic Class. 
+        Unique within the entire Integrated Site. */
+/* Short description of the IS IP Traffic Class. */
+/* DiffServ Code Point setting for this IS IP Traffic Class.
+        If there are two IS IP Traffic Classes with the same DSCP, they
+        both must refer to an IS LAN Traffic Class with identical P-bit setting. */
+/* Reference to a Managed Object of type 
+         /IntegratedSite/NetworkConfiguration/ISLanTrafficClass. */
+/* An IS LAN Traffic Class is a homogenous type
+        of (layer 2) traffic that has consistent requirements
+        for Class of Service, for example  circuit switched
+        payload. All traffic of the same class uses the same
+        priority bits (pbits). An IS LAN Traffic Class has a
+        site unique name. IS LAN Traffic Classes and IS VLANs
+        are orthogonal concepts. An IS LAN Traffic Class may be
+        shared between several Blade Systems. */
+/* Name of the IS LAN Traffic Class. 
+        Unique within the entire Integrated Site. */
+/* Short description of the IS LAN Traffic Class. */
+/* P-bit setting for this IS LAN Traffic Class. */
+/* An IS Logical Network (ISLN) is an IP network
+      with unconstrained network layer connectivity. Note
+      that there is no room for NAT (Network Address
+      Translation) in an IS Logical Network. An Integrated
+      Site will take part in multiple IS Logical Networks
+      simultaneously. An IS Logical Network may span several
+      Integrated Sites. Naming of such IS Logical Networks
+      should (but does not have to) be coordinated between
+      sites. Inside a site, an IS Logical Network merely
+      serves as a place holder for subnets and their
+      associated VLANs. In some cases it may hold several
+      subnets. An IS Logical Network may be shared between
+      several Blade Systems. */
+/* Name of the IS Logical Network. 
+        Unique within the entire Integrated Site. */
+/* Short description of the IS Logical network. */
+/* An IS Subnet is an IP subnet. An IS
+      Subnet has a starting address for the IP network, a
+      netmask (we use prefix length notation) and a broadcast
+      address. It is also connected to one IS VLAN. Each IS
+      Subnet is divided into one or more segments, so called
+      IS Subnet Segments. In many cases, the IS Subnet 
+      contains only one IS Subnet Segment. The name of an IS
+      Subnet is unique only within its IS Logical Network.
+      An IS Subnet may be shared between several Blade Systems. */
+/* Name of the IS Subnet. Unique within the IS Logical Network. */
+/* Short description of the IS Subnet. */
+/* IP network address of the IS Subnet. */
+/* Prefix length of the IP network address. */
+/* IP network mask of the IS Subnet. */
+/* Broadcast address of the IS Subnet. */
+/* A reference to a Managed Object of type
+          /IntegratedSite/NetworkConfiguration/IsVlan */
+/* An IS Subnet Segment is a segment of a
+      subnet and is mainly used when hosts on the IS
+      Subnet want to use different default gateways
+      and still be able to send packets between each
+      other without passing any gateway. The DHCP
+      server will associate a subnet section with
+      each IS Subnet Segment that is configured to
+      be enabled for DHCP. Each IS Subnet Segment
+      that is intended to handle traffic that should
+      be routed, has an IP address configured for its router.
+      The IS Subnet Segments for ISBS,
+      ISOB, and ISOS are link local and do not have
+      an associated router. The name of an IS Subnet
+      Segment is unique only within its IS Subnet.
+      An IS Subnet Segment may be shared between
+      several Blade Systems. */
+/* Name of the IS Subnet Segment. Unique within the IS Subnet. */
+/* Short description of the IS Subnet Segment. */
+/* IP network address of the IS Subnet Segment. */
+/* Prefix length of the IP network address. */
+/* IP network mask of the IS Subnet Segment. */
+/* Router address for the IS Subnet Segment. */
+/* Flag that controls whether DHCP should be enabled or not for this 
+        IS Subnet Segment. */
+/* <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork_IsSubnet_IsSubnetSegment">
+                        <xs:selector xpath="IntegratedSite:IsSubnetSegment"/>
+                        <xs:field xpath="IntegratedSite:name"/>
+                      </xs:key> */
+/* <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork_IsSubnet">
+                  <xs:selector xpath="IntegratedSite:IsSubnet"/>
+                  <xs:field xpath="IntegratedSite:name"/>
+                </xs:key> */
+/* Miscellaneous global variable settings. */
+/* The updateMode is a global attribute which controls
+        how updates of the network configuration is handled.
+
+        The updateMode can have the following persistent
+        states: 
+
+          * Safe - In Safe mode, all updates are placed in a
+            separate storage, which is not visible to the blade
+            systems. Updates are not published automatically.
+
+          * Preliminary - In Preliminary mode no updates of the
+            separate storage are allowed. This mode is a temporary
+            mode that is used only while a new parameter setting
+            is being tried out.
+
+          * ReadOnly - In ReadOnly mode, no updates are allowed at all.
+
+          * Unsafe - In Unsafe mode, all updates are immediately
+            published to the blade systems without any possibility
+            to undo the changes. You should avoid this mode. */
+/* The data model version consists of a major and a
+        minor part. The minor part is incremented when the data
+        model (the structure of the data) is extended. The
+        major part is incremented when the data model is not
+        backwards compatible with the previous version. */
+/* The RLSP marker generate interval in milliseconds.
+        It is recommended that the interval should be
+        increased in steps of 10.
+        
+        Note that after publishing an update of this value, 
+        a total site restart is necessary.
+        
+        This is an advanced option that should only be
+        changed by Ericsson personnel. */
+/* Threshold for the number of consecutive RLSP marker
+        PDUs that needs to be missing before the link is
+        regarded as down. */
+/* Threshold for the number of consecutive RLSP marker
+        PDUs that needs to be received before the link
+        is regarded as up. */
+/* The Daylight Saving Time (DST) rule (timezone_dst_rule)
+        has a syntax that is described in IEEE 1003.11. With
+        the information in this string, Blade Systems can
+        configure their clock to comply with the local time
+        zone. On Posix compatible blades its value fits nicely
+        into the TZ environment variable.
+
+        Here follows a conde */
+/* nsed summary of the time zone
+        syntax described in IEEE 1003.1. The timezone_dst_rule
+        val has a syntax like std offset or std offset dst
+        [offset],start[/time],end[/time] where the first format
+        is used when there is no Daylight Saving Time in the
+        local time zone. The std string specifies the name of
+        the time zone.  The offset specifies the time value you
+        must add to the local time to get a Coordinated
+        Universal Time value. For example, here is how we would
+        specify Eastern Standard Time, but without any Daylight
+        Saving Time alternative: "EST+5". The second format is
+        used when there is Daylight Saving Time. The dst string
+        and offset specify the name and offset for the
+        corresponding Daylight Saving Time zone; if the offset
+        is omitted, it defaults to one hour ahead of standard
+        time.The remainder of the specification describes when
+        Daylight Saving Time is in effect. The start field is
+        when Daylight Saving Time goes into effect and the end
+        field is when the change is made back to standard
+        time. The following formats are recognized for these
+        fields: Jn specifies the Julian day, with n between
+        1 and 365. February 29 is never counted, even in leap
+        years. n specifies the Julian day, with n between 0and
+        365. February 29 is counted in leap years.  Mm.w.d
+        specifies day d of week w of month m. The day d must be
+        between 0 (Sunday) and 6.  The week must be between
+        1 and 5; week 1 is the first week in which day d occurs,
+        and week 5 specifies the last d day in the month. The
+        month m should be between 1 and 12. The time fields
+        specify when, in the local time currently in effect,
+        the change to the other time occurs. If omitted, the
+        default is 02:00:00.
+
+        For example "EST+5EDT,M4.1.0/2,M10.5.0/2", specifies
+        the Eastern time zone in the United States, including
+        the appropriate Daylight Saving Time and its dates of
+        applicability. The normal offset from UTC is 5 hours;
+        since this is west of the prime meridian, the sign is
+        positive.  Summer time begins on the first Sunday in
+        April at 2:00am, and ends on the last Sunday in October
+        at 2:00am. */
+/* The DNS domain used by IS in the DNS-server. */
+/* Number of seconds from when a new network
+        configuration has been published until the
+        Blade Systems will apply the changes.
+        
+        This is an advanced option that should only be
+        changed by Ericsson personnel. */
+/* The default DHCP lease time in seconds.
+        
+        This is an advanced option that should only be
+        changed by Ericsson personnel. */
+/* The lifetime of a DHCP lease in seconds.
+
+        This is an advanced option that should only be
+        changed by Ericsson personnel. */
+/* An IS VLAN is just a VLAN (Virtual LAN).
+      It may be shared between several Blade Systems. */
+/* Identity of the IS VLAN. Unique within the entire Integrated Site. */
+/* Short description of the IS VLAN */
+/* <xs:key name="key_IntegratedSite_NetworkConfiguration_ExternalBootServer">
+            <xs:selector xpath="IntegratedSite:ExternalBootServer"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsIpTrafficClass">
+            <xs:selector xpath="IntegratedSite:IsIpTrafficClass"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLanTrafficClass">
+            <xs:selector xpath="IntegratedSite:IsLanTrafficClass"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsLogicalNetwork">
+            <xs:selector xpath="IntegratedSite:IsLogicalNetwork"/>
+            <xs:field xpath="IntegratedSite:name"/>
+          </xs:key>
+          <xs:key name="key_IntegratedSite_NetworkConfiguration_IsVlan">
+            <xs:selector xpath="IntegratedSite:IsVlan"/>
+            <xs:field xpath="IntegratedSite:identity"/>
+          </xs:key> */
+/* Describes the Software management service 
+	in the Integrated Site services Management Function Area (MFA). */
+/* This class includes actions to download files and import backups
+	into the software inventory. */
+/* An instance of a backup that is stored locally. */
+/* The site local backup identity. */
+/* A backup name selected by the user or a generated name. */
+/* A reference to the blade system that this backup was created from. */
+/* The date and time when this backup was created. */
+/* The size of the backup file in kilobytes. If the backup file 
+	  size is smaller than 0,5 kbyte the value will be 0. */
+/* Represents an alarm related to software.
+	This class can be used for listing software alarms. */
+/* The alarm identity. */
+/* A reference to the blade system affected by the alarm */
+/* Textual description of the cause of the alarm. */
+/* Textual description providing additional information about the alarm. */
+/* Container of files of data, or binary executables, needed to run
+	the system. */
+/* Product number of the software delivery package. */
+/* Product revision of the software delivery package. */
+/* Product name of the software delivery package. */
+/* Type of the software delivery package. */
+/* Contains one or more SoftwareDeliveryPackage. */
+/* Product number of the software group. */
+/* Product revision of the software group. */
+/* Product name of the software group. */
+/* Blade system product number of the software group. */
+/* Blade system revision of the software group. */
+/* Blade system name of the software group. */
+/* Integrated system product number of the software group. */
+/* Integrated system revision of the software group. */
+/* Integrated system name of the software group. */
+/* Software delivery packages related to this software group.
+	  A related software delivery package can be a CXP or  
+	  a software correction package, CXR.
+	  A related software delivery package does not necessarily have
+	  to be active. */
+/* Indicates status of a software group. A software group is 
+	  complete if all included load module containers have been 
+	  downloaded and unpacked correctly, if not, it is incomplete.
+	  A software group is inconsistent if the checksums of the load 
+	  module containers do not match the information in the system 
+	  information CXP, or if the XML data could not be registered. */
+/* <xs:key name="key_IntegratedSite_Software_SoftwareInventory_Backup">
+                  <xs:selector xpath="IntegratedSite:Backup"/>
+                  <xs:field xpath="IntegratedSite:id"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareAlarm">
+                  <xs:selector xpath="IntegratedSite:SoftwareAlarm"/>
+                  <xs:field xpath="IntegratedSite:id"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareDeliveryPackage">
+                  <xs:selector xpath="IntegratedSite:SoftwareDeliveryPackage"/>
+                  <xs:field xpath="IntegratedSite:prodNo"/>
+                  <xs:field xpath="IntegratedSite:prodRev"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareInventory_SoftwareGroup">
+                  <xs:selector xpath="IntegratedSite:SoftwareGroup"/>
+                  <xs:field xpath="IntegratedSite:prodNo"/>
+                  <xs:field xpath="IntegratedSite:prodRev"/>
+                </xs:key> */
+/* Contains system created data through ordered job actions. */
+/* This class handles creation of backups. */
+/* Given or system generated name of the backup job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to the site local backup identity. */
+/* Reference to the blade system the backup was created from. */
+/* The name of the backup. */
+/* This class handles export of locally stored backup files to 
+	an FTP server. */
+/* Given or system created name of the backup job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to a data type representing the 
+	  FTP details. */
+/* Reference to the backup to be exported. */
+/* This name is set to be the file name of the backup. */
+/* This class handles import of backup files from the FTP server.
+	The backup file is stored locally, but not loaded into the system. */
+/* Given or system created name of the backup job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to a data type representing the 
+	  FTP details. */
+/* This class handles restore of backups of the system. */
+/* Given or system created name of the backup job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to the backup to be restored. */
+/* Reference to the blade system that should be restored. */
+/* The name of the backup. */
+/* This class handles software change jobs toward the system. */
+/* Given or system generated name of the backup job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to the blade system that should change software. */
+/* Reference to the blade system software group to be 
+	  used in the software change. */
+/* Reference to the software correction package to be 
+	  used in the software change. */
+/* The maximum time allowed for the software change
+	  job to finish. After this time, the job will be interrupted.
+	  The value 0 means that maxTime will be given the
+	  timer value registered with the blade system software group. 
+	  If no such value has been registered,
+	  maxTime will be given a system default timer value. */
+/* This class handles blade information for a blade involved in
+        a software change job. */
+/* The subrack ID for the blade. */
+/* The slot number for the blade. */
+/* Reference to the blade software group to be used 
+	  in the software change. */
+/* <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareChangeJob_SoftwareChangeJobBladeInfo">
+                        <xs:selector xpath="IntegratedSite:SoftwareChangeJobBladeInfo"/>
+                        <xs:field xpath="IntegratedSite:subrackId"/>
+                        <xs:field xpath="IntegratedSite:slotNo"/>
+                      </xs:key> */
+/* This class contains information about requested, ongoing,
+	and completed software file download jobs. */
+/* Given or system generated name of the download job. */
+/* Reference to a data type representing job status 
+	  during the job execution. */
+/* Reference to a data type representing the 
+	  FTP details. */
+/* <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupCreateJob">
+                  <xs:selector xpath="IntegratedSite:BackupCreateJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupExportJob">
+                  <xs:selector xpath="IntegratedSite:BackupExportJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupImportJob">
+                  <xs:selector xpath="IntegratedSite:BackupImportJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_BackupRestoreJob">
+                  <xs:selector xpath="IntegratedSite:BackupRestoreJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareChangeJob">
+                  <xs:selector xpath="IntegratedSite:SoftwareChangeJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key>
+                <xs:key name="key_IntegratedSite_Software_SoftwareJobs_SoftwareDownloadJob">
+                  <xs:selector xpath="IntegratedSite:SoftwareDownloadJob"/>
+                  <xs:field xpath="IntegratedSite:jobName"/>
+                </xs:key> */
+type record IntegratedSite
+{
+	record {
+		XSD.Token siteAlias optional,
+		XSD.Token ipb optional,
+		record {
+			XSD.Token sisSRSongoing optional
+		} systemRestart
+	} administrativeData,
+	record {
+		record of record {
+			HwmValidNameCharacters name,
+			HwmValidNameCharacters alias optional,
+			XSD.Integer number optional,
+			XSD.Token typeName optional,
+			ObjectRef swgRef,
+			ObjectRef scpRef optional,
+			HwmAdministrativeState admState optional,
+			HwmOperationalState opState optional,
+			HwmAvailabilityStatus availStatus optional,
+			ObjectRef bsdRef optional,
+			InetAddressIPv4 bsomAddress optional,
+			ObjectRef externalBootServerRef optional,
+			XSD.Boolean autoCreatePrivateNetwork optional,
+			XSD.Token namespace optional,
+			record of record {
+				SubrackIdType_3 subrackId,
+				SlotNoType_4 slotNo,
+				XSD.Token slotLabel optional,
+				ObjectRef typeRef,
+				ObjectRef requiredSwgRef optional,
+				ObjectRef bladeSwgRef optional,
+				XSD.Boolean bsom optional,
+				HwmKnockOutPreference knockOutPreference optional,
+				XSD.Token userLabel optional,
+				HwmAdministrativeState admState optional,
+				HwmOperationalState opState optional,
+				HwmAvailabilityStatus availStatus optional,
+				HwmBusType busType optional,
+				XSD.Token prodNo optional,
+				XSD.Token prodRev optional,
+				XSD.Token serialNo optional,
+				XSD.Token prodName optional,
+				XSD.Token vendor optional,
+				XSD.Token mfgDate optional,
+				MacAddress macAddressAggregate optional,
+				MacAddress macAddressLeft optional,
+				MacAddress macAddressRight optional,
+				XSD.Token changeDate optional,
+				HwmRedundancyGroups redundancyGroup optional,
+				InetAddressIPv4 isbsAddress optional,
+				InetAddressIPv4 isobAddress optional,
+				InetAddressIPv4 islctAddress optional,
+				record of record {
+					XSD.Integer id
+				} linkSap_list
+			} blade_list,
+			record {
+				record of record {
+					XSD.Token name,
+					XSD.Token description optional,
+					ObjectRef isIpTrafficClassRef optional
+				} bsIpTrafficClass_list,
+				record of record {
+					XSD.Token name,
+					XSD.Token description optional,
+					ObjectRef isLanTrafficClassRef optional
+				} bsLanTrafficClass_list,
+				record of record {
+					XSD.Token name,
+					XSD.Token description optional,
+					XSD.Boolean private_ optional,
+					ObjectRef isLogicalNetworkRef optional,
+					record of record {
+						XSD.Token name,
+						XSD.Token description optional,
+						ObjectRef bsVlanRef optional,
+						ObjectRef isSubnetRef optional,
+						record of record {
+							XSD.Token name,
+							XSD.Token description optional,
+							XSD.Integer numOfIpaddresses optional,
+							XSD.Boolean dhcpEnabled optional,
+							XSD.Boolean routerRequired optional,
+							ObjectRef isSubnetSegmentRef optional
+						} bsSubnetSegment_list
+					} bsSubnet_list
+				} bsLogicalNetwork_list,
+				record of record {
+					XSD.Token name,
+					XSD.Token description optional,
+					XSD.Boolean private_ optional,
+					ObjectRef isVlanRef optional,
+					record of record {
+						XSD.Token name,
+						XSD.Token description optional,
+						XSD.Boolean static optional,
+						XSD.Boolean protected optional,
+						ObjectRef linkSapRef optional
+					} bsVlanSap_list
+				} bsVlan_list
+			} bsNetworkConfiguration
+		} bladeSystem_list
+	} bladeSystems,
+	record {
+		XSD.Token activeSis optional,
+		record of record {
+			HwmValidNameCharacters name,
+			XSD.Token description optional
+		} bladeSystemDomain_list,
+		record of record {
+			XSD.Token type_,
+			XSD.Token swgProdNo,
+			XSD.Token swgProdRev,
+			ObjectRef bladeSwgRef optional,
+			XSD.Token name optional,
+			WidthType_16 width optional,
+			XSD.Token oneGLinks optional,
+			XSD.Token linkAggregates optional,
+			XSD.Token tenGLinks optional,
+			XSD.Boolean hasHwData optional,
+			XSD.Boolean isMxb optional,
+			XSD.Token availOneGSlots optional,
+			XSD.Token aggregateRanges optional,
+			XSD.Boolean usesExternalBootServer optional
+		} bladeType_list,
+		record of record {
+			Subrack1IdType_22 subrack1Id,
+			Subrack1XslotType_23 subrack1Xslot,
+			Subrack1PslotType_24 subrack1Pslot,
+			Subrack1PortType_25 subrack1Port,
+			Subrack2IdType_26 subrack2Id,
+			Subrack2XslotType_27 subrack2Xslot,
+			Subrack2PslotType_28 subrack2Pslot,
+			Subrack2PortType_29 subrack2Port,
+			IslTypeType_30 islType optional,
+			HwmValidNameCharacters islName optional
+		} interSubrackLink_list,
+		record of record {
+			IdType_17 id,
+			XSD.Token type_ optional,
+			HwmValidNameCharacters userLabel optional,
+			XSD.Token position optional,
+			XSD.Token cabinetPosition optional,
+			XSD.Token location optional,
+			XSD.Token availableOneGSlots optional,
+			XSD.Token availableTenGSlots optional,
+			XSD.Token aggregateSlots optional,
+			PhysicalAddrPlug0Type_18 physicalAddrPlug0,
+			PhysicalAddrPlug1Type_19 physicalAddrPlug1,
+			PhysicalAddrPlug3Type_20 physicalAddrPlug3,
+			ObjectRef leftMxbBsSwgRef optional,
+			ObjectRef leftMxbScpRef optional,
+			ObjectRef leftMxbBladeSwgRef optional,
+			ObjectRef rightMxbBsSwgRef optional,
+			ObjectRef rightMxbScpRef optional,
+			ObjectRef rightMxbBladeSwgRef optional,
+			record of record {
+				NumberType_21 number,
+				Slot_HwmSlotState state optional,
+				ObjectRef bsRef optional
+			} slot_list
+		} subrack_list
+	} hardware,
+	record {
+		record of record {
+			XSD.Token name,
+			XSD.Token description optional,
+			XSD.Token path,
+			XSD.Token fileName,
+			InetAddressIPv4 proxyIp optional,
+			XSD.Integer pingInterval,
+			InetAddressIPv4 sideAExternalBootIp,
+			InetAddressIPv4 sideAIsIp,
+			ObjectRef sideABsSegment,
+			InetAddressIPv4 sideBExternalBootIp,
+			InetAddressIPv4 sideBIsIp,
+			ObjectRef sideBBsSegment
+		} externalBootServer_list,
+		record of record {
+			XSD.Token name,
+			XSD.Token description optional,
+			XSD.Integer dscp optional,
+			ObjectRef isLanTrafficClass optional
+		} isIpTrafficClass_list,
+		record of record {
+			XSD.Token name,
+			XSD.Token description optional,
+			PbitsType_8 pbits optional
+		} isLanTrafficClass_list,
+		record of record {
+			XSD.Token name,
+			XSD.Token description optional,
+			record length(1 .. infinity) of record {
+				XSD.Token name,
+				XSD.Token description optional,
+				InetAddressIPv4 address_ optional,
+				MaskType_5 mask optional,
+				InetAddressIPv4 longMask optional,
+				InetAddressIPv4 broadcastAddress optional,
+				ObjectRef isVlanRef optional,
+				record length(1 .. infinity) of record {
+					XSD.Token name,
+					XSD.Token description optional,
+					InetAddressIPv4 address_ optional,
+					MaskType_6 mask optional,
+					InetAddressIPv4 longMask optional,
+					InetAddressIPv4 routerAddress optional,
+					XSD.Boolean dhcpEnabled optional
+				} isSubnetSegment_list
+			} isSubnet_list
+		} isLogicalNetwork_list,
+		record {
+			UpdateModeType_9 updateMode optional,
+			DataModelVersionType_10 dataModelVersion optional,
+			RlspMarkerGenerateIntervalType_11 rlspMarkerGenerateInterval optional,
+			RlspLinkDownThresholdType_12 rlspLinkDownThreshold optional,
+			RlspLinkUpThresholdType_13 rlspLinkUpThreshold optional,
+			XSD.Token timezoneDstRule optional,
+			DnsDomainType_14 dnsDomain optional,
+			XSD.Integer notifyAfter optional,
+			XSD.Integer defaultDhcpLeaseTime optional,
+			XSD.Integer lifeTimeDhcpLeaseTime optional
+		} isVariables,
+		record of record {
+			IdentityType_7 identity,
+			XSD.Token description optional
+		} isVlan_list
+	} networkConfiguration,
+	record {
+		record {
+			record of record {
+				XSD.UnsignedInt id,
+				XSD.Token name optional,
+				ObjectRef bsRef optional,
+				XSD.DateTime date optional,
+				XSD.UnsignedInt size optional
+			} backup_list,
+			record of record {
+				XSD.UnsignedInt id,
+				ObjectRef bsRef optional,
+				XSD.Token cause optional,
+				XSD.Token info optional
+			} softwareAlarm_list,
+			record of record {
+				XSD.Token prodNo,
+				XSD.Token prodRev,
+				XSD.Token prodName optional,
+				TypeType_31 type_ optional
+			} softwareDeliveryPackage_list,
+			record of record {
+				XSD.Token prodNo,
+				XSD.Token prodRev,
+				XSD.Token prodName optional,
+				XSD.Token bsProdNo optional,
+				XSD.Token bsProdRev optional,
+				XSD.Token bsProdName optional,
+				XSD.Token integratedSystemProdNo optional,
+				XSD.Token integratedSystemProdRev optional,
+				XSD.Token integratedSystemProdName optional,
+				RelatedSDPsType_32 relatedSDPs optional,
+				StatusType_33 status optional
+			} softwareGroup_list
+		} softwareInventory,
+		record {
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				ObjectRef backupRef optional,
+				ObjectRef bsRef optional,
+				XSD.Token backupName optional
+			} backupCreateJob_list,
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				FtpData ftpData optional,
+				ObjectRef backupRef optional,
+				XSD.Token backupName optional
+			} backupExportJob_list,
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				FtpData ftpData optional
+			} backupImportJob_list,
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				ObjectRef backupRef optional,
+				ObjectRef bsRef optional,
+				XSD.Token backupName optional
+			} backupRestoreJob_list,
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				ObjectRef bsRef optional,
+				ObjectRef swgRef optional,
+				ObjectRef scpRef optional,
+				XSD.UnsignedInt maxTime optional,
+				record of record {
+					XSD.UnsignedInt subrackId,
+					XSD.UnsignedInt slotNo,
+					ObjectRef bladeSwgRef optional
+				} softwareChangeJobBladeInfo_list
+			} softwareChangeJob_list,
+			record of record {
+				XSD.Token jobName,
+				JobData jobData optional,
+				FtpData ftpData optional,
+				SwmMatchStrategy matchStrategy optional
+			} softwareDownloadJob_list
+		} softwareJobs
+	} software
+}
+with {
+  variant "element";
+  variant (administrativeData) "name as capitalized";
+  variant (administrativeData.systemRestart) "name as capitalized";
+  variant (bladeSystems) "name as capitalized";
+  variant (bladeSystems.bladeSystem_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-]) "name as 'BladeSystem'";
+  variant (bladeSystems.bladeSystem_list[-].blade_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].blade_list[-]) "name as 'Blade'";
+  variant (bladeSystems.bladeSystem_list[-].blade_list[-].linkSap_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].blade_list[-].linkSap_list[-]) "name as 'LinkSap'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration) "name as capitalized";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsIpTrafficClass_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsIpTrafficClass_list[-]) "name as 'BsIpTrafficClass'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLanTrafficClass_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLanTrafficClass_list[-]) "name as 'BsLanTrafficClass'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-]) "name as 'BsLogicalNetwork'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-].private_) "name as 'private'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-].bsSubnet_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-].bsSubnet_list[-]) "name as 'BsSubnet'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-].bsSubnet_list[-].bsSubnetSegment_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsLogicalNetwork_list[-].bsSubnet_list[-].bsSubnetSegment_list[-]) "name as 'BsSubnetSegment'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsVlan_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsVlan_list[-]) "name as 'BsVlan'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsVlan_list[-].private_) "name as 'private'";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsVlan_list[-].bsVlanSap_list) "untagged";
+  variant (bladeSystems.bladeSystem_list[-].bsNetworkConfiguration.bsVlan_list[-].bsVlanSap_list[-]) "name as 'BsVlanSap'";
+  variant (hardware) "name as capitalized";
+  variant (hardware.bladeSystemDomain_list) "untagged";
+  variant (hardware.bladeSystemDomain_list[-]) "name as 'BladeSystemDomain'";
+  variant (hardware.bladeType_list) "untagged";
+  variant (hardware.bladeType_list[-]) "name as 'BladeType'";
+  variant (hardware.bladeType_list[-].type_) "name as 'type'";
+  variant (hardware.interSubrackLink_list) "untagged";
+  variant (hardware.interSubrackLink_list[-]) "name as 'InterSubrackLink'";
+  variant (hardware.subrack_list) "untagged";
+  variant (hardware.subrack_list[-]) "name as 'Subrack'";
+  variant (hardware.subrack_list[-].type_) "name as 'type'";
+  variant (hardware.subrack_list[-].slot_list) "untagged";
+  variant (hardware.subrack_list[-].slot_list[-]) "name as 'Slot'";
+  variant (networkConfiguration) "name as capitalized";
+  variant (networkConfiguration.externalBootServer_list) "untagged";
+  variant (networkConfiguration.externalBootServer_list[-]) "name as 'ExternalBootServer'";
+  variant (networkConfiguration.isIpTrafficClass_list) "untagged";
+  variant (networkConfiguration.isIpTrafficClass_list[-]) "name as 'IsIpTrafficClass'";
+  variant (networkConfiguration.isLanTrafficClass_list) "untagged";
+  variant (networkConfiguration.isLanTrafficClass_list[-]) "name as 'IsLanTrafficClass'";
+  variant (networkConfiguration.isLogicalNetwork_list) "untagged";
+  variant (networkConfiguration.isLogicalNetwork_list[-]) "name as 'IsLogicalNetwork'";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list) "untagged";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list[-]) "name as 'IsSubnet'";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list[-].address_) "name as 'address'";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list[-].isSubnetSegment_list) "untagged";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list[-].isSubnetSegment_list[-]) "name as 'IsSubnetSegment'";
+  variant (networkConfiguration.isLogicalNetwork_list[-].isSubnet_list[-].isSubnetSegment_list[-].address_) "name as 'address'";
+  variant (networkConfiguration.isVariables) "name as capitalized";
+  variant (networkConfiguration.isVlan_list) "untagged";
+  variant (networkConfiguration.isVlan_list[-]) "name as 'IsVlan'";
+  variant (software) "name as capitalized";
+  variant (software.softwareInventory) "name as capitalized";
+  variant (software.softwareInventory.backup_list) "untagged";
+  variant (software.softwareInventory.backup_list[-]) "name as 'Backup'";
+  variant (software.softwareInventory.softwareAlarm_list) "untagged";
+  variant (software.softwareInventory.softwareAlarm_list[-]) "name as 'SoftwareAlarm'";
+  variant (software.softwareInventory.softwareDeliveryPackage_list) "untagged";
+  variant (software.softwareInventory.softwareDeliveryPackage_list[-]) "name as 'SoftwareDeliveryPackage'";
+  variant (software.softwareInventory.softwareDeliveryPackage_list[-].type_) "name as 'type'";
+  variant (software.softwareInventory.softwareGroup_list) "untagged";
+  variant (software.softwareInventory.softwareGroup_list[-]) "name as 'SoftwareGroup'";
+  variant (software.softwareJobs) "name as capitalized";
+  variant (software.softwareJobs.backupCreateJob_list) "untagged";
+  variant (software.softwareJobs.backupCreateJob_list[-]) "name as 'BackupCreateJob'";
+  variant (software.softwareJobs.backupExportJob_list) "untagged";
+  variant (software.softwareJobs.backupExportJob_list[-]) "name as 'BackupExportJob'";
+  variant (software.softwareJobs.backupImportJob_list) "untagged";
+  variant (software.softwareJobs.backupImportJob_list[-]) "name as 'BackupImportJob'";
+  variant (software.softwareJobs.backupRestoreJob_list) "untagged";
+  variant (software.softwareJobs.backupRestoreJob_list[-]) "name as 'BackupRestoreJob'";
+  variant (software.softwareJobs.softwareChangeJob_list) "untagged";
+  variant (software.softwareJobs.softwareChangeJob_list[-]) "name as 'SoftwareChangeJob'";
+  variant (software.softwareJobs.softwareChangeJob_list[-].softwareChangeJobBladeInfo_list) "untagged";
+  variant (software.softwareJobs.softwareChangeJob_list[-].softwareChangeJobBladeInfo_list[-]) "name as 'SoftwareChangeJobBladeInfo'";
+  variant (software.softwareJobs.softwareDownloadJob_list) "untagged";
+  variant (software.softwareJobs.softwareDownloadJob_list[-]) "name as 'SoftwareDownloadJob'";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'http://www.ericsson.com/is/isco/IntegratedSite/R4L06/R4AB_1.02' prefix 'IntegratedSite'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

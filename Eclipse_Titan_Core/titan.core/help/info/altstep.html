@@ -1,0 +1,131 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>altstep</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="alt.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="and.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>altstep</h1>
+<hr align="left" width="75%">
+<p>The keyword is used to specify default behavior or to structure the alternatives of an <b><font face="Courier New" color="#003258" size="4">alt</font></b> statement. Altsteps are similar to
+functions but the altstep body defines a set of alternatives (cf. <a href="alt.html"><b><font face="Courier New" color="#003258" size="4">alt</font></b></a>).&nbsp;
+<ul>
+  <li>An altstep that is activated as default shall only have <b><font face="Courier New" color="#003258" size="4">in</font></b> parameters, port parameters and timer parameters.</li>
+  <li>An altstep that is only invoked as an alternative in an alt statement or as stand-alone statement may have <b><font face="Courier New" color="#003258" size="4">in</font></b>, <b><font
+    face="Courier New" color="#003258" size="4">out</font></b>and <b><font face="Courier New" color="#003258" size="4">inout</font></b> parameters.</li>
+  <li>Altsteps may define local definitions of constants, variables and timers but this is strongly deprecated.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="alt.html"><b><font face="Courier New" color="#003258" size="4">alt</font></b></a></li>
+  <li><a href="default.html"><b><font face="Courier New" color="#003258" size="4">default</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="left"><font face="Courier New" color="#003258" size="5"><b>altstep&nbsp;</b></font><i> altstep_identifier </i> <font face="Courier New" color="#003258" size="5"><b>(</b></font> [<i>
+    altstep_parameter</i> ... ] <font face="Courier New" color="#003258" size="5"><b>)</b></font>[ <font face="Courier New" color="#003258" size="5"><b>runs on</b></font><i> component_reference </i>] <font
+      face="Courier New" color="#003258" size="5"><b>{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;</b></font> [ <i>local_definitions</i> ]&nbsp; <font face="Courier New" color="#003258" size="5"><b><br>
+    &nbsp;&nbsp;&nbsp; [</b></font> [<i>guard_expression</i>] <font face="Courier New" color="#003258" size="5"><b>]</b></font> [<i>condition</i>] <font face="Courier New" color="#003258" size="5"><b>{</b></font>
+    [<i>statement_block</i>] <font face="Courier New" color="#003258" size="5"><b>}<br>
+    &nbsp;&nbsp;&nbsp; </b></font> ...<font face="Courier New" color="#003258" size="5"><b><br>
+    };</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</div>
+<ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>altstep</b></font> keyword introduces the altstep definition.</p>
+  </li>
+  <li>
+  <p><i>altstep_identifier</i> is the&nbsp;name used to refer to the altstep. Must begin with a letter, may contain letters, numbers and underscore characters. According to the&nbsp; <a
+    href="../docs/naming.pdf" target="_blank">Naming convention</a>, the prefix <b> as_</b> is recommended.</p>
+  </li>
+  <li>
+  <p><i>altstep_parameter</i> defines a formal parameter. The expression begins with an optional keyword indicating the parameter passing method (<a href="in.html"><font face="Courier New"
+    size="4"><b>in</b></font></a>, <a href="out.html"><font face="Courier New" size="4"><b>out</b></font></a> or <a href="inout.html"><font face="Courier New" size="4"><b>inout</b></font></a>), continues
+  with a reference to a built-in type (cf. <a href="const.html#par1">their list</a>) or a <a href="type.html"> referenced type</a> and ends by a parameter identifier. <b>...</b>
+  indicates that&nbsp; several parameters may be specified; they are separated by commas.</p>
+  </li>
+  <li>
+  <p>The optional keywords <font face="Courier New" color="#003258" size="4"><b>runs on</b></font> makes component constants, variables, timers and ports visible inside the altstep</p>
+  </li>
+  <li>
+  <p><i>component_reference</i> refers to the component. It is composed of two parts: the module identifier (may be omitted) and the component tpye identifier. The two parts are linked by a dot.</p>
+  </li>
+  <li>
+  <p>The optional <i>local_definitions</i> may include constants, variables and timers visible inside the altstep. It is not recommended to use them.</p>
+  </li>
+  <li>
+  <p>Each alternative begins with an optional <i>guard_expression</i> with the following options:</p>
+  <ul>
+    <li>empty guard (note that the brackets must be written) The <i>statement_block</i> will be executed if <i>condition</i> is met.&nbsp;</li>
+    <li>Boolean expression. The <i>statement_block</i> will be executed if the Boolean expression evaluates to true AND <i>condition</i> is met.</li>
+    <li>
+    <p><font face="Courier New" color="#003258" size="4"><b>else</b></font> keyword. The <i>statement_block</i> will always be executed.&nbsp; No <i>condition</i> may appear in the branch.</p>
+    </li>
+  </ul>
+  </li>
+  <li>
+  <p><i>condition</i> may be a communication or a timer event or the termination of a parallel test component. The following operations may be written here: <a href="receive.html"><b><font
+    face="Courier New" color="#003258" size="4">receive</font></b></a>, <a href="trigger.html"><b><font face="Courier New" color="#003258" size="4">trigger</font></b></a>, <a href="getcall.html"><b><font
+    face="Courier New" color="#003258" size="4">getcall</font></b></a>, <a href="getreply.html"><b><font face="Courier New" color="#003258" size="4">getreply</font></b></a>, <a href="catch.html"><b><font
+    face="Courier New" color="#003258" size="4">catch</font></b></a>, <a href="check.html"><b><font face="Courier New" color="#003258" size="4">check</font></b></a>, <a href="timeout.html"><b><font
+    face="Courier New" color="#003258" size="4">timeout</font></b></a> and <a href="done.html"><b><font face="Courier New" color="#003258" size="4">done</font></b></a>.</p>
+  </li>
+  <li>
+  <p>The optional <i>statement_block</i> contains one or more statements separated by semicolons. When empty, the curly brackets must be written.</p>
+  </li>
+  <li>
+  <p><b>...</b> indicates that&nbsp; several branches may occur in the <font face="Courier New" color="#003258" size="4"><b>altstep</b></font> body. There is no separator between them.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>Example:
+<p><font face="Courier New">altstep as_AltSet_A(in integer pl_MyPar1) runs on MyComponentType_ct {<br>
+&nbsp;&nbsp;&nbsp;[]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L1_PCO.receive { setverdict(pass) }&nbsp;<br>
+&nbsp;&nbsp;&nbsp;[x&lt;=1] L2_PCO.receive { setverdict(inconc) }&nbsp;<br>
+&nbsp;&nbsp;&nbsp;[else]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ setverdict(fail); stop }&nbsp;<br>
+};</font>
+<p>The altstep called as_AltSet_A is defined. It has a read/only parameter called pl_MyPar1. The definitions made in the component MyComponentType_ct are visible to the altstep. The first branch
+is activated if a message has been received on port L1_PCO. The verdict is set to pass. The second branch is activated if a message has been received on port L2_PCO and the variable x is not grater
+then one. In this case the verdict is set to inconclusive. The last branch is activated if none of the ports has received a messages. The verdict is set to fail and test execution is stopped.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#altstepdef">BNF definition</a> of <font face="Courier New"> altstep</font></p>
+</body>
+</html>

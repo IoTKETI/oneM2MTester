@@ -1,0 +1,49 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:22.2.3, value of wrong type in @decoded redirect assignment
+ ** @verdict  pass reject
+ *****************************************************************/
+
+// The following requirements are tested:
+// Rules in clause 22.2.2 shall apply.
+// Any other value shall cause an error.
+
+module NegSem_220203_TriggerOperation_008 {
+
+	type integer I with { variant "32 bit"};
+
+	type record R {
+        integer id,
+        universal charstring payload
+    }
+    
+	type port P message {
+		inout R;
+	} with {extension "internal"}
+	
+    type component GeneralComp {
+		port P p;
+	}
+	
+    testcase TC_NegSem_220203_TriggerOperation_008() runs on GeneralComp {
+        var I v_src := 1953719668;
+		var I v_res;
+        var universal charstring v_str := encvalue_unichar(v_src);
+
+		connect(self:p, self:p);
+        p.send(R:{ id := 1, payload := v_str });
+        alt {
+            [] p.trigger(R:?) -> value (v_res := @decoded(v_src) payload) { 
+                setverdict (pass);
+            }
+        }
+    }
+
+    control {
+        execute(TC_NegSem_220203_TriggerOperation_008(), 5.0);
+    }
+} with { encode "RAW"}

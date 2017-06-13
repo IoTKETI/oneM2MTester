@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns="http://www.example.org/complex-restriction-with-use"
+targetNamespace="http://www.example.org/complex-restriction-with-use">
+<!-- The base type is: --> 
+<xs:complexType name="PurchaseOrderType"> 
+	<xs:sequence> 
+		<xs:element name="shipTo"     type="xs:string"/> 
+		<xs:element name="billTo"     type="xs:string" minOccurs="0"/> 
+		<xs:element name="items"      type="xs:string"/> 
+	</xs:sequence> 
+	<xs:attribute name="finishDate" type="xs:date"/> 
+	<xs:attribute name="shipDate" type="xs:date"/> 
+	<xs:attribute name="orderDate" type="xs:date"/> 
+</xs:complexType> 
+
+<!-- The restricting type is: --> 
+<xs:complexType name="RestrictedPurchaseOrderType">
+	<xs:complexContent> 
+		<xs:restriction base="PurchaseOrderType"> 
+			<xs:sequence> 
+				<xs:element name="shipTo" type="xs:string"/> 
+				<xs:element name="billTo" type="xs:string" minOccurs="1"/> 
+				<xs:element name="items"  type="xs:string"/> 
+			</xs:sequence> 
+			<xs:attribute name="finishDate" type="xs:date"/> 
+			<xs:attribute name="shipDate" type="xs:date" use="required" /> 
+			<xs:attribute name="orderDate" type="xs:date" use="prohibited" /> 
+		</xs:restriction> 
+	</xs:complexContent> 
+</xs:complexType> 
+
+<xs:element name="testsuite" type="testsuite"/>
+
+<xs:complexType name="testsuite">
+	<xs:sequence>
+		<xs:element name="properties">
+			<xs:complexType>
+			</xs:complexType>
+		</xs:element>
+	
+	</xs:sequence>
+	<xs:attribute name="time" type="xs:decimal" use="optional">
+	</xs:attribute>
+</xs:complexType>
+
+
+
+<xs:element name="testsuites">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="testsuite" >
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="testsuite">
+							<xs:sequence>
+								<xs:element name="properties">
+									<xs:complexType>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						<xs:attribute name="time" type="xs:decimal" use="required"/>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+</xs:schema>

@@ -1,0 +1,113 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Forstner, Matyas
+  Gecse, Roland
+  Raduly, Csaba
+  Szabados, Kristof
+  Szabo, Janos Zoltan – initial implementation
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>interleave</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="integer.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="isbound.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>interleave</h1>
+<hr align="left" width="75%">
+<p>The statement denotes branching of test behavior due to the reception and handling of communication and/or timer events and/or the termination of parallel test components. The sequence of the
+events does not matter. The individual alternatives (or branches) contain an event or &quot;receiving operation&quot;, which can be successful or unsuccessful (&quot;condition&quot;) and end by an
+optional statement block.
+<p>Opposed to alt statement, where only a single alternative is taken, all branches of the interleave statement must &quot;happen&quot;.
+<p>Related keyword:</p>
+<ul>
+  <li><a href="alt.html"><b><font face="Courier New" color="#003258" size="4">alt</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="left"><font face="Courier New" color="#003258" size="5"><b>interleave {<br>
+    &nbsp;&nbsp;&nbsp; []</b></font> [<i>condition</i>] <font face="Courier New" color="#003258" size="5"><b>{</b></font> [<i>statement_block</i>] <font face="Courier New" color="#003258" size="5"><b>}<br>
+    &nbsp;&nbsp;&nbsp; </b></font> ...<font face="Courier New" color="#003258" size="5"><b><br>
+    };</b></font> &nbsp;</h3>
+    </td>
+  </tr>
+</table>
+</div>
+<ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>interleave</b></font> keywords introduces the branching definition.</p>
+  </li>
+  <li>
+  <p>Each branch begins with a pair of brackets (the brackets must be empty).</p>
+  </li>
+  <li>
+  <p><i>condition</i> may be a communication or a timer event or the termination of a parallel test component. The following operations may be written here: <a href="receive.html"><b><font
+    face="Courier New" color="#003258" size="4">receive</font></b></a>, <a href="trigger.html"><b><font face="Courier New" color="#003258" size="4">trigger</font></b></a>, <a href="getcall.html"><b><font
+    face="Courier New" color="#003258" size="4">getcall</font></b></a>, <a href="catch.html"><b><font face="Courier New" color="#003258" size="4">catch</font></b></a>, <a href="check.html"><b><font
+    face="Courier New" color="#003258" size="4">check</font></b></a>, <a href="timeout.html"><b><font face="Courier New" color="#003258" size="4">timeout</font></b></a> and <a href="done.html"><b><font
+    face="Courier New" color="#003258" size="4">done</font></b></a>.</p>
+  </li>
+  <li>The optional <i>statement_block</i> contains one or more statements separated by semicolons. When empty, the curly brackets must be written.
+  <P>The use of iterative statements (for, while, do-while, etc.) is forbidden inside the statement block.
+  <P>Neither direct altstep invocation, nor default activation are permitted.
+  <P>Function calls, which contain communication operations, shall also be avoided inside the statement block of interleave statement.
+  </li>
+  <li>
+  <p><b>...</b> indicates that&nbsp; several branches may occur in the <font face="Courier New" color="#003258" size="4"><b>interleave</b></font> body. There is no separator between them.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p>Example:
+<p><font face="Courier New">interleave {&nbsp;<br>
+&nbsp;&nbsp;&nbsp;[]&nbsp;L1_PCO.receive &nbsp;&nbsp;(tr_Sig1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L1_PCO.send &nbsp;&nbsp;(t_Sig2);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L1_PCO.receive(tr_Sig3)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<br>
+&nbsp;&nbsp;&nbsp;[] L2_PCO.receive &nbsp;&nbsp;(tr_Sig4)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L2_PCO.send &nbsp;&nbsp;(t_Sig5);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L2_PCO.receive(tr_Sig6);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L2_PCO.send &nbsp;&nbsp;(t_Sig7)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<br>
+};</font>
+<p>The reception events on ports L1_PCO and L2_PCO may happen in arbitrary order. The possible orderings of <i>incoming</i> messages are:
+<p><code> tr_Sig1, tr_Sig3, tr_Sig4, tr_Sig6<BR>
+tr_Sig1, tr_Sig4, tr_Sig3, tr_Sig6<BR>
+tr_Sig1, tr_Sig4, tr_Sig6, tr_Sig3<BR>
+tr_Sig4, tr_Sig1, tr_Sig3, tr_Sig6<BR>
+tr_Sig4, tr_Sig1, tr_Sig6, tr_Sig3<BR>
+tr_Sig4, tr_Sig6, tr_Sig1, tr_Sig3 </code>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#interleavedconstruct">BNF definition</a> of <font face="Courier New"> interleave</font></p>
+</body>
+</html>

@@ -1,0 +1,41 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:5.4.1, verify that strong typing is used for passing inout parameters
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+
+// The following requirement is tested:
+// When parameters are passed by reference, strong typing is required. Both the actual and formal 
+// parameter shall be of the same type.
+
+module Sem_050401_top_level_018 { 
+
+	type component GeneralComp {
+	}
+    
+    type record R1 {
+        integer field1,
+        integer field2
+    }
+    
+	function f(inout R1 p_rec) {
+
+		if (match(p_rec, {1,2})) // working
+		{ setverdict(pass); }
+        else { setverdict(fail, "p_rec value not matching ", p_rec, R1:{1,2}); } 
+		//not working : error: Cannot determine the type of the argument {1,2}, R1:{1,2} is working
+	}
+	
+	testcase TC_Sem_050401_top_level_018() runs on GeneralComp {
+        var R1 v_rec := { field1 := 1, field2 := 2 };
+		f(v_rec);
+	}
+
+	control{
+		execute(TC_Sem_050401_top_level_018());
+	}
+}

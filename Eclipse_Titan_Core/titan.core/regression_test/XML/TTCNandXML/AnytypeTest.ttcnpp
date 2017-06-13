@@ -1,0 +1,277 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module AnytypeTest {
+
+modulepar boolean Anytype_verbose := false;
+#define verbose Anytype_verbose
+
+#include "../macros.ttcnin"
+
+
+
+type component SAP {}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+DECLARE_XER_ENCODERS(anytype, at);
+DECLARE_EXER_ENCODERS(anytype, at);
+
+const anytype c_anytype := {charstring := "str"};
+
+const universal charstring c_anytype_str_b :=
+"<anytype>\n\t<charstring>str</charstring>\n</anytype>\n\n";
+
+const universal charstring c_anytype_str :=
+"<charstring>str</charstring>\n\n";
+
+testcase enc_anytype() runs on SAP
+{
+  CHECK_METHOD(bxer_enc_at, c_anytype, c_anytype_str_b);
+  CHECK_METHOD(exer_enc_at, c_anytype, c_anytype_str);
+}
+
+testcase dec_anytype() runs on SAP
+{
+  CHECK_DECODE(bxer_dec_at, c_anytype_str_b, anytype, c_anytype);
+  CHECK_DECODE(exer_dec_at, c_anytype_str, anytype, c_anytype);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+type anytype MyAnytype;
+
+DECLARE_XER_ENCODERS(MyAnytype, atal);
+DECLARE_EXER_ENCODERS(MyAnytype, atal);
+
+const MyAnytype c_anytypeal := {charstring := "str"};
+
+const universal charstring c_anytypeal_str_b :=
+"<MyAnytype>\n\t<charstring>str</charstring>\n</MyAnytype>\n\n";
+
+const universal charstring c_anytypeal_str :=
+"<charstring>str</charstring>\n\n";
+
+testcase enc_anytypealias() runs on SAP
+{
+  CHECK_METHOD(bxer_enc_atal, c_anytypeal, c_anytypeal_str_b);
+  CHECK_METHOD(exer_enc_atal, c_anytypeal, c_anytypeal_str);
+}
+
+testcase dec_anytypealias() runs on SAP
+{
+  CHECK_DECODE(bxer_dec_atal, c_anytypeal_str_b, MyAnytype, c_anytypeal);
+  CHECK_DECODE(exer_dec_atal, c_anytypeal_str, MyAnytype, c_anytypeal);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+type record of anytype RoAnytype;
+
+DECLARE_XER_ENCODERS(RoAnytype, roat);
+DECLARE_EXER_ENCODERS(RoAnytype, roat);
+
+const RoAnytype c_roanytype := { {charstring := "str"}, {integer := 4}, {octetstring := '012345'O}, {integer := 3}};
+
+const universal charstring c_roanytype_str_b :=
+"<RoAnytype>\n"&
+"\t<charstring>str</charstring>\n"&
+"\t<integer>4</integer>\n"&
+"\t<octetstring>012345</octetstring>\n"&
+"\t<integer>3</integer>\n"&
+"</RoAnytype>\n\n";
+
+const universal charstring c_roanytype_str :=
+"<RoAnytype>\n"&
+"\t<charstring>str</charstring>\n"&
+"\t<integer>4</integer>\n"&
+"\t<octetstring>012345</octetstring>\n"&
+"\t<integer>3</integer>\n"&
+"</RoAnytype>\n\n";
+
+testcase enc_roanytype() runs on SAP
+{
+  CHECK_METHOD(bxer_enc_roat, c_roanytype, c_roanytype_str_b);
+  CHECK_METHOD(exer_enc_roat, c_roanytype, c_roanytype_str);
+}
+
+testcase dec_roanytype() runs on SAP
+{
+  CHECK_DECODE(bxer_dec_roat, c_roanytype_str_b, RoAnytype, c_roanytype);
+  CHECK_DECODE(exer_dec_roat, c_roanytype_str, RoAnytype, c_roanytype);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+type record MyAnytypeRec {
+  anytype anytype_field,
+  MyAnytype anytype_field_alias,
+  anytype anytype_field2,
+  MyAnytype anytype_field_alias2,
+  RoAnytype anytype_field_ro,
+  charstring str
+}
+
+DECLARE_XER_ENCODERS(MyAnytypeRec, recat);
+DECLARE_EXER_ENCODERS(MyAnytypeRec, recat);
+
+const MyAnytypeRec c_myanytyperec := 
+{anytype_field := {charstring := "abc"},
+anytype_field_alias := {charstring := "def"},
+anytype_field2 := {charstring := "abcdef"},
+anytype_field_alias2 := {charstring := "defghi"},
+anytype_field_ro := { {charstring := "ttt"}, {integer := 4}},
+str := "ghi"};
+
+const universal charstring c_myanytyperec_str_b :=
+"<MyAnytypeRec>\n"&
+"\t<anytype_field>\n"&
+"\t\t<charstring>abc</charstring>\n"&
+"\t</anytype_field>\n"&
+"\t<anytype_field_alias>\n"&
+"\t\t<charstring>def</charstring>\n"&
+"\t</anytype_field_alias>\n"&
+"\t<anytype_field2>\n"&
+"\t\t<charstring>abcdef</charstring>\n"&
+"\t</anytype_field2>\n"&
+"\t<anytype_field_alias2>\n"&
+"\t\t<charstring>defghi</charstring>\n"&
+"\t</anytype_field_alias2>\n"&
+"\t<anytype_field_ro>\n"&
+"\t\t<charstring>ttt</charstring>\n"&
+"\t\t<integer>4</integer>\n"&
+"\t</anytype_field_ro>\n"&
+"\t<str>ghi</str>\n"&
+"</MyAnytypeRec>\n\n";
+
+const universal charstring c_myanytyperec_str :=
+"<MyAnytypeRec>\n"&
+"\t<charstring>abc</charstring>\n"&
+"\t<charstring>def</charstring>\n"&
+"\t<charstring>abcdef</charstring>\n"&
+"\t<charstring>defghi</charstring>\n"&
+"\t<anytype_field_ro>\n"&
+"\t\t<charstring>ttt</charstring>\n"&
+"\t\t<integer>4</integer>\n"&
+"\t</anytype_field_ro>\n"&
+"\t<str>ghi</str>\n"&
+"</MyAnytypeRec>\n\n";
+
+testcase enc_myanytyperec() runs on SAP
+{
+  CHECK_METHOD(bxer_enc_recat, c_myanytyperec, c_myanytyperec_str_b);
+  CHECK_METHOD(exer_enc_recat, c_myanytyperec, c_myanytyperec_str);
+}
+
+testcase dec_myanytyperec() runs on SAP
+{
+  CHECK_DECODE(bxer_dec_recat, c_myanytyperec_str_b, MyAnytypeRec, c_myanytyperec);
+  CHECK_DECODE(exer_dec_recat, c_myanytyperec_str, MyAnytypeRec, c_myanytyperec);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+
+type record of anytype AnyTypeRo2
+with {
+  variant "untagged";
+}
+
+type record MyAnytypeRec2 {
+  AnyTypeRo2 anytype_field_ro
+}
+
+
+DECLARE_XER_ENCODERS(MyAnytypeRec2, recat2);
+DECLARE_EXER_ENCODERS(MyAnytypeRec2, recat2);
+
+const MyAnytypeRec2 c_myanytyperec2 := {anytype_field_ro := {{charstring := "gdf"}, {integer := 44}}};
+
+const universal charstring c_myanytyperec2_str_b :=
+"<MyAnytypeRec2>\n"&
+"\t<anytype_field_ro>\n"&
+"\t\t<charstring>gdf</charstring>\n"&
+"\t\t<integer>44</integer>\n"&
+"\t</anytype_field_ro>"&
+"\n</MyAnytypeRec2>\n\n";
+
+const universal charstring c_myanytyperec2_str :=
+"<MyAnytypeRec2>\n"&
+"\t<charstring>gdf</charstring>\n"&
+"\t<integer>44</integer>\n"&
+"</MyAnytypeRec2>\n\n";
+
+testcase tc_enc_anytype_ro_untagged() runs on SAP {
+  CHECK_METHOD(bxer_enc_recat2, c_myanytyperec2, c_myanytyperec2_str_b);
+  CHECK_METHOD(exer_enc_recat2, c_myanytyperec2, c_myanytyperec2_str);
+}
+
+testcase tc_dec_anytype_ro_untagged() runs on SAP
+{
+  CHECK_DECODE(bxer_dec_recat2, c_myanytyperec2_str_b, MyAnytypeRec2, c_myanytyperec2);
+  CHECK_DECODE(exer_dec_recat2, c_myanytyperec2_str, MyAnytypeRec2, c_myanytyperec2);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+type boolean MyBool 
+with {
+  variant "defaultForEmpty as 'true'";
+  variant "XSD:boolean";
+}
+
+type record DFERecAnyType {
+  anytype at
+}
+
+DECLARE_XER_ENCODERS(DFERecAnyType, dferec);
+DECLARE_EXER_ENCODERS(DFERecAnyType, dferec);
+
+const DFERecAnyType c_dferec := {at := {MyBool := true}};
+
+const universal charstring c_dferec_str :=
+"<DFERecAnyType>\n"&
+"\t<MyBool/>\n"&
+"</DFERecAnyType>\n\n";
+
+testcase tc_dec_anytype_DFE() runs on SAP {
+  CHECK_DECODE(exer_dec_dferec, c_dferec_str, DFERecAnyType, c_dferec);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+control {
+  execute(enc_anytype());
+  execute(dec_anytype());
+
+  execute(enc_anytypealias());
+  execute(dec_anytypealias());
+
+  execute(enc_roanytype());
+  execute(dec_roanytype());
+
+  execute(enc_myanytyperec());
+  execute(dec_myanytyperec());
+
+  execute(tc_enc_anytype_ro_untagged());
+  execute(tc_dec_anytype_ro_untagged());
+
+  execute(tc_dec_anytype_DFE());
+}
+
+
+
+}
+with {
+  encode "XML"
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  extension "anytype integer, MyBool, charstring, octetstring"}
+

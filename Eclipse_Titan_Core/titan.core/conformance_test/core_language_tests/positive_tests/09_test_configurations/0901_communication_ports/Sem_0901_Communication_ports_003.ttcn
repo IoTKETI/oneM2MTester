@@ -1,0 +1,119 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:9, Ensure that the the IUT receives the message sent by mycompB and mycompC
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ** @configuration  port:broadcast
+ ***************************************************/
+
+// 3 component message exchange
+module Sem_0901_Communication_ports_003{ 
+  
+	type port myport message {
+	  inout integer
+	} with {extension "internal"}
+
+	type component Mysystem
+	{
+		timer t_rec,t_rec2;
+	 	port myport messagePort;
+	}
+
+
+	//function fsend( Mysystem M1 ) runs on Mysystem {
+	function fsend( Mysystem M1, Mysystem M2 ) runs on Mysystem {
+
+		//messagePort.send(2) to all component; broadcast not supported
+		messagePort.send(2) to M1;
+		messagePort.send(2) to M2;
+		t_rec2.start(20.0);
+
+		log("SEND");
+	
+		alt {
+			 [] messagePort.receive(3) {
+				setverdict(pass);
+			 }
+			 [] messagePort.receive {
+				setverdict(fail);
+			 }
+			 [] t_rec2.timeout {
+				setverdict( inconc );
+			 }
+		} 
+		t_rec2.stop;
+	}
+
+	function frec() runs on Mysystem {
+	 	t_rec.start( 15.0 );
+
+		log("REC ", self);		
+	
+		alt {
+			[]  messagePort.receive(2) {
+				messagePort.send(3);
+				setverdict( pass );
+			}
+			[] messagePort.receive {
+				setverdict( fail );
+			}
+			[] t_rec.timeout {
+				setverdict( inconc );
+			}
+		}
+		t_rec.stop;
+	}
+	
+	testcase TC_Sem_0901_Communication_ports_003() runs on Mysystem {
+		var Mysystem MyCompA;
+		var Mysystem MyCompB;
+		var Mysystem MyCompC;
+
+		log("START");
+	
+		MyCompA:=Mysystem.create ("A") alive;
+		MyCompB:=Mysystem.create ("B") alive;
+		MyCompC:=Mysystem.create ("C") alive;
+
+		connect(MyCompA:messagePort,MyCompB:messagePort);
+		//connect(MyCompB:messagePort,MyCompA:messagePort);
+		connect(MyCompA:messagePort,MyCompC:messagePort);
+		//connect(MyCompC:messagePort,MyCompA:messagePort);
+
+		MyCompB.start(frec());
+		MyCompC.start(frec());
+		//MyCompA.start(fsend(MyCompB));
+		MyCompA.start(fsend(MyCompB,MyCompC));
+
+		//MyCompA.done;
+		MyCompB.done;
+		MyCompC.done;
+
+	/*	alt { //alapbol itt volt
+		 [] messagePort.receive(3) {
+		    setverdict(pass);
+		 }
+		 [] messagePort.receive {
+		    setverdict(fail);
+		 }
+		}*/
+
+		//if(MyCompA.alive)
+		//{ log("ALIVE"); }
+		//else
+		//{ log("DEAD"); }
+
+
+		MyCompB.stop;
+		MyCompC.stop;
+		MyCompA.stop;
+	}
+
+	control{
+		execute(TC_Sem_0901_Communication_ports_003());
+	}
+}
+

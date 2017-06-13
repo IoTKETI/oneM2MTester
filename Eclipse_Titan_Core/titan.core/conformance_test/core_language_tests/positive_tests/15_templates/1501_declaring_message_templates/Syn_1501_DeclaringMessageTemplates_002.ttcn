@@ -1,0 +1,30 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:15.1, Ensure that a simple record-based message template with a wildcard ? is accepted.
+ ** @verdict  pass accept, noexecution
+ *****************************************************************/
+
+module Syn_1501_DeclaringMessageTemplates_002 {
+
+	type record MyMessageType {
+		integer field1 optional
+	}
+
+	template MyMessageType m_myTemplate := { 
+		field1 := ?
+	}
+	
+	type component GeneralComp {}
+
+	testcase TC_Syn_1501_DeclaringMessageTemplates_002() runs on GeneralComp 
+	{ setverdict(pass);	}
+	
+	control
+	{ execute(TC_Syn_1501_DeclaringMessageTemplates_002()); }
+
+
+}

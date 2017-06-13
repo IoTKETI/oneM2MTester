@@ -1,0 +1,27 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// Tests for the '@deterministic' modifier for functions
+// (which is currently ignored by the compiler, but must not cause errors)
+module M {
+
+function @deterministic f1() return integer {
+  return 1;
+}
+
+function @deterministic f2(in integer x, out integer y) {
+  y := x + f1();
+}
+
+external function @deterministic ef(in integer x) return integer;
+
+}

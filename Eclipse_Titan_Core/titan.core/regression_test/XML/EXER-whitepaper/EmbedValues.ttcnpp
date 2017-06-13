@@ -1,0 +1,335 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Delic, Adam
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module EmbedValues {
+modulepar boolean EmbedValues_verbose := false;
+#define verbose EmbedValues_verbose
+#include "../macros.ttcnin"
+
+type component EMB {}
+
+type record EmbProduct {
+  record of universal charstring embed_values,
+  universal charstring companyName,
+  universal charstring productColor,
+  universal charstring productName,
+  octetstring productId
+}
+with {
+  variant "embedValues"
+}
+
+
+DECLARE_XER_ENCODERS(EmbProduct, emb);
+DECLARE_EXER_ENCODERS(EmbProduct, emb);
+
+const EmbProduct embval := {
+  embed_values := {"My Company", "produces", "", "with ID", "which is very popular"},
+  companyName  := "ABC",
+  productColor := "red",
+  productName  := "shirt",
+  productId    := 'C119B6'O
+}
+
+const universal charstring str_emb_e :=
+"<EmbProduct>My Company<companyName>ABC</companyName>produces<productColor>red</productColor><productName>shirt</productName>with ID<productId>C119B6</productId>which is very popular</EmbProduct>\n";
+
+const universal charstring str_emb_b :=
+"<EmbProduct>\n" &
+"\t<embed_values>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>My Company</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>produces</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING/>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>with ID</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>which is very popular</UNIVERSAL_CHARSTRING>\n" &
+"\t</embed_values>\n" &
+"\t<companyName>ABC</companyName>\n" &
+"\t<productColor>red</productColor>\n" &
+"\t<productName>shirt</productName>\n" &
+"\t<productId>C119B6</productId>\n" &
+"</EmbProduct>\n" &
+"\n";
+
+testcase encode_emb() runs on EMB
+{
+  CHECK_METHOD(bxer_enc_emb, embval, str_emb_b);
+  CHECK_METHOD(exer_enc_emb, embval, str_emb_e);
+}
+
+testcase decode_emb() runs on EMB
+{
+  var EmbProduct expected := embval;
+  CHECK_DECODE(bxer_dec_emb, str_emb_b, EmbProduct, expected);
+  CHECK_DECODE(exer_dec_emb, str_emb_e, EmbProduct, expected);
+}
+
+type record EmbedAllTypes {
+  record of universal charstring embed_values,
+  integer i,
+  float f,
+  boolean b,
+  bitstring bs,
+  hexstring hs,
+  octetstring os,
+  charstring cs,
+  universal charstring ucs,
+  enumerated { Big, Small } size,
+  record {
+    universal charstring name,
+    integer phonePrefix
+  } country,
+  record of bitstring bytes,
+  union {
+    universal charstring townName,
+    integer zipCode
+  } location
+} with {
+  variant "embedValues"
+}
+
+DECLARE_EXER_ENCODERS(EmbedAllTypes, emb_all);
+
+const EmbedAllTypes c_emb_all := { 
+  { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen" },
+  2,
+  7.1,
+  true,
+  '110101'B,
+  'ABC12'H,
+  'C119B6'O,
+  "nothing",
+  "something",
+  Small,
+  { "Hungary", 36 },
+  { '10011011'B, '11111111'B },
+  { townName := "London" }
+};
+
+const universal charstring str_emb_all := 
+"<EmbedAllTypes>one<i>2</i>two<f>7.100000</f>three<b>true</b>four<bs>110101</bs>five<hs>ABC12</hs>six<os>C119B6</os>seven<cs>nothing</cs>eight<ucs>something</ucs>nine<size>Small</size>ten<country><name>Hungary</name><phonePrefix>36</phonePrefix></country>eleven<bytes><BIT_STRING>10011011</BIT_STRING><BIT_STRING>11111111</BIT_STRING></bytes>twelve<location><townName>London</townName></location>thirteen</EmbedAllTypes>\n";
+
+testcase encode_emb_all() runs on EMB
+{
+  CHECK_METHOD(exer_enc_emb_all, c_emb_all, str_emb_all);
+}
+
+testcase decode_emb_all() runs on EMB
+{
+  CHECK_DECODE(exer_dec_emb_all, str_emb_all, EmbedAllTypes, c_emb_all);
+}
+
+type record EmbedAnyElem {
+  record of universal charstring embed_values,
+  integer id,
+  universal charstring anyElem,
+  octetstring bytes
+} with {
+  variant "embedValues";
+  variant (anyElem) "anyElement";
+}
+
+DECLARE_EXER_ENCODERS(EmbedAnyElem, emb_any);
+
+const EmbedAnyElem c_emb_any := { 
+  { "one", "two", "three", "four" },
+  2,
+  "<something/>",
+  'A1'O
+};
+
+const universal charstring str_emb_any := 
+"<EmbedAnyElem>one<id>2</id>two<something/>three<bytes>A1</bytes>four</EmbedAnyElem>\n";
+
+testcase encode_emb_any() runs on EMB
+{
+  CHECK_METHOD(exer_enc_emb_any, c_emb_any, str_emb_any);
+}
+
+testcase decode_emb_any() runs on EMB
+{
+  CHECK_DECODE(exer_dec_emb_any, str_emb_any, EmbedAnyElem, c_emb_any);
+}
+
+// EMBED-VALUES with untagged array
+// the values are also embedded between the array elements, not just the fields of the record
+type record Inner {
+  integer num,
+  charstring str
+}
+
+type record length (1..infinity) of Inner RoInner;
+
+type record Outer {
+  record of universal charstring embed_values,
+  integer attr,
+  octetstring bytes,
+  RoInner stuff
+} with {
+  variant "embedValues";
+  variant(attr) "attribute";
+  variant(bytes) "name as 'Bytes'";
+  variant(stuff) "untagged";
+}
+
+DECLARE_EXER_ENCODERS(Outer, emb_outer);
+
+const Outer c_emb_array := {
+  embed_values := { "one", "two", "three", "four", "five", "six" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+const Outer c_emb_array_w_holes := {
+  embed_values := { "one", "", "three", "", "five" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+const universal charstring str_emb_array :=
+"<Outer attr='48'>one" &
+"<Bytes>DEADBEEF</Bytes>two" &
+"<Inner><num>3</num><str>abc</str></Inner>three" &
+"<Inner><num>4</num><str>def</str></Inner>four" &
+"<Inner><num>-6</num><str>red</str></Inner>five" &
+"<Inner><num>118</num><str>blue</str></Inner>six</Outer>\n";
+
+const universal charstring str_emb_array_w_holes :=
+"<Outer attr='48'>one" &
+"<Bytes>DEADBEEF</Bytes>" &
+"<Inner><num>3</num><str>abc</str></Inner>three" &
+"<Inner><num>4</num><str>def</str></Inner>" &
+"<Inner><num>-6</num><str>red</str></Inner>five" &
+"<Inner><num>118</num><str>blue</str></Inner></Outer>\n";
+
+testcase encode_emb_array() runs on EMB
+{
+  CHECK_METHOD(exer_enc_emb_outer, c_emb_array, str_emb_array);
+  CHECK_METHOD(exer_enc_emb_outer, c_emb_array_w_holes, str_emb_array_w_holes);
+}
+
+testcase decode_emb_array() runs on EMB
+{
+  CHECK_DECODE(exer_dec_emb_outer, str_emb_array, Outer, c_emb_array);
+  CHECK_DECODE(exer_dec_emb_outer, str_emb_array_w_holes, Outer, c_emb_array_w_holes);
+}
+
+// same as before, but the embedded values are stored in an optimized record-of
+type record Outer2 {
+  record of universal charstring embed_values,
+  integer attr,
+  octetstring bytes,
+  RoInner stuff
+} with {
+  variant "name as 'Outer'";
+  extension(embed_values) "optimize:memalloc";
+  variant "embedValues";
+  variant(attr) "attribute";
+  variant(bytes) "name as 'Bytes'";
+  variant(stuff) "untagged";
+}
+
+DECLARE_EXER_ENCODERS(Outer2, emb_outer2);
+
+const Outer2 c_emb_array2 := {
+  embed_values := { "one", "two", "three", "four", "five", "six" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+const Outer2 c_emb_array_w_holes2 := {
+  embed_values := { "one", "", "three", "", "five" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+testcase encode_emb_array_opt() runs on EMB
+{
+  CHECK_METHOD(exer_enc_emb_outer2, c_emb_array2, str_emb_array);
+  CHECK_METHOD(exer_enc_emb_outer2, c_emb_array_w_holes2, str_emb_array_w_holes);
+}
+
+testcase decode_emb_array_opt() runs on EMB
+{
+  CHECK_DECODE(exer_dec_emb_outer2, str_emb_array, Outer2, c_emb_array2);
+  CHECK_DECODE(exer_dec_emb_outer2, str_emb_array_w_holes, Outer2, c_emb_array_w_holes2);
+}
+
+// same as before, but one of the embedded record-ofs is optimized
+type record length (1..infinity) of Inner RoInner2 with { extension "optimize:memalloc" };
+
+type record Outer3 {
+  record of universal charstring embed_values,
+  integer attr,
+  octetstring bytes,
+  RoInner2 stuff
+} with {
+  variant "name as 'Outer'";
+  extension(embed_values) "optimize:memalloc";
+  variant "embedValues";
+  variant(attr) "attribute";
+  variant(bytes) "name as 'Bytes'";
+  variant(stuff) "untagged";
+}
+
+DECLARE_EXER_ENCODERS(Outer3, emb_outer3);
+
+const Outer3 c_emb_array3 := {
+  embed_values := { "one", "two", "three", "four", "five", "six" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+const Outer3 c_emb_array_w_holes3 := {
+  embed_values := { "one", "", "three", "", "five" },
+  attr := 48,
+  bytes := 'DEADBEEF'O,
+  stuff := { { 3, "abc" }, { 4, "def" }, { -6, "red" }, { 118, "blue" } }
+}
+
+testcase encode_emb_array_opt2() runs on EMB
+{
+  CHECK_METHOD(exer_enc_emb_outer3, c_emb_array3, str_emb_array);
+  CHECK_METHOD(exer_enc_emb_outer3, c_emb_array_w_holes3, str_emb_array_w_holes);
+}
+
+testcase decode_emb_array_opt2() runs on EMB
+{
+  CHECK_DECODE(exer_dec_emb_outer3, str_emb_array, Outer3, c_emb_array3);
+  CHECK_DECODE(exer_dec_emb_outer3, str_emb_array_w_holes, Outer3, c_emb_array_w_holes3);
+}
+
+control {
+  execute(encode_emb());
+  execute(decode_emb());
+  execute(encode_emb_all());
+  execute(decode_emb_all());
+  execute(encode_emb_any());
+  execute(decode_emb_any());
+  execute(encode_emb_array());
+  execute(decode_emb_array());
+  execute(encode_emb_array_opt());
+  execute(decode_emb_array_opt());
+  execute(encode_emb_array_opt2());
+  execute(decode_emb_array_opt2());
+}
+
+}
+with {
+  encode "XML"
+}

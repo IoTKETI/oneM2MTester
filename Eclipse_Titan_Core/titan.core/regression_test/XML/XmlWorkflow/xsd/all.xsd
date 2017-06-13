@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+  Szabo, Bence Janos
+-->
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:this="www.example.org/all"
+targetNamespace="www.example.org/all">
+
+<xsd:attribute name="attrGlobal" type="token"/>
+
+<xsd:attributeGroup name="attrGroup">
+	<xsd:attribute name="attrInGroup2" type="token"/>
+	<xsd:attribute name="attrInGroup1" type="token"/>
+</xsd:attributeGroup>
+
+
+<xsd:annotation><xsd:documentation xml:lang="EN">All, mandatory</xsd:documentation></xsd:annotation>
+
+<xsd:complexType name="e29a"> 
+	<xsd:all>
+		<xsd:element name="foo" type="integer"/>
+		<xsd:element name="bar" type="float"/>
+		<xsd:element name="ding" type="string"/>
+	</xsd:all>
+</xsd:complexType>
+
+<xsd:complexType name="e29aAndAttributes"> 
+	<xsd:all>
+		<xsd:element name="foo" type="integer"/>
+		<xsd:element name="bar" type="float"/>
+		<xsd:element name="ding" type="string"/>
+	</xsd:all>
+	<xsd:attribute name="attrLocal" type="integer"/>
+	<xsd:attribute ref="this:attrGlobal"/>
+	<xsd:attributeGroup ref="this:attrGroup"/>
+</xsd:complexType>
+
+<xsd:annotation><xsd:documentation xml:lang="EN">All, optional</xsd:documentation></xsd:annotation>
+
+<xsd:complexType name="e29bAndAttributes"> 
+	<xsd:all minOccurs="0">
+		<xsd:element name="foo" type="integer"/>
+		<xsd:element name="bar" type="float"/>
+		<xsd:element name="ding" type="string"/>
+	</xsd:all>
+	<xsd:attribute name="attrLocal" type="integer"/>
+	<xsd:attribute ref="this:attrGlobal"/>
+	<xsd:attributeGroup ref="this:attrGroup"/>
+</xsd:complexType>
+
+<xsd:annotation><xsd:documentation xml:lang="EN">All, some elements are optional</xsd:documentation></xsd:annotation>
+
+<xsd:complexType name="e29cAndAttributes"> 
+	<xsd:all>
+		<xsd:element name="foo" type="integer"/>
+		<xsd:element name="bar" type="float" minOccurs="0"/>
+		<xsd:element name="ding" type="string"/>
+	</xsd:all>
+	<xsd:attribute name="attrLocal" type="integer"/>
+	<xsd:attribute ref="this:attrGlobal"/>
+	<xsd:attributeGroup ref="this:attrGroup"/>
+</xsd:complexType>
+
+<xsd:element name="e29cAndAttributesReferenceOptional">
+	<xsd:complexType>
+		<xsd:group ref="this:e29a" minOccurs="0"/>
+		<xsd:attribute name="attr" type="string" />
+	</xsd:complexType>
+</xsd:element>  
+
+</xsd:schema>

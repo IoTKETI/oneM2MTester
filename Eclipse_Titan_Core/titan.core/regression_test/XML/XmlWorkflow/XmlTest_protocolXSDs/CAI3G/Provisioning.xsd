@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema targetNamespace="http://schemas.ericsson.com/upg/provisioning/1.0"
+			xmlns:cai3g="http://schemas.ericsson.com/cai3g1.1/"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns="http://schemas.ericsson.com/upg/provisioning/1.0"
+			elementFormDefault="qualified" 
+			attributeFormDefault="unqualified">
+
+
+<xs:import namespace="http://schemas.ericsson.com/cai3g1.1/" schemaLocation="GenericCai3gType.xsd" />
+
+
+<xs:complexType name="AnyDocumentType">
+	<xs:sequence>
+		<xs:any namespace="##any" processContents="lax" maxOccurs="unbounded"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<!-- Resource MO -->
+<!-- Resource MOType  resource@http://schemas.ericsson.com/upg/provisioning/1.0 -->
+<!-- Resource MOId -->
+
+
+<xs:complexType name="ResourceMO">
+	<xs:sequence>
+		<xs:element name="ResourceId" type="xs:anyURI"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<!-- /Resource MOId -->
+<!-- Resource MOAttributes -->
+
+
+<xs:element name="CreateResourceAttributes" type="CreateResourceAttributesType" substitutionGroup="cai3g:CreateMODefinition"/>
+
+
+<xs:complexType name="CreateResourceAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractCreateAttributeType">
+			<xs:sequence>
+				<xs:element name="Identifiers" maxOccurs="1" minOccurs="1" type="IdentifiersType"/>
+				<xs:element name="RepositoryIds" type="RepositoryIdType" maxOccurs="1" minOccurs="1"/>
+				<xs:element name="AdditionalData" type="AdditionalDataType" maxOccurs="1" minOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="ResourceId" type="xs:anyURI"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<xs:complexType name="AdditionalDataType">
+	<xs:sequence>
+		<xs:element name="Data" type="DataType" maxOccurs="unbounded" minOccurs="0"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="DataType">
+	<xs:sequence>
+		<xs:element name="Name" type="xs:string" maxOccurs="1" minOccurs="1"/>
+		<xs:element name="Value" type="xs:string" maxOccurs="1" minOccurs="1"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="RepositoryIdType">
+	<xs:sequence>
+		<xs:element name="RepositoryId" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="IdentifiersType">
+	<xs:sequence>
+		<xs:element name="Identifier" type="IdentifierType" minOccurs="1" maxOccurs="unbounded"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="IdentifierType">
+	<xs:sequence>
+		<xs:element name="ResourceId" type="xs:anyURI" minOccurs="1"/>
+		<xs:element name="Priority" type="xs:int" minOccurs="0" maxOccurs="1" default="1"/>
+		<xs:element name="Searchable" type="xs:boolean" minOccurs="0" maxOccurs="1" default="true"/>
+	</xs:sequence> 
+	<xs:attribute name="ResourceId" type="xs:anyURI">
+	</xs:attribute>
+</xs:complexType>
+
+
+<xs:element name="GetResourceAttributes" type="GetResourceAttributesType" substitutionGroup="cai3g:GetMODefinition"/>
+
+
+<xs:complexType name="GetResourceAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractGetAttributeType">
+			<xs:sequence>
+				<xs:element name="Identifiers" type="IdentifiersType" maxOccurs="1" minOccurs="1"/>
+				<xs:element name="RepositoryIds" type="RepositoryIdType" maxOccurs="1" minOccurs="0"/>
+				<xs:element name="AdditionalData" type="AdditionalDataType" maxOccurs="1" minOccurs="0"/>
+			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<!-- /Resource MOAttributes -->
+<!-- /Resource MO -->
+<!-- Identifier MO -->
+<!-- Identifier MOType identifier@http://schemas.ericsson.com/upg/provisioning/1.0 -->
+<!-- Identifier MOId -->
+
+
+<xs:complexType name="IdentifierMO">
+	<xs:sequence>
+		<xs:element name="ResourceId" type="xs:anyURI"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<!-- /Identifier MOId -->
+<!-- Identifier MOAttributes -->
+
+
+<xs:element name="CreateIdentifierAttributes" type="CreateIdentifierAttributesType" substitutionGroup="cai3g:CreateMODefinition" />
+
+
+<xs:complexType name="CreateIdentifierAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractCreateAttributeType">
+			<xs:sequence>
+				<xs:element name="ResourceId" type="xs:anyURI" maxOccurs="1" minOccurs="1"/>
+				<xs:element name="Priority" type="xs:int" maxOccurs="1" minOccurs="0" default="1"/>
+				<xs:element name="Searchable" type="xs:boolean" maxOccurs="1" minOccurs="0" default="true"/>
+			</xs:sequence>
+			<xs:attribute name="ResourceId" type="xs:anyURI"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<xs:element name="SetIdentifierAttributes" type="SetIdentifierAttributesType" substitutionGroup="cai3g:SetMODefinition" />
+
+
+<xs:complexType name="SetIdentifierAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractSetAttributeType">
+			<xs:sequence>
+				<xs:element name="ResourceId" type="xs:anyURI" maxOccurs="1" minOccurs="1"/>
+				<xs:element name="Priority" type="xs:int" maxOccurs="1" minOccurs="0" default="1"/>
+				<xs:element name="Searchable" type="xs:boolean" maxOccurs="1" minOccurs="0" default="true"/>
+			</xs:sequence>
+			<xs:attribute name="ResourceId" type="xs:anyURI"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<!-- /Identifier MOAttributes -->
+<!-- /Identifier MO -->
+<!-- repositoryid MO -->
+<!-- repositoryid MOType repositoryid@http://schemas.ericsson.com/upg/provisioning/1.0-->
+<!-- repositoryid MOId -->
+
+
+<xs:complexType name="RepositoryIdMO">
+	<xs:sequence>
+		<xs:element name="ResourceId" type="xs:anyURI"/>
+		<xs:element name="RepositoryId" type="xs:string"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<!-- /repositoryid MOId -->
+<!-- repositoryid MOAttributes -->
+
+
+<xs:element name="CreateRepositoryIdsAttributes" type="CreateRepositoryIdsAttributesType" substitutionGroup="cai3g:CreateMODefinition" />
+
+
+<xs:complexType name="CreateRepositoryIdsAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractCreateAttributeType"/>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<xs:element name="SetRepositoryIdsAttributes" type="SetRepositoryIdsAttributesType" substitutionGroup="cai3g:SetMODefinition" />
+
+
+<xs:complexType name="SetRepositoryIdsAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractSetAttributeType">
+			<xs:sequence>
+				<xs:element name="RepositoryId" type="xs:string" maxOccurs="1" minOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="ResourceId" type="xs:anyURI"/>
+			<xs:attribute name="RepositoryId" type="xs:string"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<!-- /repositoryid MOAttributes -->
+<!-- /repositoryid MO -->
+<!-- Additional Data MO -->
+<!-- Additional Data MOType data@http://schemas.ericsson.com/provisioning/1.0 -->
+<!-- Additional Data MOId -->
+
+
+<xs:complexType name="AdditionalDataMO">
+	<xs:sequence>
+		<xs:element name="ResourceId" type="xs:anyURI"/>
+		<xs:element name="Name" type="xs:string"/>
+	</xs:sequence>
+</xs:complexType>
+
+
+<!-- /Additional Data MOId -->
+<!-- Additional Data MOAttributes -->
+
+
+<xs:element name="CreateAdditionalDataAttributes" type="CreateAdditionalDataAttributesType" substitutionGroup="cai3g:CreateMODefinition" />
+
+
+<xs:complexType name="CreateAdditionalDataAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractCreateAttributeType">
+			<xs:sequence>
+				<xs:element name="Value" type="xs:string" maxOccurs="1" minOccurs="1"/>
+			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<xs:element name="SetAdditionalDataAttributes" type="SetAdditionalDataAttributesType" substitutionGroup="cai3g:SetMODefinition" />
+
+
+<xs:complexType name="SetAdditionalDataAttributesType">
+	<xs:complexContent>
+		<xs:extension base="cai3g:AbstractSetAttributeType">
+			<xs:sequence>
+				<xs:element name="Value" type="xs:string" maxOccurs="1" minOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="ResourceId" type="xs:anyURI"/>
+			<xs:attribute name="Name" type="xs:string"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<!-- /Additional Data MOAttributes -->
+<!-- /Additional Data MO -->
+
+
+</xs:schema>

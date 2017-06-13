@@ -1,0 +1,57 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module tcname_SW {	//^In TTCN-3 module `tcname_SW'://
+
+type component PDTestComponent {};
+
+/* Tests for testcasename() function.  */
+
+function testcasename_in_func() return charstring {
+  return testcasename()
+}
+
+function testcasename_in_func_runson() runs on PDTestComponent return charstring {
+  return testcasename()
+}
+
+testcase testcasename_in_tc() runs on PDTestComponent { //In testcase definition//
+  if ("testcasename_in_tc" == testcasename_in_func())
+  	   { setverdict(pass) }
+  else { setverdict(fail) }
+  // For simple cases these should be the same.
+  if (%testcaseId == testcasename_in_func())
+       { setverdict(pass) }
+  else { setverdict(fail) }
+  if (%testcaseId == testcasename_in_func_runson())
+       { setverdict(pass) }
+  else { setverdict(fail) }
+  if (testcasename() == "testcasename_in_tc")
+       { setverdict(pass) }
+  else { setverdict(fail) } //^In else statement// \
+                             //^warning\: Control never reaches this code because of previous effective condition\(s\)//
+}
+
+// Empty string from the control part.
+testcase testcasename_from_control(in charstring p) runs on PDTestComponent {
+  if (p == "") { setverdict(pass) } else { setverdict(fail) }
+}
+
+control {
+  execute(testcasename_in_tc());
+  execute(testcasename_from_control(testcasename()));
+  // Call again outside testcase, but not directly from the control part.
+  execute(testcasename_from_control(testcasename_in_func()));
+}
+
+
+}

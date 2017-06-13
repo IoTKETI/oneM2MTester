@@ -1,0 +1,83 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module hello_world
+{
+//====================== Data Types ======================
+type record of charstring RoC; //unconstrained array of character strings
+
+//====================== Port Types ======================
+type port MYPORT message {
+  inout charstring
+} with {extension "internal"}
+
+//====================== Component Types ======================
+type component MYCOMP {
+  const integer c_MyCompDummyConstant := 42;
+  var integer v_MyCompDummyVariable1, v_MyCompDummyVariable2 := 1;
+  timer T_MyCompDummyTimer;
+  port MYPORT myport
+}
+
+//====================== Constants ======================
+const charstring ws0 := "(\n| )#(0,)"
+
+//====================== Templates ======================
+//Strings containing the words "hello" and "word", in all small, or
+//all capital letters, or small letters with first letter capital;
+//exclamation mark is optional; whitespaces allowed
+template charstring t_expected :=
+  pattern "{ws0}(((h|H)ello {ws0}(w|W)orld)|HELLO {ws0}WORLD){ws0}!#(0,1){ws0}"
+
+//====================== Functions ======================
+function f_PTC(charstring pl_toSend) runs on MYCOMP {
+  myport.send(pl_toSend);
+}
+
+//====================== Testcases ======================
+testcase TC(charstring pl_toSend) runs on MYCOMP {
+  var charstring vl_received;
+  var MYCOMP vl_PTC := MYCOMP.create alive;
+  connect (self:myport,vl_PTC:myport);
+  vl_PTC.start(f_PTC(pl_toSend));
+  T_MyCompDummyTimer.start(5.0);
+  alt {
+    [] myport.receive(t_expected)-> value vl_received {
+     setverdict(pass,"expected message received: ",vl_received)
+    }
+    [] myport.receive (charstring:?) -> value vl_received{
+      setverdict(fail,"Unexpected message received: ",vl_received)
+    }
+    [] T_MyCompDummyTimer.timeout { setverdict(inconc);}
+  }
+}
+
+//=========================================================================
+// Control Part
+//=========================================================================
+control {
+  var RoC vl_inputs := {
+    "HELLO WORLD!",
+    "hello world",
+    "Hello World!",
+    "hello WORLD!",
+    "hELLO wORLD!",
+    "helloworld!"
+  }
+  var integer i, vl_noStrings := sizeof(vl_inputs);
+  for (i:=0; i< vl_noStrings; i:=i+1){
+    execute (TC(vl_inputs[i]),5.0)
+  }
+  
+  //3 pass, 3 fail expected
+} // end of control part
+
+}  // end of module

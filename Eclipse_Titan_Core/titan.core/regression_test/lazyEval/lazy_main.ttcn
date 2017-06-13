@@ -1,0 +1,2245 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *
+ ******************************************************************************/
+module lazy_main {
+
+// Description:
+// The goal of this project is to test the feature "Lazy Parameter Evaluation" 
+// described in chapter 4.29 of referenceguide.doc 
+// Reference: Programmers's Technical Reference Guide for TITAN TTCN-3 Test Executor 
+//            2/19817-CRL 113 200/3 Uen Rev C
+//
+// Import chain: lazy_main<-lazy_A<-lazy_B<-lazy_C
+//
+//
+
+import from lazy_defs all;
+import from lazy_A all;
+import from LazyASNTypes all;
+
+
+//****************************************
+//****************************************
+//****            Functions           ****
+//****************************************
+//****************************************
+
+
+
+//****************************************
+//*** General functions               ****
+//****************************************
+function f_verdict(in boolean pl_value) runs on MyComp {
+  if(pl_value) {setverdict(pass)} else {setverdict(fail)};
+  //log("value:", pl_value);
+}
+
+//****************************************
+//*** Functions returning with integer ***
+//****************************************
+
+group g_functions_returning_integer {
+
+  function f_fail()  runs on MyComp return integer{
+    setverdict(fail);
+    return 1; //dummy
+  }
+
+  function f_returnOnefailIfIZero() runs on MyComp return integer{
+    if( v_i==0 ) {
+      setverdict(fail, "This function intentionally fails if v_i==0");
+    } else {
+      setverdict(pass, "This function intentionally pass if v_i!=0");
+    }
+    v_numberOfCalls:=v_numberOfCalls+1;
+    return 1;
+  }
+
+  function f_returnOnePassIfIZero() runs on MyComp return integer{
+    if( v_i==0 ) {
+      setverdict(pass, "This function intentionally pass if v_i==0");
+    }
+    v_numberOfCalls:=v_numberOfCalls+1;
+    return 1;
+  }
+
+  function f_returnOneWithCounterIncr() runs on MyComp return integer{
+    v_numberOfCalls:=v_numberOfCalls+1;
+    return 1;
+  }
+
+  //======= 
+
+  function f_inout_b_inv_reti(inout boolean pl_b) runs on MyComp return integer{
+    pl_b := not pl_b
+    return 1;
+  }
+
+  function  f_inout_i_inc(inout integer i) runs on MyComp return integer{
+    i:=i+1
+    return i;
+  }
+
+  function f_inout_f_inc_reti(inout float f) runs on MyComp return integer{
+    f:=f+1.0;
+    return float2int(f);
+  }
+
+  function f_inout_bs_4x_reti(inout bitstring bs) runs on MyComp return integer{
+    bs := bs & '00'B;
+    return bit2int(bs);
+  }
+
+  function f_inout_os_256x_reti(inout octetstring os) runs on MyComp return integer{
+    os := os & '00'O;
+    return oct2int(os);
+  }
+
+  function f_inout_hs_16x_reti(inout hexstring hs) runs on MyComp return integer{
+    hs := hs & '0'H;
+    return hex2int(hs);
+  }
+
+  function f_inout_cs_b_reti(inout charstring cs) runs on MyComp return integer{
+    cs := "b"
+    return char2int(cs);
+  }
+  /* lazy_main.ttcn:106.5-6: error: Reference to a variable or template variable was expected instead of timer parameter `cs'
+  function f_inout_timer_b_reti(inout timer pl_t) runs on MyComp return integer{
+  pl_t := 1.0;
+  return 1;
+  */
+
+  function f_inout_port_b_reti(inout My_PT pl_p) runs on MyComp return integer{
+    return 1;
+  }
+
+
+  //in template functions
+
+  function f_in_b_inv_reti_t(in template boolean pl_b) runs on MyComp return integer{
+    return 1;
+  }
+
+  function  f_in_i_inc_reti_t(in template integer i) runs on MyComp return integer{
+    return valueof(i)+1;
+  }
+
+  function f_in_f_inc_reti_t(in template float f) runs on MyComp return integer{
+    return float2int(valueof(f))+1;
+  }
+
+  function f_in_bs_4x_reti_t(in template bitstring bs) runs on MyComp return integer{
+    return bit2int(valueof(bs) & '00'B);
+  }
+
+  function f_in_os_256x_reti_t(in template octetstring os) runs on MyComp return integer{
+    return oct2int(valueof(os) & '00'O);
+  }
+
+  function f_in_hs_16x_reti_t(in template hexstring hs) runs on MyComp return integer{
+    return hex2int(valueof(hs) & '0'H);
+  }
+
+  function f_in_cs_b_reti_t(in template charstring pl_cs) runs on MyComp return integer{
+    return char2int(valueof(pl_cs))+1;
+  }
+
+  //inout template functions:
+
+  function f_inout_b_inv_reti_t(inout template boolean pl_b) runs on MyComp return integer{
+    pl_b := not valueof(pl_b);
+    return 1;
+  }
+
+  function  f_inout_i_inc_t(inout template integer i) runs on MyComp return integer{
+    i:=valueof(i)+1
+    return valueof(i);
+  }
+
+  function f_inout_f_inc_reti_t(inout template float f) runs on MyComp return integer{
+    f:=valueof(f)+1.0;
+    return float2int(valueof(f));
+  }
+
+  function f_inout_bs_4x_reti_t(inout template bitstring bs) runs on MyComp return integer{
+    bs := valueof(bs) & '00'B;
+    return bit2int(valueof(bs));
+  }
+
+  function f_inout_os_256x_reti_t(inout template octetstring os) runs on MyComp return integer{
+    os := valueof(os) & '00'O;
+    return oct2int(valueof(os));
+  }
+
+  function f_inout_hs_16x_reti_t(inout template hexstring hs) runs on MyComp return integer{
+    hs := valueof(hs) & '0'H;
+    return hex2int(valueof(hs));
+  }
+
+  function f_inout_cs_b_reti_t(inout template charstring cs) runs on MyComp return integer{
+    cs := "b"
+    return char2int(valueof(cs));
+  }
+
+  //out template functions:
+
+  function f_out_b_inv_reti_t(out template boolean pl_b) runs on MyComp return integer{
+    pl_b := false;
+    return 1;
+  }
+
+  function  f_out_i_inc_t(out template integer i) runs on MyComp return integer{
+    i:=2
+    return valueof(i);
+  }
+
+  function f_out_f_inc_reti_t(out template float f) runs on MyComp return integer{
+    f:=2.0
+    return float2int(valueof(f));
+  }
+
+  function f_out_bs_4x_reti_t(out template bitstring bs) runs on MyComp return integer{
+    bs := '100'B;
+    return bit2int(valueof(bs));
+  }
+
+  function f_out_os_256x_reti_t(out template octetstring os) runs on MyComp return integer{
+    os := '5500'O;
+    return oct2int(valueof(os));
+  }
+
+  function f_out_hs_16x_reti_t(out template hexstring hs) runs on MyComp return integer{
+    hs := 'f0'H;
+    return hex2int(valueof(hs));
+  }
+
+  function f_out_cs_b_reti_t(out template charstring cs) runs on MyComp return integer{
+    cs := "b"
+    return char2int(valueof(cs));
+  }
+
+  // Without import
+
+  //test for lazy function in main module with integer integer arg
+  function f_lazy_mi( in @lazy integer pl_i, in boolean pl_evalFlag) runs on MyComp {  
+    if(pl_evalFlag){
+      v_i:= pl_i; //expression evaluated
+    }
+    log("Inside lazy:", v_i);
+
+  }
+
+  function f_lazy_mi_2(in boolean pl_evalFlag, in @lazy integer pl_i) runs on MyComp {  
+    if(pl_evalFlag){
+      v_i:= pl_i; //expression evaluated
+    }
+    log("Inside lazy:", v_i);
+
+  }
+
+  //test for lazy function in main module with integer integer arg
+  //expression used more than once
+  function f_lazy_mi_3( in @lazy integer pl_i, in boolean pl_evalFlag) runs on MyComp {  
+    if(pl_evalFlag){
+      v_i:= pl_i; //expression evaluated
+      log(pl_i);
+    }
+
+    log("Inside lazy:", v_i, pl_i);
+  } 
+  // Lazy function calling lazy function from the same module:
+  function f_lazy_mmi( in @lazy integer pl_j, in boolean pl_evalFlag) runs on MyComp {  
+    f_lazy_mi(pl_j, pl_evalFlag)
+  }
+
+  // Lazy function calling lazy function from the same module:
+  function f_lazy_mmmi( in @lazy integer pl_k, in boolean pl_evalFlag) runs on MyComp {  
+    f_lazy_mmi(pl_k, pl_evalFlag)
+  }
+
+  // With import
+  // Lazy function calling lazy function from another module:
+  function f_lazy_mABi( in @lazy integer pl_j, in boolean pl_evalFlag) runs on MyComp {  
+    f_lazy_ABi(pl_j, pl_evalFlag)
+  }
+
+  //These functions do the same as tc_mi_1 -> tc_mi_5: call lazy function f_lazy_mi()
+  function f_fmi_1() runs on MyComp {
+    f_lazy_mi(2+3*4, true);
+    f_verdict(v_i==14);
+  }
+
+  function f_fmi_2() runs on MyComp {
+    f_lazy_mi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  function f_fmi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  function function_fmi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  function f_fmi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  function f_fmi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+  //These functions do the same as tc_mi_1 -> tc_mi_5: call lazy function f_lazy_mi()
+  function f_fAi_1() runs on MyComp {
+    f_lazy_Ai(2+3*4, true);
+    f_verdict(v_i==14);
+  }
+
+  function f_fAi_2() runs on MyComp {
+    f_lazy_Ai(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  function f_fAi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  function function_fAi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  function f_fAi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_Ai(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  function f_fAi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+} //g_functions_returning_integer
+
+
+group g_float_functions {
+
+  //test for lazy function in main module with integer float arg
+  function f_lazy_mf( in @lazy float pl_f, in boolean pl_evalFlag) runs on MyComp {  
+    if(pl_evalFlag){
+      v_f:= pl_f; //expression evaluated
+      log(pl_f); //second usage
+    }
+    log("Inside lazy:", v_f);
+
+  }
+
+  function f_lazy_mf_2(in boolean pl_evalFlag, in @lazy float pl_f) runs on MyComp {  
+    if(pl_evalFlag){
+      v_f:= pl_f; //expression evaluated
+    }
+    log("Inside lazy:", v_i);
+
+  }
+
+  // Lazy function calling lazy function from the same module:
+  function f_lazy_mmf( in @lazy float pl_f, in boolean pl_evalFlag) runs on MyComp {  
+    f_lazy_mf(pl_f,pl_evalFlag);
+  } 
+
+  function f_lazy_mmf_2(in boolean pl_evalFlag, in @lazy float pl_f) runs on MyComp {  
+    f_lazy_mf(pl_f,pl_evalFlag);
+  }
+
+  // Without import
+  //basic behavior for integer arg expression:
+  function f_mf_1() runs on MyComp {
+    f_lazy_mf(2.1+3.5*4.4, true);
+    if(v_f==2.1+3.5*4.4) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  function f_mf_3() runs on MyComp {
+    v_f:=0.0; 
+    v_i:=0;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  function f_mf_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0);
+  }
+
+  function f_mf_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mf(10.0*int2float(f_returnOnePassIfIZero()), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_f==10.0);
+  }
+
+  function f_mf_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), true);
+    f_verdict(v_f==10.0);
+  }
+
+}//g_float_functions
+
+group g_charstring_functions {
+
+  function f_returnHelloPassWithZero() runs on MyComp return charstring {
+    if(v_i==0) { setverdict(pass, "This function intentionally pass if v_i==0");}
+    v_numberOfCalls:=v_numberOfCalls+1;
+    return "Hello";
+  }
+
+  //test for lazy function in main module with integer lazy arg:
+  function f_lazy_mc(in @lazy charstring pl_c, in boolean pl_evalFlag) runs on MyComp { 
+    if(pl_evalFlag){
+      v_c:= pl_c; //expression evaluated
+      log("expression:",pl_c); //expression used once more
+    }
+  }
+
+  function f_mc_wrapper_in(
+    in boolean b, 
+    in integer i, 
+    in float f, 
+    in bitstring bs, 
+    in octetstring os,
+    in hexstring hs,
+    in charstring cs,
+    in MyRec rec,
+    in boolean pl_evalFlag
+  ) runs on MyComp 
+  {
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs(b)&" "&f_in_i_inc_retcs(i)&" "&
+      f_in_f_inc_retcs(f)&" "&f_in_bs_4x_retcs(bs)&" "&f_in_os_256x_retcs(os)&" "&
+      f_in_hs_16x_retcs(hs)&" "&f_in_cs_b_retcs(cs)&" "&
+      f_in_port_retcs(PCO)&" "&f_in_b_inv_retcs(rec.b)&" "&f_in_i_inc_retcs(rec.i),
+      pl_evalFlag);
+  }
+
+ function f_mc_wrapper_inout_in(
+    inout boolean b, 
+    inout integer i, 
+    inout float f, 
+    inout bitstring bs, 
+    inout octetstring os,
+    inout hexstring hs,
+    inout charstring cs,
+    inout MyRec rec,
+    in boolean pl_evalFlag
+  ) runs on MyComp 
+  {
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs(b)&" "&f_in_i_inc_retcs(i)&" "&
+      f_in_f_inc_retcs(f)&" "&f_in_bs_4x_retcs(bs)&" "&f_in_os_256x_retcs(os)&" "&
+      f_in_hs_16x_retcs(hs)&" "&f_in_cs_b_retcs(cs)&" "&
+      f_in_port_retcs(PCO)&" "&f_in_b_inv_retcs(rec.b)&" "&f_in_i_inc_retcs(rec.i),
+      pl_evalFlag);
+  }
+  
+   function f_mc_wrapper_inout_inout(
+    inout boolean b, 
+    inout integer i, 
+    inout float f, 
+    inout bitstring bs, 
+    inout octetstring os,
+    inout hexstring hs,
+    inout charstring cs,
+    inout MyRec rec,
+    in boolean pl_evalFlag
+  ) runs on MyComp 
+  {
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_inout_b_inv_retcs(b)&" "&f_inout_i_inc_retcs(i)&" "&
+      f_inout_f_inc_retcs(f)&" "&f_inout_bs_4x_retcs(bs)&" "&f_inout_os_256x_retcs(os)&" "&
+      f_inout_hs_16x_retcs(hs)&" "&f_inout_cs_b_retcs(cs)&" "&
+      f_inout_port_retcs(PCO)&" "&f_inout_b_inv_retcs(rec.b)&" "&f_inout_i_inc_retcs(rec.i),
+      pl_evalFlag);
+  }
+
+  //in functions 
+  function f_in_b_inv_retcs(in boolean pl_b) runs on MyComp return charstring{
+    return "false";
+  }
+
+  function  f_in_i_inc_retcs(in integer i) runs on MyComp return charstring{
+    return int2str(i+1);
+  }
+
+  function f_in_f_inc_retcs(in float f) runs on MyComp return charstring{
+    return float2str(f+1.0);
+  }
+
+  function f_in_bs_4x_retcs(in bitstring bs) runs on MyComp return charstring{
+    return bit2str(bs & '00'B);
+  }
+
+  function f_in_os_256x_retcs(in octetstring os) runs on MyComp return charstring{
+    return oct2str(os & '00'O);
+  }
+
+  function f_in_hs_16x_retcs(in hexstring hs) runs on MyComp return charstring{
+    return hex2str(hs & '0'H);
+  }
+
+  function f_in_cs_b_retcs(in charstring cs) runs on MyComp return charstring{
+    return "b";
+  }
+  
+  function f_in_port_retcs_legal(inout My_PT p) runs on MyComp return charstring{
+    return log2str(p);
+  }
+  
+  function f_in_port_retcs(inout My_PT p) runs on MyComp return charstring{  //TODO: change it to f_in_port_retcs(inout My_PT p) if accepted
+    return log2str(p);
+  }
+  
+  //inout
+  function f_inout_b_inv_retcs(inout boolean pl_b) runs on MyComp return charstring{
+    pl_b := not pl_b
+    return "false";
+  }
+
+  function  f_inout_i_inc_retcs(inout integer i) runs on MyComp return charstring{
+    i:=i+1
+    return int2str(i);
+  }
+
+  function f_inout_f_inc_retcs(inout float f) runs on MyComp return charstring{
+    f:=f+1.0;
+    return float2str(f);
+  }
+
+  function f_inout_bs_4x_retcs(inout bitstring bs) runs on MyComp return charstring{
+    bs := bs & '00'B;
+    return bit2str(bs);
+  }
+
+  function f_inout_os_256x_retcs(inout octetstring os) runs on MyComp return charstring{
+    os := os & '00'O;
+    return oct2str(os);
+  }
+
+  function f_inout_hs_16x_retcs(inout hexstring hs) runs on MyComp return charstring{
+    hs := hs & '0'H;
+    return hex2str(hs);
+  }
+
+  function f_inout_cs_b_retcs(inout charstring cs) runs on MyComp return charstring{
+    cs := "b"
+    return cs;
+  }
+
+  function f_inout_port_retcs(inout My_PT p) runs on MyComp return charstring{
+    return log2str(p);
+  }
+
+  //out
+  function f_out_b_inv_retcs(out boolean pl_b) runs on MyComp return charstring{
+    return "false";
+  }
+
+  function  f_out_i_inc_retcs(out integer i) runs on MyComp return charstring{
+    return "2";
+  }
+
+  function f_out_f_inc_retcs(out float f) runs on MyComp return charstring{
+    return "2.000000";
+  }
+
+  function f_out_bs_4x_retcs(out bitstring bs) runs on MyComp return charstring{
+    return "100";
+  }
+
+  function f_out_os_256x_retcs(out octetstring os) runs on MyComp return charstring{
+    return "5500";
+  }
+
+  function f_out_hs_16x_retcs(out hexstring hs) runs on MyComp return charstring{
+    return "F0";
+  }
+
+  function f_out_cs_b_retcs(out charstring cs) runs on MyComp return charstring{
+    return "b";
+  }
+
+  //in template functions
+
+  function f_in_b_inv_retcs_t(in template boolean pl_b) runs on MyComp return charstring{
+    return "false";
+  }
+
+  function  f_in_i_inc_retcs_t(in template integer i) runs on MyComp return charstring{
+    return int2str(valueof(i)+1);
+  }
+
+  function f_in_f_inc_retcs_t(in template float f) runs on MyComp return charstring{
+    return float2str(valueof(f)+1.0);
+  }
+
+  function f_in_bs_4x_retcs_t(in template bitstring bs) runs on MyComp return charstring{
+    return bit2str(valueof(bs) & '00'B);
+  }
+
+  function f_in_os_256x_retcs_t(in template octetstring os) runs on MyComp return charstring{
+    return oct2str(valueof(os) & '00'O);
+  }
+
+  function f_in_hs_16x_retcs_t(in template hexstring hs) runs on MyComp return charstring{
+    return hex2str(valueof(hs) & '0'H);
+  }
+
+  function f_in_cs_b_retcs_t(in template charstring cs) runs on MyComp return charstring{
+    return "b";
+  }
+
+  //inout template functions:
+
+  function f_inout_b_inv_retcs_t(inout template boolean pl_b) runs on MyComp return charstring{
+    pl_b := not valueof(pl_b);
+    return "false";
+  }
+
+  function  f_inout_i_inc_retcs_t(inout template integer i) runs on MyComp return charstring{
+    i:=valueof(i)+1
+    return int2str(valueof(i));
+  }
+
+  function f_inout_f_inc_retcs_t(inout template float f) runs on MyComp return charstring{
+    f:=valueof(f)+1.0;
+    return float2str(valueof(f));
+  }
+
+  function f_inout_bs_4x_retcs_t(inout template bitstring bs) runs on MyComp return charstring{
+    bs := valueof(bs) & '00'B;
+    return bit2str(valueof(bs));
+  }
+
+  function f_inout_os_256x_retcs_t(inout template octetstring os) runs on MyComp return charstring{
+    os := valueof(os) & '00'O;
+    return oct2str(valueof(os));
+  }
+
+  function f_inout_hs_16x_retcs_t(inout template hexstring hs) runs on MyComp return charstring{
+    hs := valueof(hs) & '0'H;
+    return hex2str(valueof(hs));
+  }
+
+  function f_inout_cs_b_retcs_t(inout template charstring cs) runs on MyComp return charstring{
+    cs := "b"
+    return valueof(cs);
+  }
+
+  //out template functions:
+
+  function f_out_b_inv_retcs_t(out template boolean pl_b) runs on MyComp return charstring{
+    return "false";
+  }
+
+  function  f_out_i_inc_retcs_t(out template integer i) runs on MyComp return charstring{
+    return "2";
+  }
+
+  function f_out_f_inc_retcs_t(out template float f) runs on MyComp return charstring{
+    return "2.000000";
+  }
+
+  function f_out_bs_4x_retcs_t(out template bitstring bs) runs on MyComp return charstring{
+    return "100"
+  }
+
+  function f_out_os_256x_retcs_t(out template octetstring os) runs on MyComp return charstring{
+    return "5500";
+  }
+
+  function f_out_hs_16x_retcs_t(out template hexstring hs) runs on MyComp return charstring{
+    return "F0";
+  }
+
+  function f_out_cs_b_retcs_t(out template charstring cs) runs on MyComp return charstring{
+    return "b";
+  }
+
+
+}//g_charstring_functions
+
+group g_rec_functions {
+
+  function f_returnRec(in integer pl_i, in ROI pl_roi, in boolean pl_b) runs on MyComp return MyRec {
+    v_numberOfCalls:=v_numberOfCalls+1;
+    return { pl_i,pl_roi,pl_b }
+
+  }
+  function f_lazy_mrec(in @lazy MyRec pl_rec, in boolean pl_evalFlag) runs on MyComp {
+    if(pl_evalFlag){
+      v_rec:=pl_rec;
+      log("rec:", pl_rec);
+    }
+  }
+
+}// g_rec_functions
+
+//****************************************
+//*** Templates                        ***
+//****************************************
+
+template MyRec t_lazy_rec( template @lazy integer p_i, template @lazy ROI p_roi, template @lazy boolean p_b) := {
+  i:= p_i,
+  roi:=p_roi,
+  b:=p_b
+}
+
+template MyRec t_rec( template integer p_i, template ROI p_roi, template boolean p_b) := {
+  i:= p_i,
+  roi:=p_roi,
+  b:=p_b
+}
+
+//not used first argument:
+template MyRec t_lazy_rec1( template @lazy integer p_i, template @lazy ROI p_roi, template @lazy boolean p_b) := {
+  i:= 1,
+  roi:=p_roi,
+  b:=p_b
+}
+
+//****************************************
+//*** Templates                        ***
+//****************************************
+//****************************************
+
+//This altstep is wrong:
+
+altstep as_lazy_mi(in @lazy integer pl_i, in boolean pl_evalFlag) runs on MyComp{
+  [pl_evalFlag] PCO.receive {log("valami")}
+  [else] { 
+    if(pl_evalFlag) {
+      v_i:=pl_i;
+      log(pl_i);
+    }      
+  }
+}
+
+altstep as_lazy_mf(in @lazy float pl_f, in boolean pl_evalFlag) runs on MyComp{
+  [pl_evalFlag] PCO.receive {log("valami")}
+  [else] { 
+    if(pl_evalFlag) {
+      v_f:=pl_f;
+      log(pl_f);
+    }      
+  }
+}
+
+//****************************************
+//*****   Testcases                  *****
+//****************************************
+//****************************************
+group g_lazy_integer_arg_tc {
+  //==============================
+  //==== Lazy called in testcase =
+  //==============================
+  // Without import
+  //basic behavior for integer arg expression:
+  testcase tc_mi_1() runs on MyComp {
+    f_lazy_mi(2+3*4, true);
+    if(v_i==14) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+  testcase tc_mi_2() runs on MyComp {
+    f_lazy_mi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  testcase tc_mi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_mi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+
+  // the lazy arg is not the first arg:
+  testcase tc_mi_6() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi_2(true, 10*f_returnOnefailIfIZero());
+    f_verdict(v_i==10);
+  }
+
+  // f_lazy_mi_3 uses expression more than once
+  //expression shall be evaluated only once
+  testcase tc_mi_7() runs on MyComp {
+    v_i:=1;
+    f_lazy_mi_3(10*f_returnOneWithCounterIncr(),true);
+    f_verdict(v_i==10 and v_numberOfCalls==1);
+  }
+
+  //====================================================
+  // lazy argument contains inout parameters +in params
+  //====================================================
+  type record R { integer i, float f }
+
+  testcase tc_mi_1_in() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= { i:=1, f:=1.0}
+    f_lazy_mi(i+float2int(f)+bit2int(bs)+oct2int(os)+hex2int(hs)+char2int(cs)+r.i+float2int(r.f), true);
+    if(v_i==88+15+97+2 and i==1 and b==true and f==1.0 and bs=='1'B and os=='55'O and hs=='F'H and cs=="a") {setverdict(pass)} else {setverdict(fail)};
+  }
+
+  testcase tc_mi_2_in() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= { i:=1, f:=1.0}
+    f_lazy_mi(i+float2int(f)+bit2int(bs)+oct2int(os)+hex2int(hs)+char2int(cs)+r.i+float2int(r.f),false);
+    if(v_i==1 and i==1 and b==true and f==1.0 and bs=='1'B and os=='55'O and hs=='F'H and cs=="a") {setverdict(pass)} else {setverdict(fail)};
+  }
+
+  testcase tc_mi_1_inout() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= {i:=1, f:=1.0};
+    f_lazy_mi(f_inout_i_inc(i)+f_inout_b_inv_reti(b)+f_inout_f_inc_reti(f)+f_inout_bs_4x_reti(bs)+
+      f_inout_os_256x_reti(os)+f_inout_hs_16x_reti(hs)+f_inout_cs_b_reti(cs)+f_inout_i_inc(r.i)+f_inout_f_inc_reti(r.f)+f_inout_port_b_reti(PCO)+f_returnOneWithCounterIncr(), true);
+    //v_i =     2             +      1              +       2             +   +  4 = 9
+    if(v_i==9+256*85+15*16+98+2+2+1+1 and i==2 and b==false and f==2.0 and bs=='100'B and os=='5500'O and hs=='F0'H and cs=="b"and r=={ i:=2, f:=2.0} and v_numberOfCalls==1) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+
+
+  testcase tc_mi_2_inout() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= { i:=1, f:=1.0}
+    f_lazy_mi(f_inout_i_inc(i)+f_inout_b_inv_reti(b)+f_inout_f_inc_reti(f)+i+float2int(f)+f_inout_bs_4x_reti(bs)+
+      f_inout_os_256x_reti(os)+f_inout_hs_16x_reti(hs)+f_inout_cs_b_reti(cs)+f_inout_i_inc(r.i)+f_inout_f_inc_reti(r.f)+f_inout_port_b_reti(PCO)+f_returnOneWithCounterIncr(), false);
+    if(v_i==1 and i==1 and b==true and f==1.0 and bs=='1'B and os=='55'O and hs=='F'H and cs=="a") {setverdict(pass)} else {setverdict(fail)};
+  }
+
+  //in templates
+
+  testcase tc_mi_1_in_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    var template R r:= { i:=1, f:=1.0}
+    f_lazy_mi(f_in_i_inc_reti_t(i)+f_in_b_inv_reti_t(b)+f_in_f_inc_reti_t(f)+f_in_bs_4x_reti_t(bs)+
+      f_in_os_256x_reti_t(os)+f_in_hs_16x_reti_t(hs)+f_in_cs_b_reti_t(cs)+f_in_i_inc_reti_t(r.i)+f_in_f_inc_reti_t(r.f)+f_returnOneWithCounterIncr(), true);
+    //v_i =     2             +      1              +       2             +   +  4 = 9
+    //
+    log(f_in_os_256x_reti_t(os)," ",f_in_hs_16x_reti_t(hs)," ",f_in_cs_b_reti_t(cs));
+    if(v_i==9+256*85+15*16+98+2+2+1) {setverdict(pass)} else {setverdict(fail)};
+    if(valueof(i)==1 and valueof(b)==true and 
+      valueof(f)==1.0 and valueof(bs)=='1'B and valueof(os)=='55'O and valueof(hs)=='F'H and valueof(cs)=="a" and valueof(r)=={ i:=1, f:=1.0} and v_numberOfCalls==1) 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+
+  testcase tc_mi_2_in_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    f_lazy_mi(f_in_i_inc_reti_t(i)+f_in_b_inv_reti_t(b)+f_in_f_inc_reti_t(f)+f_in_bs_4x_reti_t(bs)+f_in_os_256x_reti_t(os)+f_in_hs_16x_reti_t(hs)+f_in_cs_b_reti_t(cs)+f_returnOneWithCounterIncr(), false);
+    if(v_i==1 and valueof(i)==1 and valueof(b)==true and valueof(f)==1.0 and
+      valueof(bs)=='1'B and valueof(os)=='55'O and valueof(hs)=='F'H and valueof(cs)=="a" and v_numberOfCalls==0) 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+
+  //inout templates
+  testcase tc_mi_1_inout_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    f_lazy_mi(f_inout_i_inc_t(i)+f_inout_b_inv_reti_t(b)+f_inout_f_inc_reti_t(f)+f_inout_bs_4x_reti_t(bs)+
+      f_inout_os_256x_reti_t(os)+f_inout_hs_16x_reti_t(hs)+f_inout_cs_b_reti_t(cs)+f_returnOneWithCounterIncr(), true);
+    //v_i =     2             +      1              +       2             +   +  4 = 9
+    if(v_i==9+256*85+15*16+98+1 and valueof(i)==2 and valueof(b)==false and 
+      valueof(f)==2.0 and valueof(bs)=='100'B and valueof(os)=='5500'O and valueof(hs)=='F0'H and valueof(cs)=="b" and v_numberOfCalls==1) 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+
+  testcase tc_mi_2_inout_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    f_lazy_mi(f_inout_i_inc_t(i)+f_inout_b_inv_reti_t(b)+f_inout_f_inc_reti_t(f)+f_inout_bs_4x_reti_t(bs)+f_inout_os_256x_reti_t(os)+f_inout_hs_16x_reti_t(hs)+f_inout_cs_b_reti_t(cs), false);
+    if(v_i==1 and valueof(i)==1 and valueof(b)==true and valueof(f)==1.0 and
+      valueof(bs)=='1'B and valueof(os)=='55'O and valueof(hs)=='F'H and valueof(cs)=="a") 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+
+
+  //inout templates
+  testcase tc_mi_1_out_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    f_lazy_mi(f_out_i_inc_t(i)+f_out_b_inv_reti_t(b)+f_out_f_inc_reti_t(f)+f_out_bs_4x_reti_t(bs)+
+      f_out_os_256x_reti_t(os)+f_out_hs_16x_reti_t(hs)+f_out_cs_b_reti_t(cs), true);
+    //v_i =     2             +      1              +       2             +   +  4 = 9
+    if(v_i==9+256*85+15*16+98 and valueof(i)==2 and valueof(b)==false and 
+      valueof(f)==2.0 and valueof(bs)=='100'B and valueof(os)=='5500'O and valueof(hs)=='F0'H and valueof(cs)=="b") 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+
+  testcase tc_mi_2_out_t() runs on MyComp {
+    v_i:=1;
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    f_lazy_mi(f_out_i_inc_t(i)+f_out_b_inv_reti_t(b)+f_out_f_inc_reti_t(f)+f_out_bs_4x_reti_t(bs)+f_out_os_256x_reti_t(os)+f_out_hs_16x_reti_t(hs)+f_out_cs_b_reti_t(cs), false);
+    if(v_i==1 and valueof(i)==1 and valueof(b)==true and valueof(f)==1.0 and
+      valueof(bs)=='1'B and valueof(os)=='55'O and valueof(hs)=='F'H and valueof(cs)=="a") 
+    {setverdict(pass)} else {setverdict(fail)};
+  } 
+  // lazy argument contains function calls with inout parameters
+
+  //=================
+  //Lazy calls lazy
+  //=================
+  testcase tc_mmi_1() runs on MyComp {
+    f_lazy_mmi(2+3*4, true);
+    f_verdict(v_i==14);
+  }
+
+  testcase tc_mmi_1b() runs on MyComp {
+    f_lazy_mmi(2, false);
+    f_verdict(v_i==0);
+  }
+
+  testcase tc_mmi_2() runs on MyComp {
+    f_lazy_mmi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+
+  testcase tc_mmi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_mmi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0); 
+  }
+
+  testcase tc_mmi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1); 
+  }
+
+  testcase tc_mmi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mmi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_mmi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10); 
+  }
+  //==============================
+  //Lazy calls lazy who calls lazy
+  //==============================
+  testcase tc_mmmi_1() runs on MyComp {
+    f_lazy_mmmi(2*4, true);
+    if(v_i==8) {setverdict(pass)} else {setverdict(fail)};
+  }
+  testcase tc_mmmi_1b() runs on MyComp {
+    f_lazy_mmmi(2, false);
+    f_verdict(v_i==0);
+  }
+
+  testcase tc_mmmi_2() runs on MyComp {
+    f_lazy_mmmi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+
+  testcase tc_mmmi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_mmmi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0); 
+  }
+
+  testcase tc_mmmi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmmi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1); 
+  }
+
+  testcase tc_mmmi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mmmi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_mmmi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmmi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10); 
+  }
+
+  // **** With import *******
+
+  //==============================
+  //Lazy calls
+  //==============================
+
+  //basic behavior for integer arg expression:
+  testcase tc_Ai_1() runs on MyComp {
+    f_lazy_Ai(2+3*4, true);
+    if(v_i==14) {setverdict(pass)} else {setverdict(fail)};
+
+  }
+
+  testcase tc_Ai_2() runs on MyComp {
+    f_lazy_Ai(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_Ai_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_Ai_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  testcase tc_Ai_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_Ai(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_Ai_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_Ai(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+  //=================
+  //Lazy calls lazy
+  //=================
+  //basic behavior for integer arg expression:
+  testcase tc_AAi_1() runs on MyComp {
+    f_lazy_AAi(2+3*4, true);
+    if(v_i==14) {setverdict(pass)} else {setverdict(fail)};
+
+  }
+
+  testcase tc_AAi_2() runs on MyComp {
+    f_lazy_AAi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_AAi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_AAi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_AAi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_AAi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  testcase tc_AAi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_AAi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_AAi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_AAi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+  //basic behavior for integer arg expression:
+  testcase tc_ABi_1() runs on MyComp {
+    f_lazy_ABi(2+3*4, true);
+    if(v_i==14) {setverdict(pass)} else {setverdict(fail)};
+
+  }
+
+  testcase tc_ABi_2() runs on MyComp {
+    f_lazy_ABi(f_fail(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_ABi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_ABi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_ABi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_ABi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  testcase tc_ABi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_ABi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_ABi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_ABi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+  //mixed
+
+  //basic behavior for integer arg expression:
+  testcase tc_mABi_1() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= { i:=1, f:=1.0}
+    f_lazy_mABi(i+float2int(f)+bit2int(bs)+oct2int(os)+hex2int(hs)+char2int(cs)+r.i+float2int(r.f)+f_returnOneWithCounterIncr(), true);
+    log(v_i);
+    log(v_numberOfCalls);
+    if(v_i==88+15+97+2+1 and i==1 and b==true and f==1.0 and bs=='1'B and os=='55'O and hs=='F'H and cs=="a" and v_numberOfCalls==1) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+testcase tc_mABi_2() runs on MyComp {
+    v_i:=1;
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var R r:= { i:=1, f:=1.0}
+    f_lazy_mABi(i+float2int(f)+bit2int(bs)+oct2int(os)+hex2int(hs)+char2int(cs)+r.i+float2int(r.f)+f_returnOneWithCounterIncr(), false);
+    if(v_i==1 and i==1 and b==true and f==1.0 and bs=='1'B and os=='55'O and hs=='F'H and cs=="a" and v_numberOfCalls==0) {setverdict(pass)} else {setverdict(fail)};
+  }
+  
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mABi_3() runs on MyComp {
+    v_i:=0;
+    f_lazy_mABi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mABi_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mABi(10*f_returnOnefailIfIZero(), false);
+    f_verdict(v_i==1);
+  }
+
+  testcase tc_mABi_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mABi(10*f_returnOnePassIfIZero(), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10);
+  }
+
+  testcase tc_mABi_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mABi(10*f_returnOnefailIfIZero(), true);
+    f_verdict(v_i==10);
+  }
+
+  //==== Lazy called in function ======
+
+  //not lazy function calls lazy function in main
+  testcase tc_fmi_1() runs on MyComp {
+    f_fmi_1();
+  }
+
+  testcase tc_fmi_2() runs on MyComp {
+    f_fmi_2();
+  }
+
+  testcase tc_fmi_3() runs on MyComp {
+    f_fmi_3();
+  }
+
+  testcase tc_fmi_4() runs on MyComp {
+    f_fmi_4();
+  }
+
+  testcase tc_fmi_5() runs on MyComp {
+    f_fmi_5();
+  }
+
+  //not lazy function calls lazy function in imported module A
+  testcase tc_fAi_1() runs on MyComp {
+    f_fAi_1();
+  }
+
+  testcase tc_fAi_2() runs on MyComp {
+    f_fAi_2();
+  }
+
+  testcase tc_fAi_3() runs on MyComp {
+    f_fAi_3();
+  }
+
+  testcase tc_fAi_4() runs on MyComp {
+    f_fAi_4();
+  }
+
+  testcase tc_fAi_5() runs on MyComp {
+    f_fAi_5();
+  }
+
+}//g_lazy_integer_arg_tc
+
+
+group g_lazy_float_arg_tc {
+  // Without import
+  //basic behavior for float arg expression:
+  testcase tc_mf_1() runs on MyComp {
+    f_lazy_mf(2.1+3.5*4.4, true);
+    if(v_f==2.1+3.5*4.4) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mf_3() runs on MyComp {
+    v_f:=0.0; 
+    v_i:=0;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mf_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0);
+  }
+
+  testcase tc_mf_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mf(10.0*int2float(f_returnOnePassIfIZero()), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_f==10.0);
+  }
+
+  testcase tc_mf_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mf(10.0*int2float(f_returnOnefailIfIZero()), true);
+    f_verdict(v_f==10.0);
+  }
+
+  //================
+  // lazy calls lazy
+  //================
+
+  // Without import
+  //basic behavior for float arg expression, 
+  testcase tc_mmf_1() runs on MyComp {
+    v_f:=0.0; 
+    f_lazy_mmf(2.1+3.5*4.4, true);
+    if(v_f==2.1+3.5*4.4) {setverdict(pass)} else {setverdict(fail)};
+  }
+
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mmf_3() runs on MyComp {
+    v_f:=0.0; 
+    v_i:=0;
+    f_lazy_mmf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0 and v_numberOfCalls==0);
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_mmf_3a() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmf(10.0*int2float(f_returnOnefailIfIZero()), false);
+    f_verdict(v_f==0.0 and v_numberOfCalls==0);
+  }
+
+  testcase tc_mmf_4() runs on MyComp {
+    v_i:=0;
+    f_lazy_mmf(10.0*int2float(f_returnOnePassIfIZero()), true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_f==10.0 and v_numberOfCalls==1);
+  }
+
+  testcase tc_mmf_5() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmf(10.0*int2float(f_returnOnefailIfIZero()), true);
+    f_verdict(v_f==10.0 and v_numberOfCalls==1);
+  }
+  // the lazy arg is not the first arg:
+  testcase tc_mmf_6() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmf_2(true, 10.0*int2float(f_returnOnefailIfIZero()));
+    log(v_f)
+    log(v_numberOfCalls);
+    f_verdict(v_f==10.0 and v_numberOfCalls==1);
+  }
+
+  // f_lazy_mi_3 uses expression more than once
+  //expression shall be evaluated only once
+  testcase tc_mmf_7() runs on MyComp {
+    v_i:=1;
+    f_lazy_mmf(10.0*int2float(f_returnOneWithCounterIncr()),true);
+    f_verdict(v_f==10.0 and v_numberOfCalls==1);
+  }
+
+  // The first lazy arg is located in function
+  testcase tc_fmf_1() runs on MyComp {
+    f_mf_1();
+  }
+
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_fmf_3() runs on MyComp {
+    f_mf_3()
+  }
+
+  //The goal of this testcase 
+  //to test if expression is not evaluated if the condition is false
+  testcase tc_fmf_3a() runs on MyComp {
+    f_mf_3a();
+  }
+
+  testcase tc_fmf_4() runs on MyComp {
+    f_mf_4();
+  }
+
+  testcase tc_fmf_5() runs on MyComp {
+    f_mf_5();
+  }
+
+
+}
+group g_lazy_charstring_arg_tc {
+
+  testcase tc_mc_1() runs on MyComp {
+    f_lazy_mc("Haliho",true);
+    f_verdict(match(v_c,"Haliho") and v_numberOfCalls==0);
+  }
+
+  testcase tc_mc_1b() runs on MyComp {
+    f_lazy_mc(f_returnHelloPassWithZero(),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello"));
+    f_verdict(match(v_c,"Hello") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_2() runs on MyComp {
+    f_lazy_mc("Hi "&f_returnHelloPassWithZero(),false);
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  // charstring value testcases
+  testcase tc_mc_1_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true }   
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs(b)&" "&f_in_i_inc_retcs(i)&" "&
+      f_in_f_inc_retcs(f)&" "&f_in_bs_4x_retcs(bs)&" "&f_in_os_256x_retcs(os)&" "&
+      f_in_hs_16x_retcs(hs)&" "&f_in_cs_b_retcs(cs)&" "&f_in_port_retcs(PCO)&" "&f_in_b_inv_retcs(rec.b)&" "&f_in_i_inc_retcs(rec.i),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2") and v_numberOfCalls==1);
+  }
+  
+  // this testcase aims to check if parameters can be passed to the lazy expression
+  testcase tc_mc_par_1_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_in(b,i,f,bs,os,hs,cs,rec,true);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2") and v_numberOfCalls==1);
+  }
+  
+  testcase tc_mc_2_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs(b)&" "&f_in_i_inc_retcs(i)&" "&
+      f_in_f_inc_retcs(f)&" "&f_in_bs_4x_retcs(bs)&" "&f_in_os_256x_retcs(os)&" "&
+      f_in_hs_16x_retcs(hs)&" "&f_in_cs_b_retcs(cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  
+   // this testcase aims to check if parameters can be passed to the lazy expression
+  testcase tc_mc_par_2_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_in(b,i,f,bs,os,hs,cs,rec,false);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  testcase tc_mc_1_inout() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true }    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_inout_b_inv_retcs(b)&" "&f_inout_i_inc_retcs(i)&" "&
+      f_inout_f_inc_retcs(f)&" "&f_inout_bs_4x_retcs(bs)&" "&f_inout_os_256x_retcs(os)&" "&
+      f_inout_hs_16x_retcs(hs)&" "&f_inout_cs_b_retcs(cs)&" "&f_inout_port_retcs(PCO)&" "&f_inout_b_inv_retcs(rec.b)&" "&f_inout_i_inc_retcs(rec.i),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,""));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2") and v_numberOfCalls==1);
+  }
+
+ testcase tc_mc_par_1_inout_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_inout_in(b,i,f,bs,os,hs,cs,rec,true);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2") and v_numberOfCalls==1);
+  }
+  
+   testcase tc_mc_par_1_inout_inout() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_inout_inout(b,i,f,bs,os,hs,cs,rec,true);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO false 2") and v_numberOfCalls==1);
+  }
+  testcase tc_mc_2_inout() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true }
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_inout_b_inv_retcs(b)&" "&f_inout_i_inc_retcs(i)&" "&
+      f_inout_f_inc_retcs(f)&" "&f_inout_bs_4x_retcs(bs)&" "&f_inout_os_256x_retcs(os)&" "&
+      f_inout_hs_16x_retcs(hs)&" "&f_inout_cs_b_retcs(cs)&" "&f_inout_port_retcs(PCO)&" "&f_inout_b_inv_retcs(rec.b)&" "&f_inout_i_inc_retcs(rec.i),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b port PCO"));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+testcase tc_mc_par_2_inout_in() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_inout_in(b,i,f,bs,os,hs,cs,rec,false);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  
+  testcase tc_mc_par_2_inout_inout() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";
+    var MyRec rec:= { i:=1, roi:={1,2},b:=true};
+    
+    f_mc_wrapper_inout_inout(b,i,f,bs,os,hs,cs,rec,false);   
+    
+    log(v_c);
+    log(v_numberOfCalls);
+    log(      match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  testcase tc_mc_1_out() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_out_b_inv_retcs(b)&" "&f_out_i_inc_retcs(i)&" "&
+      f_out_f_inc_retcs(f)&" "&f_out_bs_4x_retcs(bs)&" "&f_out_os_256x_retcs(os)&" "&
+      f_out_hs_16x_retcs(hs)&" "&f_out_cs_b_retcs(cs),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_2_out() runs on MyComp {
+    v_c:="";
+    var boolean b:=true;
+    var integer i:=1;
+    var float f:= 1.0;
+    var bitstring bs:='1'B;
+    var octetstring os:='55'O;
+    var hexstring hs:='F'H;
+    var charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_out_b_inv_retcs(b)&" "&f_out_i_inc_retcs(i)&" "&
+      f_out_f_inc_retcs(f)&" "&f_out_bs_4x_retcs(bs)&" "&f_out_os_256x_retcs(os)&" "&
+      f_out_hs_16x_retcs(hs)&" "&f_out_cs_b_retcs(cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  //==== charstring template testcases
+  testcase tc_mc_1_in_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(b)&" "&f_in_i_inc_retcs_t(i)&" "&
+      f_in_f_inc_retcs_t(f)&" "&f_in_bs_4x_retcs_t(bs)&" "&f_in_os_256x_retcs_t(os)&" "&
+      f_in_hs_16x_retcs_t(hs)&" "&f_in_cs_b_retcs_t(cs),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_2_in_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(b)&" "&f_in_i_inc_retcs_t(i)&" "&
+      f_in_f_inc_retcs_t(f)&" "&f_in_bs_4x_retcs_t(bs)&" "&f_in_os_256x_retcs_t(os)&" "&
+      f_in_hs_16x_retcs_t(hs)&" "&f_in_cs_b_retcs_t(cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello true 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  testcase tc_mc_1_inout_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";
+    var template MyRec rec:= { i:=1, roi:={1,2},b:=true };  
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(b)&" "&f_inout_i_inc_retcs_t(i)&" "&
+      f_inout_f_inc_retcs_t(f)&" "&f_inout_bs_4x_retcs_t(bs)&" "&f_inout_os_256x_retcs_t(os)&" "&
+      f_inout_hs_16x_retcs_t(hs)&" "&f_inout_cs_b_retcs_t(cs)&" "&f_inout_b_inv_retcs_t(rec.b)&" "&f_inout_i_inc_retcs_t(rec.i),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b false 2"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b false 2") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_2_inout_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(b)&" "&f_inout_i_inc_retcs_t(i)&" "&
+      f_inout_f_inc_retcs_t(f)&" "&f_inout_bs_4x_retcs_t(bs)&" "&f_inout_os_256x_retcs_t(os)&" "&
+      f_inout_hs_16x_retcs_t(hs)&" "&f_inout_cs_b_retcs_t(cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  testcase tc_mc_1_out_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_out_b_inv_retcs_t(b)&" "&f_out_i_inc_retcs_t(i)&" "&
+      f_out_f_inc_retcs_t(f)&" "&f_out_bs_4x_retcs_t(bs)&" "&f_out_os_256x_retcs_t(os)&" "&
+      f_out_hs_16x_retcs_t(hs)&" "&f_out_cs_b_retcs_t(cs),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_2_out_t() runs on MyComp {
+    v_c:="";
+    var template boolean b:=true;
+    var template integer i:=1;
+    var template float f:= 1.0;
+    var template bitstring bs:='1'B;
+    var template octetstring os:='55'O;
+    var template hexstring hs:='F'H;
+    var template charstring cs:="a";    
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_out_b_inv_retcs_t(b)&" "&f_out_i_inc_retcs_t(i)&" "&
+      f_out_f_inc_retcs_t(f)&" "&f_out_bs_4x_retcs_t(bs)&" "&f_out_os_256x_retcs_t(os)&" "&
+      f_out_hs_16x_retcs_t(hs)&" "&f_out_cs_b_retcs_t(cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  //const
+  testcase tc_mc_const_1() runs on MyComp {
+    v_c:="";
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(c_b)&" "&f_in_i_inc_retcs(c_i)&" "&
+      f_in_f_inc_retcs(c_f)&" "&f_in_bs_4x_retcs(c_bs)&" "&f_in_os_256x_retcs(c_os)&" "&
+      f_in_hs_16x_retcs(c_hs)&" "&f_in_cs_b_retcs(c_cs),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    //log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_const_2() runs on MyComp {
+    v_c:="";
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(c_b)&" "&f_in_i_inc_retcs(c_i)&" "&
+      f_in_f_inc_retcs(c_f)&" "&f_in_bs_4x_retcs(c_bs)&" "&f_in_os_256x_retcs(c_os)&" "&
+      f_in_hs_16x_retcs(c_hs)&" "&f_in_cs_b_retcs(c_cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    //log(match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+
+  //==== charstring template testcases
+  testcase tc_mc_const_1_t() runs on MyComp {
+    v_c:="";
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(t_b)&" "&f_in_i_inc_retcs_t(t_i)&" "&
+      f_in_f_inc_retcs_t(t_f)&" "&f_in_bs_4x_retcs_t(t_bs)&" "&f_in_os_256x_retcs_t(t_os)&" "&
+      f_in_hs_16x_retcs_t(t_hs)&" "&f_in_cs_b_retcs_t(t_cs),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 5500 F0 b") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_const_2_t() runs on MyComp {
+    v_c:="";
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_in_b_inv_retcs_t(t_b)&" "&f_in_b_inv_retcs_t(t_b)&" "&f_in_i_inc_retcs_t(t_i)&" "&
+      f_in_f_inc_retcs_t(t_f)&" "&f_in_bs_4x_retcs_t(t_bs)&" "&f_in_os_256x_retcs_t(t_os)&" "&
+      f_in_hs_16x_retcs_t(t_hs)&" "&f_in_cs_b_retcs_t(t_cs),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello true 2 2.000000 100 5500 F0 b"));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  //===const2: rec, recof, array, set, setof, enum, union, anytype===
+  testcase tc_mc_const2_1() runs on MyComp {
+    log(log2str(c_myRec)," ",c_rocs," ",c_cs3);
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(c_myRec)&log2str(c_rocs)&log2str(c_cs3)&log2str(c_set)&log2str(c_socs)&log2str(c_enum)&log2str(c_union),true);
+    f_verdict(match(v_c,"Hello"&log2str(c_myRec)&log2str(c_rocs)&log2str(c_cs3)&log2str(c_set)&log2str(c_socs)&log2str(c_enum)&log2str(c_union)) and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_const2_2() runs on MyComp {
+    log(log2str(c_myRec)," ",c_rocs," ",c_cs3);
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(c_myRec)&log2str(c_rocs)&log2str(c_cs3)&log2str(t_set)&log2str(t_socs)&log2str(t_enum)&log2str(c_union),false);
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  testcase tc_mc_const2_1_t() runs on MyComp {
+    log(log2str(t_myRec)," ",t_rocs," ",t_cs3, log2str(t_cs3)&log2str(t_set)&log2str(t_socs)&log2str(t_enum)&log2str(c_union));
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(t_myRec)&log2str(t_rocs)&log2str(t_cs3)&log2str(t_set)&log2str(t_socs)&log2str(t_enum)&log2str(c_union),true);
+    f_verdict(match(v_c,"Hello"&log2str(t_myRec)&log2str(t_rocs)&log2str(t_cs3)&log2str(t_set)&log2str(t_socs)&log2str(t_enum)&log2str(c_union)) and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_const2_2_t() runs on MyComp {
+    log(log2str(t_myRec)," ",t_rocs," ",t_cs3," ",t_set," ",t_socs," ",t_enum," ",t_union);
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(t_myRec)&log2str(t_rocs)&log2str(t_cs3)&log2str(t_set)&log2str(t_socs)&log2str(t_enum)&log2str(c_union),false);
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }  
+
+  testcase tc_mc_asn1_1() runs on MyComp {
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(c_asn1rec)&log2str(myASNrec),true);
+    f_verdict(match(v_c,"Hello"&log2str(c_asn1rec)&log2str(myASNrec)) and v_numberOfCalls==1);
+    log(v_c);
+  }
+
+  testcase tc_mc_asn1_2() runs on MyComp {
+    f_lazy_mc(f_returnHelloPassWithZero()&log2str(c_asn1rec)&log2str(myASNrec),false);
+    log(v_c);
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+
+  testcase tc_mc_asn1_1_inout() runs on MyComp {
+    v_c:="";
+    var MyASNRecord asnrec := { b:=true,i:=1,r:=1.0,bs:='1'B, os:='FF'O, cs:="a"}
+    var MyASNUnion asnunion := { i:= 1};
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_inout_b_inv_retcs(asnrec.b)&" "&f_inout_i_inc_retcs(asnrec.i)&" "&
+      f_inout_f_inc_retcs(asnrec.r)&" "&f_inout_bs_4x_retcs(asnrec.bs)&" "&f_inout_os_256x_retcs(asnrec.os)&" "&
+      f_inout_cs_b_retcs(asnrec.cs)&" "&f_inout_i_inc_retcs(asnunion.i),true);
+    log(v_c);
+    log(v_numberOfCalls);
+    log(match(v_c,"Hello false 2 2.000000 100 FF00 b 2"));
+    f_verdict(match(v_c,"Hello false 2 2.000000 100 FF00 b 2") and v_numberOfCalls==1);
+  }
+
+  testcase tc_mc_asn1_2_inout() runs on MyComp {
+    v_c:="";
+    var MyASNRecord asnrec := { b:=true,i:=1,r:=1.0,bs:='1'B, os:='FF'O, cs:="a"}
+    var MyASNUnion asnunion := { i:= 1};
+    f_lazy_mc(f_returnHelloPassWithZero()&" "&f_inout_b_inv_retcs(asnrec.b)&" "&f_inout_i_inc_retcs(asnrec.i)&" "&
+      f_inout_f_inc_retcs(asnrec.r)&" "&f_inout_bs_4x_retcs(asnrec.bs)&" "&f_inout_os_256x_retcs(asnrec.os)&" "&
+      f_inout_cs_b_retcs(asnrec.cs)&" "&f_inout_i_inc_retcs(asnunion.i),false);
+    log(v_c);
+    log(v_numberOfCalls);
+    //log(match(v_c,""));
+    f_verdict(match(v_c,"") and v_numberOfCalls==0);
+  }
+  
+}//g_lazy_charstring_arg_tc
+
+group g_lazy_boolean_arg_tc {
+
+}
+
+group g_lazy_rec_arg_tc {
+
+  testcase tc_mrec_1() runs on MyComp {
+    var MyRec vl_myRec:=c_myRec;
+    vl_myRec.i:= 2*vl_myRec.i;
+    f_lazy_mrec(vl_myRec, true);
+    f_verdict(match(vl_myRec,v_rec) and v_numberOfCalls==0);
+  }
+
+  testcase tc_mrec_2() runs on MyComp {
+    f_lazy_mrec(f_returnRec(1+v_rec.i,v_rec.roi,v_rec.b), true)
+    f_verdict( match(v_rec,{11,{11,12},true}) and v_numberOfCalls==1);
+  }
+
+  testcase tc_mrec_3() runs on MyComp {
+    f_lazy_mrec(f_returnRec(1+v_rec.i,v_rec.roi,v_rec.b), false)
+    f_verdict( match(v_rec,c_myRec) and v_numberOfCalls==0);
+  }
+
+
+}//g_lazy_rec_arg_tc
+
+group g_lazy_template_tc {
+
+  //testcase calls template with lazy arg
+
+  testcase tc_template_1() runs on MyComp {
+    var template MyRec vl_myRec;
+    vl_myRec:=t_lazy_rec(10*f_returnOnePassIfIZero(), {1,2}, ?);
+    f_verdict(getverdict == pass);
+    f_verdict(match({10,{1,2},true},vl_myRec));
+    f_verdict(v_numberOfCalls==1);
+  }
+
+  testcase tc_template_1a() runs on MyComp {
+    var template MyRec vl_myRec;
+    vl_myRec:=t_lazy_rec(10*f_returnOnePassIfIZero(), {f_returnOnePassIfIZero(),2}, ?);
+    f_verdict(getverdict == pass);
+    f_verdict(match({10,{1,2},true},vl_myRec));
+    f_verdict(v_numberOfCalls==2);
+  }
+
+  testcase tc_template_2() runs on MyComp {
+    f_verdict(match({10,{1,2},true},t_lazy_rec(10*f_returnOnePassIfIZero(), {1,2}, ?)));
+    f_verdict(v_numberOfCalls==1);
+  }
+
+  testcase tc_template_3() runs on MyComp {
+    f_verdict(true or match({10,{1,2},true},t_lazy_rec(10*f_returnOnePassIfIZero(), {1,2}, ?)));
+    log(v_numberOfCalls);
+    f_verdict(v_numberOfCalls==0);
+  }
+
+  //control without lazy:
+  testcase tc_template_4() runs on MyComp {
+    f_verdict(true or match({10,{1,2},true},t_rec(10*f_returnOnePassIfIZero(), {1,2}, ?)));
+    f_verdict(v_numberOfCalls==0);
+  }
+
+  //not used first arg
+  testcase tc_template_5() runs on MyComp {
+    f_verdict(match({1,{1,2},true},t_lazy_rec1(10*f_returnOnePassIfIZero(), {1,2}, ?)));
+    log(v_numberOfCalls);
+    f_verdict(v_numberOfCalls==0);
+  }
+
+
+  //function calls template with lazy arg
+  //dyn template ?
+
+}//g_lazy_template_tc
+
+group g_lazy_altstep_tc {
+  testcase tc_altstep_mi_1() runs on MyComp {
+    v_i:=0;
+    as_lazy_mi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+
+
+  testcase tc_altstep_mi_2() runs on MyComp {
+    v_i:=1;
+    as_lazy_mi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == none);
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+
+  //if the evalFlag is false, the expression must not evaluated
+  testcase tc_altstep_mi_3() runs on MyComp {
+    v_i:=0;
+    as_lazy_mi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),false);
+    f_verdict(getverdict == none);
+    f_verdict(v_i==0 and v_numberOfCalls==0);
+  }
+
+  testcase tc_altstep_Ai_1() runs on MyComp { 
+    as_lazy_Ai(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == pass );
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+
+  testcase tc_altstep_Ai_2() runs on MyComp { 
+    v_i:=1;
+    as_lazy_Ai(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == none );
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+  //if the evalFlag is false, the expression must not evaluated
+  testcase tc_altstep_Ai_3() runs on MyComp { 
+    v_i:=0;
+    as_lazy_Ai(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),false);
+    f_verdict(getverdict == none );
+    f_verdict(v_i==0 and v_numberOfCalls==0);
+  }
+
+  testcase tc_altstep_ABi_1() runs on MyComp { 
+    as_lazy_ABi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == pass );
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+  //if the evalFlag is false, the expression must not evaluated
+  testcase tc_altstep_ABi_2() runs on MyComp { 
+    v_i:=1;
+    as_lazy_ABi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),true);
+    f_verdict(getverdict == none );
+    f_verdict(v_i==10 and v_numberOfCalls==2);
+  }
+  testcase tc_altstep_ABi_3() runs on MyComp { 
+    v_i:=0;
+    as_lazy_ABi(10*f_returnOneWithCounterIncr()*f_returnOnePassIfIZero(),false);
+    f_verdict(getverdict == none );
+    f_verdict(v_i==0 and v_numberOfCalls==0);
+  }
+
+  testcase tc_altstep_fi_1() runs on MyComp {
+    v_i:=0;
+    as_lazy_mf(10.0*int2float(f_returnOneWithCounterIncr()*f_returnOnePassIfIZero()),true);
+    f_verdict(getverdict == pass);
+    f_verdict(v_f==10.0 and v_numberOfCalls==2);
+  }
+
+
+  testcase tc_altstep_fi_2() runs on MyComp {
+    v_i:=1;
+    as_lazy_mf(10.0*int2float(f_returnOneWithCounterIncr()*f_returnOnePassIfIZero()),true);
+    f_verdict(getverdict == none);
+    f_verdict(v_f==10.0 and v_numberOfCalls==2);
+  }
+
+  //if the evalFlag is false, the expression must not evaluated
+  testcase tc_altstep_fi_3() runs on MyComp {
+    v_i:=0;
+    as_lazy_mf(10.0*int2float(f_returnOneWithCounterIncr()*f_returnOnePassIfIZero()),false);
+    f_verdict(getverdict == none);
+    f_verdict(v_f==0.0 and v_numberOfCalls==0);
+  }
+
+}//g_lazy_altstep_tc
+
+control{
+  log("Control part started");
+  //integer
+  execute(tc_mi_1());
+  execute(tc_mi_2());
+  execute(tc_mi_3());
+  execute(tc_mi_4());
+  execute(tc_mi_5());
+  execute(tc_mi_6());
+  execute(tc_mi_7());
+
+  execute(tc_mi_1_in());
+  execute(tc_mi_2_in());
+  execute(tc_mi_1_inout());
+  execute(tc_mi_2_inout());
+  execute(tc_mi_1_in_t());
+  execute(tc_mi_2_in_t());
+  execute(tc_mi_1_inout_t());
+  execute(tc_mi_2_inout_t());
+  execute(tc_mi_1_out_t());
+  execute(tc_mi_2_out_t());
+
+  execute(tc_mmi_1());
+  execute(tc_mmi_1b());
+  execute(tc_mmi_2());
+  execute(tc_mmi_3());
+  execute(tc_mmi_4());
+  execute(tc_mmi_5()); 
+
+  execute(tc_mmmi_1());   
+  execute(tc_mmmi_1b());
+  execute(tc_mmmi_2());
+  execute(tc_mmmi_3());
+  execute(tc_mmmi_4());
+  execute(tc_mmmi_5()); 
+
+  execute(tc_Ai_1());
+  execute(tc_Ai_2());
+  execute(tc_Ai_3());
+  execute(tc_Ai_4());
+  execute(tc_Ai_5()); 
+
+  execute(tc_AAi_1());
+  execute(tc_AAi_2());
+  execute(tc_AAi_3());
+  execute(tc_AAi_4());
+  execute(tc_AAi_5());
+
+  execute(tc_ABi_1());
+  execute(tc_ABi_2());
+  execute(tc_ABi_3());
+  execute(tc_ABi_4());
+  execute(tc_ABi_5());    
+
+  execute(tc_mABi_1());
+  execute(tc_mABi_2());
+  execute(tc_mABi_3());
+  execute(tc_mABi_4());
+  execute(tc_mABi_5());
+
+  execute(tc_fmi_1());
+  execute(tc_fmi_2());
+  execute(tc_fmi_3());
+  execute(tc_fmi_4());
+  execute(tc_fmi_5());
+
+  execute(tc_fAi_1());
+  execute(tc_fAi_2());
+  execute(tc_fAi_3());
+  execute(tc_fAi_4());
+  execute(tc_fAi_5());
+
+  //float
+  execute(tc_mf_1());
+  execute(tc_mf_3());
+  execute(tc_mf_3a());
+  execute(tc_mf_4());
+  execute(tc_mf_5());
+
+
+  execute(tc_mmf_1());
+  execute(tc_mmf_3());
+  execute(tc_mmf_3a());
+  execute(tc_mmf_4());
+  execute(tc_mmf_5());
+  execute(tc_mmf_6());
+  execute(tc_mmf_7());
+
+  execute(tc_fmf_1());
+  execute(tc_fmf_3());
+  execute(tc_fmf_3a());
+  execute(tc_fmf_4());
+  execute(tc_fmf_5());
+
+  //charstring
+  execute(tc_mc_1());
+  execute(tc_mc_1b());
+  execute(tc_mc_2());
+  execute(tc_mc_1_in());
+  execute(tc_mc_par_1_in());
+  execute(tc_mc_2_in());
+  execute(tc_mc_par_2_in());
+  execute(tc_mc_1_inout());
+  execute(tc_mc_par_1_inout_in());
+  execute(tc_mc_par_1_inout_inout());
+  execute(tc_mc_2_inout());
+  execute(tc_mc_par_2_inout_in());
+  execute(tc_mc_par_2_inout_inout());
+  execute(tc_mc_1_out());
+  execute(tc_mc_2_out());
+  execute(tc_mc_1_in_t());
+  execute(tc_mc_2_in_t());
+  execute(tc_mc_1_inout_t());
+  execute(tc_mc_2_inout_t());
+  execute(tc_mc_1_out_t());
+  execute(tc_mc_2_out_t());
+
+  execute(tc_mc_const_1());
+  execute(tc_mc_const_2());
+  execute(tc_mc_const_1_t());
+  execute(tc_mc_const_2_t());
+  execute(tc_mc_const2_1());
+  execute(tc_mc_const2_2());
+  execute(tc_mc_const2_1_t());
+  execute(tc_mc_const2_2_t());
+  execute(tc_mc_asn1_1());
+  execute(tc_mc_asn1_2());
+  execute(tc_mc_asn1_1_inout());
+  execute(tc_mc_asn1_2_inout());
+
+  //record
+  execute(tc_mrec_1());
+  execute(tc_mrec_2());
+  execute(tc_mrec_3());
+
+  //template
+  execute(tc_template_1());
+  execute(tc_template_1a());
+  execute(tc_template_2());
+  execute(tc_template_3());
+  execute(tc_template_4());
+  execute(tc_template_5());
+  //altstep
+  execute(tc_altstep_mi_1());
+  execute(tc_altstep_mi_2());
+  execute(tc_altstep_mi_3());
+  execute(tc_altstep_Ai_1());
+  execute(tc_altstep_Ai_2());
+  execute(tc_altstep_Ai_3());
+  execute(tc_altstep_ABi_1());
+  execute(tc_altstep_ABi_2());
+  execute(tc_altstep_ABi_3());  
+  execute(tc_altstep_fi_1());
+  execute(tc_altstep_fi_2());
+  execute(tc_altstep_fi_3());
+
+}
+
+
+
+}

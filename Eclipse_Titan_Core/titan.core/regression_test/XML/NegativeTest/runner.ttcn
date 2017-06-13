@@ -1,0 +1,99 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module runner {
+
+import from uni    { testcase all }
+import from rec    { testcase all }
+import from rec_of { testcase all }
+import from exer_rec    { testcase all }
+import from exer_rec_of { testcase all }
+import from exer_uni    { testcase all }
+
+control // the only control part in the system
+{
+  // testcases imported from rec
+  execute(plain());
+  execute(before());
+  execute(before_named());
+  execute(before_raw());
+  execute(replacer());
+  execute(after());
+  execute(omitter());
+
+  // testcase from rec_of
+  execute(rof_plain());
+
+  execute(rof_before());
+  execute(rof_before_raw());
+
+  execute(rof_replacer());
+  execute(rof_replacer_raw());
+
+  execute(rof_after());
+  execute(rof_after_raw());
+
+  // testcase imported from uni
+  execute(u_plain());
+  execute(u_replace());
+  execute(u_before_embedded());
+
+  // testcases imported from exer_rec_of
+  execute(exer_recof_plain());
+  execute(exer_recof_before0());
+
+  execute(aa_plain());
+  execute(aa_before0());
+  execute(aa_replace0());
+  execute(aa_after());
+
+  // testcases imported from exer_rec
+  execute(exer_rec_plain());
+  execute(exer_rec_before());
+
+  execute(exer_attr());
+  execute(exer_attr_before1());
+  execute(exer_attr_before1raw());
+
+  execute(exer_attr_replace2());
+  execute(exer_attr_replace2raw());
+
+  execute(exer_attr_after2());
+  execute(exer_attr_after2raw());
+
+  execute(exer_attr_omit1());
+  execute(exer_attr_omit_all_before());
+  execute(exer_attr_omit_all_after());
+
+  execute(exer_qname_plain());
+  execute(exer_qname_before());
+  execute(exer_qname_replace());
+  execute(exer_qname_after());
+
+  execute(uo_plain());
+  execute(uo_omit());
+  execute(uo_omit_after());
+
+  execute(unil_plain());
+  execute(unil_present_to_omit());
+  execute(unil_absent_to_present());
+
+  // from exer_uni
+  execute(ut_plain());
+  execute(ut_replace());
+  execute(ut_nested_plain());
+  execute(ut_nested_replace());
+  execute(uu_plain());
+}
+
+}

@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+#echo "*****************************************************"
+#echo "Ez egy negyedik tok primitiv automatizalt teszter V0.0"
+#echo "ami leellenorzi hogy az ASN1 kotojelek kettos alahuzasra
+# fordulnak.  Egyelore sima greppel , de kesobb majd osszehasonlitunk
+# egy TTCN3-bol generalt filevel
+#echo "*****************************************************"
+
+if $GREP -q "typedef INTEGER My__Integer__Type" ./Test284.hh
+then
+    if $GREP -q "typedef INTEGER_template My__Integer__Type_template" ./Test284.hh
+    then
+	if $GREP -q "extern const INTEGER& my__Integer__Value" ./Test284.hh
+        then 
+	    if $GREP -q "const_my__Integer__Value = 9;" ./*.cc
+            then Verdict="pass"
+            else Verdict="fail 4"
+            fi
+        else  Verdict="fail 3"
+	fi
+    else  Verdict="fail 2"
+    fi
+else Verdict="fail 1"
+fi
+
+echo "ASN1:TEST284 = Verdict: $Verdict"

@@ -1,0 +1,78 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Pandi, Krisztian
+ *   Raduly, Csaba
+ *   Szabados, Kristof
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module high_titan_SE {	//^In TTCN-3 module `high_titan_SE':$//
+}
+with {
+  extension "requiresTITAN R1A01"; /* surely this can be satisfied, but not the next one */
+  extension "requiresTITAN CRL 113 200/65535 R99Z"; //^error: This module needs to be compiled with TITAN version CRL 113 200/\d+ R\d{1,2}[A-HJ-NS-VX-Z](\d{1,2})? or higher; version CRL 113 200(\/\d+ )?R\d{1,2}[A-HJ-NS-VX-Z](\d{1,2})? detected//
+  // WARNING! Different regexes, where one is a stricter version of the other, are not allowed
+  // (a limitation of the checker script logic).
+  // So we can't have the above regex check for precisely /R9Z/ and the one below
+  // check for the more general /R\d[A-HJ-NS-VX-Z](\d{1,2})?/
+
+  /* Test needs to be adjusted for every release !!!!!!! */
+  extension "requiresTITAN CRL 113 200/6 R1A"; /* This one must just pass, the next one must just fail */
+  extension "requiresTITAN CRL 113 200/6 R1B01"; //^error: This module needs to be compiled with TITAN version (C[RN]L \d+ \d+\/\d+ )?R\d{1,2}[A-HJ-NS-VX-Z](\d{1,2})? or higher; version (C[RN]L \d+ \d+\/\d+ )?R\d{1,2}[A-HJ-NS-VX-Z](\d{1,2})? detected//
+
+  /* The old style RnXnn, without the CRL 113 200 and the suffix, implies major version 1
+   * Now that Titan is at version 2, the following will always pass:
+   */
+  extension "requiresTITAN R99A"; /* highest version without the suffix is still only v1 */
+  extension "requiresTITAN R99AA";
+
+  extension "requiresTITAN	CRL		113		200/1 R8H";
+  extension "requiresTITAN	CRL		113		200/1 R8HH";
+  
+  /* The old keyword requiresTitan has been superseded by requiresTITAN */
+  extension "requiresTitan R9Z"; //^error: at or before token `requiresTitan': syntax error, unexpected Identifier, expecting \$end//
+
+  /* Tests for incorrect version data, copied from c3p0 */
+  /* First letter must be 'R' */
+  extension "requiresTITAN C3P0"; //^error: Incorrect version data//
+  extension "requiresTITAN C3PO"; //^error: Incorrect version data//
+  /* I said R! */
+  extension "requiresTITAN r2D2"; //^error: Incorrect version data//
+
+  /* Negative number ? Surely not */
+  extension "requiresTITAN R-1Z"; //^error: Incorrect version data// //^error: at or before token `-': syntax error, unexpected '-', expecting \$end//
+  /*   above parses "R" as the identifier, then stumbles on the '-' */
+
+  extension "requiresTITAN RAWR"; //^error: Incorrect version data//
+
+  extension "requiresTITAN R2ZZZ"; //^error: Incorrect version data//
+  extension "requiresTITAN R2ZZZ1"; //^error: Incorrect version data//
+  extension "requiresTITAN R0FLMAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOooooooooooooooooooooooooooooooooooooooooooooooooooooooo"; //^error: Incorrect version data//
+
+  extension "requiresTITAN R2Z-1"; //^error: at or before token `-': syntax error, unexpected '-', expecting \$end//
+  /* It was going so well until the - */
+
+  /* template NOT allowed for requiresTITAN */
+  extension "requiresTITAN <>"     ; //^error: at or before token `<': syntax error, unexpected '<', expecting Identifier//
+  extension "requiresTITAN <R2D>"  ; //^error: at or before token `<': syntax error, unexpected '<', expecting Identifier//
+  extension "requiresTITAN <R2D2>" ; //^error: at or before token `<': syntax error, unexpected '<', expecting Identifier//
+  extension "requiresTITAN <RnXnn;"; //^error: at or before token `<': syntax error, unexpected '<', expecting Identifier//
+  extension "requiresTITAN <RmXnn>"; //^error: at or before token `<': syntax error, unexpected '<', expecting Identifier//
+
+  /* test "forbidden" letters */
+  extension "requiresTITAN R2I"; //^error: Incorrect version data//
+  extension "requiresTITAN R2O"; //^error: Incorrect version data//
+  extension "requiresTITAN R2P"; //^error: Incorrect version data//
+  extension "requiresTITAN R2Q"; //^error: Incorrect version data//
+  extension "requiresTITAN R2R"; //^error: Incorrect version data//
+  extension "requiresTITAN R2W"; //^error: Incorrect version data//
+
+}

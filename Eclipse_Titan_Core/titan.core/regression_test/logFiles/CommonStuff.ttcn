@@ -1,0 +1,738 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kovacs, Ferenc
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module CommonStuff
+{
+
+modulepar float tsp_EPTF_maxRunningTime := 2147483.0;
+
+modulepar integer tsp_CLL_debug_acceptableMaxSizeOfGrowingVariables := -1;
+modulepar float tsp_CLL_debug_increasePercentage4AcceptableMaxSize := 0.1;
+
+type record of default EPTF_DefaultList;
+type record of integer EPTF_IntegerList;
+
+type record of EPTF_IntegerList EPTF_IntegerArray2D;
+
+type record of charstring EPTF_CharstringList;
+
+type record of float EPTF_FloatList;
+
+type record of boolean EPTF_BooleanList;
+
+type enumerated EPTF_LEDColors {
+   led_blue,
+   led_black,
+   led_yellow,
+   led_green,
+   led_red
+}
+
+type record EPTF_StatusLED {
+   EPTF_LEDColors color,
+   charstring     text optional
+}
+
+type record EPTF_ParamRangeDescriptor{
+  charstring name,
+  integer    baseOffset,
+  integer    count,
+  integer    iterator
+}
+
+type record of EPTF_ParamRangeDescriptor EPTF_ParamRangeDescriptorList;
+
+const boolean c_EPTF_Common_debugSwitch := true;
+
+public external function f_EPTF_Common_error(in charstring pl_message);
+public external function f_EPTF_Common_warning(in charstring pl_message);
+public external function f_EPTF_Common_user(in charstring pl_message);
+
+private external function f_EPTF_Common_initErrorMsgs();
+
+public function f_EPTF_Common_init() {
+  f_EPTF_Common_initErrorMsgs();
+}
+
+public external function f_EPTF_Common_nofErrorMsgs() return integer;
+public external function f_EPTF_Common_getErrorMsg(in integer pl_errorNum := 0) return charstring;
+
+public function f_EPTF_Common_checkExpectedError(in charstring pl_expectedError, in integer pl_errorNum := 0) return boolean {
+  if (not match(f_EPTF_Common_getErrorMsg(pl_errorNum), pattern pl_expectedError)) {
+    f_EPTF_Common_warning("Warning: "&%definitionId& ": Error message with id "&int2str(pl_errorNum)&" is different from the expected pattern: "&
+      log2str(match(f_EPTF_Common_getErrorMsg(pl_errorNum), pattern pl_expectedError)));
+    return false;
+  } else {
+    f_EPTF_Common_user(%definitionId& ": Error message with id "&int2str(pl_errorNum)&" matches with the expected pattern: "& pl_expectedError);
+    return true;
+  }
+  return true;
+}
+
+group RangeHandling {
+  public function f_EPTF_Common_resetParamRanges(inout EPTF_ParamRangeDescriptorList pl_rangeList) {
+    for (var integer i:=0;i<sizeof(pl_rangeList);i:=i+1) {
+      pl_rangeList[i].iterator := pl_rangeList[i].baseOffset;
+    }
+  }
+
+  public function f_EPTF_Common_incParamRanges(inout EPTF_ParamRangeDescriptorList pl_rangeList) return boolean {
+    var integer i;
+    for (i:=sizeof(pl_rangeList)-1;i>=0 and f_EPTF_Common_private_incParamRangeItem(pl_rangeList[i]);i:=i-1) {}
+    if (i<0) {return true}
+    return false;
+  }
+
+  public function f_EPTF_Common_private_incParamRangeItem(inout EPTF_ParamRangeDescriptor pl_range) return boolean {
+    pl_range.iterator := pl_range.iterator + 1;
+    if (pl_range.baseOffset + pl_range.count>pl_range.iterator) {return false}
+    pl_range.iterator := pl_range.baseOffset;
+    return true;
+  }
+
+}
+
+group WeightedLists {
+
+  public function f_EPTF_Common_fillWeightedBuckets(in EPTF_FloatList pl_weightList, in integer pl_nrOfElements, out EPTF_IntegerList pl_result) return boolean
+  {
+
+    if (sizeof(pl_weightList)<1) {
+      f_EPTF_Common_user(log2str(%definitionId,": empty weightList, unable to split"));
+      return false;
+    }
+
+    if (sizeof(pl_weightList)>pl_nrOfElements) {
+      f_EPTF_Common_user(log2str(%definitionId,": not enough elements, unable to split"));
+      return false;
+    }
+
+    var EPTF_IntegerList vl_sortedWeightsIdx := {};
+    for (var integer i:=0;i<sizeof(pl_weightList);i:=i+1) {
+      vl_sortedWeightsIdx[i] := i;
+    }
+
+    var integer vl_tmpint;
+    for (var integer i:=sizeof(pl_weightList)-1;i>=0;i:=i-1) {
+      for (var integer j:=0;j<i;j:=j+1) {
+        if (pl_weightList[vl_sortedWeightsIdx[j]]>pl_weightList[vl_sortedWeightsIdx[j+1]]) {
+          vl_tmpint := vl_sortedWeightsIdx[j];
+          vl_sortedWeightsIdx[j] := vl_sortedWeightsIdx[j+1];
+          vl_sortedWeightsIdx[j+1] := vl_tmpint;
+        }
+      }
+    }
+
+    var integer vl_nrOfUsedElements := 0;
+    pl_result := {};
+    for (var integer i:=0;i<sizeof(pl_weightList)-1;i:=i+1) {
+      pl_result[vl_sortedWeightsIdx[i]] := float2int(pl_weightList[vl_sortedWeightsIdx[i]] * int2float(pl_nrOfElements));
+      if (pl_result[vl_sortedWeightsIdx[i]]<1) {pl_result[vl_sortedWeightsIdx[i]] := 1}
+      vl_nrOfUsedElements := vl_nrOfUsedElements + pl_result[vl_sortedWeightsIdx[i]];
+    }
+    pl_result[vl_sortedWeightsIdx[sizeof(pl_weightList)-1]] := pl_nrOfElements - vl_nrOfUsedElements;
+
+    return true;
+  }
+}
+
+type record EPTF_Common_IndexArray{
+  EPTF_IntegerList values,
+  integer firstBusy
+}
+const EPTF_Common_IndexArray c_EPTF_emptyCommon_IndexArray := {
+  {},
+  -1
+}
+
+function f_EPTF_Common_IndexArray_getOrCreateFreeSlot(inout EPTF_Common_IndexArray pl_array) return integer{
+  for ( var integer vl_i := 0; vl_i < sizeof(pl_array.values) ; vl_i := vl_i+1 ){
+    if(pl_array.values[vl_i] < 0){
+      return vl_i
+    }
+  }
+  return sizeof(pl_array.values)
+}
+
+function f_EPTF_Common_IndexArray_getElement(
+  inout EPTF_Common_IndexArray pl_array,
+  in integer pl_idx)
+return integer{
+  if(pl_idx >= 0 and pl_idx < sizeof(pl_array.values)){
+    return pl_array.values[pl_idx]
+  }
+  return -1
+}
+
+function f_EPTF_Common_IndexArray_setElement(
+  inout EPTF_Common_IndexArray pl_array,
+  in integer pl_idx,
+  in integer pl_data := -1){
+  if (pl_idx < 0) {
+    f_EPTF_Common_error(%definitionId&": using a negative index: "&int2str(pl_idx));
+    return;
+  }
+  if(0 > pl_data){pl_data := pl_idx}
+  pl_array.values[pl_idx] := pl_data;
+  if((pl_array.firstBusy > pl_idx) or (0 > pl_array.firstBusy)){
+    pl_array.firstBusy := pl_idx
+  }
+  for ( var integer vl_i := (pl_idx - 1); vl_i >= 0 and not isvalue(pl_array.values[vl_i]) ; vl_i := vl_i - 1 ){
+      pl_array.values[vl_i] := -1;
+  }
+}
+
+function f_EPTF_Common_IndexArray_setNewElement(
+  inout EPTF_Common_IndexArray pl_array,
+  in integer pl_data := -1)
+return integer{
+  var integer vl_idx := f_EPTF_Common_IndexArray_getOrCreateFreeSlot(pl_array)
+  if(0 > pl_data){pl_data := vl_idx}
+  pl_array.values[vl_idx] := pl_data;
+  if((pl_array.firstBusy > vl_idx) or (0 > pl_array.firstBusy)){
+    pl_array.firstBusy := vl_idx
+  }
+  return vl_idx
+}
+
+function f_EPTF_Common_IndexArray_freeElement(
+  inout EPTF_Common_IndexArray pl_array,
+  in integer pl_idx)
+return integer{
+  var integer vl_ret := -1
+  if(pl_idx >= 0 and pl_idx < sizeof(pl_array.values)){
+    vl_ret := pl_array.values[pl_idx]
+    pl_array.values[pl_idx] := -1
+    if(pl_idx == pl_array.firstBusy){
+      pl_array.firstBusy := -1
+      for ( var integer vl_i := pl_idx+1; vl_i < sizeof(pl_array.values) and -1 == pl_array.firstBusy ; vl_i := vl_i+1 ){
+        if(0 <= pl_array.values[vl_i]){
+          pl_array.firstBusy := vl_i
+        }
+      }
+    }
+  }
+  return vl_ret
+}
+
+function f_EPTF_Common_IndexArray_arrayIsEmpty(
+  inout EPTF_Common_IndexArray pl_array)
+return boolean{
+  return -1 == pl_array.firstBusy
+}
+
+function f_EPTF_Common_IndexArray_getFirstBusyIdx(
+  inout EPTF_Common_IndexArray pl_array)
+return integer{
+  return pl_array.firstBusy
+}
+
+function f_EPTF_Common_IndexArray_getNextBusyIdx(
+  inout EPTF_Common_IndexArray pl_array,
+  in integer pl_idx)
+return integer{
+  if(pl_idx >= 0 and pl_idx < sizeof(pl_array.values)){
+    for ( var integer vl_i := pl_idx+1; vl_i < sizeof(pl_array.values) ; vl_i := vl_i+1 ){
+      if(0 <= pl_array.values[vl_i]){
+        return vl_i
+      }
+    }
+  }
+  return -1
+}
+
+modulepar boolean tsp_EPTF_Base_serialStopAllComponents := true;
+
+type function f_EPTF_Feature_cleanup_CT() runs on self;
+
+type record of f_EPTF_Feature_cleanup_CT EPTF_Base_CleanupFunctions;
+
+type record of EPTF_Base_CT EPTF_Base_ComponentList;
+
+type union EPTF_Base_MgmtMsg {
+  EPTF_Base_Msg_Hello hello,
+  EPTF_Base_Msg_Bye bye,
+  EPTF_Base_Msg_ByeAck byeAck,
+  EPTF_Base_Msg_StopRemote stopRemote
+}
+
+type record EPTF_Base_Msg_Hello {
+}
+
+type EPTF_Base_Msg_Hello EPTF_Base_Msg_Bye;
+
+type EPTF_Base_Msg_Hello EPTF_Base_Msg_ByeAck;
+
+type record EPTF_Base_Msg_StopRemote {
+  boolean noCleanup
+}
+
+type port EPTF_Base_Mgmt_PT message {
+  inout EPTF_Base_MgmtMsg;
+} with { extension "internal" }
+
+type component EPTF_Base_CT extends EPTF_Base_CT_private {
+}
+
+friend module EPTF_CLL_Base_Functions;
+friend type component EPTF_Base_CT_private {
+  private var charstring v_selfName;
+  private var boolean v_EPTF_Base_initialized := false;
+  private var EPTF_Base_CleanupFunctions v_EPTF_Base_cleanupFunctions := {};
+  private port EPTF_Base_Mgmt_PT EPTF_Base_MgmtIf;
+  private var default v_EPTF_Base_def;
+  private var EPTF_Base_ComponentList v_EPTF_Base_componentsToStop := {};
+  private var boolean v_EPTF_Base_serialStopAllComponents := tsp_EPTF_Base_serialStopAllComponents;
+  private var boolean v_EPTF_Base_disableBye := false;
+  private var boolean v_EPTF_Base_byeAckReceived := false;
+  private var EPTF_Base_CT v_EPTF_Base_stopRemoteSentTo := null;
+  timer T_EPTF_componentClock := tsp_EPTF_maxRunningTime;
+  private var float v_EPTF_Base_abstimeOfZeroComponentClock := 0.0;
+
+  private var boolean v_EPTF_Base_negativeTestMode := false;
+  private var EPTF_CharstringList v_EPTF_Base_assertMsgs := {};
+  private var charstring v_EPTF_Base_expectedAssert := "";
+  private var charstring v_EPTF_Base_expectedError := "";
+}
+
+group Public {
+
+public function f_EPTF_Base_init_CT(in charstring pl_selfName) runs on EPTF_Base_CT_private {
+  if (v_EPTF_Base_initialized) {
+    return;
+  }
+  v_selfName := pl_selfName;
+  v_EPTF_Base_cleanupFunctions := {};
+  v_EPTF_Base_componentsToStop := {};
+  v_EPTF_Base_disableBye := false;
+  v_EPTF_Base_byeAckReceived := false;
+  v_EPTF_Base_stopRemoteSentTo := null;
+  v_EPTF_Base_negativeTestMode := false;
+  v_EPTF_Base_assertMsgs := {};
+  v_EPTF_Base_expectedAssert := "";
+  v_EPTF_Base_expectedError := "";
+
+  if (self != mtc) {
+    connect(self:EPTF_Base_MgmtIf,mtc:EPTF_Base_MgmtIf);
+    f_EPTF_Base_send({hello := {}},mtc);
+    disconnect(self:EPTF_Base_MgmtIf,mtc:EPTF_Base_MgmtIf);
+  }
+  T_EPTF_componentClock.start;
+  v_EPTF_Base_abstimeOfZeroComponentClock := f_EPTF_Base_getTimeOfDay();
+  v_EPTF_Base_def := activate(as_handle_main_EPTF_Base_MgmtIf());
+  v_EPTF_Base_initialized := true;
+
+  f_EPTF_Base_registerCleanup(refers(f_EPTF_Base_cleanup_CT));
+  f_EPTF_Common_user(log2str("----BASE INIT DONE FOR COMPONENT ",v_selfName,"----"));
+}
+
+public function f_EPTF_Base_registerCleanup(in f_EPTF_Feature_cleanup_CT pl_featureCleanupFn) runs on EPTF_Base_CT_private {
+  if (v_EPTF_Base_initialized == false) {
+    f_EPTF_Common_error(log2str("ERROR:","f_EPTF_Base_init_CT is not called before calling f_EPTF_Base_registerCleanup for ", pl_featureCleanupFn));
+  }
+  for (var integer i:=0; i<sizeof(v_EPTF_Base_cleanupFunctions); i:=i+1) {
+    if (pl_featureCleanupFn == v_EPTF_Base_cleanupFunctions[i]) {
+      return;
+    }
+  }
+  v_EPTF_Base_cleanupFunctions[sizeof(v_EPTF_Base_cleanupFunctions)] := pl_featureCleanupFn;
+}
+
+public function f_EPTF_Base_cleanup_CT() runs on EPTF_Base_CT_private {
+  if (v_EPTF_Base_initialized == false) {
+    return;
+  }
+  v_EPTF_Base_initialized := false;
+
+  f_EPTF_Common_user("----BASE CLEANUP START----");
+  if (mtc == self) {
+    f_EPTF_Base_stopAllComponents();
+  }
+
+  for (var integer i:=sizeof(v_EPTF_Base_cleanupFunctions)-1; i>-1; i:=i-1) {
+    f_EPTF_Common_user(log2str("DEBUG:","Calling cleanup function ",v_EPTF_Base_cleanupFunctions[i]));
+    v_EPTF_Base_cleanupFunctions[i].apply();
+    f_EPTF_Common_user(log2str("DEBUG:","Cleanup function done ",v_EPTF_Base_cleanupFunctions[i]));
+  }
+
+  if (v_EPTF_Base_expectedAssert!="") {
+    if (f_EPTF_Base_checkExpectedAssert(v_EPTF_Base_expectedAssert)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+  if (v_EPTF_Base_expectedError!="") {
+    if (f_EPTF_Base_checkExpectedError(v_EPTF_Base_expectedError)) {
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+
+  if (mtc == self) {
+    f_EPTF_Base_stopAllComponents();
+    timer t_periodicStop := 2.0;
+    t_periodicStop.start;
+    alt {
+      [] all component.done;
+      [] t_periodicStop.timeout {
+        f_EPTF_Base_stopAllComponents();
+        t_periodicStop.start;
+        repeat;
+      }
+    }
+  } else {
+    if (v_EPTF_Base_disableBye == false) {
+      connect(self:EPTF_Base_MgmtIf,mtc:EPTF_Base_MgmtIf);
+      f_EPTF_Base_send({bye := {}},mtc);
+      f_EPTF_Base_waitForByeAck();
+      disconnect(self:EPTF_Base_MgmtIf,mtc:EPTF_Base_MgmtIf);
+    }
+  }
+
+  if(T_EPTF_componentClock.running) { T_EPTF_componentClock.stop; }
+
+  v_EPTF_Base_stopRemoteSentTo := null;
+  f_EPTF_Common_user(log2str("----BASE CLEANUP DONE FOR ",v_selfName,"----"));
+}
+
+public function f_EPTF_Base_stop(in verdicttype pl_verdict := fail) runs on EPTF_Base_CT_private {
+  if (v_EPTF_Base_initialized == false) {
+    f_EPTF_Common_warning(log2str("Warning:","Cleanup is in progress, additional stop is ignored."));
+    return;
+  }
+  if (pl_verdict != none and not v_EPTF_Base_negativeTestMode) {
+    setverdict(pl_verdict);
+  }
+  f_EPTF_Common_user("Trying to stop execution gracefully...");
+  f_EPTF_Base_cleanup_CT();
+  stop;
+}
+
+public function f_EPTF_Base_stopRemote(in EPTF_Base_CT_private pl_remoteComp, in boolean pl_noCleanup := false) runs on EPTF_Base_CT_private {
+  f_EPTF_Common_user(log2str("Requesting to stop execution of component ",pl_remoteComp," gracefully..."));
+
+  if (self == mtc) {
+    f_EPTF_Base_removeComponent(pl_remoteComp);
+  }
+
+  if (pl_remoteComp == mtc) {
+    if (v_EPTF_Base_initialized == false) {
+      f_EPTF_Common_warning(log2str("Warning:","Cleanup is in progress, additional stopRemote is ignored for pl_remoteComp: mtc."));
+      return;
+    }
+    if (self != mtc) {
+      connect(self:EPTF_Base_MgmtIf,pl_remoteComp:EPTF_Base_MgmtIf);
+      f_EPTF_Base_send({stopRemote := {pl_noCleanup}},pl_remoteComp);
+      disconnect(self:EPTF_Base_MgmtIf,pl_remoteComp:EPTF_Base_MgmtIf);
+    }
+      if (pl_noCleanup == false) {
+        v_EPTF_Base_disableBye := true;
+        f_EPTF_Base_cleanup_CT();
+      }
+    stop;
+  }
+  connect(self:EPTF_Base_MgmtIf,pl_remoteComp:EPTF_Base_MgmtIf);
+  f_EPTF_Base_send({stopRemote := {pl_noCleanup}},pl_remoteComp);
+}
+
+public function f_EPTF_Base_stopAll(in verdicttype pl_verdict := fail, in boolean pl_noCleanup := false) runs on EPTF_Base_CT_private {
+  if (pl_verdict != none and not v_EPTF_Base_negativeTestMode) {
+    setverdict(pl_verdict);
+  }
+  f_EPTF_Common_user("Trying to stop execution of all components gracefully...");
+  f_EPTF_Base_stopRemote(mtc,pl_noCleanup);
+}
+
+public function f_EPTF_Base_selfName() runs on EPTF_Base_CT_private  return charstring {
+  return v_selfName;
+}
+
+public function f_EPTF_Base_cleanupIsInProgress() runs on EPTF_Base_CT_private  return boolean {
+  return v_EPTF_Base_initialized;
+}
+
+public function f_EPTF_Base_wait4Shutdown() runs on EPTF_Base_CT_private
+{
+  T_EPTF_componentClock.timeout;
+}
+
+public function f_EPTF_Base_getRelTimeInSecs()
+runs on EPTF_Base_CT_private
+return float
+{
+  return T_EPTF_componentClock.read;
+}
+
+public function f_EPTF_Base_getRelTimeOffsetInSecs()
+runs on EPTF_Base_CT_private
+return float
+{
+  return v_EPTF_Base_abstimeOfZeroComponentClock;
+}
+
+public function f_EPTF_Base_getAbsTimeInSecs()
+runs on EPTF_Base_CT_private
+return float
+{
+  return v_EPTF_Base_abstimeOfZeroComponentClock + T_EPTF_componentClock.read;
+}
+
+public external function f_EPTF_Base_upcast(in EPTF_Base_CT pl_compRef) return integer;
+
+public external function f_EPTF_Base_downcast(in integer pl_baseCompRef) return EPTF_Base_CT;
+
+public function f_EPTF_Base_setNegativeTestMode(in boolean pl_negativeTest := true) runs on EPTF_Base_CT_private {
+  action(%definitionId&": THIS IS A NEGATIVE TEST, VERDICT SHOULD BE PASS!");
+  v_EPTF_Base_negativeTestMode:= pl_negativeTest;
+}
+
+public function f_EPTF_Base_getNegativeTestMode()
+runs on EPTF_Base_CT_private
+return boolean{
+  return v_EPTF_Base_negativeTestMode;
+}
+
+public external function f_EPTF_Base_assert(in charstring pl_assertMessage,in boolean pl_predicate);
+
+private function  f_EPTF_Base_addAssertMsg(in charstring pl_newMsg) runs on EPTF_Base_CT_private {
+  v_EPTF_Base_assertMsgs[sizeof(v_EPTF_Base_assertMsgs)] := pl_newMsg;
+}
+
+public function f_EPTF_Base_nofAssertMsgs() runs on EPTF_Base_CT_private return integer {
+  return sizeof(v_EPTF_Base_assertMsgs);
+}
+
+public function f_EPTF_Base_getAssertMsg(in integer pl_assertNum := 0) runs on EPTF_Base_CT_private return charstring {
+  if (sizeof(v_EPTF_Base_assertMsgs)==0) {
+    return "";
+  }
+  if (sizeof(v_EPTF_Base_assertMsgs)<=pl_assertNum or pl_assertNum<0) {
+    return "";
+  }
+  return v_EPTF_Base_assertMsgs[pl_assertNum];
+}
+
+public function f_EPTF_Base_setExpectedAssertMsg(in charstring pl_expectedAssert) runs on EPTF_Base_CT_private {
+  v_EPTF_Base_expectedAssert := pl_expectedAssert;
+  if("" != v_EPTF_Base_expectedError){
+    f_EPTF_Common_warning(%definitionId&": There is already an expected error message: "&v_EPTF_Base_expectedError&
+    " This may cause ambiguous behavior!")
+  }
+  f_EPTF_Base_setNegativeTestMode()
+}
+
+public function f_EPTF_Base_setExpectedErrorMsg(in charstring pl_expectedError) runs on EPTF_Base_CT_private {
+  v_EPTF_Base_expectedError := pl_expectedError;
+  if("" != v_EPTF_Base_expectedAssert){
+    f_EPTF_Common_warning(%definitionId&": There is already an expected assert message: "&v_EPTF_Base_expectedAssert&
+    " This may cause ambiguous behavior!")
+  }
+  f_EPTF_Base_setNegativeTestMode()
+}
+
+public function f_EPTF_Base_checkExpectedAssert(in charstring pl_expectedAssert, in integer pl_assertNum := 0)
+runs on EPTF_Base_CT_private return boolean {
+  if (not match(f_EPTF_Base_getAssertMsg(pl_assertNum), pattern pl_expectedAssert)) {
+    f_EPTF_Common_warning("Warning: "&%definitionId& ": Assert message with id "&int2str(pl_assertNum)&" is different from the expected pattern: "&
+      log2str(match(f_EPTF_Base_getAssertMsg(pl_assertNum), pattern pl_expectedAssert)));
+    return false;
+  } else {
+    f_EPTF_Common_user(%definitionId& ": Assert message with id "&int2str(pl_assertNum)&" matches with the expected pattern: "& pl_expectedAssert);
+    return true;
+  }
+  return true;
+}
+
+public function f_EPTF_Base_checkExpectedError(in charstring pl_expectedError, in integer pl_errNum := 0)
+runs on EPTF_Base_CT_private return boolean {
+  if (not match(f_EPTF_Common_getErrorMsg(pl_errNum), pattern pl_expectedError)) {
+    f_EPTF_Common_warning("Warning: "&%definitionId& ": Error message with id "&int2str(pl_errNum)&" is different from the expected pattern: "&
+      log2str(match(f_EPTF_Common_getErrorMsg(pl_errNum), pattern pl_expectedError)));
+    return false;
+  } else {
+    f_EPTF_Common_user(%definitionId& ": Error message with id "&int2str(pl_errNum)&" matches with the expected pattern: "& pl_expectedError);
+    return true;
+  }
+  return true;
+}
+
+public external function f_EPTF_Base_getTimeOfDay() return float;
+
+}
+
+function f_EPTF_Base_RegisterCleanup(in f_EPTF_Feature_cleanup_CT pl_featureCleanupFn) runs on EPTF_Base_CT_private {
+  f_EPTF_Common_warning("Warning: "&%definitionId& ": This function is deprecated and will be removed! Use f_EPTF_Base_registerCleanup instead!");
+  f_EPTF_Base_registerCleanup(pl_featureCleanupFn);
+}
+
+private function f_EPTF_Base_addComponent(in EPTF_Base_CT pl_remoteCompRef) runs on EPTF_Base_CT_private {
+  var integer vl_i := sizeof(v_EPTF_Base_componentsToStop) - 1;
+  while(vl_i >= 0 and v_EPTF_Base_componentsToStop[vl_i] == null) {
+    vl_i := vl_i - 1;
+  }
+  vl_i := vl_i + 1;
+  v_EPTF_Base_componentsToStop[vl_i] := pl_remoteCompRef;
+}
+
+private function f_EPTF_Base_removeComponent(in EPTF_Base_CT_private pl_remoteCompRef) runs on EPTF_Base_CT_private {
+  for (var integer i:=0; i<sizeof(v_EPTF_Base_componentsToStop); i := i+1) {
+    if ( v_EPTF_Base_componentsToStop[i] == pl_remoteCompRef) {
+      v_EPTF_Base_componentsToStop[i] := null;
+      return;
+    }
+  }
+}
+
+private function f_EPTF_Base_stopAllComponents() runs on EPTF_Base_CT_private {
+  v_EPTF_Base_stopRemoteSentTo:=mtc;
+  for (var integer i:=sizeof(v_EPTF_Base_componentsToStop)-1; i>=0; i := i-1) {
+    if ( v_EPTF_Base_componentsToStop[i] != null) {
+      var EPTF_Base_CT vl_componentToStop := v_EPTF_Base_componentsToStop[i];
+      f_EPTF_Base_stopRemote(v_EPTF_Base_componentsToStop[i]);
+      if (v_EPTF_Base_serialStopAllComponents) {
+        vl_componentToStop.done;
+        i:=sizeof(v_EPTF_Base_componentsToStop)-1;
+      }
+    }
+  }
+}
+
+private function f_EPTF_Base_stopLastComponent() runs on EPTF_Base_CT_private{
+  if (self!=mtc) {
+    return;
+  }
+
+  for (var integer i:=sizeof(v_EPTF_Base_componentsToStop)-1; i>=0; i := i-1) {
+    if ( v_EPTF_Base_componentsToStop[i] != null) {
+      var EPTF_Base_CT vl_componentToStop := v_EPTF_Base_componentsToStop[i];
+      f_EPTF_Base_stopRemote(v_EPTF_Base_componentsToStop[i]);
+      v_EPTF_Base_stopRemoteSentTo := vl_componentToStop;
+      return;
+    }
+  }
+  f_EPTF_Common_user(log2str("All components terminated. Stopping myself (MTC)..."));
+  f_EPTF_Base_cleanup_CT();
+  stop;
+}
+
+private function f_EPTF_Base_send(in EPTF_Base_MgmtMsg pl_EPTF_Base_MgmtMsg, in EPTF_Base_CT_private pl_remoteCompRef) runs on EPTF_Base_CT_private {
+  EPTF_Base_MgmtIf.send(pl_EPTF_Base_MgmtMsg) to pl_remoteCompRef;
+}
+
+private function f_EPTF_Base_handle_StopRemote(in EPTF_Base_Msg_StopRemote pl_stopRemote, in EPTF_Base_CT_private pl_EPTF_Base_MgmtIf_msg_sender) runs on EPTF_Base_CT_private {
+  if (v_EPTF_Base_initialized == false) {
+    f_EPTF_Common_warning(log2str("Warning:","Cleanup is in progress, stopRemote message dropped."));
+    if (self == mtc) {
+      f_EPTF_Base_removeComponent(pl_EPTF_Base_MgmtIf_msg_sender);
+    }
+    return;
+  }
+  f_EPTF_Common_user(log2str("StopRemote received from ",pl_EPTF_Base_MgmtIf_msg_sender,". Trying to stop execution gracefully..."));
+  if (self != mtc) {
+    disconnect(self:EPTF_Base_MgmtIf,pl_EPTF_Base_MgmtIf_msg_sender:EPTF_Base_MgmtIf);
+  }
+  if (pl_stopRemote.noCleanup) {
+    f_EPTF_Common_warning(log2str("Warning:","Cleanup is disabled in stopRemote message. CLEANUP IS NOT PERFORMED."));
+  } else {
+    if (pl_EPTF_Base_MgmtIf_msg_sender == mtc) {
+      v_EPTF_Base_disableBye := true;
+    }
+    if (self == mtc) {
+      f_EPTF_Base_removeComponent(pl_EPTF_Base_MgmtIf_msg_sender);
+      if (v_EPTF_Base_serialStopAllComponents) {
+        f_EPTF_Base_stopLastComponent();
+      } else {
+        f_EPTF_Base_stopAllComponents();
+      }
+      return;
+    }
+    f_EPTF_Base_cleanup_CT();
+  }
+  stop;
+}
+
+private function f_EPTF_Base_handle_hello(in EPTF_Base_CT pl_EPTF_Base_MgmtIf_msg_sender) runs on EPTF_Base_CT_private {
+  f_EPTF_Base_addComponent(pl_EPTF_Base_MgmtIf_msg_sender);
+}
+
+private function f_EPTF_Base_handle_bye(in EPTF_Base_CT pl_EPTF_Base_MgmtIf_msg_sender) runs on EPTF_Base_CT_private {
+  f_EPTF_Base_removeComponent(pl_EPTF_Base_MgmtIf_msg_sender);
+  f_EPTF_Base_send({byeAck := {}},pl_EPTF_Base_MgmtIf_msg_sender);
+}
+
+private function f_EPTF_Base_handle_byeAck(in EPTF_Base_CT pl_EPTF_Base_MgmtIf_msg_sender) runs on EPTF_Base_CT_private {
+  v_EPTF_Base_byeAckReceived := true;
+}
+
+modulepar float tsp_EPTF_Base_maxWaitTime := 120.0;
+
+private function f_EPTF_Base_waitForByeAck() runs on EPTF_Base_CT_private {
+  timer t_wait := 0.0;
+  t_wait.start;
+  timer t_maxWait := tsp_EPTF_Base_maxWaitTime;
+  t_maxWait.start;
+  alt {
+    [v_EPTF_Base_byeAckReceived] t_wait.timeout;
+    [] t_maxWait.timeout {
+      f_EPTF_Common_warning(%definitionId&": ByeAck is not received before max wait time expired. Continuing anyway...");
+    }
+  }
+}
+
+private function f_handle_main_EPTF_Base_MgmtIf(
+  in EPTF_Base_MgmtMsg vl_EPTF_Base_MgmtIf_msg,
+  in EPTF_Base_CT vl_EPTF_Base_MgmtIf_msg_sender) runs on EPTF_Base_CT_private return boolean {
+  if (ischosen(vl_EPTF_Base_MgmtIf_msg.stopRemote)) {
+    f_EPTF_Base_handle_StopRemote(vl_EPTF_Base_MgmtIf_msg.stopRemote,vl_EPTF_Base_MgmtIf_msg_sender);
+    return true;
+  }
+  if (ischosen(vl_EPTF_Base_MgmtIf_msg.hello)) {
+    f_EPTF_Base_handle_hello(vl_EPTF_Base_MgmtIf_msg_sender);
+    return true;
+  }
+  if (ischosen(vl_EPTF_Base_MgmtIf_msg.bye)) {
+    f_EPTF_Base_handle_bye(vl_EPTF_Base_MgmtIf_msg_sender);
+    return true;
+  }
+  if (ischosen(vl_EPTF_Base_MgmtIf_msg.byeAck)) {
+    f_EPTF_Base_handle_byeAck(vl_EPTF_Base_MgmtIf_msg_sender);
+    return true;
+  }
+
+  f_EPTF_Common_error(log2str("ERROR:","Unexpected message received from ",vl_EPTF_Base_MgmtIf_msg_sender,": ",vl_EPTF_Base_MgmtIf_msg));
+  return false;
+}
+
+private altstep as_EPTF_Base_stopAllComponents() runs on EPTF_Base_CT_private {
+  [self==mtc and v_EPTF_Base_stopRemoteSentTo!=null and v_EPTF_Base_stopRemoteSentTo!=mtc] v_EPTF_Base_stopRemoteSentTo.done {
+    f_EPTF_Base_stopLastComponent();
+    repeat;
+  }
+  [self==mtc and v_EPTF_Base_stopRemoteSentTo==mtc and v_EPTF_Base_initialized] all component.done {
+    f_EPTF_Base_stopLastComponent();
+    repeat;
+  }
+}
+
+private altstep as_handle_main_EPTF_Base_MgmtIf() runs on EPTF_Base_CT_private {
+  var EPTF_Base_MgmtMsg vl_EPTF_Base_MgmtIf_msg;
+  var EPTF_Base_CT vl_EPTF_Base_MgmtIf_msg_sender;
+  [] EPTF_Base_MgmtIf.receive(?) -> value vl_EPTF_Base_MgmtIf_msg sender vl_EPTF_Base_MgmtIf_msg_sender {
+    if (f_handle_main_EPTF_Base_MgmtIf(vl_EPTF_Base_MgmtIf_msg,vl_EPTF_Base_MgmtIf_msg_sender)) {repeat;}
+  }
+  [] as_EPTF_Base_stopAllComponents();
+}
+
+}

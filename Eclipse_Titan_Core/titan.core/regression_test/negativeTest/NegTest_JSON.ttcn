@@ -1,0 +1,342 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module tests the 'negative testing' feature of the JSON encoder.
+module NegTest_JSON {
+
+/****************** Types ******************/
+type record of integer IntList;
+
+type record of IntList IntListList;
+
+type record Rec {
+  integer num,
+  charstring str optional
+}
+
+type set Set {
+  IntList list,
+  Rec rec optional,
+  boolean b
+}
+
+type union Uni {
+  integer i,
+  octetstring os,
+  IntList list
+}
+
+type union Uni2 {
+  integer i,
+  octetstring os,
+  IntList list
+}
+with {
+  variant "JSON: as value";
+}
+
+type component CT {}
+
+/************ Encoding functions ************/
+external function f_enc_il(in IntList x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+  
+external function f_enc_ill(in IntListList x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+  
+external function f_enc_r(in Rec x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+  
+external function f_enc_s(in Set x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+  
+external function f_enc_u(in Uni x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+  
+external function f_enc_u2(in Uni2 x) return octetstring
+  with { extension "prototype(convert) encode(JSON)" }
+
+/************* Erroneous values *************/
+const IntList il1 := { 0, 1, 2, 3 } with { erroneous([2]) "before := omit all" };
+const IntList il2 := { 0, 1, 2, 3 } with { erroneous([2]) "after := omit all" };
+const IntList il3 := { 4, 5, 6 } with { erroneous([1]) "before := boolean:false" };
+const IntList il4 := { 4, 5, 6 } with { erroneous([1]) "after := boolean:false" };
+const IntList il5 := { 4, 5, 6 } with { erroneous([1]) "value := boolean:false" };
+const IntList il6 := { 7, 8, 9 } with { erroneous([0]) "before(raw) := '616263'O" };
+const IntList il7 := { 7, 8, 9 } with { erroneous([0]) "after(raw) := '616263'O" };
+const IntList il8 := { 7, 8, 9 } with { erroneous([0]) "value(raw) := '616263'O" };
+
+const IntListList ill1 := { il1, il3, il5, il7 };
+const IntListList ill2 := { { 1, 2, 3 }, { 4, 5 }, { 6, 7, 8 } } with { erroneous([1]) "before := float:3.5"; erroneous([2][2]) "before := omit all" };
+
+const Rec r1 := { num := 10, str := "hello" } with { erroneous(num) "before := true" };
+const Rec r2 := { num := 10, str := "hello" } with { erroneous(num) "after := true" };
+const Rec r3 := { num := 10, str := "hello" } with { erroneous(num) "value := true" };
+const Rec r4 := { num := 10, str := "hello" } with { erroneous(str) "value := omit" };
+const Rec r5 := { num := 10, str := "hello" } with { erroneous(num) "before(raw) := \"abc\"" };
+const Rec r6 := { num := 10, str := "hello" } with { erroneous(num) "after(raw) := \"abc\"" };
+const Rec r7 := { num := 10, str := "hello" } with { erroneous(num) "value(raw) := \"abc\"" };
+
+const Set s1 := { list := il4, rec := r2, b := false } with { erroneous(rec) "before := omit all" };
+const Set s2 := { list := il4, rec := r2, b := false } with { erroneous(rec) "after := omit all" };
+const Set s3 := { list := { 1, 3, 5, 7 }, rec := { num := 2, str := "abc" }, b := true } with { erroneous(list[2]) "after := charstring:""str"""; erroneous(rec.str) "value(raw) := \"abc\"" };
+
+const Uni u1 := { i := -6 } with { erroneous(i) "value := \"-6\"" };
+const Uni u2 := { i := -6 } with { erroneous(i) "value := omit" };
+const Uni u3 := { i := -6 } with { erroneous(i) "value(raw) := universal charstring:\"abc\"" };
+const Uni u4 := { os := '1234'O } with { erroneous(i) "value := \"-6\"" }; // non-selected field is erroneous
+const Uni u5 := { list := { 0, 3, 6 } } with { erroneous(list[2]) "value := \"6\"" };
+
+const Uni2 u6 := { i := -6 } with { erroneous(i) "value := \"-6\"" };
+const Uni2 u7 := { i := -6 } with { erroneous(i) "value := omit" };
+const Uni2 u8 := { i := -6 } with { erroneous(i) "value(raw) := \"abc\" & char(0,0,1,117)" };
+const Uni2 u9 := { list := { 0, 3, 6 } } with { erroneous(list[2]) "value := \"6\"" };
+
+template Rec r_temp := { num := 10, str := "hello" } with { erroneous(str) "value := r1" }; // the erroneous attributes of r1 will also affect the result
+
+template Set s_temp_pard(IntList p1, Rec p2) := { list := p1, rec := p2, b := true } with { erroneous(list) "after := omit all" }; // the erroneous attributes of p1 will also affect the result
+
+/* Erroneous constants and templates imported by other modules */
+const IntList c_imp := { 1, 12, 23, 34 } with { erroneous([3]) "value := 234" };
+template Rec t_imp := { num := 10, str := "hello" };
+template Uni2 t_imp_pard(IntList p) := { list := p } with { erroneous(list[0]) "after := omit all" };
+
+/******** Test cases for record-ofs ********/
+testcase tc_record_of_omit_before() runs on CT {
+  var octetstring res := f_enc_il(il1);
+  if (char2oct("[2,3]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_omit_after() runs on CT {
+  var octetstring res := f_enc_il(il2);
+  if (char2oct("[0,1,2]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_extra_before() runs on CT {
+  var octetstring res := f_enc_il(il3);
+  if (char2oct("[4,false,5,6]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_extra_after() runs on CT {
+  var octetstring res := f_enc_il(il4);
+  if (char2oct("[4,5,false,6]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_other_value() runs on CT {
+  var octetstring res := f_enc_il(il5);
+  if (char2oct("[4,false,6]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_raw_before() runs on CT {
+  var octetstring res := f_enc_il(il6);
+  if (char2oct("[abc7,8,9]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_raw_after() runs on CT {
+  var octetstring res := f_enc_il(il7);
+  if (char2oct("[7abc,8,9]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_raw_value() runs on CT {
+  var octetstring res := f_enc_il(il8);
+  if (char2oct("[abc8,9]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_embedded_values() runs on CT {
+  var octetstring res := f_enc_ill(ill1);
+  if (char2oct("[[2,3],[4,false,5,6],[4,false,6],[7abc,8,9]]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_of_erroneous_in_elements() runs on CT {
+  var octetstring res := f_enc_ill(ill2);
+  if (char2oct("[[1,2,3],3.500000,[4,5],[8]]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+/***** Test cases for records and sets *****/
+testcase tc_record_extra_before() runs on CT {
+  var octetstring res := f_enc_r(r1);
+  if (char2oct("{\"BOOLEAN\":true,\"num\":10,\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_extra_after() runs on CT {
+  var octetstring res := f_enc_r(r2);
+  if (char2oct("{\"num\":10,\"BOOLEAN\":true,\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_other_value() runs on CT {
+  var octetstring res := f_enc_r(r3);
+  if (char2oct("{\"num\":true,\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_omit_value() runs on CT {
+  var octetstring res := f_enc_r(r4);
+  if (char2oct("{\"num\":10}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_raw_before() runs on CT {
+  var octetstring res := f_enc_r(r5);
+  if (char2oct("{abc\"num\":10,\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_raw_after() runs on CT {
+  var octetstring res := f_enc_r(r6);
+  if (char2oct("{\"num\":10abc,\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_record_raw_value() runs on CT {
+  var octetstring res := f_enc_r(r7);
+  if (char2oct("{abc\"str\":\"hello\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_set_embedded_values_omit_before() runs on CT {
+  var octetstring res := f_enc_s(s1);
+  if (char2oct("{\"rec\":{\"num\":10,\"BOOLEAN\":true,\"str\":\"hello\"},\"b\":false}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_set_embedded_values_omit_after() runs on CT {
+  var octetstring res := f_enc_s(s2);
+  if (char2oct("{\"list\":[4,5,false,6],\"rec\":{\"num\":10,\"BOOLEAN\":true,\"str\":\"hello\"}}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_set_erroneous_in_fields() runs on CT {
+  var octetstring res := f_enc_s(s3);
+  if (char2oct("{\"list\":[1,3,5,\"str\",7],\"rec\":{\"num\":2abc},\"b\":true}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+/********** Test cases for unions **********/
+testcase tc_union_regular_other_value() runs on CT {
+  var octetstring res := f_enc_u(u1);
+  if (char2oct("{\"i\":\"-6\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_regular_omit_value() runs on CT {
+  var octetstring res := f_enc_u(u2);
+  if (char2oct("{}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_regular_raw_value() runs on CT {
+  var octetstring res := f_enc_u(u3);
+  if (char2oct("{abc}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_regular_wrong_alternative() runs on CT {
+  var octetstring res := f_enc_u(u4);
+  if (char2oct("{\"os\":\"1234\"}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_regular_alternative_is_erroneous() runs on CT {
+  var octetstring res := f_enc_u(u5);
+  if (char2oct("{\"list\":[0,3,\"6\"]}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_as_value_other_value() runs on CT {
+  var octetstring res := f_enc_u2(u6);
+  if (char2oct("\"-6\"") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_as_value_omit_value() runs on CT {
+  var octetstring res := f_enc_u2(u7);
+  if (char2oct("") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_as_value_raw_value() runs on CT {
+  var octetstring res := f_enc_u2(u8);
+  if (unichar2oct("abc" & char(0,0,1,117), "UTF-8") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_union_as_value_alternative_is_erroneous() runs on CT {
+  var octetstring res := f_enc_u2(u9);
+  if (char2oct("[0,3,\"6\"]") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+/********* Test cases for templates *********/
+testcase tc_record_template_other_value() runs on CT {
+  var octetstring res := f_enc_r(valueof(r_temp));
+  if (char2oct("{\"num\":10,\"str\":{\"BOOLEAN\":true,\"num\":10,\"str\":\"hello\"}}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+testcase tc_set_template_pard_omit_after() runs on CT {
+  var octetstring res := f_enc_s(valueof(s_temp_pard(il1, r1)));
+  if (char2oct("{\"list\":[2,3]}") == res) { setverdict(pass); }
+  else { setverdict(fail, res); }
+}
+
+/*************** Control part ***************/
+control {
+  execute(tc_record_of_omit_before());
+  execute(tc_record_of_omit_after());
+  execute(tc_record_of_extra_before());
+  execute(tc_record_of_extra_after());
+  execute(tc_record_of_other_value());
+  execute(tc_record_of_raw_before());
+  execute(tc_record_of_raw_after());
+  execute(tc_record_of_raw_value());
+  execute(tc_record_of_embedded_values());
+  execute(tc_record_of_erroneous_in_elements());
+  execute(tc_record_extra_before());
+  execute(tc_record_extra_after());
+  execute(tc_record_other_value());
+  execute(tc_record_omit_value());
+  execute(tc_record_raw_before());
+  execute(tc_record_raw_after());
+  execute(tc_record_raw_value());
+  execute(tc_set_embedded_values_omit_before());
+  execute(tc_set_embedded_values_omit_after());
+  execute(tc_set_erroneous_in_fields());
+  execute(tc_union_regular_other_value());
+  execute(tc_union_regular_omit_value());
+  execute(tc_union_regular_raw_value());
+  execute(tc_union_regular_wrong_alternative());
+  execute(tc_union_regular_alternative_is_erroneous());
+  execute(tc_union_as_value_other_value());
+  execute(tc_union_as_value_omit_value());
+  execute(tc_union_as_value_raw_value());
+  execute(tc_union_as_value_alternative_is_erroneous());
+  execute(tc_record_template_other_value());
+  execute(tc_set_template_pard_omit_after());
+}
+
+}
+with {
+  encode "JSON";
+}

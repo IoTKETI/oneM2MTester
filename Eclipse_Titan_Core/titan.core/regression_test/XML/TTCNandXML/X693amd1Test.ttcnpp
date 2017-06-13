@@ -1,0 +1,634 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module X693amd1Test
+{
+modulepar boolean X693amd1Test_verbose := false;
+#define verbose X693amd1Test_verbose
+#include "../macros.ttcnin"
+
+import from X693amd1 all;
+import from EmbedValues { const LF };
+import from Flattener { function flatten }
+
+type component ice {}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// A record with an attribute and a LIST
+
+DECLARE_XER_ENCODERS(Employee, emp);
+DECLARE_EXER_ENCODERS(Employee, emp);
+
+const universal charstring empl_b :=
+"<Employee>\n" &
+"\t<id>239</id>\n" &
+"\t<recruited>27-11-2002</recruited>\n" &
+"\t<salaries>\n" &
+"\t\t<salary>29876</salary>\n" &
+"\t\t<salary>54375</salary>\n" &
+"\t\t<salary>98435</salary>\n" &
+"\t</salaries>\n" &
+"</Employee>\n" &
+"\n";
+
+const universal charstring empl_x :=
+"<employee id='239'>\n" &
+"\t<recruited>27-11-2002</recruited>\n" &
+"\t<salaries>29876 54375 98435</salaries>\n" &
+"</employee>\n" &
+"\n";
+
+const Employee e1 := {
+  id := 239,
+  recruited := "27-11-2002",
+  salaries := { 29876, 54375, 98435 }
+}
+
+testcase enc_employee() runs on ice
+{
+  CHECK_METHOD(bxer_enc_emp, e1, empl_b);
+  var universal charstring empl_c := flatten(empl_b);
+  CHECK_METHOD(cxer_enc_emp, e1, empl_c);
+  CHECK_METHOD(exer_enc_emp, e1, empl_x);
+}
+
+testcase dec_employee() runs on ice
+{
+  CHECK_DECODE(bxer_dec_emp, empl_b, Employee, e1);
+  var universal charstring empl_c := flatten(empl_b);
+  CHECK_DECODE(cxer_dec_emp, empl_c, Employee, e1);
+
+  CHECK_DECODE(exer_dec_emp, empl_x, Employee, e1);
+  empl_c := flatten(empl_x);
+  CHECK_DECODE(exer_dec_emp, empl_c, Employee, e1);
+}
+
+/* * * * * * * * * * * * * * * */
+// CHOICE/union with USE-UNION
+
+DECLARE_XER_ENCODERS(Int_or_boolean_u, uu)
+DECLARE_EXER_ENCODERS(Int_or_boolean_u, uu)
+
+// First alternative (int)
+const Int_or_boolean_u thirty_nine := { int := 39 };
+
+const universal charstring str_39_b :=
+"<Int_or_boolean_u>\n" &
+"\t<int>39</int>\n" &
+"</Int_or_boolean_u>\n\n";
+
+const universal charstring str_39_e :=
+"<Int_or_boolean_u xmlns:p='cns' xmlns:xsd='http://www.w3.org/2001/XMLSchema' p:type='xsd:integer'>39</Int_or_boolean_u>\n\n";
+
+// Second alternative (bool)
+const Int_or_boolean_u so_true := { boolean_ := true };
+
+const universal charstring str_true_b :=
+"<Int_or_boolean_u>\n" &
+"\t<boolean_><true/></boolean_>\n" &
+"</Int_or_boolean_u>\n\n";
+
+const universal charstring str_true_e :=
+"<Int_or_boolean_u xmlns:p='cns' xmlns:xsd='http://www.w3.org/2001/XMLSchema' p:type='xsd:boolean'>true</Int_or_boolean_u>\n\n";
+
+
+testcase enc_uu() runs on ice
+{
+  CHECK_METHOD(bxer_enc_uu, thirty_nine, str_39_b);
+  var universal charstring str_39_c := flatten(str_39_b);
+  CHECK_METHOD(cxer_enc_uu, thirty_nine, str_39_c);
+  CHECK_METHOD(exer_enc_uu, thirty_nine, str_39_e);
+
+  CHECK_METHOD(bxer_enc_uu, so_true, str_true_b);
+  var universal charstring str_true_c := flatten(str_true_b);
+  CHECK_METHOD(cxer_enc_uu, so_true, str_true_c);
+  CHECK_METHOD(exer_enc_uu, so_true, str_true_e);
+}
+
+testcase dec_uu() runs on ice
+{
+  CHECK_DECODE(bxer_dec_uu, str_39_b, Int_or_boolean_u, thirty_nine);
+  CHECK_DECODE(exer_dec_uu, str_39_e, Int_or_boolean_u, thirty_nine);
+
+  CHECK_DECODE(bxer_dec_uu, str_true_b, Int_or_boolean_u, so_true);
+  CHECK_DECODE(exer_dec_uu, str_true_e, Int_or_boolean_u, so_true);
+}
+
+/* * * * * * * * * * * * * * * */
+// UNION/choice with USE-TYPE
+
+DECLARE_XER_ENCODERS(Int_or_boolean_t, ut)
+DECLARE_EXER_ENCODERS(Int_or_boolean_t, ut)
+
+const Int_or_boolean_t fourtytwo := { int := 42 };
+
+const universal charstring str_42_b :=
+"<Int_or_boolean_t>\n" &
+"\t<int>42</int>\n" &
+"</Int_or_boolean_t>\n\n";
+
+const universal charstring str_42_e :=
+"<Int_or_boolean_t>42</Int_or_boolean_t>\n\n";
+// "int" is the first choice and needs no type attribute
+
+const Int_or_boolean_t so_ttrue := { boolean_ := true };
+
+const universal charstring str_ttrue_b :=
+"<Int_or_boolean_t>\n" &
+"\t<boolean_><true/></boolean_>\n" &
+"</Int_or_boolean_t>\n\n";
+
+const universal charstring str_ttrue_e :=
+"<Int_or_boolean_t xmlns:p='cns' p:type='boolean'>true</Int_or_boolean_t>\n\n";
+
+testcase enc_ut() runs on ice
+{
+  CHECK_METHOD(bxer_enc_ut, fourtytwo, str_42_b);
+  var universal charstring str_42_c := flatten(str_42_b);
+  CHECK_METHOD(cxer_enc_ut, fourtytwo, str_42_c);
+  CHECK_METHOD(exer_enc_ut, fourtytwo, str_42_e);
+
+  CHECK_METHOD(bxer_enc_ut, so_ttrue, str_ttrue_b);
+  var universal charstring str_ttrue_c := flatten(str_ttrue_b);
+  CHECK_METHOD(cxer_enc_ut, so_ttrue, str_ttrue_c);
+  CHECK_METHOD(exer_enc_ut, so_ttrue, str_ttrue_e);
+}
+
+testcase dec_ut() runs on ice
+{
+  CHECK_DECODE(bxer_dec_ut, str_ttrue_b, Int_or_boolean_t, so_ttrue);
+  CHECK_DECODE(exer_dec_ut, str_ttrue_e, Int_or_boolean_t, so_ttrue);
+
+  CHECK_DECODE(bxer_dec_ut, str_42_b, Int_or_boolean_t, fourtytwo);
+  CHECK_DECODE(exer_dec_ut, str_42_e, Int_or_boolean_t, fourtytwo);
+}
+
+/* * * * * * * * * * * * * * * */
+// record with record of (list) enum (useNumber)
+
+DECLARE_XER_ENCODERS(PrimeProducts, pp)
+DECLARE_EXER_ENCODERS(PrimeProducts, pp)
+
+const PrimeProducts pp := {
+  { int2, int7, int17, int23, int29, int3 }, 476338.0
+}
+
+const PrimeProducts pp0 := {
+  {}, 0.0
+}
+
+const universal charstring str_pp_b :=
+"<PrimeProducts>\n" &
+"\t<input>\n" &
+"\t\t<int2/><int7/><int17/><int23/><int29/><int3/>\n" &
+"\t</input>\n" &
+"\t<output>476338.000000</output>\n" &
+"</PrimeProducts>\n\n"
+;
+
+const universal charstring str_pp_e :=
+"<PrimeProducts input=\'2 7 17 23 29 3\' output=\'476338.000000\'/>\n\n";
+
+const universal charstring str_pp0_b :=
+"<PrimeProducts>\n" &
+"\t<input/>\n" &
+"\t<output>0.000000</output>\n" &
+"</PrimeProducts>\n\n"
+;
+
+const universal charstring str_pp0_e :=
+"<PrimeProducts input=\'\' output=\'0.000000\'/>\n\n";
+
+DECLARE_XER_ENCODERS(PrimeProductsLocalList, ppll)
+DECLARE_EXER_ENCODERS(PrimeProductsLocalList, ppll)
+
+const PrimeProductsLocalList ppll := {
+  { int2, int7, int17, int23, int29, int3 }, 476338.0
+}
+
+const PrimeProductsLocalList ppll0 := {
+  {}, 0.0
+}
+
+const universal charstring str_ppll_b :=
+"<PrimeProductsLocalList>\n" &
+"\t<input>\n" &
+"\t\t<int2/><int7/><int17/><int23/><int29/><int3/>\n" &
+"\t</input>\n" &
+"\t<output>476338.000000</output>\n" &
+"</PrimeProductsLocalList>\n\n"
+;
+
+const universal charstring str_ppll_e :=
+"<PrimeProductsLocalList input=\'2 7 17 23 29 3\' output=\'476338.000000\'/>\n\n";
+
+const universal charstring str_ppll0_b :=
+"<PrimeProductsLocalList>\n" &
+"\t<input/>\n" &
+"\t<output>0.000000</output>\n" &
+"</PrimeProductsLocalList>\n\n"
+;
+
+const universal charstring str_ppll0_e :=
+"<PrimeProductsLocalList input=\'\' output=\'0.000000\'/>\n\n";
+
+testcase enc_pp() runs on ice
+{
+  CHECK_METHOD(bxer_enc_pp, pp, str_pp_b);
+  var universal charstring str_pp_c := flatten(str_pp_b);
+  CHECK_METHOD(cxer_enc_pp, pp, str_pp_c);
+  CHECK_METHOD(exer_enc_pp, pp, str_pp_e);
+
+  CHECK_METHOD(bxer_enc_pp, pp0, str_pp0_b);
+  var universal charstring str_pp0_c := flatten(str_pp0_b);
+  CHECK_METHOD(cxer_enc_pp, pp0, str_pp0_c);
+  CHECK_METHOD(exer_enc_pp, pp0, str_pp0_e);
+
+  CHECK_METHOD(bxer_enc_ppll, ppll, str_ppll_b);
+  var universal charstring str_ppll_c := flatten(str_ppll_b);
+  CHECK_METHOD(cxer_enc_ppll, ppll, str_ppll_c);
+  CHECK_METHOD(exer_enc_ppll, ppll, str_ppll_e);
+
+  CHECK_METHOD(bxer_enc_ppll, ppll0, str_ppll0_b);
+  var universal charstring str_ppll0_c := flatten(str_ppll0_b);
+  CHECK_METHOD(cxer_enc_ppll, ppll0, str_ppll0_c);
+  CHECK_METHOD(exer_enc_ppll, ppll0, str_ppll0_e);
+}
+
+testcase dec_pp() runs on ice
+{
+  CHECK_DECODE(bxer_dec_pp, str_pp_b, PrimeProducts, pp);
+  CHECK_DECODE(exer_dec_pp, str_pp_e, PrimeProducts, pp);
+
+  CHECK_DECODE(bxer_dec_pp, str_pp0_b, PrimeProducts, pp0);
+  CHECK_DECODE(exer_dec_pp, str_pp0_e, PrimeProducts, pp0);
+}
+
+/* * * * * * * * * * * * * * * */
+// USE-NIL
+
+DECLARE_XER_ENCODERS(nilluser, nil)
+DECLARE_EXER_ENCODERS(nilluser, nil)
+
+const nilluser here := { "here", 42 }
+const universal charstring str_here_b :=
+"<nilluser>\n" &
+"\t<title>here</title>\n" &
+"\t<maybe>42</maybe>\n" &
+"</nilluser>\n\n" ;
+
+const universal charstring str_here_e :=
+"<nilluser title=\'here\'>42</nilluser>\n\n";
+
+const nilluser nope := { "nope", omit }
+
+const universal charstring str_nope_b :=
+"<nilluser>\n" &
+"\t<title>nope</title>\n" &
+"</nilluser>\n\n" ;
+
+const universal charstring str_nope_e :=
+"<nilluser xmlns:p='cns' title=\'nope\' p:nil=\'true\'/>\n\n";
+
+testcase enc_nil() runs on ice
+{
+  CHECK_METHOD(bxer_enc_nil, here, str_here_b);
+  var universal charstring str_here_c := flatten(str_here_b);
+  CHECK_METHOD(cxer_enc_nil, here, str_here_c);
+  CHECK_METHOD(exer_enc_nil, here, str_here_e);
+
+  CHECK_METHOD(bxer_enc_nil, nope, str_nope_b);
+  var universal charstring str_nope_c := flatten(str_nope_b);
+  CHECK_METHOD(cxer_enc_nil, nope, str_nope_c);
+  CHECK_METHOD(exer_enc_nil, nope, str_nope_e);
+}
+
+testcase dec_nil() runs on ice
+{
+  CHECK_DECODE(bxer_dec_nil, str_here_b, nilluser, here);
+  var universal charstring str_here_c := flatten(str_here_b);
+  CHECK_DECODE(cxer_dec_nil, str_here_c, nilluser, here);
+  CHECK_DECODE(exer_dec_nil, str_here_e, nilluser, here);
+
+  CHECK_DECODE(bxer_dec_nil, str_nope_b, nilluser, nope);
+  var universal charstring str_nope_c := flatten(str_nope_b);
+  CHECK_DECODE(cxer_dec_nil, str_nope_c, nilluser, nope);
+
+  CHECK_DECODE(exer_dec_nil, str_nope_e, nilluser, nope);
+}
+
+/* * * * * * * * * * * * * * * */
+// DEFAULT-FOR-EMPTY
+
+DECLARE_XER_ENCODERS(CallDetails, cd)
+DECLARE_EXER_ENCODERS(CallDetails, cd)
+
+DECLARE_XER_ENCODERS(CallDetails0, cd0)
+DECLARE_EXER_ENCODERS(CallDetails0, cd0)
+
+DECLARE_XER_ENCODERS(CallDetails_indirect, cdi)
+DECLARE_EXER_ENCODERS(CallDetails_indirect, cdi)
+
+/***************** The default value *****************/
+// CallDetails default for empty is number_not_known
+const CallDetails unk := {
+  number := "0164593746", // attribute
+  response := number_not_known // d-f-e value
+}
+
+const universal charstring str_unk_b :=
+"<CallDetails>\n" &
+"\t<number>0164593746</number>\n" &
+"\t<response><number_not_known/></response>\n" & // Basic XER, never omitted
+"</CallDetails>\n\n";
+
+const universal charstring str_unk_e_enc := // EXER, "number-not-known" not omitted when encoding
+"<CallDetails number=\'0164593746\'>number-not-known</CallDetails>\n\n";
+
+const universal charstring str_unk_e_dec := // EXER, "number-not-known" omitted can be decoded
+"<CallDetails number=\'0164593746\'/>\n\n";
+
+testcase enc_dfe_unk() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cd, unk, str_unk_b);
+  var universal charstring str_unk_c := flatten(str_unk_b);
+  CHECK_METHOD(cxer_enc_cd, unk, str_unk_c);
+  CHECK_METHOD(exer_enc_cd, unk, str_unk_e_enc);
+}
+
+testcase dec_dfe_unk() runs on ice
+{
+  CHECK_DECODE(bxer_dec_cd, str_unk_b, CallDetails, unk);
+  var universal charstring str_unk_c := flatten(str_unk_b);
+  CHECK_DECODE(cxer_dec_cd, str_unk_c, CallDetails, unk);
+
+  // EXER must decode both omitted and not-omitted
+  CHECK_DECODE(exer_dec_cd,         str_unk_e_enc , CallDetails, unk);
+  CHECK_DECODE(exer_dec_cd,         str_unk_e_dec , CallDetails, unk);
+}
+
+/***************** A non-default value *****************/
+
+const CallDetails ring :={
+  number := "555-555-555", // attribute
+  response := ringing // not d-f-e value
+}
+
+const universal charstring str_ring_b :=
+"<CallDetails>\n" &
+"\t<number>555-555-555</number>\n" &
+"\t<response><ringing/></response>\n" & // Basic XER, never omitted
+"</CallDetails>\n\n";
+
+const universal charstring str_ring_e :=
+"<CallDetails number=\'555-555-555\'>" &
+"ringing" & // EXER, untagged, not the default value
+"</CallDetails>\n\n";
+
+testcase enc_dfe_ring() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cd, ring, str_ring_b);
+  var universal charstring str_ring_c := flatten(str_ring_b);
+  CHECK_METHOD(cxer_enc_cd, ring, str_ring_c);
+  CHECK_METHOD(exer_enc_cd, ring, str_ring_e);
+}
+
+testcase dec_dfe_ring() runs on ice
+{
+  CHECK_DECODE(bxer_dec_cd, str_ring_b, CallDetails, ring);
+  var universal charstring str_ring_c := flatten(str_ring_b);
+  CHECK_DECODE(cxer_dec_cd, str_ring_c, CallDetails, ring);
+  CHECK_DECODE(exer_dec_cd, str_ring_e, CallDetails, ring);
+}
+
+
+/***************** value doesn't matter if no DFE *****************/
+
+// CallDetails0 has no default for empty
+const CallDetails0 unk_0 := {
+  number := "0164593746",
+  response := number_not_known
+}
+
+const universal charstring str_unk_0e := str_unk_e_enc
+
+const universal charstring str_unk_0b :=
+"<CallDetails0>\n" &
+"\t<number>0164593746</number>\n" &
+"\t<response><number_not_known/></response>\n" & // Basic XER, never omitted
+"</CallDetails0>\n\n";
+
+
+testcase enc_dfe_unk0() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cd0, unk_0, str_unk_0b);
+  CHECK_METHOD(exer_enc_cd0, unk_0, str_unk_0e);
+}
+
+testcase dec_dfe_unk0() runs on ice
+{
+  // Basic and Canonical XER is the same for CallDetails0 and
+  // CallDetails_indirect, except for the tag name
+  CHECK_DECODE(bxer_dec_cd0, str_unk_0b, CallDetails0, unk_0);
+  CHECK_DECODE(exer_dec_cd0, str_unk_0e, CallDetails0, unk_0);
+  // no test for omitted, no DFE for CallDetails0
+}
+
+
+const CallDetails0 ring_0 :={
+  number := "555-555-555",
+  response := ringing
+}
+
+const universal charstring str_ring_0b :=
+"<CallDetails0>\n" &
+"\t<number>555-555-555</number>\n" &
+"\t<response><ringing/></response>\n" & // Basic XER, never omitted
+"</CallDetails0>\n\n";
+
+// CallDetails0 has a "name as CallDetails" (does not apply to BXER, above)
+const universal charstring str_ring_0e := str_ring_e
+
+testcase enc_dfe_ring0() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cd0, ring_0, str_ring_0b);
+  CHECK_METHOD(exer_enc_cd0, ring_0, str_ring_0e);
+}
+
+testcase dec_dfe_ring0() runs on ice
+{
+  // Basic and Canonical XER is the same for CallDetails0 and
+  // CallDetails_indirect, except for the tag name
+  CHECK_DECODE(bxer_dec_cd0, str_ring_0b, CallDetails0, ring_0);
+  CHECK_DECODE(exer_dec_cd0, str_ring_0e, CallDetails0, ring_0);
+}
+
+/***************** Now the late-apply DFE *****************/
+
+// CallDetails_indirect default for empty is ringing
+const CallDetails_indirect unk_i := {
+  number := "0164593746",
+  response := number_not_known // not the default value
+}
+
+const universal charstring str_unki_b :=
+"<CallDetails_indirect>\n" &
+"\t<number>0164593746</number>\n" &
+"\t<response><number_not_known/></response>\n" & // Basic XER, never omitted
+"</CallDetails_indirect>\n\n";
+
+const universal charstring str_unki_e :=
+"<CallDetails number=\'0164593746\'>" &
+"number-not-known" & // EXER, untagged, not the default value
+"</CallDetails>\n\n";
+
+testcase enc_dfe_unki() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cdi, unk_i, str_unki_b);
+  var universal charstring str_unki_c := flatten(str_unki_b);
+  CHECK_METHOD(cxer_enc_cdi, unk_i, str_unki_c);
+  CHECK_METHOD(exer_enc_cdi, unk_i, str_unki_e);
+}
+
+testcase dec_dfe_unki() runs on ice
+{
+  CHECK_DECODE(bxer_dec_cdi, str_unki_b, CallDetails_indirect, unk_i);
+  var universal charstring str_unki_c := flatten(str_unki_b);
+  CHECK_DECODE(cxer_dec_cdi, str_unki_c, CallDetails_indirect, unk_i);
+  CHECK_DECODE(exer_dec_cdi, str_unki_e, CallDetails_indirect, unk_i);
+}
+
+/***************** Now the default value *****************/
+const CallDetails_indirect ring_i :={
+  number := "555-555-555",
+  response := ringing // default value
+}
+
+const universal charstring str_ringi_b :=
+"<CallDetails_indirect>\n" &
+"\t<number>555-555-555</number>\n" &
+"\t<response><ringing/></response>\n" & // Basic XER, never omitted
+"</CallDetails_indirect>\n\n";
+
+const universal charstring str_ringi_e_enc :=
+"<CallDetails number=\'555-555-555\'>ringing</CallDetails>\n\n"; // EXER, not omitted when encoding
+
+const universal charstring str_ringi_e_dec :=
+"<CallDetails number=\'555-555-555\'/>\n\n"; // EXER, "ringing" omitted
+
+
+testcase enc_dfe_ringi() runs on ice
+{
+  CHECK_METHOD(bxer_enc_cdi, ring_i, str_ringi_b);
+  var universal charstring str_ringi_c := flatten(str_ringi_b);
+  CHECK_METHOD(cxer_enc_cdi, ring_i, str_ringi_c);
+  CHECK_METHOD(exer_enc_cdi, ring_i, str_ringi_e_enc);
+}
+
+testcase dec_dfe_ringi() runs on ice
+{
+  CHECK_DECODE(bxer_dec_cdi, str_ringi_b, CallDetails_indirect, ring_i);
+  var universal charstring str_ringi_c := flatten(str_ringi_b);
+  CHECK_DECODE(cxer_dec_cdi, str_ringi_c, CallDetails_indirect, ring_i);
+  // Must decode both forms
+  CHECK_DECODE(exer_dec_cdi, str_ringi_e_enc, CallDetails_indirect, ring_i);
+  CHECK_DECODE(exer_dec_cdi, str_ringi_e_dec, CallDetails_indirect, ring_i);
+}
+
+/* * * * * * * * * * * * * * * */
+// Test for TEXT
+DECLARE_XER_ENCODERS (State, st)
+DECLARE_EXER_ENCODERS(State, st)
+
+const State magic := magic;
+const State more_magic := more_magic;
+
+const universal charstring str_magic_b :=
+"<State><magic/></State>\n" & LF;
+const universal charstring str_magic_e :=
+"<state>Magic</state>\n" & LF;
+
+const universal charstring str_more_magic_b :=
+"<State><more_magic/></State>\n" & LF;
+const universal charstring str_more_magic_e :=
+"<state>off</state>\n" & LF;
+
+
+testcase enc_txt() runs on ice
+{
+  CHECK_METHOD(bxer_enc_st, magic, str_magic_b);
+  var universal charstring str_magic_c := flatten(str_magic_b);
+  CHECK_METHOD(cxer_enc_st, magic, str_magic_c);
+  CHECK_METHOD(exer_enc_st, magic, str_magic_e);
+
+  CHECK_METHOD(bxer_enc_st, more_magic, str_more_magic_b);
+  var universal charstring str_more_magic_c := flatten(str_more_magic_b);
+  CHECK_METHOD(cxer_enc_st, more_magic, str_more_magic_c);
+  CHECK_METHOD(exer_enc_st, more_magic, str_more_magic_e);
+}
+
+/* * * * * * * * * * * * * * * */
+
+DECLARE_XER_ENCODERS (Nillable, nl)
+DECLARE_EXER_ENCODERS(Nillable, nl)
+
+const Nillable omitted := { content := omit };
+const universal charstring nilstr :=
+"<Nillable/>\n\n";
+
+const universal charstring nilstr_e :=
+"<Nillable xmlns:p='cns' p:nil='true'/>\n\n";
+
+testcase enc_nillable() runs on ice
+{
+  CHECK_METHOD(bxer_enc_nl, omitted, nilstr);
+  var universal charstring nilstr_c := flatten(nilstr);
+  CHECK_METHOD(cxer_enc_nl, omitted, nilstr_c);
+  CHECK_METHOD(exer_enc_nl, omitted, nilstr_e);
+}
+
+control {
+  execute(enc_employee())
+  execute(dec_employee())
+
+  execute(enc_uu())
+  execute(dec_uu())
+
+  execute(enc_ut())
+  execute(dec_ut())
+
+  execute(enc_pp())
+  execute(dec_pp())
+
+  execute(enc_nil())
+  execute(dec_nil())
+
+  execute(enc_dfe_unk())
+  execute(dec_dfe_unk())
+  execute(enc_dfe_ring())
+  execute(dec_dfe_ring())
+  execute(enc_dfe_unk0())
+  execute(dec_dfe_unk0())
+  execute(enc_dfe_ring0())
+  execute(dec_dfe_ring0())
+  execute(enc_dfe_unki())
+  execute(dec_dfe_unki())
+  execute(enc_dfe_ringi())
+  execute(dec_dfe_ringi())
+
+  execute(enc_txt())
+
+  execute(enc_nillable())
+}
+
+}

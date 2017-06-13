@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/complextype/aliases"
+ targetNamespace="www.example.org/complextype/aliases">
+
+
+<!-- Theese types needed to force the nameconversion -->
+<xsd:element name="ComplexTypeExtensionNotAlias_"/>
+<xsd:element name="ComplexTypeRestrictionAlias_"/>
+
+
+<xsd:complexType name="ComplexType">
+	<xsd:sequence>
+		<xsd:element name="elem" type="xsd:integer"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeExtensionAlias">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexType"/>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with attr attribute -->
+<xsd:complexType name="ComplexTypeExtensionNotAlias">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionAlias">
+			<xsd:attribute name="attr" type="xsd:string"/>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeExtensionAlias2">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionNotAlias"/>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with elem1 element -->
+<xsd:complexType name="ComplexTypeExtensionNotAlias2">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionAlias2">
+			<xsd:sequence>
+				<xsd:element name="elem1" type="xsd:integer"/>
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeExtensionAlias3">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionNotAlias2"/>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because extended with optional sequence -->
+<xsd:complexType name="ComplexTypeExtensionNotAlias3">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionAlias3">
+			<xsd:sequence minOccurs="0">
+				<xsd:element name="elem2" type="xsd:integer"/>
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeExtensionAlias4">
+	<xsd:complexContent>
+		<xsd:extension base="this:ComplexTypeExtensionNotAlias3"/>
+	</xsd:complexContent>
+</xsd:complexType>
+
+
+
+<!-- Resitrictions -->
+
+<xsd:complexType name="ComplexType2">
+	<xsd:sequence minOccurs="0" maxOccurs="2">
+		<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+		<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+	</xsd:sequence>
+	<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeRestrictionAlias">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexType2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="ComplexTypeRestrictionAlias2">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because the minOccurs of the sequence is restricted to 1 -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="1" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because the minOccurs of the elem element is restricted to 1 -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias2">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="1"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because of the elem element is removed -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias3">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because of the attr attribute is required -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias4">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="required"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Alias attribute is not mentioned -->
+<xsd:complexType name="ComplexTypeRestrictionAlias3">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because of the elem element's fixed value is 2 -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias5">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionAlias2">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="0" fixed="2"/>
+				<xsd:element name="elem1" type="xsd:integer" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because of the elem1 element removed and the elem element is not optional -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias6">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionNotAlias5">
+			<xsd:sequence minOccurs="0" maxOccurs="2">
+				<xsd:element name="elem" type="xsd:integer" minOccurs="1" fixed="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="attr" type="xsd:string" use="optional"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<!-- Not alias because everything is removed -->
+<xsd:complexType name="ComplexTypeRestrictionNotAlias7">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ComplexTypeRestrictionNotAlias6">
+			<xsd:attribute name="attr" type="xsd:string" use="prohibited"/>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+
+</xsd:schema>

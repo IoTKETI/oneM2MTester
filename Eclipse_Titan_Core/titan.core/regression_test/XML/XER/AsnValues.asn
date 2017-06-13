@@ -1,0 +1,575 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Raduly, Csaba
+--
+--/////////////////////////////////////////////////////////////////////////////
+AsnValues DEFINITIONS AUTOMATIC TAGS
+::= BEGIN
+
+IMPORTS 
+
+Asn-bs ,	-- BIT STRING
+Asn-bool,	-- BOOLEAN
+Asn-pdv,	-- EMBEDDED PDV
+Asn-ext,	-- EXTERNAL
+Asn-int,	-- INTEGER
+Asn-nul,	-- NULL
+Asn-oid,	-- OBJECT IDENTIFIER
+Asn-odesc,  -- ObjectDescriptor
+Asn-os ,	-- OCTET STRING
+Asn-real,	-- REAL
+Asn-roid,	-- RELATIVE-OID
+
+Asn-bmp,	-- BMPString
+Asn-gen,	-- GeneralString
+Asn-gra,	-- GraphicString
+Asn-ia5,	-- IA5String
+Asn-num,	-- NumericString
+Asn-prn,	-- PrintableString
+Asn-ttx,	-- TeletexString
+Asn-uni,	-- UniversalString
+Asn-utf,	-- UTF8String
+Asn-vis,	-- VisibleString
+Asn-vtx,	-- VideotexString
+Asn-unr, 	-- CHARACTER STRING
+Flintstones,	-- enum
+Family,
+NothingToSeeHere,
+Everything,
+MaybeEverything,
+Something,
+Nestor, NestorEx,
+Deep1c, Deep1s,
+Deep2o, Deep3o, Deep4o, Deep5o,
+A-rboolean,
+LotsaText
+
+FROM Asntypes ;
+
+-- BIT STRING
+bstr   Asn-bs     ::= '10100100'B
+bstr0  Asn-bs     ::= ''B
+
+abstr  BIT STRING ::= '10100100'B
+abstr0 BIT STRING ::= ''B
+
+binpi BIT STRING ::= -- first 256 bits of the fractional part of pi 
+'00100100 00111111 01101010 10001000 10000101 10100011 00001000 11010011 
+ 00010011 00011001 10001010 00101110 00000011 01110000 01110011 01000100 
+ 10100100 00001001 00111000 00100010 00101001 10011111 00110001 11010000 
+ 00001000 00101110 11111010 10011000 11101100 01001110 01101100 10001001'B
+
+/* The OSS Nokalva ASN.1 compiler rejects the value below if it's split
+   over multiple lines. Strangely it accepts the one above. This appears
+   to depend on whether it's a built-in BIT STRING or the user-defined Asn-bs.
+*/
+
+binpi2 Asn-bs ::= -- next 256 bits of the fractional part of pi
+'01000101 00101000 00100001 11100110 00111000 11010000 00010011 01110111  10111110 01010100 01100110 11001111 00110100 11101001 00001100 01101100  11000000 10101100 00101001 10110111 11001001 01111100 01010000 11011101  00111111 10000100 11010101 10110101 10110101 01000111 00001001 00010111'B 
+
+-- BOOLEAN
+boo  Asn-bool ::= TRUE
+noo  Asn-bool ::= FALSE -- do not want
+so-true BOOLEAN ::= TRUE
+
+-- EMBEDDED PDV
+
+-- note: data-value-descriptor not allowed for EMBEDDED PDV
+
+pdv-sxs  Asn-pdv ::= { -- identification : SyntaXeS
+  identification syntaxes : {
+    abstract { iso 0 9 8 7 6 5 }, transfer { iso 0 5 6 7 8 9 }
+  },
+  -- data-value-descriptor "Food given to cattle",
+  data-value 'BEEFFEED'H
+}
+
+pdv-sx   Asn-pdv ::= {
+  identification syntax : { etsi 1 3 5 },
+  -- data-value-descriptor "We need real coffee",
+  data-value 'DECAFBAD'H
+}
+
+pdv-pci  Asn-pdv ::= { -- identification : Presentation-Context-Id 
+  identification presentation-context-id : 1,
+  -- OPTIONAL data-value-descriptor
+  data-value 'BABEFACE'H
+}
+
+pdv-cneg Asn-pdv ::= { -- identification : Context-NEGotiation
+  identification context-negotiation : {
+    presentation-context-id 69,
+    transfer-syntax { joint-iso-itu-t 7 18 28 18 28 45 90 45 }
+  },
+  -- OPTIONAL data-value-descriptor
+  data-value 'C1AFB1'H  
+}
+
+pdv-xsx Asn-pdv ::= {
+  identification transfer-syntax : { etsi 0 1 2 },
+  data-value 'C0FFEE'H
+}
+
+pdv-fix Asn-pdv ::= {
+  identification fixed : NULL,
+  data-value 'F1'H
+}
+
+
+epdv-sxs  EMBEDDED PDV ::= { -- identification : SyntaXeS
+  identification syntaxes : {
+    abstract { iso 0 9 8 7 6 5 }, transfer { iso 0 5 6 7 8 9 }
+  },
+  -- data-value-descriptor "Food given to cattle",
+  data-value 'BEEFFEED'H
+}
+
+epdv-sx   EMBEDDED PDV ::= {
+  identification syntax : { etsi 1 3 5 },
+  -- data-value-descriptor "We need real coffee",
+  data-value 'DECAFBAD'H
+}
+
+epdv-pci  EMBEDDED PDV ::= { -- identification : Presentation-Context-Id 
+  identification presentation-context-id : 1,
+  -- OPTIONAL data-value-descriptor
+  data-value 'BABEFACE'H
+}
+
+epdv-cneg EMBEDDED PDV ::= { -- identification : Context-NEGotiation
+  identification context-negotiation : {
+    presentation-context-id 69,
+    transfer-syntax { joint-iso-itu-t 7 18 28 18 28 45 90 45 }
+  },
+  -- OPTIONAL data-value-descriptor
+  data-value 'C1AFB1'H  
+}
+
+epdv-xsx EMBEDDED PDV ::= {
+  identification transfer-syntax : { etsi 0 1 2 },
+  data-value 'C0FFEE'H
+}
+
+epdv-fix EMBEDDED PDV ::= {
+  identification fixed : NULL,
+  data-value 'F1'H
+}
+
+
+-- EXTERNAL
+ext  Asn-ext ::= 
+{
+  identification presentation-context-id : 2,
+  -- OPTIONAL data-value-descriptor "p-c-i, indirect only"
+  data-value 'BABEFACE'H
+}
+
+ext-sx Asn-ext ::=
+{
+  identification syntax : e-oid,
+  data-value-descriptor "using syntax, direct only",
+  data-value 'BAADF00D'H
+}
+
+ext-cn Asn-ext ::=
+{
+  identification	context-negotiation : {
+    presentation-context-id 111,  
+    transfer-syntax	ber-oid
+  },
+  data-value-descriptor "using context negotiation, both",
+  data-value '1337D00D'H
+}
+
+-- INTEGER
+fourty-two  Asn-int ::= 42
+zarro       Asn-int ::= 0
+avogadro    Asn-int ::= 602214179000000000000000
+
+-- NULL
+nul Asn-nul ::= NULL
+
+-- OBJECT IDENTIFIER
+etsi             Asn-oid ::= { itu-t identified-organization etsi(0) }
+etsi-reserved    Asn-oid ::= { itu-t identified-organization etsi(0) reserved(127) }
+etsid            Asn-oid ::= { itu-t identified-organization etsi(0) reserved(127) etsi-identified-organization(0) }
+ericsson         Asn-oid ::= { itu-t identified-organization etsi(0) reserved(127) etsi-identified-organization(0) ericsson(5) }
+ericsson-testing Asn-oid ::= { itu-t identified-organization etsi(0) reserved(127) etsi-identified-organization(0) ericsson(5) testing(0) }
+pi-oid           Asn-oid ::= { iso 3 14 15 9 2 6 5 3 5 8 9 7 9 3 2 3 8 4 6 2 6 4 3 3 }
+e-oid            Asn-oid ::= { 2 7 18 28 18 28 45 90 45 }
+etsi-solo        Asn-oid ::= { etsi } -- is this a ROID ?
+
+ber-oid Asn-oid ::= {joint-iso-ccitt asn1(1) basic-encoding(1)}
+-- (see Clause 25.2 of Recommendation X.208, Appendix A, "Referenced Documents").
+
+cer-oid Asn-oid ::= {joint-iso-ccitt mhs-motis(6) group(6) white(1) api(2) om(4) canonical-ber(4)}
+-- (see Clause 8.7 of Recommendation X.509, Appendix A, "Referenced Documents").
+
+
+-- this is invalid (objid component list cannot be empty) 
+-- noid             Asn-oid ::= {}
+
+-- this is not allowed, X.690 (07/2002) 31.10 refers to X.660;
+-- X.660 requires that an object identifier value shall contain at least two arcs 
+-- itu-t            Asn-oid ::= { itu-t }
+
+
+-- ObjectDescriuptor
+etsi-desc Asn-odesc ::= "European Telecommunications Standards Institute"
+
+-- OCTET STRING
+os  Asn-os ::= '00112233'H
+os0 Asn-os ::= ''H
+
+-- REAL
+pi     Asn-real ::= 3.1415926535897932384626433
+e      Asn-real ::= 2.718281828459045
+o      Asn-real ::= 0
+
+/* Minus zero is not permitted, see X.680 (07/2002) 18.2
+minus0 Asn-real ::= -0
+*/
+
+-- RELATIVE-OID
+
+zoid   Asn-roid ::= {iso(1) member-body(2) bsi(826) disc(0) ericsson(1249)}
+
+-- BMPString
+b1val  Asn-bmp ::= {"Ich wei", {0,0,0,223} ," es! Basic Multilingual Plane."}
+b0val  Asn-bmp ::= ""
+-- author Asn-bmp ::= { latinCapitalLetterR , latinSmallLetterAWithAcute, latinSmallLetterD, latinSmallLetterU, latinSmallLetterL, latinSmallLetterY }
+esc-bmp Asn-bmp ::= { -- this string is to test the escaping of non-ASCII characters (group and plane must be zero for BMPString)
+"BMP", {0,0,0,10},
+{0,0,0,0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,13}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66} 
+}
+esc-bmp-dec Asn-bmp ::= { -- this string is what we get back from XML decoding
+"BMP", {0,0,0,10},
+{0,0,0,0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,10 /* instead of 13 */}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66} 
+}
+html-bmp Asn-bmp ::= "<html><body onload='javascript.alert(""BMP"")'>&nbsp;</body></html>"
+
+
+-- GeneralString
+g1val  Asn-gen ::= "Who is General Failure and why is he reading my disk ?"
+g0val  Asn-gen ::= ""
+
+-- GrapgicString
+gr1val Asn-gra ::= "Graphic"
+gr0val Asn-gra ::= ""
+
+-- IA5String
+ia5val Asn-ia5 ::= "Ia5! Ia5! Cthulhu fhtagn!"
+ia6val Asn-ia5 ::= ""
+ia7val IA5String ::= "A bona fide IA5String"
+ia8val IA5String ::= ""
+
+val-vis	Asn-vis ::= "Visible (ISO646)"	-- VisibleString a.k.a. ISO646String
+val-num	Asn-num ::= "150130937545296572356771972164254457814047970568738777235893533016064"	-- NumericString= 42 ** 42 !
+val-prn	Asn-prn ::= "Printable"	-- PrintableString
+val-ttx	Asn-ttx ::= "Teletex"	-- TeletexString
+val-uni	Asn-uni ::= { "Universal ", {0, 0, 112, 112}, {0, 0, 127, 189}, kisarvizturo }	 -- UniversalString
+--                                  0xE7 0x81 0xB0      0xE7 0xBE 0xBD
+
+esc-uni Asn-uni ::= { -- this string is to test the escaping of non-ASCII characters
+"Universal escapology", {0,0,0,10}, -- newline
+-- Now all the control characters
+{0,0,0,0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,13}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+-- Now some Unicode characters
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66}, {0,1,66,66}, {0,16,66,66}  
+}
+esc-uni-dec Asn-uni ::= { -- this string is what we get back from XER decoding
+"Universal escapology", {0,0,0,10}, -- newline
+-- Now all the control characters
+{0,0,0,0}, {0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,10 /* instead of 13 */}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+-- Now some Unicode characters
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66}, {0,1,66,66}, {0,16,66,66}  
+}
+html-uni Asn-uni ::= "<html><body onload='javascript.alert(""Universal"")'>&nbsp;</body></html>"
+
+val-utf	Asn-utf ::= { "UTF8 ", nagyarvizturo }	-- UTF8String
+esc-utf Asn-utf ::= {
+-- {0,0,0,0} not valid for UTF8 (string terminator)
+"UTF8 escapology", {0,0,0,10},
+{0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,13}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66}, {0,1,66,66}, {0,16,66,66} 
+}
+esc-utf-dec Asn-utf ::= { -- what we get back from XER decoding
+"UTF8 escapology", {0,0,0,10},
+{0,0,0,1}, {0,0,0,2}, {0,0,0,3}, {0,0,0,4}, {0,0,0,5}, {0,0,0,6}, {0,0,0,7}, 
+{0,0,0,8}, {0,0,0,9}, {0,0,0,10}, {0,0,0,11}, {0,0,0,12}, {0,0,0,10 /* instead of 13 */}, {0,0,0,14}, {0,0,0,15}, 
+{0,0,0,16}, {0,0,0,17}, {0,0,0,18}, {0,0,0,19}, {0,0,0,20}, {0,0,0,21}, {0,0,0,22}, {0,0,0,23}, 
+{0,0,0,24}, {0,0,0,25}, {0,0,0,26}, {0,0,0,27}, {0,0,0,28}, {0,0,0,29}, {0,0,0,30}, {0,0,0,31},
+{0,0,0,132}, {0,0,1,66}, {0,0,66,66}, {0,1,66,66}, {0,16,66,66} 
+}
+html-utf Asn-utf ::= "<html><body onload='javascript.alert(""UTF8"")'>&nbsp;</body></html>"
+
+val-vtx	Asn-vtx ::= "Videotex"	-- VideotexString
+/* Note: only BMPString, UTF8String and UniversalString can have {qu,ad,ru,ples} */
+
+blank-vis   Asn-vis ::= ""  -- VisibleString a.k.a. ISO646String
+blank-num   Asn-num ::= ""  -- NumericString
+blank-prn   Asn-prn ::= ""  -- PrintableString
+blank-ttx   Asn-ttx ::= ""  -- TeletexString
+blank-uni   Asn-uni ::= ""  -- UniversalString
+blank-utf   Asn-utf ::= ""  -- UTF8String
+blank-vtx   Asn-vtx ::= ""  -- VideotexString
+
+val-unr-sxs Asn-unr ::=
+{
+  identification syntaxes : {
+    abstract pi-oid,
+    transfer e-oid
+  },
+  string-value 'C3A17276 C3AD7A74 C5B172C5 912074C3'H -- kisarvizturo elso fele
+}
+
+val-unr-sx Asn-unr ::=
+{
+  identification syntax : pi-oid,
+  string-value 'BC6BC3B6 7266C3BA 72C3B367 C3A970'H -- kisarvizturo masodik fele
+}
+
+val-unr-pci Asn-unr ::=
+{
+  identification presentation-context-id : 42,
+  string-value 'C3815256 C38D5A54 C5B052C5 902054C3'H -- nagyarvizturo eleje
+}
+
+val-unr-cneg Asn-unr ::=
+{
+  identification context-negotiation : {
+    presentation-context-id 17,
+    transfer-syntax ber-oid
+  },
+  string-value '9C4BC396 5246C39A 52C39347 C38950'H -- nagyarvizturo ve'ge
+}
+
+val-unr-tsx Asn-unr ::=
+{
+  identification transfer-syntax : ber-oid,
+  string-value 'BEEE'H
+}
+
+val-unr-fix Asn-unr ::= --{ "CHARACTER STRING ", nagyarvizturo }
+{
+  identification fixed : NULL,
+  string-value 'C3815256 C38D5A54 C5B052C5 902054C3 9C4BC396 5246C39A 52C39347 C38950'H
+  -- nagyarvizturo, UTF-8
+}
+
+
+-- enum
+
+rubble	Family ::= { barney, betty }
+
+-- empty record
+
+move-along NothingToSeeHere ::= {}
+
+-- -- -- -- -- -- -- -- -- --
+
+nagykisarvizturo UniversalString ::=
+  {nagyarvizturo, " ", {0,0,0,173}, " ", kisarvizturo}
+/* UTF8: ... 20C2AD20 ... */
+
+nagyarvizturo UniversalString ::= {
+  {0,0,0,193}, "RV", {0,0,0,205}, "ZT", {0,0,1,112}, "R", {0,0,1,80},
+  " T", {0,0,0,220}, "K", {0,0,0,214}, "RF", {0,0,0,218}, "R", {0,0,0,211}, "G", {0,0,0,201}, "P"
+}
+/*
+UTF8: "
+  C3815256        C38D5A54        C5B052C5        902054C3
+  9C4BC396        5246C39A        52C39347        C38950
+
+  195,129,82,86   195,141,90,84   197,176,82,197  144,32,84,195
+  156,75,195,150  82,70,195,154   82,195,147,71   195,137,80
+"
+*/
+
+kisarvizturo UniversalString ::= {
+  {0,0,0,225}, "rv", {0,0,0,237}, "zt", {0,0,1,113}, "r", {0,0,1,81},
+  " t", {0,0,0,252}, "k", {0,0,0,246}, "rf", {0,0,0,250}, "r", {0,0,0,243}, "g", {0,0,0,233}, "p"
+}
+/*
+UTF8: "
+  C3A17276        C3AD7A74        C5B172C5        912074C3
+  BC6BC3B6        7266C3BA        72C3B367        C3A970
+
+  195,161,114,118   195,173,122,116   197,177,114,197   145,32,116,195
+  188,107,195,182   114,102,195,186   114,195,179,103   195,169,112
+"
+*/
+
+d11-22a OCTET STRING ::=
+ '61448A42
+  C3815256C38D5A54C5B052C5902054C39C4BC3965246C39A52C39347C38950
+  20C2AD20
+  C3A17276C3AD7A74C5B172C5912074C3BC6BC3B67266C3BA72C3B367C3A970'H 
+
+
+arbomit  A-rboolean ::= { }
+arbtrue  A-rboolean ::= { bb TRUE }
+arbfalse A-rboolean ::= { bb FALSE}
+
+a-evth Everything ::= {
+  bitstr binpi,
+  booool TRUE,
+  pdv pdv-sx,
+  cartoon betty,
+  outsider ext-cn,
+  wholenum 42,
+  nix NULL,
+  emptyrec {},
+  objection etsi,
+  octets 'F00DF00D'H,
+  printer "a-evth",
+  floating 0.0,
+  rroid zoid
+}
+
+-- -- -- -- -- -- -- --
+
+a-maybe    MaybeEverything ::= { -- Whoa, deja vu !
+  bitstr binpi,
+  booool TRUE,
+  pdv pdv-sx,
+  cartoon betty,
+  outsider ext-cn,
+  wholenum 42,
+  nix NULL,
+  emptyrec {},
+  objection etsi,
+  octets 'F00DF00D'H,
+  printer "a-maybe",
+  floating 0.0,
+  rroid zoid
+}
+
+a-maybenot MaybeEverything ::= {}
+
+a-maybe-bitstr MaybeEverything ::= { bitstr bstr0 }
+
+a-maybe-true   MaybeEverything ::= { booool FALSE }
+
+a-maybe-b      MaybeEverything ::= {
+  bitstr bstr,
+  booool TRUE
+}
+
+-- -- -- -- -- -- -- --
+
+nixtor Nestor ::= {{
+  name "nixtor",
+  f2 {}
+}}
+
+nixtor2 Nestor ::= {{
+  name "nixtor2",
+  f2 {{}}
+}}
+
+nixtor3 Nestor ::= {{
+  name "nixtor3",
+  f2 {{{}}}
+}}
+
+nixtor4 Nestor ::= {{
+  name "nixtor4",
+  f2 {{{}}}
+}}
+
+an3 Nestor ::= {
+  { name "an3[0]", f2 {}     },
+  { name "an3[1]", f2 {{}}   },
+  { name "an3[2]", f2 {{{}}} }
+}
+
+nn Nestor ::= {{
+  name "nn",
+  f1 { ts1 10, ts2 TRUE },
+  f2 { { { { { your only : 5.0 } } } } }
+}}
+
+-- -- -- -- -- -- -- --
+
+
+nixtorex NestorEx ::= {{
+  name "nixtorex",
+  f2 {}
+}}
+
+nixtor2ex NestorEx ::= {{
+  name "nixtor2ex",
+  f2 {{}}
+}}
+
+nixtor3ex NestorEx ::= {{
+  name "nixtor3ex",
+  f2 {{{}}}
+}}
+
+nixtor4ex NestorEx ::= {{
+  name "nixtor4ex",
+  f2 {{{}}}
+}}
+
+an3ex NestorEx ::= {
+  { name "an3ex[0]", f2 {}     },
+  { name "an3ex[1]", f2 {{}}   },
+  { name "an3ex[2]", f2 {{{}}} }
+}
+
+
+d1c Deep1c ::= only : 1.0
+d1s Deep1s ::= { your only : 1.1 }
+d2o Deep2o ::= { { your only : 2.0 } }
+d3o Deep3o ::= { { { your only : 3.0 } } }
+d4o Deep4o ::= { { { { your only : 4.0 } } } }
+d5o Deep5o ::= { { { { { your only : 5.0 } } } } }
+
+nnx NestorEx ::= {{
+  name "nnx",
+  f1 { ts1 10, ts2 TRUE },
+  f2 { { { { { your only : 5.0 } } } } }
+}}
+
+-- -- -- -- -- -- -- --
+
+limerick LotsaText ::= {
+  "There was a young fellow named Fisk",
+  "A swordsman, exceedingly brisk",
+  "So fast was his action",
+  "The Lorentz contraction",
+  "Reduced his rapier to a disc"
+}
+
+-- Titan rejects this: lf IA5String ::= {0,10}
+lf IA5String ::= "
+"
+
+END
+

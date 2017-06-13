@@ -1,0 +1,133 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module types {
+// Types are kept separate to cut down on the size of the generated code
+// from the actual test (all_from*.ttcn, sapc.ttcn)
+
+type component A {
+  var RoI v_roi:={20,21,22};
+  var SoI v_soi:={20,21,22};
+}
+
+type record of integer RoI;
+type set    of integer SoI;
+type record of float RoF;
+type record of SoI RoSoI;
+type record of RoI RoRoI;
+type record of RoOS RoRoOS;
+type record of SoOS RoSoOS;
+
+type set of integer MySetOfType (0 .. 10);
+
+type record of bitstring RoBS;
+
+type record of hexstring RoHS;
+
+type record of charstring RoCS;
+type set of charstring CoCS;
+
+type record of octetstring RoOS;
+type set of octetstring SoOS;
+
+type record of universal charstring RoUCS;
+
+type record MyRecord {
+  integer i optional,
+  RoI     roi optional,
+  SoI     soi optional
+}
+
+type union MyUnion {
+  integer i,
+  RoI     roi,
+  SoI     soi
+} 
+
+type record of MyRecord RoMyRec;
+type record of MyUnion RoMyUnion;
+
+//==== Function Reference ====
+//this is just a dummy type to test all from for function references
+type function F_int2int(in integer pl_i) return integer;
+
+type record of F_int2int RoF_int2int;
+
+/* * * * * * * * sapc types * * * * * * * */
+
+type record CreateSAPCSubscription
+{
+    record of charstring pcBlacklistService_list
+};
+
+type record GetResponseSAPCSubscription
+{
+    record of charstring pcBlacklistService_list
+};
+
+/*
+type record MOD {
+  GetResponseSAPCSubscription getResponseSAPCSubscription
+}
+
+type record MOA {
+  MOD getMODefinition
+}
+
+type record GetResp {
+  MOA mOAttributes
+}
+
+type record CAI3gCommand {
+  GetResp getResponse
+}
+*/
+
+/* * * * Subtypes * * * */
+
+type integer PosInt (0..infinity);
+
+type float NegFloat (-infinity..0.0);
+
+type bitstring ByteString length (8);
+
+type hexstring WordString length (4);
+
+type octetstring DWordString length (4);
+
+type charstring TtcnFileName (pattern "*.ttcn");
+
+type universal charstring XsdString (
+  char(0,0,0,9)..char(0,0,0,9),
+  char(0,0,0,10)..char(0,0,0,10),
+  char(0,0,0,12)..char(0,0,0,12),
+  char(0,0,0,32)..char(0,0,215,255),
+  char(0,0,224,0)..char(0,0,255,253),
+  char(0,1,0,0)..char(0,16,255,253)
+);
+
+type record length (0..3) of integer ShortRoI;
+
+type record length (0..3) of float ShortRoF;
+
+type record length (0..3) of bitstring ShortRoBS;
+
+type record length (0..3) of hexstring ShortRoHS;
+
+type record length (0..3) of octetstring ShortRoOS;
+
+type record length (0..3) of charstring ShortRoCS;
+
+type record length (0..3) of universal charstring ShortRoUCS;
+
+}

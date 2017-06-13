@@ -1,0 +1,571 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *   Szabo, Bence Janos
+ *
+ ******************************************************************************/
+module Untagged1 {
+
+// Untagged basic types
+
+modulepar boolean Untagged1_verbose := false;
+#define verbose Untagged1_verbose
+#include "../macros.ttcnin"
+
+type component Unt {}
+
+type record r_boolean {
+  boolean truth
+}
+with { variant (truth) "untagged "}
+
+DECLARE_XER_ENCODERS(r_boolean, rb);
+DECLARE_EXER_ENCODERS(r_boolean, rb);
+
+const r_boolean rb := { truth := true /* FileNotFound */ }
+
+const universal charstring str_rb_b :=
+"<r_boolean>\n" &
+"\t<truth><true/></truth>\n" &
+"</r_boolean>\n\n";
+
+const universal charstring str_rb_e :=
+"<r_boolean>true</r_boolean>\n\n";
+
+testcase tc_enc_bool() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_rb, rb, str_rb_b);
+  CHECK_METHOD(exer_enc_rb, rb, str_rb_e);
+}
+
+testcase tc_dec_bool() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_rb, str_rb_b, r_boolean, rb);
+  CHECK_DECODE(exer_dec_rb, str_rb_e, r_boolean, rb);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record r_charstring {
+  charstring bits
+}
+with { variant (bits) "untagged "}
+
+DECLARE_XER_ENCODERS(r_charstring, rs);
+DECLARE_EXER_ENCODERS(r_charstring, rs);
+
+const r_charstring rs := { "Nu zajec, pogodi!" }
+
+const universal charstring str_rs_b :=
+"<r_charstring>\n" &
+"\t<bits>Nu zajec, pogodi!</bits>\n" &
+"</r_charstring>\n\n";
+
+const universal charstring str_rs_e :=
+"<r_charstring>Nu zajec, pogodi!</r_charstring>\n\n";
+
+testcase tc_enc_str() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_rs, rs, str_rs_b);
+  CHECK_METHOD(exer_enc_rs, rs, str_rs_e);
+}
+
+testcase tc_dec_str() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_rs, str_rs_b, r_charstring, rs);
+  CHECK_DECODE(exer_dec_rs, str_rs_e, r_charstring, rs);
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record r_float {
+  float up
+}
+with { variant (up) "untagged "}
+
+DECLARE_XER_ENCODERS(r_float, rf);
+DECLARE_EXER_ENCODERS(r_float, rf);
+
+const r_float pie := { 3.141593 }
+
+const universal charstring str_pie_b :=
+"<r_float>\n" &
+"\t<up>3.141593</up>\n" &
+"</r_float>\n\n";
+
+const universal charstring str_pie_e :=
+"<r_float>3.141593</r_float>\n\n";
+
+testcase tc_enc_float() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_rf, pie, str_pie_b);
+  CHECK_METHOD(exer_enc_rf, pie, str_pie_e);
+}
+
+testcase tc_dec_float() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_rf, str_pie_b, r_float, pie)
+  CHECK_DECODE(exer_dec_rf, str_pie_e, r_float, pie)
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record r_integer {
+  integer i
+}
+with { variant (i) "untagged "}
+
+DECLARE_XER_ENCODERS(r_integer, ri);
+DECLARE_EXER_ENCODERS(r_integer, ri);
+
+const r_integer ft := { 42 }
+
+const universal charstring bstr_ft :=
+"<r_integer>\n" &
+"\t<i>42</i>\n" &
+"</r_integer>\n\n";
+
+const universal charstring estr_ft :=
+"<r_integer>42</r_integer>\n\n";
+
+testcase tc_enc_int() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_ri, ft, bstr_ft);
+  CHECK_METHOD(exer_enc_ri, ft, estr_ft);
+}
+
+testcase tc_dec_int() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_ri, bstr_ft, r_integer, ft);
+  CHECK_DECODE(exer_dec_ri, estr_ft, r_integer, ft);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record r_os {
+  octetstring os
+}
+with {
+  variant (os) "untagged "
+  variant (os) "XSD:base64Binary" // required for octetstring to be character-encodable
+}
+
+DECLARE_XER_ENCODERS(r_os, os);
+DECLARE_EXER_ENCODERS(r_os, os);
+
+const r_os cow := { 'DEADBEEF'O }
+
+const universal charstring bstr_cow :=
+"<r_os>\n" &
+"\t<os>DEADBEEF</os>\n" &
+"</r_os>\n\n";
+
+const universal charstring estr_cow :=
+"<r_os>3q2+7w==</r_os>\n\n";
+
+testcase tc_enc_os() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_os, cow, bstr_cow);
+  CHECK_METHOD(exer_enc_os, cow, estr_cow);
+}
+
+testcase tc_dec_os() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_os, bstr_cow, r_os, cow);
+  CHECK_DECODE(exer_dec_os, estr_cow, r_os, cow);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record r_hs {
+  hexstring hs
+}
+with {
+  variant (hs) "untagged "
+  variant (hs) "XSD:base64Binary" // required for hexstring to be character-encodable
+}
+
+DECLARE_XER_ENCODERS(r_hs, hs);
+DECLARE_EXER_ENCODERS(r_hs, hs);
+
+const r_hs chow := { 'DEADBEEF'H }
+
+const universal charstring bstr_chow :=
+"<r_hs>\n" &
+"\t<hs>DEADBEEF</hs>\n" &
+"</r_hs>\n\n";
+
+const universal charstring estr_chow :=
+"<r_hs>3q2+7w==</r_hs>\n\n";
+
+testcase tc_enc_hs() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_hs, chow, bstr_chow);
+  CHECK_METHOD(exer_enc_hs, chow, estr_chow);
+}
+
+testcase tc_dec_hs() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_hs, bstr_chow, r_hs, chow);
+  CHECK_DECODE(exer_dec_hs, estr_chow, r_hs, chow);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * */
+
+type record  r_us {
+  universal charstring us
+}
+with { variant (us) "untagged" }
+
+DECLARE_XER_ENCODERS(r_us, unistr);
+DECLARE_EXER_ENCODERS(r_us, unistr);
+
+const r_us usa := { "Land of the malloc and free!" }
+
+const universal charstring bstr_usa :=
+"<r_us>\n" &
+"\t<us>Land of the malloc and free!</us>\n" &
+"</r_us>\n\n";
+
+const universal charstring estr_usa :=
+"<r_us>Land of the malloc and free!</r_us>\n\n";
+
+testcase tc_enc_us() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_unistr, usa, bstr_usa);
+  CHECK_METHOD(exer_enc_unistr, usa, estr_usa);
+}
+
+testcase tc_dec_us() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_unistr, bstr_usa, r_us, usa);
+  CHECK_DECODE(exer_dec_unistr, estr_usa, r_us, usa);
+}
+
+// Untagged at toplevel (ignored) for record
+// HM70032
+type record Envelope {
+  record {} r
+}
+with {
+  variant "element";
+  variant "untagged";
+  variant "namespace as 'foo:bar' prefix 'baz'";
+}
+
+DECLARE_XER_ENCODERS(Envelope, env);
+DECLARE_EXER_ENCODERS(Envelope, env);
+
+const Envelope c_env := { r := {} }
+const universal charstring estr_env :=
+"<baz:Envelope xmlns:baz='foo:bar'>\n" &
+"\t<r/>\n" &
+"</baz:Envelope>\n\n";
+
+const universal charstring bstr_env :=
+"<Envelope>\n" &
+"\t<r/>\n" &
+"</Envelope>\n\n";
+
+testcase tc_enc_env() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_env, c_env, bstr_env);
+  CHECK_METHOD(exer_enc_env, c_env, estr_env);
+}
+
+testcase tc_dec_env() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_env, bstr_env, Envelope, c_env);
+  CHECK_DECODE(exer_dec_env, estr_env, Envelope, c_env);
+}
+
+// Untagged at toplevel (ignored) for record-of
+
+type record of integer Ints
+with {
+  variant "element"
+  variant "untagged"
+  variant "namespace as 'foo:bar' prefix 'baz'";
+}
+
+DECLARE_XER_ENCODERS(Ints, ints);
+DECLARE_EXER_ENCODERS(Ints, ints);
+
+const Ints noints := {}
+const universal charstring bstr_noints :=
+"<Ints/>\n\n";
+const universal charstring estr_noints :=
+"<baz:Ints xmlns:baz='foo:bar'/>\n\n";
+
+const Ints twoints := { 3, 14 }
+const universal charstring bstr_twoints :=
+"<Ints>\n" &
+"\t<INTEGER>3</INTEGER>\n" &
+"\t<INTEGER>14</INTEGER>\n" &
+"</Ints>\n\n";
+const universal charstring estr_twoints :=
+"<baz:Ints xmlns:baz='foo:bar'>\n" &
+"\t<INTEGER>3</INTEGER>\n" &
+"\t<INTEGER>14</INTEGER>\n" &
+"</baz:Ints>\n\n";
+
+
+testcase tc_enc_ints() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_ints, noints, bstr_noints);
+  CHECK_METHOD(exer_enc_ints, noints, estr_noints);
+
+  CHECK_METHOD(bxer_enc_ints, twoints, bstr_twoints);
+  CHECK_METHOD(exer_enc_ints, twoints, estr_twoints);
+}
+
+testcase tc_dec_ints() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_ints, bstr_noints, Ints, noints);
+  CHECK_DECODE(exer_dec_ints, estr_noints, Ints, noints);
+
+  CHECK_DECODE(bxer_dec_ints, bstr_twoints, Ints, twoints);
+  CHECK_DECODE(exer_dec_ints, estr_twoints, Ints, twoints);
+}
+
+// not Untagged at toplevel for union
+// HM71472
+type union Choice
+{
+  integer answer,
+  charstring s
+}
+with {
+  variant "element"
+  variant "namespace as 'foo:bar' prefix 'baz'";
+}
+
+DECLARE_XER_ENCODERS(Choice, ch);
+DECLARE_EXER_ENCODERS(Choice, ch);
+
+const Choice itg := { answer := 42 };
+const universal charstring bstr_itg :=
+"<Choice>\n" &
+"\t<answer>42</answer>\n" &
+"</Choice>\n\n";
+const universal charstring estr_itg :=
+"<baz:Choice xmlns:baz='foo:bar'>\n" &
+"\t<answer>42</answer>\n" &
+"</baz:Choice>\n\n";
+
+
+testcase tc_enc_choice() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_ch, itg, bstr_itg);
+  CHECK_METHOD(exer_enc_ch, itg, estr_itg);
+}
+
+testcase tc_dec_choice() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_ch, bstr_itg, Choice, itg);
+  CHECK_DECODE(exer_dec_ch, estr_itg, Choice, itg);
+}
+
+// Untagged at toplevel for union
+// HM71472
+type union Choice2
+{
+  integer answer,
+  charstring s
+}
+with {
+  variant "element"
+  variant "untagged"
+  // the namespace as variant will be not visible because it will be lost due to
+  // untagged
+  variant "namespace as 'foo:bar' prefix 'baz'";
+}
+
+DECLARE_XER_ENCODERS(Choice2, ch2);
+DECLARE_EXER_ENCODERS(Choice2, ch2);
+
+const Choice2 itg2 := { answer := 42 };
+const universal charstring bstr_itg2 :=
+"<Choice2>\n" &
+"\t<answer>42</answer>\n" &
+"</Choice2>\n\n";
+const universal charstring estr_itg2 :=
+"<answer>42</answer>\n\n";
+
+
+testcase tc_enc_choice2() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_ch2, itg2, bstr_itg2);
+  CHECK_METHOD(exer_enc_ch2, itg2, estr_itg2);
+}
+
+testcase tc_dec_choice2() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_ch2, bstr_itg2, Choice2, itg2);
+  CHECK_DECODE(exer_dec_ch2, estr_itg2, Choice2, itg2);
+}
+
+// Untagged at toplevel for union
+// HM71472
+type union Choice3
+{
+  integer answer,
+  charstring s
+}
+with {
+  variant "element"
+  variant "untagged"
+  variant (answer) "namespace as 'foo:bar' prefix 'baz'";
+  variant (answer) "element";
+}
+
+DECLARE_XER_ENCODERS(Choice3, ch3);
+DECLARE_EXER_ENCODERS(Choice3, ch3);
+
+const Choice3 itg3 := { answer := 42 };
+const universal charstring bstr_itg3 :=
+"<Choice3>\n" &
+"\t<answer>42</answer>\n" &
+"</Choice3>\n\n";
+const universal charstring estr_itg3 :=
+"<baz:answer xmlns:baz='foo:bar'>42</baz:answer>\n\n";
+
+
+testcase tc_enc_choice3() runs on Unt
+{
+  CHECK_METHOD(bxer_enc_ch3, itg3, bstr_itg3);
+  CHECK_METHOD(exer_enc_ch3, itg3, estr_itg3);
+}
+
+testcase tc_dec_choice3() runs on Unt
+{
+  CHECK_DECODE(bxer_dec_ch3, bstr_itg3, Choice3, itg3);
+  CHECK_DECODE(exer_dec_ch3, estr_itg3, Choice3, itg3);
+}
+
+// HM80553
+
+type record AddRequest
+{
+  Widgets widgets
+};
+
+type union Widgets
+{
+  Hbox hbox
+}
+with { variant "untagged" }
+
+type union EmbeddedWidget {
+  Hbox hbox
+}
+with { variant "untagged" }
+
+type record Hbox {
+  EmbeddedWidgets embeddedwidgets
+}
+with { variant "name as uncapitalized" }
+
+type record EmbeddedWidgets {
+  record of EmbeddedWidget embeddedwidget_list
+}
+with {
+  variant "untagged";
+  variant (embeddedwidget_list) "untagged";
+};
+
+DECLARE_XER_ENCODERS(AddRequest, ar);
+DECLARE_EXER_ENCODERS(AddRequest, ar);
+
+const AddRequest c1 := {
+  widgets := {
+    hbox := {
+      embeddedwidgets := {
+        embeddedwidget_list := {
+          {
+            hbox := {
+              embeddedwidgets := {
+                embeddedwidget_list := {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
+const universal charstring str_c1 :=
+  "<AddRequest>\n" &
+  "\t<hbox>\n" &
+  "\t\t<hbox/>\n" &
+  "\t</hbox>\n" &
+  "</AddRequest>\n\n";
+  
+
+testcase tc_enc_widget() runs on Unt
+{
+  CHECK_METHOD(exer_enc_ar, c1, str_c1);
+}
+
+testcase tc_dec_widget() runs on Unt
+{
+  CHECK_DECODE(exer_dec_ar, str_c1, AddRequest, c1);
+}
+
+control {
+  execute(tc_enc_bool());
+  execute(tc_dec_bool());
+
+  execute(tc_enc_str());
+  execute(tc_dec_str());
+
+  execute(tc_enc_float());
+  execute(tc_dec_float());
+
+  execute(tc_enc_int());
+  execute(tc_dec_int());
+
+  execute(tc_enc_os());
+  execute(tc_dec_os());
+
+  execute(tc_enc_hs());
+  execute(tc_dec_hs());
+
+  execute(tc_enc_us());
+  execute(tc_dec_us());
+
+  execute(tc_enc_env());
+  execute(tc_dec_env());
+
+  execute(tc_enc_ints());
+  execute(tc_dec_ints());
+
+  execute(tc_enc_choice());
+  execute(tc_dec_choice());
+
+  execute(tc_enc_choice2());
+  execute(tc_dec_choice2());
+  
+  execute(tc_enc_choice3());
+  execute(tc_dec_choice3());
+
+  execute(tc_enc_widget());
+  execute(tc_dec_widget());
+}
+
+
+}
+with {
+  encode "XML";
+}
+

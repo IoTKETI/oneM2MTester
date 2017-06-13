@@ -1,0 +1,1385 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module all_from { // ETSI CR 6088
+import from types all;
+import from functions all;
+import from imported_templates all;
+
+//just to test these types as well:
+modulepar RoI tsp_RoI3 := {20,21,22};
+modulepar RoI tsp_SoI3 := {20,21,22};
+
+const RoI c_RoI3 := {20,21,22};
+const SoI c_SoI3 := {20,21,22};
+
+// Test Target:
+// ETSI ES 201 873-1 v?.?
+// B 1.2.1 Template List
+//"It can be used on values of all types"
+
+//============Record of Integer============================
+template RoI t_RoI1 := {1, 2, (6..9)};
+template RoI t_RoI2 := {1, *, 3};
+template RoI t_RoI3 := {20,21,22};
+template RoI t_RoI4 := {1, ?, 3};
+
+template integer t_i0 := (all from t_RoI1);
+template integer t_i0_eq := (1, 2, (6..9));
+
+template integer t_i1 := (all from t_RoI1, 100);
+template integer t_i1_eq := (1, 2, (6..9), 100); 
+
+template integer t_i2 := (-1,0,all from t_RoI1, 100);
+template integer t_i2_eq:=(-1,0,1, 2, (6..9),100);
+
+template integer t_i3 := (-1,0,all from t_RoI1, all from t_RoI3, 100);
+template integer t_i3_eq := (-1,0,1, 2, (6..9), 20,21,22, 100);
+
+template integer t_i4 := (-1,0,all from t_RoI1, 100, all from t_RoI3);
+template integer t_i4_eq := (-1,0,1, 2, (6..9),100,20,21,22);
+
+template integer t_i5 := (-1,0,all from t_RoI1, 100,all from t_RoI3,all from t_RoI3 ); //repetition
+template integer t_i5_eq := (-1,0,1, 2, (6..9),100,20,21,22,20,21,22);
+
+template integer t_i6 := (-1,0,all from t_RoI1, 100, all from t_RoI3,all from t_RoI3,all from t_RoI3); //repetition
+template integer t_i6_eq := (-1,0,1, 2, (6..9),100,20,21,22,20,21,22,20,21,22);
+
+template integer t_i7 := (all from t_RoI4,100);
+template integer t_i7_eq := (1,?,3,100);
+
+template integer t_i8 := (100,all from t_RoI4);
+template integer t_i8_eq := (100,1,?,3);
+
+template integer t_i9 := (100,all from t_RoI4,-1);
+template integer t_i9_eq := (100,1,?,3,-1);
+//NEG TEST: template integer t_i10 := ((all from t_RoI2),100);   //<== WHY not if the previous three accepted?
+//NEG TEST: template integer t_i11 := (100,all from t_RoI2);
+//NEG TEST: template integer t_i12 := (100,all from t_RoI2,-1);
+
+//from modulepar:
+template integer t_i13roi := (all from tsp_RoI3);
+template integer t_i13_eq := (20,21,22);
+template integer t_i13soi := (all from tsp_SoI3);
+
+//from const:
+template integer t_i13roi_c := (all from c_RoI3);
+template integer t_i13soi_c := (all from c_SoI3);
+
+
+//=== All from referring remote templates (imported templates)
+template integer t_importing_i0 := (all from t_imported_RoI1);
+template integer t_importing_i1 := (all from t_imported_RoI1, 100);
+template integer t_importing_i2 := (-1,0,all from t_imported_RoI1, 100);
+template integer t_importing_i3 := (-1,0,all from t_imported_RoI1, all from t_imported_RoI3, 100);
+template integer t_importing_i4 := (-1,0,all from t_imported_RoI1, 100, all from t_imported_RoI3);
+template integer t_importing_i5 := (-1,0,all from t_imported_RoI1, 100,all from t_imported_RoI3,all from t_imported_RoI3 ); //repetition
+template integer t_importing_i6 := (-1,0,all from t_imported_RoI1, 100, all from t_imported_RoI3,all from t_imported_RoI3,all from t_imported_RoI3); //repetition
+template integer t_importing_i7 := (all from t_imported_RoI4,100);
+template integer t_importing_i8 := (100,all from t_imported_RoI4);
+template integer t_importing_i9 := (100,all from t_imported_RoI4,-1);
+
+  
+//===========Set of Integer================================
+template SoI t_SoI1 := {1,2,(6..9)};
+template SoI t_SoI2 := {1, *, 3};
+template SoI t_SoI3 := {20,21,22};
+
+template integer t_i0s    := (all from t_SoI1);
+template integer t_i0s_eq := ( 1,2,(6..9));
+
+template integer t_i1s    := (all from t_SoI1, 100);
+template integer t_i1s_eq := ( 1,2,(6..9),100);
+// equivalent to         (1, 2, (6..9)   , 100);
+
+template integer t_i2s := (-1,0,all from t_SoI1, 100);
+template integer t_i2s_eq:=(-1,0,1,2,(6..9), 100);
+
+template integer t_i3s := (-1,0,all from t_SoI1, all from t_SoI3, 100);
+template integer t_i3s_eq := (-1,0,1,2,(6..9),20,21,22, 100);
+
+template integer t_i4s := (-1,0,all from t_SoI1, 100, all from t_SoI3);
+template integer t_i4s_eq := (-1,0,1,2,(6..9),100,20,21,22);
+
+template integer t_i5s := (-1,0,all from t_imported_SoI1, 100, all from t_imported_SoI3,all from t_imported_SoI3 ); //repetition
+template integer t_i5s_eq := (-1,0,1,2,(6..9),100,20,21,22,20,21,22);
+
+template integer t_i6s := (-1,0,all from t_imported_SoI1, 100, all from t_imported_SoI3,all from t_imported_SoI3,all from t_imported_SoI3); //repetition
+template integer t_i6s_eq := (-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+
+template integer t_importing_i0s    := (all from t_imported_SoI1);
+template integer t_importing_i1s    := (all from t_imported_SoI1, 100);
+template integer t_importing_i2s := (-1,0,all from t_imported_SoI1, 100);
+template integer t_importing_i3s := (-1,0,all from t_imported_SoI1, all from t_imported_SoI3, 100);
+template integer t_importing_i4s := (-1,0,all from t_imported_SoI1, 100, all from t_imported_SoI3);
+template integer t_importing_i5s := (-1,0,all from t_imported_SoI1, 100, all from t_imported_SoI3,all from t_imported_SoI3 ); //repetition
+template integer t_importing_i6s := (-1,0,all from t_SoI1, 100, all from t_SoI3,all from t_SoI3,all from t_SoI3); //repetition
+
+//===========Record of of charstring================================
+template RoCS t_RoCS1 := { "apple","banana","","pear"};
+template RoCS t_RoCS2 := { "apples","bananas","","pears"};
+template charstring t_cs1 := ( all from t_RoCS1, "dog" );
+template charstring t_cs1_eq := ( "apple","banana","","pear", "dog" );
+template charstring t_cs2 := ( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2);
+template charstring t_cs2_eq := ( "treeeeeeeeeeeeee","apple","banana","","pear", "dog","apples","bananas","","pears");
+
+//===========Record of octetstring================================
+template RoOS t_RoOS1 := {'ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O}
+template octetstring t_os1 := ( all from t_RoOS1 );
+template octetstring t_os1_eq := ('ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O)
+template octetstring t_os2 := ( 'AA'O,all from t_RoOS1,all from t_RoOS1);
+
+//====== Embedded templates ====
+//Record
+template MyRecord t_myrec1 := { i:= t_i1, roi:=t_RoI1, soi:=t_SoI1 }
+template MyRecord t_myrec1_eq := { i:= t_i1_eq, roi:=t_RoI1, soi:={1,2,(6..9)} }
+
+template MyRecord t_myrec2 := { i:= t_i2, roi:=t_RoI1, soi:=t_SoI1 }
+template MyRecord t_myrec2_eq := { i:= t_i2_eq, roi:=t_RoI1, soi:= {1,2,(6..9)}}  
+
+template MyRecord t_myrec3 := { i:= t_i2, roi:={t_i0s,t_i1}, soi:=t_SoI1 }
+template MyRecord t_myrec3_eq := { i:= t_i2_eq, roi:={( 1,2,(6..9)),(1, 2, (6..9), 100)}, soi:={1,2,(6..9)} }    
+
+//Union
+template MyUnion t_myunion1i   := { i:= t_i1}
+template MyUnion t_myunion1roi := { roi:={t_i1,t_i1}} 
+template MyUnion t_myunion1soi := { soi:={t_i1,t_i1}} 
+
+template MyUnion t_myunion1i_eq   := { i:= t_i1_eq}
+template MyUnion t_myunion1roi_eq := { roi:= {(1, 2, (6..9)),(1, 2, (6..9))}} 
+template MyUnion t_myunion1soi_eq := { soi:= {(1, 2, (6..9)),(1, 2, (6..9))}}
+
+template MyUnion t_myunion2i := { i:= t_i2  }
+template MyUnion t_myunion2roi := { roi:=t_RoI1  }
+template MyUnion t_myunion2soi := { soi:=t_SoI1 }
+
+template MyUnion t_myunion2i_eq := { i:= t_i2_eq  }
+template MyUnion t_myunion2roi_eq := { roi:={1, 2,(6..9)} };
+template MyUnion t_myunion2soi_eq := { soi:= {1,2,(6..9)} };
+
+template MyUnion t_myunion3 := { roi:={t_i0s,t_i1}}
+template MyUnion t_myunion3_eq := {roi:={ ( 1,2,(6..9)),(1, 2, (6..9), 100)}} 
+
+//Complex
+template RoI t_roiComplex1 := { t_i0s, (all from t_SoI3) };
+template RoI t_roiComplex1_eq  := { ( 1,2,(6..9)), (20,21,22)};
+template integer t_complex1 := (all from t_roiComplex1);
+template integer t_complex1_eq := ( ( 1,2,(6..9)), (20,21,22));
+
+//==== function reference =====
+template RoF_int2int t_rofref_int2int := { refers(f_int2int_1),refers(f_int2int_2) }
+template F_int2int t_fref_int2int := ( all from t_rofref_int2int );
+template F_int2int t_fref_int2int_eq := ( refers(f_int2int_1),refers(f_int2int_2)  );
+
+//============== Test for Integer List ================================
+
+
+//----- Tests for static templates ------
+
+//real static template, without any manipulation
+testcase tc_checkIntegerValueListTemplate() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  action("t_i1=", t_i1, " will be checked against ",vl_goodValues);
+  var integer N:=sizeof(vl_goodValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (match(vl_goodValues[i], t_i1)) { setverdict(pass); }
+    else { setverdict(fail,vl_goodValues[i], " should match ", t_i1); }
+  }
+
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  action("t_i1=", t_i1, " will be checked against ",vl_badValues);
+  N:=sizeof(vl_badValues);
+  for(var integer i:=0;i<N;i:=i+1) {
+    if (not match(vl_badValues[i], t_i1)) { setverdict(pass); }
+    else { setverdict(fail,vl_badValues[i], " should match ", t_i1); }
+  }
+
+}
+
+//=== 0 ===
+//( 1,2,(6..9));
+testcase tc_checkIntegerValueListTemplate0_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i0,t_i0_eq);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate0_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_importing_i0,t_i0_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i0,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate0() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_importing_i0,vl_goodValues,vl_badValues);
+}
+//=== 1 ===
+//( 1,2,(6..9),100);
+testcase tc_checkIntegerValueListTemplate1_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i1,t_i1_eq);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate1_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_importing_i1,t_i1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate1() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate1() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_importing_i1,vl_goodValues,vl_badValues);
+}
+//=== 2 ===
+//(-1,0,1,2,(6..9), 100);
+testcase tc_checkIntegerValueListTemplate2_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i2,t_i2_eq);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate2_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_importing_i2,t_i2_eq);
+}
+testcase tc_checkIntegerValueListTemplate2() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i2,vl_goodValues,vl_badValues);
+}
+testcase tc_checkImportingIntegerValueListTemplate2() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_importing_i2,vl_goodValues,vl_badValues);
+}
+//=== 3 ===
+//(-1,0,1,2,(6..9),20,21,22, 100);
+testcase tc_checkIntegerValueListTemplate3_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i3,t_i3_eq);
+}
+testcase tc_checkIntegerValueListTemplate3() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i3,vl_goodValues,vl_badValues);
+}
+//=== 4 ===
+//order;(-1,0,1,2,(6..9),100,20,21,22);
+testcase tc_checkIntegerValueListTemplate4_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i4,t_i4_eq);
+}
+testcase tc_checkIntegerValueListTemplate4() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i4,vl_goodValues,vl_badValues);
+}
+
+//=== 5 ===
+//repetition
+//(-1,0,1,2,(6..9),100,20,21,22,20,21,22);
+testcase tc_checkIntegerValueListTemplate5_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i5,t_i5_eq);
+}
+testcase tc_checkIntegerValueListTemplate5() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i5,vl_goodValues,vl_badValues);
+}
+
+//=== 6 ===
+//(-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+testcase tc_checkIntegerValueListTemplate6_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i6,t_i6_eq);
+}
+testcase tc_checkIntegerValueListTemplate6() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i6,vl_goodValues,vl_badValues);
+}
+//=== 7 ===
+//(1,?,3,100);
+testcase tc_checkIntegerValueListTemplate7_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i7,t_i7_eq);
+}
+testcase tc_checkIntegerValueListTemplate7() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i7,vl_goodValues,vl_badValues);
+}
+//=== 8 ===
+//(100,all from t_RoI4);
+testcase tc_checkIntegerValueListTemplate8_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i8,t_i8_eq);
+}
+testcase tc_checkIntegerValueListTemplate8() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i8,vl_goodValues,vl_badValues);
+}
+//=== 9 ===
+//(100,1,?,3,-1);
+testcase tc_checkIntegerValueListTemplate9_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i9,t_i9_eq);
+}
+testcase tc_checkIntegerValueListTemplate9() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i9,vl_goodValues,vl_badValues);
+}
+
+/* wrong?
+testcase tc_checkIntegerValueListTemplate10() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i10,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate11() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i11,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate12() runs on A
+{
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i12,vl_goodValues,vl_badValues);
+}
+*/
+
+//=== i13 ===
+//(20,21,22);
+
+testcase tc_checkIntegerValueListTemplate13roi_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i13roi,t_i13_eq);
+}
+testcase tc_checkIntegerValueListTemplate13roi() runs on A
+{
+  var RoI vl_goodValues := {20,21,22};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i13roi,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate13soi_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i13soi,t_i13_eq);
+}
+testcase tc_checkIntegerValueListTemplate13soi() runs on A
+{
+  var RoI vl_goodValues := {20,21,22};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i13soi,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate13roi_c_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i13roi_c,t_i13_eq);
+}
+testcase tc_checkIntegerValueListTemplate13roi_c() runs on A
+{
+  var RoI vl_goodValues := {20,21,22};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i13roi_c,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate13soi_c_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i13soi_c,t_i13_eq);
+}
+testcase tc_checkIntegerValueListTemplate13soi_c() runs on A
+{
+  var RoI vl_goodValues := {20,21,22};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(t_i13soi_c,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkAllFromInFunctionCall_IntegerValueListInTemplate13roi_eq() runs on A{
+  var template integer tl_i := 0;
+  f_createIntegerWithAllFromFromInTemplateFromRoi(t_RoI3,tl_i);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+testcase tc_checkAllFromInFunctionCall_IntegerValueListInOutTemplate13roi_eq() runs on A{
+  var template integer tl_i := 0;
+  f_createIntegerWithAllFromFromInTemplateFromRoi(t_RoI3,tl_i);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+testcase tc_checkAllFromInFunctionCall_IntegerValueListInTemplate13soi_eq() runs on A{
+  var template integer tl_i := 0;
+  f_createIntegerWithAllFromFromInTemplateFromSoi(t_SoI3,tl_i);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+testcase tc_checkAllFromInFunctionCall_IntegerValueListInOutTemplate13soi_eq() runs on A{
+  var template integer tl_i := 0;
+  f_createIntegerWithAllFromFromInTemplateFromSoi(t_SoI3,tl_i);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+testcase tc_checkAllFromComponentVar_IntegerValueListTemplate13roi_eq() runs on A{
+  var template integer tl_i := (all from v_roi);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+testcase tc_checkAllFromComponentVar_IntegerValueListTemplate13soi_eq() runs on A{
+  var template integer tl_i := (all from v_soi);
+  f_checkIntTemplateEquivalence(tl_i,t_i13_eq);
+}
+
+//====== templates derived from set of integers
+//=== i0s ===
+//t_i0s_eq := ( 1,2,(6..9));
+
+testcase tc_checkIntegerValueListTemplate0s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i0s,t_i0s_eq);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate0s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_importing_i0s,t_i0s_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0s() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i0s,vl_goodValues,vl_badValues);
+}
+testcase tc_checkImportingIntegerValueListTemplate0s() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_importing_i0s,vl_goodValues,vl_badValues);
+}
+//=== i1s ==
+//t_i1s_eq := ( 1,2,(6..9),100);
+testcase tc_checkIntegerValueListTemplate1s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i1s,t_i1s_eq);
+}
+testcase tc_checkImportingIntegerValueListTemplate1s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_importing_i1s,t_i1s_eq);
+}
+testcase tc_checkIntegerValueListTemplate1s() runs on A
+{
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i1s,vl_goodValues,vl_badValues);
+}
+
+//=== i2s ===
+//(-1,0,1,2,(6..9), 100);
+testcase tc_checkIntegerValueListTemplate2s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i2s,t_i2s_eq);
+}
+testcase tc_checkIntegerValueListTemplate2s() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i2s,vl_goodValues,vl_badValues);
+}
+
+//=== i3s ===
+//(-1,0,1,2,(6..9),20,21,22, 100);
+testcase tc_checkIntegerValueListTemplate3s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i3s,t_i3s_eq);
+}
+testcase tc_checkIntegerValueListTemplate3s() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i3s,vl_goodValues,vl_badValues);
+}
+
+//=== i4s ===
+//order
+//(-1,0,1,2,(6..9),100,20,21,22);
+testcase tc_checkIntegerValueListTemplate4s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i4s,t_i4s_eq);
+}
+testcase tc_checkIntegerValueListTemplate4s() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i4s,vl_goodValues,vl_badValues);
+}
+
+//=== i5s ===
+//repetition
+testcase tc_checkIntegerValueListTemplate5s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i5s,t_i5s_eq);
+}
+testcase tc_checkIntegerValueListTemplate5s() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i5s,vl_goodValues,vl_badValues);
+}
+
+//=== i6s ===
+//(-1,0,1,2,(6..9),100,20,21,22,20,21,22,20,21,22);
+testcase tc_checkIntegerValueListTemplate6s_eq() runs on A{
+  f_checkIntTemplateEquivalence(t_i6s,t_i6s_eq);
+}
+testcase tc_checkIntegerValueListTemplate6s() runs on A
+{
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i6s,vl_goodValues,vl_badValues);
+}
+//-------- Tests for dynamic templates ( template variables) ----
+//=== i0 ===
+//( 1,2,(6..9));
+testcase tc_checkIntegerValueListTemplate0_eq_dyn() runs on A{
+  var template integer tl_i0 := (all from t_RoI1);
+  f_checkIntTemplateEquivalence(tl_i0,t_i0_eq);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate0_eq_dyn() runs on A{
+  var template integer tl_importing_i0 := (all from t_imported_RoI1);
+  f_checkIntTemplateEquivalence(tl_importing_i0,t_i0_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0_eq_2dyn() runs on A{
+  var template RoI tl_RoI1 := {1, 2, (6..9)};
+  var template integer tl_i0 := (all from tl_RoI1);
+  f_checkIntTemplateEquivalence(tl_i0,t_i0_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0_dyn() runs on A
+{
+  var template integer tl_i0 := (all from t_RoI1);
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i0,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkImportingIntegerValueListTemplate0_dyn() runs on A
+{
+  var template integer tl_importing_i0 := (all from t_imported_RoI1);
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_importing_i0,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate0_2dyn() runs on A
+{
+  var template RoI tl_RoI1 := {1, 2, (6..9)};
+  var template integer tl_i0 := (all from tl_RoI1);
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i0,vl_goodValues,vl_badValues);
+}
+//=== i1 ===
+testcase tc_checkIntegerValueListTemplate1_eq_dyn() runs on A
+{
+  var template integer tl_i1 := (all from t_RoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i1,t_i1_eq);
+}
+testcase tc_checkIntegerValueListTemplate1_eq_2dyn() runs on A
+{
+  var template RoI tl_RoI1 := {1, 2, (6..9)};
+  var template integer tl_i1 := (all from tl_RoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i1,t_i1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate1_dyn() runs on A
+{
+  var template integer tl_i1 := (all from t_RoI1, 100);
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate1_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template integer tl_i1 := (all from tl_RoI1, 100);
+  var RoI vl_goodValues := {1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i1,vl_goodValues,vl_badValues);
+}
+
+//=== i2 ===
+testcase tc_checkIntegerValueListTemplate2_eq_dyn() runs on A{
+  var template integer tl_i2 := (-1,0,all from t_RoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i2,t_i2_eq);
+}
+testcase tc_checkIntegerValueListTemplate2_eq_2dyn() runs on A{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template integer tl_i2 := (-1,0,all from tl_RoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i2,t_i2_eq);
+}
+testcase tc_checkIntegerValueListTemplate2_dyn() runs on A
+{
+  var template integer tl_i2 := (-1,0,all from t_RoI1, 100);
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i2,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate2_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template integer tl_i2 := (-1,0,all from tl_RoI1, 100);
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i2,vl_goodValues,vl_badValues);
+}
+//=== i3 ===
+
+testcase tc_checkIntegerValueListTemplate3_eq_dyn() runs on A{
+  var template integer tl_i3 := (-1,0,all from t_RoI1, all from t_RoI3, 100); 
+  f_checkIntTemplateEquivalence(tl_i3,t_i3_eq);
+}
+testcase tc_checkIntegerValueListTemplate3_eq_2dyn() runs on A{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i3 := (-1,0,all from tl_RoI1, all from tl_RoI3, 100); 
+  f_checkIntTemplateEquivalence(tl_i3,t_i3_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate3_dyn() runs on A
+{
+  var template integer tl_i3 := (-1,0,all from t_RoI1, all from t_RoI3, 100); 
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,20,21,22,100};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i3,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate3_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i4 := (-1,0,all from tl_RoI1, 100, all from tl_RoI3);
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i4,vl_goodValues,vl_badValues);
+}
+
+//=== i4 ===
+testcase tc_checkIntegerValueListTemplate4_eq_dyn() runs on A{
+  var template integer tl_i4 :=  (-1,0,all from t_RoI1, 100, all from t_RoI3);
+  f_checkIntTemplateEquivalence(tl_i4,t_i4_eq);
+}
+testcase tc_checkIntegerValueListTemplate4_eq_2dyn() runs on A{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i4 :=  (-1,0,all from tl_RoI1, 100, all from tl_RoI3);
+  f_checkIntTemplateEquivalence(tl_i4,t_i4_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate4_dyn() runs on A
+{
+  var template integer tl_i4 := (-1,0,all from t_RoI1, 100, all from t_RoI3);
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(t_i4,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate4_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i4 := (-1,0,all from tl_RoI1, 100, all from tl_RoI3);
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i4,vl_goodValues,vl_badValues);
+}
+
+//=== i5 ===
+testcase tc_checkIntegerValueListTemplate5_eq_dyn() runs on A{
+  var template integer tl_i5 :=  (-1,0,all from t_RoI1, 100,all from t_RoI3,all from t_RoI3 ) 
+  f_checkIntTemplateEquivalence(tl_i5,t_i5_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate5_eq_2dyn() runs on A{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i5 :=  (-1,0,all from tl_RoI1, 100,all from tl_RoI3,all from tl_RoI3 ) 
+  f_checkIntTemplateEquivalence(tl_i5,t_i5_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate5_dyn() runs on A
+{
+  var template integer tl_i5 :=  (-1,0,all from t_RoI1, 100,all from t_RoI3,all from t_RoI3 )
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i5,vl_goodValues,vl_badValues);
+}
+testcase tc_checkIntegerValueListTemplate5_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i5 :=  (-1,0,all from tl_RoI1, 100,all from tl_RoI3,all from tl_RoI3 )
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i5,vl_goodValues,vl_badValues);
+}
+
+//=== i6 ===
+testcase tc_checkIntegerValueListTemplate6_eq_dyn() runs on A{
+  var template integer tl_i6 := (-1,0,all from t_RoI1, 100, all from t_RoI3,all from t_RoI3,all from t_RoI3);  
+  f_checkIntTemplateEquivalence(tl_i6,t_i6_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate6_eq_2dyn() runs on A{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i6 := (-1,0,all from tl_RoI1, 100, all from tl_RoI3,all from tl_RoI3,all from tl_RoI3);  
+  f_checkIntTemplateEquivalence(tl_i6,t_i6_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate6_dyn() runs on A
+{
+  var template integer tl_i6 := (-1,0,all from t_RoI1, 100, all from t_RoI3,all from t_RoI3,all from t_RoI3); //repetition
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i6,vl_goodValues,vl_badValues);
+}
+testcase tc_checkIntegerValueListTemplate6_2dyn() runs on A
+{
+  var template RoI tl_RoI1:= {1, 2, (6..9)};
+  var template RoI tl_RoI3 := {20,21,22};
+  var template integer tl_i6 := (-1,0,all from t_RoI1, 100, all from t_RoI3,all from t_RoI3,all from t_RoI3); //repetition
+  var RoI vl_goodValues := { -1,0,1,2,6,7,8,9,100,20,21,22};
+  var RoI vl_badValues := { -99,-10,3,4,5,10,11,19,23,40,42,44,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i6,vl_goodValues,vl_badValues);
+}
+//=== i7 ===
+testcase tc_checkIntegerValueListTemplate7_eq_dyn() runs on A{
+  var template integer tl_i7 :=  (all from t_RoI4,100); 
+  f_checkIntTemplateEquivalence(tl_i7,t_i7_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate7_eq_2dyn() runs on A{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i7 :=  (all from tl_RoI4,100); 
+  f_checkIntTemplateEquivalence(tl_i7,t_i7_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate7_dyn() runs on A
+{
+  var template integer tl_i7 :=  (all from t_RoI4,100); 
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i7,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate7_2dyn() runs on A
+{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i7 :=  (all from tl_RoI4,100); 
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i7,vl_goodValues,vl_badValues);
+}
+
+//=== i8 ===
+testcase tc_checkIntegerValueListTemplate8_eq_dyn() runs on A{
+  var template integer tl_i8 :=  (100,all from t_RoI4);
+  f_checkIntTemplateEquivalence(tl_i8,t_i8_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate8_eq_2dyn() runs on A{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i8 :=  (100,all from tl_RoI4);
+  f_checkIntTemplateEquivalence(tl_i8,t_i8_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate8_dyn() runs on A
+{
+  var template integer tl_i8 := (100,all from t_RoI4);
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i8,vl_goodValues,vl_badValues);
+}
+testcase tc_checkIntegerValueListTemplate8_2dyn() runs on A
+{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i8 := (100,all from t_RoI4);
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i8,vl_goodValues,vl_badValues);
+}
+
+//=== i9 ===
+testcase tc_checkIntegerValueListTemplate9_eq_dyn() runs on A{
+  var template integer tl_i9 := (100,all from t_RoI4,-1);  
+  f_checkIntTemplateEquivalence(tl_i9,t_i9_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate9_eq_2dyn() runs on A
+{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i9 := (100,all from t_RoI4,-1);  
+  f_checkIntTemplateEquivalence(tl_i9,t_i9_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate9_dyn() runs on A
+{
+  var template integer tl_i9 := (100,all from t_RoI4,-1); 
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i9,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate9_2dyn() runs on A
+{
+  var template RoI tl_RoI4 := {1, ?, 3};
+  var template integer tl_i9 := (100,all from tl_RoI4,-1); 
+  var RoI vl_goodValues := {-1,0,1,2,3,4,5,500,5000};
+  var RoI vl_badValues := { };  
+  f_checkIntegerTemplate(tl_i9,vl_goodValues,vl_badValues);
+}
+
+//=== 10 ===
+//More complex example
+
+//== 10 eq ==
+testcase tc_RoITemplate10_eq() runs on A
+{
+  f_checkRoITemplateEquivalence(t_roiComplex1,t_roiComplex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq() runs on A
+{
+  f_checkIntTemplateEquivalence(t_complex1,t_complex1_eq);
+}
+
+//local template
+testcase tc_checkIntegerValueListTemplate10_eq_local() runs on A
+{
+  template integer tl_complex1 := (all from t_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq_dyn() runs on A
+{
+  var template integer tl_complex1 := (all from t_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq_2dyn() runs on A
+{
+  var template RoI tl_roiComplex1 := { t_i0s, (all from t_SoI3) };
+  var template integer tl_complex1 := (all from tl_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq_3dyn() runs on A
+{
+  var template integer tl_i0s    := (all from t_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from t_SoI3) };
+  var template integer tl_complex1 := (all from tl_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq_4dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  template SoI tl_SoI3 := {20,21,22};
+
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) };
+  var template integer tl_complex1 := (all from tl_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate10_eq_5dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template SoI tl_SoI3 := {20,21,22};  //<=== !!! if this is local then the tc can be compiled
+
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) };//compile error
+  var template integer tl_complex1 := (all from tl_roiComplex1);
+  f_checkIntTemplateEquivalence(tl_complex1,t_complex1_eq);
+}
+//=== 10 check values ==
+testcase tc_checkIntegerValueListTemplate10() runs on A
+{
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(t_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_dyn() runs on A
+{
+  var template integer tl_complex1 := (all from t_roiComplex1); 
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_loc_dyn() runs on A
+{
+  template RoI tl_roiComplex1 := { t_i0s, (all from t_SoI3) }; //local template def
+  var template integer tl_complex1 := (all from tl_roiComplex1); //dyn template def
+  
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_2loc_2dyn () runs on A
+{
+  template SoI tl_SoI1 := {1,2,(6..9)};     //local template def
+  template SoI tl_SoI3 := {20,21,22};       //local template def
+  var template RoI tl_roiComplex1 := { (all from tl_SoI1), (all from tl_SoI3) }; 
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+  
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_3loc_2dyn () runs on A
+{
+  template SoI tl_SoI1 := {1,2,(6..9)};     //local template def
+  template SoI tl_SoI3 := {20,21,22};       //local template def
+  template integer tl_i0s    := (all from tl_SoI1);   //local template def
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) }; 
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+  
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_1dyn_1loc_3dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  template SoI tl_SoI3 := {20,21,22};
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) };
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+  
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate10_2loc_3dyn () runs on A
+{
+  template SoI tl_SoI1 := {1,2,(6..9)};
+  template SoI tl_SoI3 := {20,21,22};
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) };
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+// The following two thestcases are critical:
+
+//PASS
+testcase tc_checkIntegerValueListTemplate10_6dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template SoI tl_SoI3 := {20,21,22};
+  var template integer tl_i0s := (all from tl_SoI1);
+  var template integer tl_i1s := (all from tl_SoI3); //<===this helps to compile
+  var template RoI tl_roiComplex1 := { tl_i0s,tl_i1s};
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+ 
+testcase tc_checkIntegerValueListTemplate10_5dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template SoI tl_SoI3 := {20,21,22};  
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var template RoI tl_roiComplex1 := { tl_i0s, (all from tl_SoI3) };  
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+ 
+testcase tc_checkIntegerValueListTemplate10_4dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template SoI tl_SoI3 := {20,21,22};  
+  var template RoI tl_roiComplex1 := { (all from tl_SoI1), (all from tl_SoI3) };  
+  var template integer tl_complex1 := (all from tl_roiComplex1); 
+
+  var RoI vl_goodValues := {1,2,6,7,8,9,20,21,22};
+  var RoI vl_badValues := { 0,3,4,5,10,19,23};  
+  f_checkIntegerTemplate(tl_complex1,vl_goodValues,vl_badValues);
+}
+
+//+++++++++ NEGATIVE TEST+++++++++++++++++++++++++
+
+// see: TTCN3_SA_13_TD.script
+
+//====== Dynamic Templates for Set Of Integer =====
+
+//=== i0s ===
+//t_i0s_eq := ( 1,2,(6..9));
+
+testcase tc_checkIntegerValueListTemplate0s_eq_dyn() runs on A{
+  var template integer tl_i0s    := (all from t_SoI1);
+  f_checkIntTemplateEquivalence(tl_i0s,t_i0s_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0s_eq_2dyn() runs on A{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template integer tl_i0s    := (all from tl_SoI1);
+  f_checkIntTemplateEquivalence(tl_i0s,t_i0s_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate0s_dyn() runs on A
+{
+  var template integer tl_i0s    := (all from t_SoI1);
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i0s,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate0s_2dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template integer tl_i0s    := (all from tl_SoI1);
+  var RoI vl_goodValues := { 1,2,6,7,8,9};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,100,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i0s,vl_goodValues,vl_badValues);
+}
+
+//=== i1s ==
+//t_i1s_eq := ( 1,2,(6..9),100);
+testcase tc_checkIntegerValueListTemplate1s_eq_dyn() runs on A{
+  var template integer tl_i1s    := (all from t_SoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i1s,t_i1s_eq);
+}
+
+testcase tc_checkIntegerValueListTemplate1s_eq_2dyn() runs on A{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template integer tl_i1s    := (all from tl_SoI1, 100);
+  f_checkIntTemplateEquivalence(tl_i1s,t_i1s_eq);
+}
+
+
+testcase tc_checkIntegerValueListTemplate1s_dyn() runs on A
+{
+  var template integer tl_i1s    := (all from t_SoI1, 100);
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i1s,vl_goodValues,vl_badValues);
+}
+
+testcase tc_checkIntegerValueListTemplate1s_2dyn() runs on A
+{
+  var template SoI tl_SoI1 := {1,2,(6..9)};
+  var template integer tl_i1s    := (all from tl_SoI1, 100);
+  var RoI vl_goodValues := { 1,2,6,7,8,9,100};
+  var RoI vl_badValues := { -99,-10,-1,0,3,4,5,10,11,20,99,101,102,200,1000, 100000000000000};  
+  f_checkIntegerTemplate(tl_i1s,vl_goodValues,vl_badValues);
+}
+
+
+//=========================================================
+//===== Test for Record of charstring =====================
+//=========================================================
+
+//=== cs1 ===
+testcase tc_CharstringTemplate1_eq() runs on A
+{
+  f_checkCharstringTemplateEquivalence(t_cs1,t_cs1_eq);
+}
+
+testcase tc_CharstringTemplate1_eq_local() runs on A
+{
+  template charstring tl_cs1 := ( all from t_RoCS1, "dog" );
+  f_checkCharstringTemplateEquivalence(tl_cs1,t_cs1_eq);
+}
+
+testcase tc_CharstringTemplate1_eq_dyn() runs on A
+{
+  var template charstring tl_cs1 := ( all from t_RoCS1, "dog" );
+  f_checkCharstringTemplateEquivalence(tl_cs1,t_cs1_eq);
+}
+
+testcase tc_CharstringTemplate1_eq_2dyn() runs on A
+{
+  var template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template charstring tl_cs1 := ( all from tl_RoCS1, "dog" );
+  f_checkCharstringTemplateEquivalence(tl_cs1,t_cs1_eq);
+}
+
+testcase tc_CharstringTemplate1() runs on A
+{
+  var RoCS vl_goodValues := { "apple","banana","","pear", "dog" };
+  var RoCS vl_badValues := { "house","apples" };  
+  f_checkCharstringTemplate(t_cs1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_CharstringTemplate1_local() runs on A
+{
+  template charstring tl_cs1 := ( all from t_RoCS1, "dog" )
+  var RoCS vl_goodValues := { "apple","banana","","pear", "dog" };
+  var RoCS vl_badValues := { "house","apples" };  
+  f_checkCharstringTemplate(tl_cs1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_CharstringTemplate1_dyn() runs on A
+{
+  var template charstring tl_cs1 := ( all from t_RoCS1, "dog" )
+  var RoCS vl_goodValues := { "apple","banana","","pear", "dog" };
+  var RoCS vl_badValues := { "house","apples" };  
+  f_checkCharstringTemplate(tl_cs1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_CharstringTemplate1_2dyn() runs on A
+{
+  var template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template charstring tl_cs1 := ( all from tl_RoCS1, "dog" )
+  var RoCS vl_goodValues := { "apple","banana","","pear", "dog" };
+  var RoCS vl_badValues := { "house","apples" };  
+  f_checkCharstringTemplate(tl_cs1,vl_goodValues,vl_badValues);
+}
+
+//=== cs2 ===
+testcase tc_CharstringTemplate2_eq() runs on A
+{
+  f_checkCharstringTemplateEquivalence(t_cs2,t_cs2_eq);
+}
+
+testcase tc_CharstringTemplate2_eq_local() runs on A
+{
+  template charstring tl_cs2 :=  ( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2);
+  f_checkCharstringTemplateEquivalence(tl_cs2,t_cs2_eq);
+}
+
+testcase tc_CharstringTemplate2_eq_dyn() runs on A
+{
+  var template charstring tl_cs2 := ( "treeeeeeeeeeeeee",all from t_RoCS1, "dog", all from t_RoCS2); 
+  f_checkCharstringTemplateEquivalence(tl_cs2,t_cs2_eq);
+}
+
+testcase tc_CharstringTemplate2_eq_2dyn() runs on A
+{
+  var template RoCS tl_RoCS1 := { "apple","banana","","pear"};
+  var template RoCS tl_RoCS2 := { "apples","bananas","","pears"};
+  var template charstring tl_cs2 := ( "treeeeeeeeeeeeee",all from tl_RoCS1, "dog", all from tl_RoCS2);  
+  f_checkCharstringTemplateEquivalence(tl_cs2,t_cs2_eq);
+}
+testcase tc_CharstringTemplate2() runs on A
+{
+  var RoCS vl_goodValues := { "apple","banana","","pear", "dog", "treeeeeeeeeeeeee","apples","bananas","pears" };
+  var RoCS vl_badValues := { "house","applesss","tree","a","app","appl","pple" };  
+  f_checkCharstringTemplate(t_cs2,vl_goodValues,vl_badValues);
+}
+//=========================================================
+//================== Test for Octetstring =================
+//=========================================================
+
+//== 1 ===
+//( all from t_RoOS1 )
+//('ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O)
+testcase tc_OctetstringTemplate1_eq() runs on A
+{
+  f_checkOctetstringTemplateEquivalence(t_os1,t_os1_eq);
+}
+
+testcase tc_OctetstringTemplate1() runs on A
+{
+
+  var RoOS vl_goodValues := { 'ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O  };
+  var RoOS vl_badValues := { ''O,'0000'O,'00FF'O,'AA'O,'00ABBA'O };  
+  f_checkOctetstringTemplate(t_os1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_OctetstringTemplate1_eq_local() runs on A
+{
+  template octetstring tl_os1 := ( all from t_RoOS1 );
+  f_checkOctetstringTemplateEquivalence(tl_os1,t_os1_eq);
+}
+
+testcase tc_OctetstringTemplate1_eq_dyn() runs on A
+{
+  var template octetstring tl_os1 := ( all from t_RoOS1 );
+  f_checkOctetstringTemplateEquivalence(tl_os1,t_os1_eq);
+}
+
+testcase tc_OctetstringTemplate1_eq_local_dyn() runs on A
+{
+  template RoOS tl_RoOS1 := {'ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O}
+  var template octetstring tl_os1 := ( all from tl_RoOS1 );
+  f_checkOctetstringTemplateEquivalence(tl_os1,t_os1_eq);
+}
+
+testcase tc_OctetstringTemplate1_eq_2dyn() runs on A
+{
+  var template RoOS tl_RoOS1 := {'ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O}
+  var template octetstring tl_os1 := ( all from tl_RoOS1 );
+  f_checkOctetstringTemplateEquivalence(tl_os1,t_os1_eq);
+}
+
+testcase tc_OctetstringTemplate1_dyn() runs on A
+{
+  var RoOS vl_goodValues := { 'ABBA'O,'BABA'O,'FFFF'O,'00'O,'0B'O  };
+  var RoOS vl_badValues := { ''O,'0000'O,'00FF'O,'AA'O,'00ABBA'O };  
+  f_checkOctetstringTemplate(t_os1,vl_goodValues,vl_badValues);
+}
+//=========================================================
+//================== Test for Records =====================
+//=========================================================
+testcase tc_MyRecordTemplate1_eq() runs on A {
+  f_checkMyRecordTemplateEquivalence(t_myrec1,t_myrec1_eq);
+}
+
+testcase tc_MyRecordTemplate1() runs on A
+{
+  var RoMyRec vl_goodValues := { 
+    {i:=1,roi:={1,2,6},soi:={1,7,2} },
+    {i:=2,roi:={1,2,7},soi:={1,9,2} } };
+  var RoMyRec vl_badValues := {{omit,omit,omit}  };  
+  f_checkMyRecTemplate(t_myrec1,vl_goodValues,vl_badValues);
+}
+
+testcase tc_MyRecordTemplate2_eq() runs on A {
+  f_checkMyRecordTemplateEquivalence(t_myrec2,t_myrec2_eq);
+}
+
+testcase tc_MyRecordTemplate3_eq() runs on A {
+  f_checkMyRecordTemplateEquivalence(t_myrec3,t_myrec3_eq);
+}
+
+//=========================================================
+//================== Test for Union =====================
+//=========================================================
+testcase tc_MyUnionTemplate1i_eq() runs on A {
+  f_checkMyUnionTemplateEquivalence(t_myunion1i,t_myunion1i_eq);
+}
+
+testcase tc_MyUnionTemplate1i() runs on A
+{
+  var RoMyUnion vl_goodValues := {{i:=1},{i:=2},{i:=6},{i:=7},{i:=8},{i:=9},{i:=100}}  ;
+  var RoMyUnion vl_badValues := {{i:=0},{i:=3},{roi:={}},{roi:={1,2}}};  
+  f_checkMyUnionTemplate(t_myunion1i,vl_goodValues,vl_badValues);
+}
+testcase tc_MyUnionTemplate1roi() runs on A
+{
+  var RoMyUnion vl_goodValues := { 
+    { roi:={1,2}  },{roi:={1,2}},{roi:={1,6}},{roi:={2,7}},{roi:={100,100}} };
+  var RoMyUnion vl_badValues := {{roi:={1}},{roi:={1,4}}, {roi:={2,3}},{roi:={1,2,3}},{roi:={1,2,6,101}},{roi:={1,2,6,100}} };  
+  f_checkMyUnionTemplate(t_myunion1roi,vl_goodValues,vl_badValues);
+}
+testcase tc_MyUnionTemplate1soi() runs on A
+{
+  var RoMyUnion vl_goodValues := { 
+   { soi:={1,2}  },{soi:={1,2}},{soi:={1,6}},{soi:={2,7}},{soi:={100,100}} };  
+  var RoMyUnion vl_badValues := { {soi:={}},{soi:={1,3}},{soi:={1,101}} };
+  f_checkMyUnionTemplate(t_myunion1soi,vl_goodValues,vl_badValues);
+}
+testcase tc_MyUnionTemplate2i_eq() runs on A {
+  f_checkMyUnionTemplateEquivalence(t_myunion2i,t_myunion2i_eq);
+}
+testcase tc_MyUnionTemplate2roi_eq() runs on A {
+  f_checkMyUnionTemplateEquivalence(t_myunion2roi,t_myunion2roi_eq);
+}
+testcase tc_MyUnionTemplate2soi_eq() runs on A {
+  f_checkMyUnionTemplateEquivalence(t_myunion2soi,t_myunion2soi_eq);
+}
+testcase tc_MyUnionTemplate3_eq() runs on A {
+  f_checkMyUnionTemplateEquivalence(t_myunion3,t_myunion3_eq);
+}
+
+//==== function reference =====
+testcase tc_functionRef_rof_eq() runs on A {
+  f_checkMyFunctionRefTemplateEquivalence( t_fref_int2int,t_fref_int2int_eq);
+}
+
+// all from with length restriction
+// 1. the target of 'all from' is foldable (known at compile-time)
+testcase tc_varTemplate_len_res_foldable() runs on A
+{
+  template RoI tl_foldable := { 6, 9 };
+  var template RoI tl_len_res := { 2, all from tl_foldable } length (3);
+  var template RoI tl_len_res_eq := { 2, 6, 9 } length (3);
+  f_checkRoITemplateEquivalence(tl_len_res, tl_len_res_eq);
+}
+
+// 2. the target of 'all from' is unfoldable (not known at compile-time)
+testcase tc_varTemplate_len_res_unfoldable() runs on A
+{
+  var template RoI tl_unfoldable := { 6, 9 };
+  var template RoI tl_len_res := { 2, all from tl_unfoldable } length (3);
+  var template RoI tl_len_res_eq := { 2, 6, 9 } length (3);
+  f_checkRoITemplateEquivalence(tl_len_res, tl_len_res_eq);
+}
+
+// HU21359 Length of record of template containing 'all from' is invalid
+template RoI t_ints_1 := { 1 };
+template RoI t_ints_2 := { 2, 3 };
+
+function modify (template RoI p1, template RoI p2)
+return template RoI
+{    
+  return { all from p1, all from p2 };
+}
+
+testcase tc_HU21359() runs on A {
+  var template RoI vt_res := modify(t_ints_1, t_ints_2);
+  var template RoI vt_exp := { 1, 2, 3 };
+  f_checkRoITemplateEquivalence(vt_res, vt_exp);
+}
+
+
+// control part is NOT used during the test!
+control {
+  //  execute(tc_checkIntegerValueListTemplate_eq());
+  execute(tc_checkIntegerValueListTemplate0());
+  execute(tc_checkIntegerValueListTemplate1());
+  execute(tc_checkIntegerValueListTemplate2());
+  execute(tc_checkIntegerValueListTemplate3());
+  execute(tc_checkIntegerValueListTemplate4());
+  execute(tc_checkIntegerValueListTemplate5());
+  execute(tc_checkIntegerValueListTemplate6());  
+
+  execute(tc_checkIntegerValueListTemplate1s());
+  execute(tc_checkIntegerValueListTemplate2s());
+  execute(tc_checkIntegerValueListTemplate3s());
+  execute(tc_checkIntegerValueListTemplate4s());
+  execute(tc_checkIntegerValueListTemplate5s());
+  execute(tc_checkIntegerValueListTemplate6s());
+
+  execute(tc_CharstringTemplate1());
+  execute(tc_CharstringTemplate2());
+}
+
+}

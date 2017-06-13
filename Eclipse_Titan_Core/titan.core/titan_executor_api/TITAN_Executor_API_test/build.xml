@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Lovassy, Arpad
+-->
+<project basedir="." default="build" name="TITAN_Executor_API_test">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="TITAN_Executor_API.location" value="../TITAN_Executor_API"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="${junit.full}"/>
+        <pathelement location="${hamcrest.full}"/>
+    </path>
+    <path id="TITAN_Executor_API.classpath">
+        <pathelement location="${TITAN_Executor_API.location}/bin"/>
+    </path>
+    <path id="TITAN_Executor_API_test.classpath">
+        <pathelement location="bin"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+        <path refid="TITAN_Executor_API.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.g"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${TITAN_Executor_API.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${TITAN_Executor_API.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="JniExecutorAsyncHappyTest.testExecutor_Async_Route1_TestByTestCaseName_Happy">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncHappyTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="JniExecutorAsyncErrorIllegalArgTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncErrorIllegalArgTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="JniExecutorAsyncErrorWrongStateTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncErrorWrongStateTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="StringUtilTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.StringUtilTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="JniExecutorAsyncHappyTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncHappyTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="JniExecutorAsyncHappySimpleTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncHappySimpleTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="JniExecutorSyncTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorSyncTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="HostControllerErrorIllegalArgTest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.HostControllerErrorIllegalArgTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+    </target>
+    <target name="TITAN_Executor_API_test" depends="build">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr" failureproperty="test.failed">
+            <formatter type="xml"/>
+            <test name="org.eclipse.titan.executorapi.test.HostControllerErrorIllegalArgTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncErrorIllegalArgTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncErrorWrongStateTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncHappySimpleTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorAsyncHappyTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.JniExecutorSyncTest" todir="${junit.output.dir}"/>
+            <test name="org.eclipse.titan.executorapi.test.StringUtilTest" todir="${junit.output.dir}"/>
+            <classpath refid="TITAN_Executor_API_test.classpath"/>
+        </junit>
+	<fail if="test.failed" message="TITAN_Executor_API_test FAILED"/>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>

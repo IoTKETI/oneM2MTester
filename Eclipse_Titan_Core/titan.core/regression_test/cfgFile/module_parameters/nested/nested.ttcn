@@ -1,0 +1,140 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// this module contains tests for assigning and concatenating nested module parameters
+// i.e. the left side of the assignment or concatenation refers to a part of the module
+// parameter (through field names and array indexes), instead of the whole module parameter
+module nested {
+
+type record of integer ROI;
+type set of integer SOI;
+
+type record NestedRec {
+  ROI roi,
+  SOI soi
+}
+
+type record of NestedRec RoNestedRec;
+
+type union HasRoNestedRec {
+  RoNestedRec recs,
+  integer num
+}
+
+type NestedRec NestedRecArr[3];
+
+type record Rec {
+  ROI roi,
+  SOI soi
+}
+
+type record of Rec RoRec;
+
+type component MyComp_CT { }
+
+// parameters used in assignments
+modulepar NestedRec tsp_nested := { { 1, 2, 3 }, { 1, 2, 3 } };
+modulepar RoNestedRec tsp_ro_nested := {
+  { {  1,  2,  3 }, {  1,  2,  3 } },
+  { { 11, 12, 13 }, { 11, 12, 13 } }
+};
+modulepar HasRoNestedRec tsp_has_nested := { num := 1 };
+modulepar NestedRecArr tsp_nested_arr := {
+  { {  1,  2,  3 }, {  1,  2,  3 } },
+  { { 11, 12, 13 }, { 11, 12, 13 } },
+  { { 21, 22, 23 }, { 21, 22, 23 } }
+};
+
+// parameter templates used in assignments
+modulepar template NestedRec tsp_templ_nested := { { 1, 2, 3 }, { 1, 2, 3 } };
+modulepar template RoNestedRec tsp_templ_ro_nested := {
+  { {  1,  2,  3 }, {  1,  2,  3 } },
+  { { 11, 12, 13 }, { 11, 12, 13 } }
+};
+modulepar template HasRoNestedRec tsp_templ_has_nested := { num := 1 };
+modulepar template NestedRecArr tsp_templ_nested_arr := {
+  { {  1,  2,  3 }, {  1,  2,  3 } },
+  { { 11, 12, 13 }, { 11, 12, 13 } },
+  { { 21, 22, 23 }, { 21, 22, 23 } }
+};
+
+// parameters used in concatentations
+modulepar Rec tsp_Rec := { { 1, 2, 3 }, { 1, 2, 3 } };
+modulepar RoRec tsp_RoRec := {
+  { {  1,  2,  3 }, {  1,  2,  3 } },
+  { { 11, 12, 13 }, { 11, 12, 13 } }
+};
+
+// testing assignments of nested module parameters
+testcase tc_assign() runs on MyComp_CT {
+  if (tsp_nested == { { 4, 5, 9 }, { 6, 7, 8 } }) { setverdict(pass); }
+  else { setverdict(fail, "tsp_nested = ", tsp_nested); }
+
+  if (tsp_ro_nested == { { {  4,  5 },     {  6,  7,  8 } },
+                         { { 14, 15 },     { 16, 17, 18 } }, 
+                         { { 24, 25, 29 }, { 26, 27, 28 } } }) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ro_nested = ", tsp_ro_nested); }
+
+  if (tsp_has_nested == { recs := { { { 3, 2, 1 }, { 9, 6, 3 } }, 
+                                    { { 2, 4, 6, 8 }, { 1, 3, 5, 7, 9 } } } })
+       { setverdict(pass); }
+  else { setverdict(fail, "tsp_has_nested = ", tsp_has_nested); }
+
+  if (tsp_nested_arr == { { {  1,  2,  3 }, {  1,  2,  3 } },
+                          { { 19, 18, 17 }, { 11, 12, 13 } }, 
+                          { { 21, 22, 23 }, { 29, 28, 27 } } }) { setverdict(pass); }
+  else { setverdict(fail, "tsp_nested_arr = ", tsp_nested_arr); }
+}
+
+// testing assignments of nested module parameter templates
+testcase tc_assign_templ() runs on MyComp_CT {
+  var template NestedRec vt_nested := { { 4, 5, 9 }, { 6, 7, 8 } };
+  if (log2str(tsp_templ_nested) == log2str(vt_nested)) { setverdict(pass); }
+  else { setverdict(fail, "tsp_templ_nested = ", tsp_templ_nested); }
+
+  var template RoNestedRec vt_ro_nested := { { {  4,  5 },     {  6,  7,  8 } },
+                                             { { 14, 15 },     { 16, 17, 18 } }, 
+                                             { { 24, 25, 29 }, { 26, 27, 28 } } };
+  if (log2str(tsp_templ_ro_nested) == log2str(vt_ro_nested)) { setverdict(pass); }
+  else { setverdict(fail, "tsp_templ_ro_nested = ", tsp_templ_ro_nested); }
+
+  var template HasRoNestedRec vt_has_nested := { recs := { { { 3, 2, 1 }, { 9, 6, 3 } }, 
+    { { 2, 4, 6, 8 }, { 1, 3, 5, 7, 9 } } } };
+  if (log2str(tsp_templ_has_nested) == log2str(vt_has_nested))
+       { setverdict(pass); }
+  else { setverdict(fail, "tsp_templ_has_nested = ", tsp_templ_has_nested); }
+
+  var template NestedRecArr vt_nested_arr := { { {  1,  2,  3 }, {  1,  2,  3 } },
+                                               { { 19, 18, 17 }, { 11, 12, 13 } }, 
+                                               { { 21, 22, 23 }, { 29, 28, 27 } } }
+  if (log2str(tsp_templ_nested_arr) == log2str(vt_nested_arr)) { setverdict(pass); }
+  else { setverdict(fail, "tsp_templ_nested_arr = ", tsp_templ_nested_arr); }
+}
+
+// testing concatentations of nested module parameters
+testcase tc_concat() runs on MyComp_CT {
+  if (tsp_Rec == { { 1, 2, 3, 4, 5 }, { 1, 2, 3, 6, 7, 8 } }) { setverdict(pass); }
+  else { setverdict(fail, "tsp_Rec = ", tsp_Rec); }
+
+  if (tsp_RoRec == { { {  1,  2,  3,  4,  5 }, {  1,  2,  3,  6,  7,  8 } },
+                     { { 11, 12, 13, 14, 15 }, { 11, 12, 13, 16, 17, 18 } },
+                     { { 21, 22, 23, 24, 25 }, { 21, 22, 23, 26, 27, 28 } } }) { setverdict(pass); }
+  else { setverdict(fail, "tsp_RoRec = ", tsp_RoRec); }
+}
+
+control {
+  execute(tc_assign());
+  execute(tc_assign_templ());
+  execute(tc_concat());
+}
+
+}

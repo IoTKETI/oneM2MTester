@@ -1,0 +1,89 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Beres, Szabolcs
+ *
+ ******************************************************************************/
+module concat {
+
+type record of integer ROI;
+type record of ROI ROROI;
+type record of ROROI ROROROI;
+
+type set of integer SOI;
+type set of SOI SOSOI;
+type set of SOSOI SOSOSOI;
+
+type record Rec {
+  ROI roi,
+  SOI soi
+}
+
+type record of Rec RoRec;
+
+// Record of
+modulepar ROI tsp_ROI_1;
+modulepar ROI tsp_ROI_2;
+modulepar ROI tsp_ROI_3;
+modulepar ROI tsp_ROI_4;
+modulepar ROROI tsp_ROROI_1;
+modulepar ROROI tsp_ROROI_2;
+
+// Set of
+modulepar SOI tsp_SOI_1;
+modulepar SOI tsp_SOI_2;
+modulepar SOI tsp_SOI_3;
+modulepar SOI tsp_SOI_4;
+modulepar SOSOI tsp_SOSOI_1;
+modulepar SOSOI tsp_SOSOI_2;
+
+
+type component MyComp_CT {
+}
+
+testcase tc_record_of() runs on MyComp_CT {
+  if (tsp_ROI_1 == {1, 2, 3}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ROI_1"); }
+
+  if (tsp_ROI_2 == {0, 1, 2, 3, 4, 5}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ROI_2"); }
+
+  if (tsp_ROI_4 == {}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ROI_4"); }
+
+  if (tsp_ROROI_1 == {{0,1}, {1,2}, {3,4}}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ROROI_1"); }
+
+  if (tsp_ROROI_2 == {}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_ROROI_2"); }
+}
+
+testcase tc_set_of() runs on MyComp_CT {
+  if (tsp_SOI_1 == {1, 2, 3}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_SOI_1"); }
+
+  if (tsp_SOI_2 == {0, 1, 2, 3, 4, 5}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_SOI_2"); }
+
+  if (tsp_SOI_4 == {}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_SOI_4"); }
+
+  if (tsp_SOSOI_1 == {{0,1}, {1,2}, {3,4}}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_SOSOI_1"); }
+
+  if (tsp_SOSOI_2 == {}) { setverdict(pass); }
+  else { setverdict(fail, "tsp_SOSOI_2"); }
+}
+
+control {
+  execute(tc_record_of());
+  execute(tc_set_of());
+}
+}

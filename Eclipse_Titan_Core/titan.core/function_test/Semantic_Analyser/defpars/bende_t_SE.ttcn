@@ -1,0 +1,90 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module bende_t_SE {	//^In TTCN-3 module//
+
+type record Cause
+{
+  octetstring causeValue,
+  bitstring   cS
+}
+
+type record PrivateExtension
+{}
+
+type set DownlinkDataNotificationFailureIndication
+{
+ Cause                                   cause,
+ PrivateExtension                        privateExtension optional
+};
+
+
+type union GTPCv2_PDUs
+{
+ DownlinkDataNotificationFailureIndication    downlinkDataNotificationFailureIndication
+}
+
+const bitstring zerobit := '0'B;
+
+// GTPCv2_IE_Templates.ttcn:122
+template Cause t_GTPCv2_IE_cause (
+  template bitstring   pl_cS := // specific value, which is either:
+  '0'B, // V_BSTR
+  template octetstring pl_causeValue := omit
+) :=
+{
+  causeValue := pl_causeValue,
+  cS := pl_cS
+// The presence of this _parameterized_ template alone is not enough for fatal error.
+// It has to be the default value of a parameter (template or function).
+}
+
+const octetstring cg_GTPv2_CV_UENotResponding := '57'O
+
+// The original kaboom
+template GTPCv2_PDUs t_GTPCv2_DataDownlinkNotificationFailureIndication(
+    template Cause pl_Cause := t_GTPCv2_IE_cause(pl_causeValue := cg_GTPv2_CV_UENotResponding)
+) :=
+{
+    downlinkDataNotificationFailureIndication :=
+    {
+        cause := pl_Cause,
+        privateExtension := omit
+    }
+}   /* template t_GTPCv2_DataDownlinkNotificationFailureIndication */
+
+// Parameterized template as default value => kaboom!
+//function f(in template Cause p_cause := t_GTPCv2_IE_cause(pl_causeValue := cg_GTPv2_CV_UENotResponding)) runs on C
+//{}
+
+type component C {
+  var octetstring m_os;
+  var bitstring   m_bs;
+  var template Cause mt_cause := {};
+}
+
+// correctly flagged as error:
+// "default value cannot refer to a field of the component in the `runs on' clause"
+function f2(	//^In function definition//	//^In formal parameter list:$//
+	in template Cause p_cause := mt_cause	//^In parameter `p_cause':$//	//^In default value:// \
+		//^error\: default value cannot refer to a field of the component in the \`runs on\' clause$//
+	) runs on C
+{}
+
+
+testcase tc1() runs on C
+{
+  // no problems here
+  var template Cause vt_cause := t_GTPCv2_IE_cause(pl_causeValue := cg_GTPv2_CV_UENotResponding);
+}
+
+}

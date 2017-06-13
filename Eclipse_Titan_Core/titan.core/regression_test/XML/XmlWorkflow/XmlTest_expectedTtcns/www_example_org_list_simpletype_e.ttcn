@@ -1,0 +1,155 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_list_simpletype.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Wed Oct 21 12:34:20 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- list_simpletype.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/list/simpletype" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_list_simpletype {
+
+
+import from XSD all;
+
+
+type record length(3) of XSD.String ListLength length(4)
+with {
+  variant "name as uncapitalized";
+  variant "list";
+};
+
+
+type record of enumerated
+{
+	orange,
+	red
+} SimpleListEnumeration
+with {
+  variant ([-]) "text 'orange' as capitalized";
+  variant ([-]) "text 'red' as capitalized";
+  variant "list";
+  variant "element";
+};
+
+
+type record of union
+{
+	XSD.Boolean alt_,
+	XSD.Float alt_1
+} SimpleListUnion
+with {
+  variant "list";
+  variant "element";
+  variant ([-]) "useUnion";
+  variant ([-].alt_) "name as ''";
+  //variant ([-].alt_) "text 'true' as '1'";
+  //variant ([-].alt_) "text 'false' as '0'";
+  variant ([-].alt_1) "name as ''";
+};
+
+
+type record of enumerated
+{
+	int_5(-5),
+	int0(0),
+	int5(5),
+	int10(10)
+} SimpleListEnumerationNumber
+with {
+  variant ([-]) "useNumber";
+  variant "list";
+  variant "element";
+};
+
+
+type record ComplexListUnionEnumeration
+{
+	record of enumerated {
+		red,
+		orange
+	} listEnumeration,
+	record of union {
+		XSD.Boolean alt_,
+		XSD.Float alt_1
+	} listUnion
+}
+with {
+  variant "element";
+  variant (listEnumeration) "name as capitalized";
+  variant (listEnumeration) "list";
+  variant (listEnumeration[-]) "text 'orange' as capitalized";
+  variant (listEnumeration[-]) "text 'red' as capitalized";
+  variant (listUnion) "name as capitalized";
+  variant (listUnion[-]) "useUnion";
+  variant (listUnion) "list";
+  variant (listUnion[-].alt_) "name as ''";
+  //variant (listUnion[-].alt_) "text 'true' as '1'";
+  //variant (listUnion[-].alt_) "text 'false' as '0'";
+  variant (listUnion[-].alt_1) "name as ''";
+};
+
+
+type record length(3) of XSD.Float ElementWithList
+with {
+  variant "list";
+  variant "element";
+};
+
+
+type union MyType
+{
+  XSD.Boolean alt_,
+  record of XSD.Integer alt_1,
+  record of XSD.Float alt_2
+}
+with {
+  variant "useUnion";
+  variant "element";
+  variant (alt_) "name as ''";
+  //variant (alt_) "text 'true' as '1'";
+  //variant (alt_) "text 'false' as '0'";
+  variant (alt_1) "list";
+  variant (alt_1) "name as ''";
+  variant (alt_2) "list";
+  variant (alt_2) "name as ''";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/list/simpletype' prefix 'this'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

@@ -1,0 +1,160 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module AnyStuff {
+
+import from Flattener { function all }
+
+modulepar boolean AnyStuff_verbose := false;
+#define verbose AnyStuff_verbose
+#include "../macros.ttcnin"
+
+type component Anything {}
+
+type record AnyElem {
+    universal charstring Html,
+    integer    num
+}
+with {
+    variant (Html) "anyElement"
+}
+
+type record UnivAnyElem {
+    universal charstring Html,
+    integer    num
+}
+with {
+    variant (Html) "anyElement"
+}
+
+type record AnyElemList {
+    record of universal charstring elem_list
+    , integer f1 optional
+    , charstring f2 optional
+}
+with {
+    variant (elem_list) "anyElement" // perhaps this should now be variant (elem_list[-])
+}
+
+DECLARE_XER_ENCODERS(AnyElem, ae);
+DECLARE_EXER_ENCODERS(AnyElem, ae);
+
+DECLARE_XER_ENCODERS(UnivAnyElem, uae);
+DECLARE_EXER_ENCODERS(UnivAnyElem, uae);
+
+DECLARE_XER_ENCODERS(AnyElemList, anyt);
+DECLARE_EXER_ENCODERS(AnyElemList, anyt);
+
+const AnyElem ae1 := {
+    "<html><head><title>Hello</title></head><body>nobody</body></html>",
+    42
+}
+
+const UnivAnyElem uae1 := {
+    "<html><head><title>Hello</title></head><body>nobody</body></html>",
+    42
+}
+
+const AnyElemList aybabtu := {
+    { "<all/>", "<your/>", "<base/>", "<are/>", "<belong to='us'/>" }
+    , omit, omit
+}
+
+const AnyElemList aybabtu_expect := {
+    { "<all/>", "<your/>", "<base/>", "<are/>", "<belong to=\"us\"/>" }
+    , omit, omit
+}
+
+const universal charstring ae1str := 
+"<AnyElem>\n" &
+"\t<html><head><title>Hello</title></head><body>nobody</body></html>\n" &
+"\t<num>42</num>\n" &
+"</AnyElem>\n\n";
+
+const universal charstring ae1strb := // for Basic XER 
+"<AnyElem>\n" &
+"\t<Html>&lt;html&gt;&lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;&lt;body&gt;nobody&lt;/body&gt;&lt;/html&gt;</Html>\n" &
+"\t<num>42</num>\n" &
+"</AnyElem>\n\n";
+
+const universal charstring uae1str := 
+"<UnivAnyElem>\n" &
+"\t<html><head><title>Hello</title></head><body>nobody</body></html>\n" &
+"\t<num>42</num>\n" &
+"</UnivAnyElem>\n\n";
+
+const universal charstring uae1strb := // for Basic XER 
+"<UnivAnyElem>\n" &
+"\t<Html>&lt;html&gt;&lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;&lt;body&gt;nobody&lt;/body&gt;&lt;/html&gt;</Html>\n" &
+"\t<num>42</num>\n" &
+"</UnivAnyElem>\n\n";
+
+const universal charstring aybabtustr :=
+"<AnyElemList>\n" &
+"\t<all/>\n" &
+"\t<your/>\n" &
+"\t<base/>\n" &
+"\t<are/>\n" &
+"\t<belong to='us'/>\n" &
+"</AnyElemList>\n\n";
+
+const universal charstring aybabtustr_b :=
+"<AnyElemList>\n" &
+"\t<elem_list>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;all/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;your/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;base/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;are/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t\t<UNIVERSAL_CHARSTRING>&lt;belong to=&apos;us&apos;/&gt;</UNIVERSAL_CHARSTRING>\n" &
+"\t</elem_list>\n" &
+"</AnyElemList>\n\n";
+
+
+testcase enc_anyelement() runs on Anything
+{
+    CHECK_METHOD(bxer_enc_ae, ae1, ae1strb);
+    CHECK_METHOD(exer_enc_ae, ae1, ae1str);
+
+    CHECK_METHOD(bxer_enc_uae, uae1, uae1strb);
+    CHECK_METHOD(exer_enc_uae, uae1, uae1str);
+    
+    CHECK_METHOD(bxer_enc_anyt, aybabtu, aybabtustr_b);
+    CHECK_METHOD(exer_enc_anyt, aybabtu, aybabtustr);
+}
+
+testcase dec_anyelement() runs on Anything
+{
+    CHECK_DECODE(bxer_dec_ae, ae1strb, AnyElem, ae1);
+    CHECK_DECODE(exer_dec_ae, ae1str , AnyElem, ae1);
+    CHECK_DECODE(exer_dec_ae, flatten(ae1str), AnyElem, ae1);
+
+    CHECK_DECODE(bxer_dec_uae, uae1strb, UnivAnyElem, uae1);
+    CHECK_DECODE(exer_dec_uae, uae1str , UnivAnyElem, uae1);
+    CHECK_DECODE(exer_dec_uae, flatten(uae1str), UnivAnyElem, uae1);
+
+	var AnyElemList expected := aybabtu;
+    CHECK_DECODE(bxer_dec_anyt, aybabtustr_b, AnyElemList, expected);
+    //No, it should NOT do this: expected.elem_list := {}
+    //This is not an EMBED-VALUES!
+    expected := aybabtu_expect;
+    CHECK_DECODE(exer_dec_anyt, aybabtustr, AnyElemList, expected);
+    CHECK_DECODE(exer_dec_anyt, flatten(aybabtustr), AnyElemList, expected);
+}
+
+control
+{
+    execute(enc_anyelement());
+    execute(dec_anyelement());
+}
+
+}
+with { encode "XML" }

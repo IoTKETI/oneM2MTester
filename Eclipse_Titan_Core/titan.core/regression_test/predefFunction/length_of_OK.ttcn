@@ -1,0 +1,367 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module length_of_OK {
+
+type component PDTestComponent {};
+
+/*--- LENGTH OF BITSTRING --------------------------------------------------*/
+
+const bitstring lofb := '1110001100'B
+const bitstring lofb1 := ''B
+
+modulepar integer lofbi := lengthof(lofb & lofb)
+modulepar integer lofbi1 := lengthof(substr(lofb,0,lengthof(lofb)))
+modulepar integer lofbi2 := lengthof(substr(lofb,0,lengthof(lofb)/2))
+modulepar integer lofbi3 := lengthof(lofb & lofb1)
+modulepar integer lofbi4 := lengthof(lofb1 & lofb1)
+modulepar integer lofbi5 := lengthof(substr(lofb1,0,lengthof(lofb1)))
+
+testcase lengthof_bitstr() runs on PDTestComponent{
+
+	if ((lofbi == 2*lengthof(lofb))
+	and (lofbi == lengthof(lofb & lofb)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofbi1 == lengthof(lofb))
+	and (lofbi1 == lengthof(substr(lofb,0,lengthof(lofb)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofbi2 == 5)
+	and (lofbi2 == lengthof(substr(lofb,0,lengthof(lofb)/2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofbi3 == 10)
+	and (lofbi3 == lengthof(lofb & lofb1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofbi4 == 0)
+	and (lofbi4 == lengthof(lofb1 & lofb1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofbi5 == 0)
+	and (lofbi5 == lengthof(substr(lofb1,0,lengthof(lofb1)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j;
+	var bitstring bb,b := ''B;
+
+	for (j:=0; j<lengthof(lofb); j:=j+1) {
+		b := b & lofb
+		if (lengthof(b) == (j+1)*lengthof(lofb))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	for (j:=lengthof(b); j>=0; j:=j-1) {
+		bb := substr(b,0,j)
+		if (lengthof(bb) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	b := ''B
+	for (j:=1; j<4096; j:=j+1) {
+		b := b & int2bit(j,12)
+		if (lengthof(b) == j*12)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+		bb :=int2bit(j,j)
+		if (lengthof(bb) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+/*--- LENGTH OF HEXSTRING --------------------------------------------------*/
+
+const hexstring lofh := '1110001100'H
+const hexstring lofh1 := ''H
+
+modulepar integer lofhi := lengthof(lofh & lofh)
+modulepar integer lofhi1 := lengthof(substr(lofh,0,lengthof(lofh)))
+modulepar integer lofhi2 := lengthof(substr(lofh,0,lengthof(lofh)/2))
+modulepar integer lofhi3 := lengthof(lofh & lofh1)
+modulepar integer lofhi4 := lengthof(lofh1 & lofh1)
+modulepar integer lofhi5 := lengthof(substr(lofh1,0,lengthof(lofh1)))
+
+testcase lengthof_hexstr() runs on PDTestComponent{
+
+	if ((lofhi == 2*lengthof(lofh))
+	and (lofhi == lengthof(lofh & lofh)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofhi1 == lengthof(lofh))
+	and (lofhi1 == lengthof(substr(lofh,0,lengthof(lofh)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofhi2 == 5)
+	and (lofhi2 == lengthof(substr(lofh,0,lengthof(lofh)/2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofhi3 == 10)
+	and (lofhi3 == lengthof(lofh & lofh1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofhi4 == 0)
+	and (lofhi4 == lengthof(lofh1 & lofh1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofhi5 == 0)
+	and (lofhi5 == lengthof(substr(lofh1,0,lengthof(lofh1)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j;
+	var hexstring hh,h := ''H;
+
+	for (j:=0; j<lengthof(lofh); j:=j+1) {
+		h := h & lofh
+		if (lengthof(h) == (j+1)*lengthof(lofh))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	for (j:=lengthof(h); j>=0; j:=j-1) {
+		hh := substr(h,0,j)
+		if (lengthof(hh) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	h := ''H
+	for (j:=1; j<4096; j:=j+1) {
+		h := h & int2hex(j,12)
+		if (lengthof(h) == j*12)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+		hh :=int2hex(j,j)
+		if (lengthof(hh) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+/*--- LENGTH OF OCTETSTRING --------------------------------------------------*/
+
+const octetstring lofo := '11111100000011110000'O
+const octetstring lofo1 := ''O
+
+modulepar integer lofoi := lengthof(lofo & lofo)
+modulepar integer lofoi1 := lengthof(substr(lofo,0,lengthof(lofo)))
+modulepar integer lofoi2 := lengthof(substr(lofo,0,lengthof(lofo)/2))
+modulepar integer lofoi3 := lengthof(lofo & lofo1)
+modulepar integer lofoi4 := lengthof(lofo1 & lofo1)
+modulepar integer lofoi5 := lengthof(substr(lofo1,0,lengthof(lofo1)))
+
+testcase lengthof_octetstr() runs on PDTestComponent{
+
+	if ((lofoi == 2*lengthof(lofo))
+	and (lofoi == lengthof(lofo & lofo)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofoi1 == lengthof(lofo))
+	and (lofoi1 == lengthof(substr(lofo,0,lengthof(lofo)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofoi2 == 5)
+	and (lofoi2 == lengthof(substr(lofo,0,lengthof(lofo)/2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofoi3 == 10)
+	and (lofoi3 == lengthof(lofo & lofo1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofoi4 == 0)
+	and (lofoi4 == lengthof(lofo1 & lofo1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofoi5 == 0)
+	and (lofoi5 == lengthof(substr(lofo1,0,lengthof(lofo1)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j;
+	var octetstring oo,o := ''O;
+
+	for (j:=0; j<lengthof(lofo); j:=j+1) {
+		o := o & lofo
+		if (lengthof(o) == (j+1)*lengthof(lofo))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	for (j:=lengthof(o); j>=0; j:=j-1) {
+		oo := substr(o,0,j)
+		if (lengthof(oo) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	o := ''O
+	for (j:=1; j<4096; j:=j+1) {
+		o := o & int2oct(j,12)
+		if (lengthof(o) == j*12)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+		oo :=int2oct(j,j)
+		if (lengthof(oo) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+
+/*--- LENGTH OF CHARSTRING --------------------------------------------------*/
+
+const charstring lofc := "1110001100"
+const charstring lofc1 := ""
+
+modulepar integer lofci := lengthof(lofc & lofc)
+modulepar integer lofci1 := lengthof(substr(lofc,0,lengthof(lofc)))
+modulepar integer lofci2 := lengthof(substr(lofc,0,lengthof(lofc)/2))
+modulepar integer lofci3 := lengthof(lofc & lofc1)
+modulepar integer lofci4 := lengthof(lofc1 & lofc1)
+modulepar integer lofci5 := lengthof(substr(lofc1,0,lengthof(lofc1)))
+
+testcase lengthof_charstr() runs on PDTestComponent{
+
+	if ((lofci == 2*lengthof(lofc))
+	and (lofci == lengthof(lofc & lofc)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofci1 == lengthof(lofc))
+	and (lofci1 == lengthof(substr(lofc,0,lengthof(lofc)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofci2 == 5)
+	and (lofci2 == lengthof(substr(lofc,0,lengthof(lofc)/2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofci3 == 10)
+	and (lofci3 == lengthof(lofc & lofc1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofci4 == 0)
+	and (lofci4 == lengthof(lofc1 & lofc1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofci5 == 0)
+	and (lofci5 == lengthof(substr(lofc1,0,lengthof(lofc1)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j;
+	var charstring cc,c := "";
+
+	for (j:=0; j<lengthof(lofc); j:=j+1) {
+		c := c & lofc
+		if (lengthof(c) == (j+1)*lengthof(lofc))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	for (j:=lengthof(c); j>=0; j:=j-1) {
+		cc := substr(c,0,j)
+		if (lengthof(cc) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	c := ""
+	for (j:=1; j<128; j:=j+1) {
+		c := c & int2char(j)
+		if (lengthof(c) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+}
+
+
+/*--- LENGTH OF UNIVERSAL CHARSTRING --------------------------------------------------*/
+
+const universal charstring lofuc := "1111" & char(0,0,0,65) & "0000" & char(0,0,0,66)
+const universal charstring lofuc1 := ""
+
+modulepar integer lofuci := lengthof(lofuc & lofuc)
+modulepar integer lofuci1 := lengthof(substr(lofuc,0,lengthof(lofuc)))
+modulepar integer lofuci2 := lengthof(substr(lofuc,0,lengthof(lofuc)/2))
+modulepar integer lofuci3 := lengthof(lofuc & lofuc1)
+modulepar integer lofuci4 := lengthof(lofuc1 & lofuc1)
+modulepar integer lofuci5 := lengthof(substr(lofuc1,0,lengthof(lofuc1)))
+
+testcase lengthof_ucharstr() runs on PDTestComponent{
+
+	if ((lofuci == 2*lengthof(lofuc))
+	and (lofuci == lengthof(lofuc & lofuc)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofuci1 == lengthof(lofuc))
+	and (lofuci1 == lengthof(substr(lofuc,0,lengthof(lofuc)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofuci2 == 5)
+	and (lofuci2 == lengthof(substr(lofuc,0,lengthof(lofuc)/2))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofuci3 == 10)
+	and (lofuci3 == lengthof(lofuc & lofuc1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofuci4 == 0)
+	and (lofuci4 == lengthof(lofuc1 & lofuc1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((lofuci5 == 0)
+	and (lofuci5 == lengthof(substr(lofuc1,0,lengthof(lofuc1)))))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+	var integer j;
+	var universal charstring c,cc := "";
+
+	c := ""
+	for (j:=0; j<lengthof(lofuc); j:=j+1) {
+		c := c & lofuc
+		if (lengthof(c) == (j+1)*lengthof(lofc))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	for (j:=lengthof(c); j>=0; j:=j-1) {
+		cc := substr(c,0,j)
+		if (lengthof(cc) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+	c := ""
+	for (j:=1; j<128; j:=j+1) {
+		c := c & int2char(j)
+
+      	if (lengthof(c) == j)
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	}
+
+}
+
+control {
+	execute (lengthof_bitstr());
+	execute (lengthof_hexstr());
+	execute (lengthof_octetstr());
+	execute (lengthof_charstr());
+	execute (lengthof_ucharstr());
+}
+
+}

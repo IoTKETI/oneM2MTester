@@ -1,0 +1,50 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:20.2, Ensure that alt statements are correctly handled for dynamically mapped ports
+ ** @verdict  pass accept, ttcn3verdict:pass
+ ***************************************************/
+
+// Mycompport A is dynamically mapped
+module Sem_2002_TheAltStatement_013{ 
+
+    type port Sem_2002_013_loopbackPort message {
+	  	inout integer
+	}
+	
+	type component GeneralComp
+	{
+		port Sem_2002_013_loopbackPort MycomportA
+	}
+
+	type component MyTestSystemInterface
+	{
+	 	port Sem_2002_013_loopbackPort messagePort
+	}
+	
+	// MyTestSystemInterface is the test system interface
+	testcase TC_Sem_2002_TheAltStatement_013() runs on GeneralComp system MyTestSystemInterface {
+	 	timer tc_timer := 0.1;
+	 	
+		map(mtc:MycomportA, system:messagePort);
+
+	 	MycomportA.send(2);
+	 	tc_timer.start;
+
+	 	unmap(mtc:MycomportA, system:messagePort);
+
+		alt {
+		 	[] tc_timer.timeout {
+		    	MycomportA.clear;
+		    	setverdict(pass);
+		 	}
+		}
+	}
+
+	control{
+		execute(TC_Sem_2002_TheAltStatement_013());
+	}
+}

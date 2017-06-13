@@ -1,0 +1,289 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module all_from_subrefs {
+
+// in these tests the targets of 'all from' contain subreferences (array indexes and/or fields names)
+
+import from types all;
+
+// source templates and constants
+template MyRecord t_rec := { i := omit, roi := { 1, 3, 5 }, soi := { 2, 4, 6 } };
+template RoRoI t_roroi := { { 1, 2, 3 }, { 4, 5 }, { 6, 7, 8 } };
+template RoSoI t_rosoi(in integer x) := { { 10, 20, 30 }, { x, x * 2 } };
+const RoMyRec c_rorec := { { i := omit, roi := { -1, -3, -5 }, soi := { -2, -4, -6 } }, { i := 0, roi := omit, soi := { -10, -20, -30 } } };
+const RoMyUnion c_rouni := { { roi := { 11, 22, 33 } }, { soi := { -11, -22, -33 } } };
+const MyUnion c_uni := { roi := { 7, 77, 777 } };
+
+// just 'all from'
+template integer t_sr1 := ( 0, all from t_rec.soi, 8, 10 );
+template integer t_sr1_exp := ( 0, 2, 4, 6, 8, 10 );
+
+template integer t_sr2 := ( all from t_rec.roi, all from t_roroi[2] );
+template integer t_sr2_exp := ( 1, 3, 5, 6, 7, 8 );
+
+template integer t_sr3 := ( all from t_rosoi(100)[0], all from c_rorec[1].soi );
+template integer t_sr3_exp := ( 10, 20, 30, -10, -20, -30 );
+
+template integer t_sr4 := ( 0, all from c_rouni[0].roi, 44 );
+template integer t_sr4_exp := ( 0, 11, 22, 33, 44 );
+
+template integer t_sr5 := ( all from c_uni.roi );
+template integer t_sr5_exp := ( 7, 77, 777 );
+
+testcase tc_all_from_subrefs() runs on A
+{
+  if (log2str(t_sr1) != log2str(t_sr1_exp)) {
+    setverdict(fail, "Expected: ", t_sr1_exp, ", got: ", t_sr1);
+  }
+  if (log2str(t_sr2) != log2str(t_sr2_exp)) {
+    setverdict(fail, "Expected: ", t_sr2_exp, ", got: ", t_sr2);
+  }
+  if (log2str(t_sr3) != log2str(t_sr3_exp)) {
+    setverdict(fail, "Expected: ", t_sr3_exp, ", got: ", t_sr3);
+  }
+  if (log2str(t_sr4) != log2str(t_sr4_exp)) {
+    setverdict(fail, "Expected: ", t_sr4_exp, ", got: ", t_sr4);
+  }
+  if (log2str(t_sr5) != log2str(t_sr5_exp)) {
+    setverdict(fail, "Expected: ", t_sr5_exp, ", got: ", t_sr5);
+  }
+  setverdict(pass);
+}
+
+// permutation + all from
+template RoI t_sr_perm1 := { permutation ( all from t_rec.roi ) };
+template RoI t_sr_perm1_exp := { permutation ( 1, 3, 5 ) };
+
+template RoI t_sr_perm2 := { permutation ( 3, all from t_roroi[1], all from t_roroi[2] ) };
+template RoI t_sr_perm2_exp := { permutation ( 3, 4, 5, 6, 7, 8 ) };
+
+template RoI t_sr_perm3 := { permutation ( all from c_rorec[0].roi, all from c_rorec[0].soi ) };
+template RoI t_sr_perm3_exp := { permutation ( -1, -3, -5, -2, -4, -6 ) };
+
+testcase tc_all_from_subrefs_permutation() runs on A
+{
+  if (log2str(t_sr_perm1) != log2str(t_sr_perm1_exp)) {
+    setverdict(fail, "Expected: ", t_sr_perm1_exp, ", got: ", t_sr_perm1);
+  }
+  if (log2str(t_sr_perm2) != log2str(t_sr_perm2_exp)) {
+    setverdict(fail, "Expected: ", t_sr_perm2_exp, ", got: ", t_sr_perm2);
+  }
+  if (log2str(t_sr_perm3) != log2str(t_sr_perm3_exp)) {
+    setverdict(fail, "Expected: ", t_sr_perm3_exp, ", got: ", t_sr_perm3);
+  }
+  setverdict(pass);
+}
+
+// subset + all from
+template SoI t_sr_sub1 := subset ( all from c_rouni[1].soi );
+template SoI t_sr_sub1_exp := subset ( -11, -22, -33 );
+
+template SoI t_sr_sub2 := subset ( all from t_rec.soi, 2, all from t_roroi[0] );
+template SoI t_sr_sub2_exp := subset ( 2, 4, 6, 2, 1, 2, 3 );
+
+template SoI t_sr_sub3 := subset ( all from t_rosoi(100)[1], all from c_rorec[0].roi, all from c_rorec[0].roi );
+template SoI t_sr_sub3_exp := subset ( 100, 200, -1, -3, -5, -1, -3, -5 );
+
+testcase tc_all_from_subrefs_subset() runs on A
+{
+  if (log2str(t_sr_sub1) != log2str(t_sr_sub1_exp)) {
+    setverdict(fail, "Expected: ", t_sr_sub1_exp, ", got: ", t_sr_sub1);
+  }
+  if (log2str(t_sr_sub2) != log2str(t_sr_sub2_exp)) {
+    setverdict(fail, "Expected: ", t_sr_sub2_exp, ", got: ", t_sr_sub2);
+  }
+  if (log2str(t_sr_sub3) != log2str(t_sr_sub3_exp)) {
+    setverdict(fail, "Expected: ", t_sr_sub3_exp, ", got: ", t_sr_sub3);
+  }
+  setverdict(pass);
+}
+
+// superset + all from
+template SoI t_sr_super1 := superset ( all from c_rouni[0].roi );
+template SoI t_sr_super1_exp := superset ( 11, 22, 33 );
+
+template SoI t_sr_super2 := superset ( all from t_rec.roi, 2, all from t_roroi[1] );
+template SoI t_sr_super2_exp := superset ( 1, 3, 5, 2, 4, 5 );
+
+template SoI t_sr_super3 := superset ( all from t_rosoi(100)[0], all from c_rorec[1].soi, all from c_rorec[1].soi );
+template SoI t_sr_super3_exp := superset ( 10, 20, 30, -10, -20, -30, -10, -20, -30 );
+
+testcase tc_all_from_subrefs_superset() runs on A
+{
+  if (log2str(t_sr_super1) != log2str(t_sr_super1_exp)) {
+    setverdict(fail, "Expected: ", t_sr_super1_exp, ", got: ", t_sr_super1);
+  }
+  if (log2str(t_sr_super2) != log2str(t_sr_super2_exp)) {
+    setverdict(fail, "Expected: ", t_sr_super2_exp, ", got: ", t_sr_super2);
+  }
+  if (log2str(t_sr_super3) != log2str(t_sr_super3_exp)) {
+    setverdict(fail, "Expected: ", t_sr_super3_exp, ", got: ", t_sr_super3);
+  }
+  setverdict(pass);
+}
+
+// all from + variables / template variables
+testcase tc_all_from_subrefs_var() runs on A
+{
+  // source variables
+  var MyRecord v_rec := { i := omit, roi := { 2, 1, 0 }, soi := { 7, 1, 5 } };
+  var RoSoI v_rosoi := { { 2, 4, 8, 16 } };
+  var template RoMyUnion vt_rouni := { { soi := { 1, 1, 1 } }, { soi := { -1, -3, -5 } } };
+  var template RoRoI vt_roroi := { { 10, 11 }, { 20, 26, 29 }, { 31, 33 } };
+  
+  // templates with 'all from'
+  var template integer vt_sr := ( 0, all from v_rec.soi, all from vt_roroi[1] );
+  var template integer vt_sr_exp := ( 0, 7, 1, 5, 20, 26, 29 );
+  var template RoI vt_sr_perm := { permutation ( 3, all from v_rec.roi, all from vt_rouni[1].soi ) };
+  var template RoI vt_sr_perm_exp := { permutation ( 3, 2, 1, 0, -1, -3, -5 ) };
+  var template SoI vt_sr_sub := subset ( all from v_rosoi[0], 6, all from vt_roroi[0] );
+  var template SoI vt_sr_sub_exp := subset ( 2, 4, 8, 16, 6, 10, 11 );
+  var template SoI vt_sr_super := superset ( all from vt_rouni[0].soi, all from vt_rouni[0].soi );
+  var template SoI vt_sr_super_exp := superset ( 1, 1, 1, 1, 1, 1 );
+  
+  // test templates with 'all from' against the expected templates
+  if (log2str(vt_sr) != log2str(vt_sr_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_exp, ", got: ", vt_sr);
+  }
+  if (log2str(vt_sr_perm) != log2str(vt_sr_perm_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_perm_exp, ", got: ", vt_sr_perm);
+  }
+  if (log2str(vt_sr_sub) != log2str(vt_sr_sub_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_sub_exp, ", got: ", vt_sr_sub);
+  }
+  if (log2str(vt_sr_super) != log2str(vt_sr_super_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_super_exp, ", got: ", vt_sr_super);
+  }
+  setverdict(pass);
+}
+
+// all from + module parameters
+modulepar MyRecord mp_rec := { i := omit, roi := { 2, 1, 0 }, soi := { 7, 1, 5 } };
+modulepar RoSoI mp_rosoi := { { 2, 4, 8, 16 } };
+modulepar template RoMyUnion mpt_rouni := { { soi := { 1, 1, 1 } }, { soi := { -1, -3, -5 } } };
+modulepar template RoRoI mpt_roroi := { { 10, 11 }, { 20, 26, 29 }, { 31, 33 } };
+
+testcase tc_all_from_subrefs_modulepar() runs on A
+{
+  // templates with 'all from'
+  var template integer vt_sr := ( 0, all from mp_rec.soi, all from mpt_roroi[1] );
+  var template integer vt_sr_exp := ( 0, 7, 1, 5, 20, 26, 29 );
+  var template RoI vt_sr_perm := { permutation ( 3, all from mp_rec.roi, all from mpt_rouni[1].soi ) };
+  var template RoI vt_sr_perm_exp := { permutation ( 3, 2, 1, 0, -1, -3, -5 ) };
+  var template SoI vt_sr_sub := subset ( all from mp_rosoi[0], 6, all from mpt_roroi[0] );
+  var template SoI vt_sr_sub_exp := subset ( 2, 4, 8, 16, 6, 10, 11 );
+  var template SoI vt_sr_super := superset ( all from mpt_rouni[0].soi, all from mpt_rouni[0].soi );
+  var template SoI vt_sr_super_exp := superset ( 1, 1, 1, 1, 1, 1 );
+
+  // test templates with 'all from' against the expected templates
+  if (log2str(vt_sr) != log2str(vt_sr_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_exp, ", got: ", vt_sr);
+  }
+  if (log2str(vt_sr_perm) != log2str(vt_sr_perm_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_perm_exp, ", got: ", vt_sr_perm);
+  }
+  if (log2str(vt_sr_sub) != log2str(vt_sr_sub_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_sub_exp, ", got: ", vt_sr_sub);
+  }
+  if (log2str(vt_sr_super) != log2str(vt_sr_super_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_super_exp, ", got: ", vt_sr_super);
+  }
+  setverdict(pass);
+}
+
+// all from + function parameters
+function f_test_all_from_param(RoMyRec p_rorec, in RoMyUnion p_rouni, inout MyUnion p_uni,
+  template RoSoI pt_rosoi, in template RoRoI pt_roroi, inout template MyRecord pt_rec)
+{
+  // templates with 'all from'
+  var template integer vt_sr := ( all from p_rorec[0].roi, 0, all from pt_rec.roi );
+  var template integer vt_sr_exp := ( -1, -3, -5, 0, 1, 3, 5 );
+  var template RoI vt_sr_perm := { permutation ( all from pt_rosoi[0], all from p_rouni[0].roi ) };
+  var template RoI vt_sr_perm_exp := { permutation ( 10, 20, 30, 11, 22, 33 ) };
+  var template SoI vt_sr_sub := subset ( all from p_uni.roi, all from p_uni.roi );
+  var template SoI vt_sr_sub_exp := subset ( 7, 77, 777, 7, 77, 777 );
+  var template SoI vt_sr_super := superset ( 0, all from pt_roroi[0], all from pt_roroi[1] );
+  var template SoI vt_sr_super_exp := superset ( 0, 1, 2, 3, 4, 5 );
+
+  // test templates with 'all from' against the expected templates
+  if (log2str(vt_sr) != log2str(vt_sr_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_exp, ", got: ", vt_sr);
+  }
+  if (log2str(vt_sr_perm) != log2str(vt_sr_perm_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_perm_exp, ", got: ", vt_sr_perm);
+  }
+  if (log2str(vt_sr_sub) != log2str(vt_sr_sub_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_sub_exp, ", got: ", vt_sr_sub);
+  }
+  if (log2str(vt_sr_super) != log2str(vt_sr_super_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_super_exp, ", got: ", vt_sr_super);
+  }
+  setverdict(pass);
+}
+
+testcase tc_all_from_subrefs_param() runs on A
+{
+  var MyUnion v_uni := c_uni;
+  var template MyRecord vt_rec := t_rec;
+  f_test_all_from_param(c_rorec, c_rouni, v_uni, t_rosoi(100), t_roroi, vt_rec);
+}
+
+// all from + function calls
+function f_rorec() return RoMyRec { return c_rorec; }
+function f_rouni() return RoMyUnion { return c_rouni; }
+function f_uni() return MyUnion { return c_uni; }
+function f_rosoi(in integer x) return template RoSoI { return t_rosoi(x); }
+function f_roroi() return template RoRoI { return t_roroi; }
+function f_rec() return template MyRecord { return t_rec; }
+
+testcase tc_all_from_subrefs_function() runs on A
+{
+  // templates with 'all from'
+  var template integer vt_sr := ( all from f_rorec()[0].roi, 0, all from f_rec().roi );
+  var template integer vt_sr_exp := ( -1, -3, -5, 0, 1, 3, 5 );
+  var template RoI vt_sr_perm := { permutation ( all from f_rosoi(100)[0], all from f_rouni()[0].roi ) };
+  var template RoI vt_sr_perm_exp := { permutation ( 10, 20, 30, 11, 22, 33 ) };
+  var template SoI vt_sr_sub := subset ( all from f_uni().roi, all from f_uni().roi );
+  var template SoI vt_sr_sub_exp := subset ( 7, 77, 777, 7, 77, 777 );
+  var template SoI vt_sr_super := superset ( 0, all from f_roroi()[0], all from f_roroi()[1] );
+  var template SoI vt_sr_super_exp := superset ( 0, 1, 2, 3, 4, 5 );
+
+  // test templates with 'all from' against the expected templates
+  if (log2str(vt_sr) != log2str(vt_sr_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_exp, ", got: ", vt_sr);
+  }
+  if (log2str(vt_sr_perm) != log2str(vt_sr_perm_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_perm_exp, ", got: ", vt_sr_perm);
+  }
+  if (log2str(vt_sr_sub) != log2str(vt_sr_sub_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_sub_exp, ", got: ", vt_sr_sub);
+  }
+  if (log2str(vt_sr_super) != log2str(vt_sr_super_exp)) {
+    setverdict(fail, "Expected: ", vt_sr_super_exp, ", got: ", vt_sr_super);
+  }
+  setverdict(pass);
+}
+
+control {
+  execute(tc_all_from_subrefs());
+  execute(tc_all_from_subrefs_permutation());
+  execute(tc_all_from_subrefs_subset());
+  execute(tc_all_from_subrefs_superset());
+  execute(tc_all_from_subrefs_var());
+  execute(tc_all_from_subrefs_modulepar());
+  execute(tc_all_from_subrefs_param());
+  execute(tc_all_from_subrefs_function());
+}
+
+}

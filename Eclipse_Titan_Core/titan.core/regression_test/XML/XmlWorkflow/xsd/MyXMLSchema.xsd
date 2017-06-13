@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.example.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:a="http://www.example.org/2001/XMLSchema"> 
+
+
+
+<xs:group name="attrDecls">
+	<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="attribute" type="xs:string"/>
+			<xs:element name="attributeGroup" type="xs:string"/>
+		</xs:choice>
+	</xs:sequence>
+</xs:group>
+
+
+
+<xs:complexType name="openAttrs">
+	<xs:complexContent>
+		<xs:restriction base="xs:anyType">
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
+		</xs:restriction>
+	</xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="annotated">
+	<xs:complexContent>
+		<xs:extension base="a:openAttrs">
+			<xs:sequence>
+				 <xs:element type="xs:string" name="asd" minOccurs="0"/>
+			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+
+<xs:group name="typeDefParticle">
+	<xs:choice>
+		<xs:element name="group" type="xs:string"/>
+	</xs:choice>
+</xs:group>
+ 
+
+<xs:complexType name="restrictionType">
+	<xs:complexContent>
+		<xs:extension base="a:annotated">
+			<xs:sequence>
+				<xs:choice minOccurs="0">
+					<xs:group ref="a:typeDefParticle"/>
+				</xs:choice>
+				<xs:group ref="a:attrDecls"/>
+			</xs:sequence>
+		</xs:extension>
+	</xs:complexContent>       
+</xs:complexType>
+
+
+<xs:complexType name="complexRestrictionType">
+	<xs:complexContent>
+		<xs:restriction base="a:restrictionType">
+			<xs:sequence>
+				<xs:choice minOccurs="1">
+					<xs:group ref="a:typeDefParticle"/>
+				</xs:choice>
+				<xs:group ref="a:attrDecls"/>
+			</xs:sequence>
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
+		</xs:restriction>
+	</xs:complexContent>       
+</xs:complexType>
+
+
+</xs:schema>

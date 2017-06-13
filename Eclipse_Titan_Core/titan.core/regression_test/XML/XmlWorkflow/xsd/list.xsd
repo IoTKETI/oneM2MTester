@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<schema  xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:ns="www.example.org/list"
+targetNamespace="www.example.org/list">
+
+<!-- helper union types -->
+<xsd:simpleType name="myUnionAttr">
+	<xsd:union memberTypes="xsd:integer xsd:boolean"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="myUnionChildren">
+	<xsd:union>
+		<xsd:simpleType>
+			<xsd:restriction base="string"/>
+		</xsd:simpleType>
+		<xsd:simpleType>
+			<xsd:restriction base="float"/>
+		</xsd:simpleType>
+	</xsd:union>
+</xsd:simpleType>
+
+
+
+<!-- list defined by itemType attribute -->
+<xsd:simpleType name="listByAttribute">
+	<xsd:list itemType="xsd:integer"/>
+</xsd:simpleType>
+
+
+<!-- list defined by atomic child element -->
+<xsd:simpleType name="listByAtomicChild">
+	<xsd:list>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:float"/>
+		</xsd:simpleType>
+	</xsd:list>
+</xsd:simpleType>
+
+<!-- list defined by unnamed union child element -->
+<xsd:simpleType name="listByUnionAttribChild">
+	<xsd:list>
+		<xsd:simpleType>
+			<xsd:union memberTypes="xsd:integer xsd:boolean"/>
+		</xsd:simpleType>
+	</xsd:list>
+</xsd:simpleType>
+
+<!-- list defined by named union child element -->
+<xsd:simpleType name="listByUnionElemChild">
+	<xsd:list>
+		<xsd:simpleType>
+			<xsd:union>
+				<xsd:simpleType>
+					<xsd:restriction base="string"/>
+				</xsd:simpleType>
+				<xsd:simpleType>
+					<xsd:restriction base="float"/>
+				</xsd:simpleType>
+			</xsd:union>
+		</xsd:simpleType>
+	</xsd:list>
+</xsd:simpleType>
+
+<!-- lists defined by refernced unnamed union child element -->
+<xsd:simpleType name="listByAttributeRef1">
+	<xsd:list itemType="ns:myUnionAttr"/>
+</xsd:simpleType>
+
+<xsd:simpleType name="listByAttributeRef2">
+	<xsd:list itemType="ns:myUnionChildren"/>
+</xsd:simpleType>
+
+</schema>

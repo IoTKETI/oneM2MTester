@@ -1,0 +1,353 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+// This module contains tests for concatenating octetstring templates
+module TemplateConcatOct {
+
+import from Types all;
+
+const octetstring c_oct := 'ABCD'O;
+
+template octetstring t_oct := ? length(2..2);
+
+template octetstring t_oct1 := 'ABCD'O & ? length (2) & 'EF'O;
+template octetstring t_oct1_exp := 'ABCD??EF'O;
+
+template octetstring t_oct2 := 'ABCD'O & 'EF'O & ? & ? length(1) & 'EF'O;
+template octetstring t_oct2_exp := 'ABCDEF*?EF'O;
+
+template octetstring t_oct3 := ('ABCD'O & ? length(2..2)) length(4);
+template octetstring t_oct3_exp := 'ABCD??'O length(4);
+
+template octetstring t_oct4 := c_oct & ? length (2) & 'EF'O;
+template octetstring t_oct4_exp := 'ABCD??EF'O;
+
+template octetstring t_oct5 := ('ABCD'O & t_oct) length(4);
+template octetstring t_oct5_exp := 'ABCD??'O length(4);
+
+template octetstring t_oct6 := 'ABCD'O & ?;
+template octetstring t_oct6_exp := 'ABCD*'O;
+
+template octetstring t_oct7 := ? & 'EF'O;
+template octetstring t_oct7_exp := '*EF'O;
+
+template octetstring t_oct8 := 'ABCD'O & ? & 'EF'O;
+template octetstring t_oct8_exp := 'ABCD*EF'O;
+
+template octetstring t_oct9 := ? & ?;
+template octetstring t_oct9_exp := ?;
+
+template octetstring t_oct10 := ? & ? & 'EF'O;
+template octetstring t_oct10_exp := '*EF'O;
+
+template octetstring t_oct11 := 'ABCD'O & 'EF'O & ? & ? & ? length(1) & 'EF'O;
+template octetstring t_oct11_exp := 'ABCDEF*?EF'O;
+
+testcase tc_oct_t_w_literals() runs on CT {
+  if (log2str(t_oct1) != log2str(t_oct1_exp)) {
+    setverdict(fail, "Expected: ", t_oct1_exp, ", got: ", t_oct1);
+  }
+  else if (log2str(t_oct2) != log2str(t_oct2_exp)) {
+    setverdict(fail, "Expected: ", t_oct2_exp, ", got: ", t_oct2);
+  }
+  else if (log2str(t_oct3) != log2str(t_oct3_exp)) {
+    setverdict(fail, "Expected: ", t_oct3_exp, ", got: ", t_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_t_w_refs() runs on CT {
+  if (log2str(t_oct4) != log2str(t_oct4_exp)) {
+    setverdict(fail, "Expected: ", t_oct4_exp, ", got: ", t_oct4);
+  }
+  else if (log2str(t_oct5) != log2str(t_oct5_exp)) {
+    setverdict(fail, "Expected: ", t_oct5_exp, ", got: ", t_oct5);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_t_w_any_value() runs on CT {
+  if (log2str(t_oct6) != log2str(t_oct6_exp)) {
+    setverdict(fail, "Expected: ", t_oct6_exp, ", got: ", t_oct6);
+  }
+  else if (log2str(t_oct7) != log2str(t_oct7_exp)) {
+    setverdict(fail, "Expected: ", t_oct7_exp, ", got: ", t_oct7);
+  }
+  else if (log2str(t_oct8) != log2str(t_oct8_exp)) {
+    setverdict(fail, "Expected: ", t_oct8_exp, ", got: ", t_oct8);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_t_dbl_any_value() runs on CT {
+  if (log2str(t_oct9) != log2str(t_oct9_exp)) {
+    setverdict(fail, "Expected: ", t_oct9_exp, ", got: ", t_oct9);
+  }
+  else if (log2str(t_oct10) != log2str(t_oct10_exp)) {
+    setverdict(fail, "Expected: ", t_oct10_exp, ", got: ", t_oct10);
+  }
+  else if (log2str(t_oct11) != log2str(t_oct11_exp)) {
+    setverdict(fail, "Expected: ", t_oct11_exp, ", got: ", t_oct11);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_w_literals() runs on CT {
+  var template octetstring vt_oct1 := 'ABCD'O & ? length (2) & 'EF'O;
+  var template octetstring vt_oct1_exp := 'ABCD??EF'O;
+  
+  var template octetstring vt_oct2 := 'ABCD'O & 'EF'O & ? & ? length(1) & 'EF'O;
+  var template octetstring vt_oct2_exp := 'ABCDEF*?EF'O;
+  
+  var template octetstring vt_oct3 := ('ABCD'O & ? length(2..2)) length(4);
+  var template octetstring vt_oct3_exp := 'ABCD??'O length(4);
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_w_refs() runs on CT {
+  var integer v_len := 3;
+  var octetstring v_oct := 'EF'O;
+  var template octetstring vt_oct := ?;
+
+  var template octetstring vt_oct1 := c_oct & ? length (2) & 'EF'O;
+  var template octetstring vt_oct1_exp := 'ABCD??EF'O;
+  
+  var template octetstring vt_oct2 := 'ABCD'O & v_oct & vt_oct & ? length(v_len) & v_oct;
+  var template octetstring vt_oct2_exp := 'ABCDEF*???EF'O;
+  
+  var template octetstring vt_oct3 := ('ABCD'O & t_oct) length(4);
+  var template octetstring vt_oct3_exp := 'ABCD??'O length(4);
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_w_any_value() runs on CT {
+  var template octetstring vt_oct1 := 'ABCD'O & ?;
+  var template octetstring vt_oct1_exp := 'ABCD*'O;
+  
+  var template octetstring vt_oct2 := ? & 'EF'O;
+  var template octetstring vt_oct2_exp := '*EF'O;
+  
+  var template octetstring vt_oct3 := 'ABCD'O & ? & 'EF'O;
+  var template octetstring vt_oct3_exp := 'ABCD*EF'O;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_dbl_any_value() runs on CT {
+  var integer v_len := 3;
+
+  var template octetstring vt_oct1 := ? & ?;
+  var template octetstring vt_oct1_exp := ?;
+  
+  var template octetstring vt_oct2 := ? & ? & 'EF'O;
+  var template octetstring vt_oct2_exp := '*EF'O;
+  
+  var template octetstring vt_oct3 := 'ABCD'O & 'EF'O & ? & ? & ? length(v_len - 1) & 'EF'O;
+  var template octetstring vt_oct3_exp := 'ABCDEF*??EF'O;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_dbl_any_value_w_refs() runs on CT {
+  var template octetstring vt_oct := ?;
+  
+  var template octetstring vt_oct1 := vt_oct & ?;
+  var template octetstring vt_oct1_exp := ?;
+  
+  var template octetstring vt_oct2 := ? & vt_oct;
+  var template octetstring vt_oct2_exp := ?;
+  
+  var template octetstring vt_oct3 := vt_oct & vt_oct;
+  var template octetstring vt_oct3_exp := ?;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "1st test. Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "2nd test. Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "3rd test. Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_w_str_elem() runs on CT {
+  var octetstring v_oct := 'EF'O;
+  var octetstring v_oct2 := 'ABCD'O;
+
+  var template octetstring vt_oct1 := v_oct[0] & ?;
+  var template octetstring vt_oct1_exp := 'EF*'O;
+  
+  var template octetstring vt_oct2 := 'AB'O & ? length(3) & v_oct2[1];
+  var template octetstring vt_oct2_exp := 'AB???CD'O;
+  
+  var template octetstring vt_oct3 := ? & v_oct2[0];
+  var template octetstring vt_oct3_exp := '*AB'O;
+  
+  var template octetstring vt_oct4 := v_oct2[1] & vt_oct1_exp;
+  var template octetstring vt_oct4_exp := 'CDEF*'O;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else if (log2str(vt_oct4) != log2str(vt_oct4_exp)) {
+    setverdict(fail, "Expected: ", vt_oct4_exp, ", got: ", vt_oct4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_w_opt_fields() runs on CT {
+  var Rec v_rec := { '12AB'O, omit, omit, omit, omit, omit, omit };
+
+  var template octetstring vt_oct1 := 'EF'O & ? length(1) & v_rec.os;
+  var template octetstring vt_oct1_exp := 'EF?12AB'O;
+  
+  var template octetstring vt_oct2 := v_rec.os & vt_oct1_exp;
+  var template octetstring vt_oct2_exp := '12ABEF?12AB'O;
+  
+  var template octetstring vt_oct3 := ? & v_rec.os;
+  var template octetstring vt_oct3_exp := '*12AB'O;
+  
+  var template octetstring vt_oct4 := v_rec.os & ?;
+  var template octetstring vt_oct4_exp := '12AB*'O;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else if (log2str(vt_oct4) != log2str(vt_oct4_exp)) {
+    setverdict(fail, "Expected: ", vt_oct4_exp, ", got: ", vt_oct4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+testcase tc_oct_vt_extra() runs on CT {
+  var octetstring v_oct2 := 'ABCD'O;
+  var Rec v_rec := { '12AB'O, omit, omit, omit, omit, omit, omit };
+
+  var template octetstring vt_oct1 := v_rec.os & 'FF'O;
+  var template octetstring vt_oct1_exp := '12ABFF'O;
+  
+  var template octetstring vt_oct2 := 'FF'O & v_rec.os & 'FF'O;
+  var template octetstring vt_oct2_exp := 'FF12ABFF'O;
+  
+  var template octetstring vt_oct3 := v_oct2[1] & v_rec.os;
+  var template octetstring vt_oct3_exp := 'CD12AB'O;
+  
+  var template octetstring vt_oct4 := v_rec.os & v_oct2[1];
+  var template octetstring vt_oct4_exp := '12ABCD'O;
+  
+  if (log2str(vt_oct1) != log2str(vt_oct1_exp)) {
+    setverdict(fail, "Expected: ", vt_oct1_exp, ", got: ", vt_oct1);
+  }
+  else if (log2str(vt_oct2) != log2str(vt_oct2_exp)) {
+    setverdict(fail, "Expected: ", vt_oct2_exp, ", got: ", vt_oct2);
+  }
+  else if (log2str(vt_oct3) != log2str(vt_oct3_exp)) {
+    setverdict(fail, "Expected: ", vt_oct3_exp, ", got: ", vt_oct3);
+  }
+  else if (log2str(vt_oct4) != log2str(vt_oct4_exp)) {
+    setverdict(fail, "Expected: ", vt_oct4_exp, ", got: ", vt_oct4);
+  }
+  else {
+    setverdict(pass);
+  }
+}
+
+control {
+  execute(tc_oct_t_w_literals());
+  execute(tc_oct_t_w_refs());
+  execute(tc_oct_t_w_any_value());
+  execute(tc_oct_t_dbl_any_value());
+  execute(tc_oct_vt_w_literals());
+  execute(tc_oct_vt_w_refs());
+  execute(tc_oct_vt_w_any_value());
+  execute(tc_oct_vt_dbl_any_value());
+  execute(tc_oct_vt_dbl_any_value_w_refs());
+  execute(tc_oct_vt_w_str_elem());
+  execute(tc_oct_vt_w_opt_fields());
+  execute(tc_oct_vt_extra());
+}
+
+}

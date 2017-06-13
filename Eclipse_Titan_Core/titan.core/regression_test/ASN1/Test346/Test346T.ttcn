@@ -1,0 +1,76 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kulcsar, Endre
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module Test346T
+{
+import from Test346A all;
+
+type bitstring MyBitstringType2
+
+// AS A CONSTANT *********************************************
+const MyBitstringType2 myBitstringValue2 := myBitstringValue1
+
+type port MyPort message
+{
+inout MyType
+} with { extension "internal" }
+
+type record MyType
+{
+bitstring field1
+}
+
+template MyType myMessage(bitstring par_Bitstring) :=
+{
+field1 := par_Bitstring
+}
+
+type component MyMainComponent
+    {
+      port MyPort M_PCO;
+    }
+
+type component MyParallelComponent
+    {
+      port MyPort P_PCO;
+    }
+
+function handle_msg_on_ptc() runs on MyParallelComponent
+{
+
+// AS A PARAMETER *********************************************
+P_PCO.receive (myMessage(myBitstringValue1))
+setverdict ( pass );
+}
+
+testcase Test() runs on MyMainComponent
+{
+
+// AS A VARIABLE *********************************************
+var MyBitstringType2 myBitstringValue3 := myBitstringValue1
+
+var MyParallelComponent myparallelcomponent := MyParallelComponent.create;
+connect ( mtc:M_PCO, myparallelcomponent: P_PCO );
+ myparallelcomponent.start(handle_msg_on_ptc());
+
+// AS A PARAMETER *********************************************
+ M_PCO.send(myMessage(myBitstringValue1))
+myparallelcomponent.done;
+}
+
+control
+    {
+    execute (Test())
+    }
+}
+

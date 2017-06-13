@@ -1,0 +1,74 @@
+#!/bin/bash
+
+function changeFile {
+# This will need improvement...
+ sed -i 's/The address of MC.*/The address of MC deletedPart/g' $1
+ sed -i 's/Process id:.[0-9]*/Process id: deletedPart/g' $1
+ sed -i 's/process id:.[0-9]*/process id: deletedPart/g' $1
+ sed -i 's/operations:.[0-9]*/operations: deletedPart/g' $1
+ sed -i 's/context switches:.[0-9]*/context switches: deletedPart/g' $1
+ sed -i 's/time:..[0-9]*\..[0-9]*/time: deletedPart/g' $1
+ sed -i 's/ttcn3-portconn.*/ttcn3-portconn deletedPart/g' $1
+ sed -i 's/ - / /g' $1
+ sed -i 's/Version:..[0-9]*\..[0-9]*\..*\./Version: deletedPart/g' $1
+ sed -i 's/size:..[0-9]*/size: deletedPart/g' $1
+ sed -i 's/I\/O:..[0-9]*/I\/O: deletedPart/g' $1
+}
+
+if [ "$1" = "-h" ]; then
+ echo "Usage diffLogs dir1/ dir2/"
+ echo "In case of no params, . will be used"
+ echo "The aim of this script is to compare ttcn3 log files made with different titan versions."
+ echo "The .diff and .lo2 files are generated into dir1/"
+ exit 1
+fi
+
+if [ "$1" = "" ]; then
+ MYVAL="."
+ echo "Will use . as start"
+else
+ MYVAL=$1
+fi
+
+if [ ! -d "$1" ]; then
+ echo "$1 does not exists"
+ exit 1
+fi
+
+find $MYVAL -maxdepth 1 -type f \( -name "*.log" \) -print0 | while read -d $'\0' file
+do
+    cut -d' ' -f3- $file > "${file%%.???}.lo2"
+    changeFile "${file%%.???}.lo2"
+done
+
+
+if [ "$2" != "" ]; then
+ if [ ! -d "$2" ]; then
+  echo "$2 does not exists"
+  exit 1
+ fi
+ 
+ rm -f $1/*.diff
+ 
+ MYVAL=$2
+ find $MYVAL -maxdepth 1 -type f \( -name "*.log" \) -print0 | while read -d $'\0' file
+ do
+    cut -d' ' -f3- $file > "${file%%.???}.lo2"
+    changeFile "${file%%.???}.lo2"
+    basename=`basename "$file"`
+    
+    diff "${file%%.???}.lo2" $1/${basename%.*}.lo2  >> $1/${basename%.*}.diff
+    
+    if [ -s "$1/${basename%.*}.diff" ]; then
+      echo "File differs.. : " $1${basename%.*}.diff
+      echo "File differs.. : " $1${basename%.*}.diff >> $1/diffLogs.diff
+    fi
+ done 
+ 
+ if [ ! -s $1/diffLogs.diff ]; then
+   echo "Log Files are identical, yuhu!!"
+   exit 0
+ else
+   exit 1
+ fi
+fi

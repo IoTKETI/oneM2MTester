@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/long/extension"
+xmlns:xml="http://www.w3.org/XML/1675/namespace"
+ targetNamespace="www.example.org/long/extension">
+
+<xsd:element name="Top">
+	<xsd:complexType>
+		<xsd:complexContent>
+			<xsd:extension base="this:TopBase1">
+				<xsd:sequence>
+					<xsd:element name="Subelem" minOccurs="0" maxOccurs="unbounded"
+type="string"/>
+				</xsd:sequence>
+				<xsd:attribute name="SubAttrib" type="string" use="required"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:element>
+
+
+<xsd:complexType name="TopBase1">
+	<xsd:complexContent>
+		<xsd:extension base="this:baseElement">
+			<xsd:sequence>
+				<xsd:element name="author" type="xsd:string"/>
+				<xsd:element name="action" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:extension base="this:namedBaseElement">
+								<xsd:sequence>
+									<xsd:element name="parameter" type="string" minOccurs="0" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:extension>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="event" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:extension base="this:response">
+								<xsd:sequence>
+									<xsd:element name="description" type="xsd:string"/>
+								</xsd:sequence>
+								<xsd:attribute name="name" type="xsd:Name" use="required"/>
+							</xsd:extension>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute ref="xsd:string" use="required"/>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+
+<xsd:complexType name="namedBaseElement">
+	<xsd:complexContent>
+		<xsd:extension base="this:baseElement">
+			<xsd:attribute name="name" type="string" use="required"/>
+		</xsd:extension>
+	</xsd:complexContent>
+</xsd:complexType>
+<xsd:complexType name="baseElement">
+	<xsd:sequence>
+		<xsd:element name="label" type="xsd:string"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="response">
+		<xsd:sequence>
+			<xsd:element name="item" type="string" minOccurs="0"/>
+		</xsd:sequence>
+</xsd:complexType>
+
+</xsd:schema>

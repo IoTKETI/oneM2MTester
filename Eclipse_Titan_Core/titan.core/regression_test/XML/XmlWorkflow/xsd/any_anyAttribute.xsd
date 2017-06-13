@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+  Szabo, Bence Janos
+-->
+<schema  xmlns="http://www.w3.org/2001/XMLSchema"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:this="http://www.example.org/ttcn/wildcards"
+targetNamespace="http://www.example.org/ttcn/wildcards">
+
+<group name="Mygroup">
+	<sequence>
+		<any id="MyAny" namespace="##targetNamespace"/>
+	</sequence>
+</group>
+
+<annotation><documentation xml:lang="EN">anyAttribute examples</documentation></annotation>
+
+<xs:complexType name="e45">
+	<xs:anyAttribute namespace="##any"/>
+</xs:complexType>
+
+<xs:complexType name="e45a">
+	<xs:anyAttribute namespace="##other"/>
+</xs:complexType>
+
+
+<xs:complexType name="e45b">
+	<xs:anyAttribute namespace="##targetNamespace"/>
+</xs:complexType>
+
+<xs:complexType name="e45c">
+	<xs:anyAttribute namespace="##local http://www.organization.org/ttcn/attribute"/>
+</xs:complexType>
+
+<xs:complexType name="e45d">
+	<xs:complexContent>
+		<xs:extension base="this:e45c">
+<!--			<xs:element name="attr" type="xs:integer"/> -->
+			<xs:anyAttribute namespace="##targetNamespace"/>
+		</xs:extension>
+	</xs:complexContent>
+</xs:complexType>
+
+<annotation><documentation xml:lang="EN">any examples</documentation></annotation>
+
+<xs:complexType name="e46">
+	<xs:sequence>
+		<xs:any namespace="##any"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="e46ab">
+	<xs:sequence>
+		<xs:any minOccurs="0" namespace="##other"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="e46bc">
+	<xs:sequence>
+		<xs:any minOccurs="0" maxOccurs="unbounded" namespace="##local"/>
+	</xs:sequence>
+</xs:complexType>
+
+<annotation><documentation xml:lang="EN">minOccurs, maxOccurs</documentation></annotation>
+
+<complexType name="e15">
+	<sequence minOccurs="5" maxOccurs="10">
+		<element name="foo" type="integer"/>
+		<element name="bar" type="float"/>
+	</sequence>
+</complexType>
+
+<complexType name="e15a">
+	<sequence minOccurs="0">
+		<element name="foo" type="integer"/>
+		<element name="bar" type="float"/>
+	</sequence>
+</complexType>
+
+<complexType name="e15b">
+	<sequence minOccurs="0" maxOccurs="1">
+		<element name="foo" type="integer"/>
+		<element name="bar" type="float"/>
+	</sequence>
+</complexType>
+
+<complexType name="e15c">
+	<sequence minOccurs="5" maxOccurs="unbounded">
+		<element name="foo" type="integer"/>
+		<element name="bar" type="float"/>
+	</sequence>
+</complexType>
+
+
+<element name="MyType">
+	<complexType>
+		<simpleContent>
+			<extension base="string">
+				<anyAttribute namespace="##targetNamespace"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+</element>
+
+
+</schema>

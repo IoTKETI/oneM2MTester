@@ -1,0 +1,41 @@
+/***************************************************
+ ** @author   STF470
+ ** @version  0.0.1
+ ** @desc     Test cases for clause 6.2                     
+ ** @purpose  1:6.2, Ensure that assignments with "implicit omit" attribute are correctly handled
+ ** @verdict  pass reject
+ ***************************************************/
+module Sem_060202_SetTypeValues_005 {
+
+	type component GeneralComp {	    	    
+	}
+
+ 	type set S {
+	  	integer f1,
+	  	integer f2 optional,
+	  	integer f3,
+	  	integer f4 optional,
+	  	integer f5 optional
+	 }  
+
+	const S v_assigned := { f1 := 1, f2:= 2 } with { optional "implicit omit" }
+
+	testcase TC_Sem_060202_SetTypeValues_005() runs on GeneralComp {
+
+ 		
+ 		template S m_check := { f1:= 1, f2:= omit, f3:= 2, f4:= omit, f5:= omit }
+ 
+		if (match(v_assigned,m_check)) {  //cannot match undefined components of v_assigned
+			setverdict(fail, "somehow it matched?");
+		}
+		else {
+			setverdict(pass, "cannot match: ", v_assigned, " with ", m_check);
+		}
+
+	}
+
+	control {
+		execute(TC_Sem_060202_SetTypeValues_005());
+	}
+
+}

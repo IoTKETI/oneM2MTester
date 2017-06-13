@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:this="www.example.org/substitutiongroup/complextype/block"
+ targetNamespace="www.example.org/substitutiongroup/complextype/block" blockDefault="extension">
+
+
+<xsd:element name="head" type="this:restrictedType" block="restriction" />
+
+<!-- SUBSTITUTABLE PARENT TYPE -->
+<xsd:complexType name="ParentType">
+	<xsd:sequence>
+		<xsd:element name="foo" minOccurs="0" maxOccurs="unbounded" type="xsd:string" />
+		<xsd:element name="bar" type="xsd:string"/>
+	</xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="RestrictedTypeElem" type="this:restrictedType" substitutionGroup="this:head"/>
+<!-- The restricting type is: -->    
+<xsd:complexType name="restrictedType">
+	<xsd:complexContent>
+		<xsd:restriction base="this:ParentType">
+			<xsd:sequence>
+				<xsd:element name="foo" minOccurs="1" maxOccurs="unbounded" type="xsd:string"/>
+				<xsd:element name="bar" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:restriction>
+	</xsd:complexContent>
+</xsd:complexType>
+
+
+</xsd:schema>

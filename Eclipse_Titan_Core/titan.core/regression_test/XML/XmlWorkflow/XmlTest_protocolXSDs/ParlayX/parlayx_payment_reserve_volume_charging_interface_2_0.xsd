@@ -1,0 +1,96 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xsd:schema elementFormDefault="qualified"
+
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:parlayx_common_xsd="http://www.csapi.org/schema/parlayx/common/v2_0"
+xmlns:parlayx_payment_xsd="http://www.csapi.org/schema/parlayx/payment/v2_0"
+xmlns:parlayx_payment_reserve_volume_charging_local_xsd="http://www.csapi.org/schema/parlayx/payment/reserve_volume_charging/v2_0/local"
+targetNamespace="http://www.csapi.org/schema/parlayx/payment/reserve_volume_charging/v2_0/local">
+
+<xsd:import namespace="http://www.csapi.org/schema/parlayx/payment/v2_0" schemaLocation="parlayx_payment_types_2_0.xsd"/>
+<xsd:import namespace="http://www.csapi.org/schema/parlayx/common/v2_0" schemaLocation="parlayx_common_types_2_0.xsd"/>
+  
+
+	 <xsd:element name="getAmount" type="parlayx_payment_reserve_volume_charging_local_xsd:getAmount"/>
+	 <xsd:complexType name="getAmount">
+			<xsd:sequence>
+				 <xsd:element name="endUserIdentifier" type="xsd:anyURI"/>
+				 <xsd:element name="volume" type="xsd:long"/>
+				 <xsd:element name="parameters" type="parlayx_payment_xsd:Property" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="getAmountResponse" type="parlayx_payment_reserve_volume_charging_local_xsd:getAmountResponse"/>
+	 <xsd:complexType name="getAmountResponse">
+			<xsd:sequence>
+				 <xsd:element name="result" type="xsd:decimal"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="reserveVolume" type="parlayx_payment_reserve_volume_charging_local_xsd:reserveVolume"/>
+	 <xsd:complexType name="reserveVolume">
+			<xsd:sequence>
+				 <xsd:element name="endUserIdentifier" type="xsd:anyURI"/>
+				 <xsd:element name="volume" type="xsd:long"/>
+				 <xsd:element name="billingText" type="xsd:string"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="reserveVolumeResponse" type="parlayx_payment_reserve_volume_charging_local_xsd:reserveVolumeResponse"/>
+	 <xsd:complexType name="reserveVolumeResponse">
+			<xsd:sequence>
+				 <xsd:element name="result" type="xsd:string"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="reserveAdditionalVolume" type="parlayx_payment_reserve_volume_charging_local_xsd:reserveAdditionalVolume"/>
+	 <xsd:complexType name="reserveAdditionalVolume">
+			<xsd:sequence>
+				 <xsd:element name="reservationIdentifier" type="xsd:string"/>
+				 <xsd:element name="volume" type="xsd:long"/>
+				 <xsd:element name="billingText" type="xsd:string"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="reserveAdditionalVolumeResponse" type="parlayx_payment_reserve_volume_charging_local_xsd:reserveAdditionalVolumeResponse"/>
+	 <xsd:complexType name="reserveAdditionalVolumeResponse">
+			<xsd:sequence/>
+	 </xsd:complexType>
+
+	 <xsd:element name="chargeReservation" type="parlayx_payment_reserve_volume_charging_local_xsd:chargeReservation"/>
+	 <xsd:complexType name="chargeReservation">
+			<xsd:sequence>
+				 <xsd:element name="reservationIdentifier" type="xsd:string"/>
+				 <xsd:element name="volume" type="xsd:long"/>
+				 <xsd:element name="billingText" type="xsd:string"/>
+				 <xsd:element name="referenceCode" type="xsd:string"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="chargeReservationResponse" type="parlayx_payment_reserve_volume_charging_local_xsd:chargeReservationResponse"/>
+	 <xsd:complexType name="chargeReservationResponse">
+			<xsd:sequence/>
+	 </xsd:complexType>
+
+	 <xsd:element name="releaseReservation" type="parlayx_payment_reserve_volume_charging_local_xsd:releaseReservation"/>
+	 <xsd:complexType name="releaseReservation">
+			<xsd:sequence>
+				 <xsd:element name="reservationIdentifier" type="xsd:string"/>
+			</xsd:sequence>
+	 </xsd:complexType>
+
+	 <xsd:element name="releaseReservationResponse" type="parlayx_payment_reserve_volume_charging_local_xsd:releaseReservationResponse"/>
+	 <xsd:complexType name="releaseReservationResponse">
+			<xsd:sequence/>
+	 </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,350 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module Namespaces
+{
+modulepar boolean Namespaces_verbose := false;
+#define verbose Namespaces_verbose
+#include "../macros.ttcnin"
+
+type component NS {}
+
+const universal charstring all_namespaces :=
+"xmlns:tst=\'http://www.example.org/test\' xmlns:opt='http://www.example.org/middle'";
+// xmlns=\'http://www.example.org/data\'
+
+type record S {
+  charstring firstName,
+  charstring lastName,
+  record { charstring middleInitial } mini optional
+}
+with {
+  variant "element";
+  variant "namespace as 'http://www.example.org/test' prefix 'tst'"
+  variant (mini) "untagged"
+  variant (mini.middleInitial) "namespace as 'http://www.example.org/middle' prefix 'opt'"
+  variant (mini.middleInitial) "form as qualified"
+}
+
+DECLARE_XER_ENCODERS(S, s)
+DECLARE_EXER_ENCODERS(S, s)
+
+// J. Random Hacker's middle initial is "Random", no?
+const S jrh := { "J", "Hacker", {"Random"} }
+
+const universal charstring str_ns_e :=
+"<tst:S " & all_namespaces & ">\n" &
+"\t<firstName>J</firstName>\n" &
+"\t<lastName>Hacker</lastName>\n" &
+"\t<opt:middleInitial>Random</opt:middleInitial>\n" &
+"</tst:S>\n\n";
+
+const universal charstring str_ns_b :=
+"<S>\n" &
+"\t<firstName>J</firstName>\n" &
+"\t<lastName>Hacker</lastName>\n" &
+"\t<mini>\n" &
+"\t\t<middleInitial>Random</middleInitial>\n" &
+"\t</mini>\n" &
+"</S>\n\n";
+
+
+testcase enc_ns() runs on NS
+{
+  CHECK_METHOD(bxer_enc_s, jrh, str_ns_b);
+  CHECK_METHOD(exer_enc_s, jrh, str_ns_e);
+}
+
+testcase dec_ns() runs on NS
+{
+  CHECK_DECODE(bxer_dec_s, str_ns_b, S, jrh);
+  CHECK_DECODE(exer_dec_s, str_ns_e, S, jrh);
+}
+
+// -- -- -- -- -- -- -- -- -- example 2 -- -- -- -- -- -- -- -- -- --
+
+type charstring fullname
+with {
+  variant "namespace as 'http://www.example.org/B' prefix 'B'";
+  variant "element" //"form as qualified";
+}
+
+DECLARE_XER_ENCODERS(fullname, fn)
+DECLARE_EXER_ENCODERS(fullname, fn)
+
+const fullname j_r_h := "J. Random Hacker"
+
+const universal charstring str_fn_e :=
+"<B:fullname" & " xmlns:B=\'http://www.example.org/B\'" & ">J. Random Hacker</B:fullname>\n\n";
+
+// When decoding, the prefix can be anything; only the URI matters.
+const universal charstring str_fn_foo :=
+"<FOO:fullname" & " xmlns:FOO=\'http://www.example.org/B\'" & ">J. Random Hacker</FOO:fullname>\n\n";
+
+const universal charstring str_fn_b :=
+"<fullname>J. Random Hacker</fullname>\n\n";
+
+
+testcase enc_fn() runs on NS
+{
+  CHECK_METHOD(bxer_enc_fn, j_r_h, str_fn_b);
+  // alas, namespace doesn't work on built-in types at the top level :(
+  // CHECK_METHOD(exer_enc_fn, j_r_h, str_fn_e);
+}
+
+testcase dec_fn() runs on NS
+{
+  CHECK_DECODE(bxer_dec_fn, str_fn_b,   fullname, j_r_h);
+  CHECK_DECODE(exer_dec_fn, str_fn_e,   fullname, j_r_h);
+  CHECK_DECODE(exer_dec_fn, str_fn_foo, fullname, j_r_h);
+}
+
+// -- -- -- -- -- -- -- -- -- union -- -- -- -- -- -- -- -- -- --
+
+group SB {
+
+type union SoapBox {
+  record of ABC content_list
+}
+with {
+variant (content_list) "untagged";
+variant "element";
+}
+
+type union ABC {
+  Crate crater
+}
+with {
+  variant "element";
+}
+
+type charstring MyString;
+/*
+type record  AMT
+{
+  record of MyString elem_list
+}
+with {
+  variant (elem_list) "list"
+}
+*/
+
+type record Crate {
+  charstring tipic,
+  //AMT id optional
+  record {record of MyString elem_list} id optional
+}
+with {
+  variant "element";
+  variant (tipic) "form as qualified";
+  variant (id) "form as qualified";
+  variant (id.elem_list) "list"
+  variant (id.elem_list) "untagged"
+}
+
+DECLARE_XER_ENCODERS(SoapBox, sb);
+DECLARE_EXER_ENCODERS(SoapBox, sb);
+
+const SoapBox c_sb := { // union
+  content_list := { // record of
+    { // ABC
+      crater := { // record
+        tipic := "moo",
+        id    := { { "A", "B" } }
+      }
+    }
+  }
+}
+
+} // group
+with {
+  //variant "namespace as 'http://schemas.ericsson.com/cai3g1.2/'";
+  variant "namespace as 'http://www.example.org/test' prefix 'tst'"
+}
+
+const universal charstring e_str_sb :=
+//"<tst:SoapBox xmlns:tst='http://www.example.org/test'" &
+//" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'" &
+//" xmlns:tst='http://schemas.ericsson.com/cai3g1.1/'" &
+//" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>\n" &
+//">\n" &
+"<tst:SoapBox " & "xmlns:tst=\'http://www.example.org/test\'" & ">\n" &
+
+"\t<tst:ABC>\n" &
+"\t\t<tst:crater>\n" &
+"\t\t\t<tst:tipic>moo</tst:tipic>\n" &
+"\t\t\t<tst:id>A B</tst:id>\n" &
+"\t\t</tst:crater>\n" &
+"\t</tst:ABC>\n" &
+
+"</tst:SoapBox>\n\n";
+
+const universal charstring b_str_sb :=
+"<SoapBox>\n" &
+"\t<content_list>\n"&
+"\t\t<crater>\n"&
+"\t\t\t<tipic>moo</tipic>\n"&
+"\t\t\t<id>\n" &
+"\t\t\t\t<elem_list>\n"&
+"\t\t\t\t\t<MyString>A</MyString>\n"&
+"\t\t\t\t\t<MyString>B</MyString>\n"&
+"\t\t\t\t</elem_list>\n" &
+"\t\t\t</id>\n"&
+"\t\t</crater>\n"&
+"\t</content_list>\n"&
+"</SoapBox>\n\n";
+
+testcase enc_sb() runs on NS
+{
+  CHECK_METHOD(bxer_enc_sb, c_sb, b_str_sb);
+  CHECK_METHOD(exer_enc_sb, c_sb, e_str_sb);
+}
+
+testcase dec_sb() runs on NS
+{
+  CHECK_DECODE(bxer_dec_sb, b_str_sb, SoapBox, c_sb);
+  CHECK_DECODE(exer_dec_sb, e_str_sb, SoapBox, c_sb);
+}
+
+// -- -- -- -- Canceling the effect of an outer namespace -- -- -- -- --
+
+type record globns { // has namespace from the module
+  float up
+}
+with { variant "element" }
+
+// We need a group to cancel the namespace on both the record and its field
+group not_ns {
+
+type record nons {
+  float up
+}
+with { variant "element" }
+
+}
+with {
+  variant "namespace as '' prefix ''"
+}
+
+DECLARE_XER_ENCODERS(globns, gn);
+DECLARE_EXER_ENCODERS(globns, gn);
+
+
+DECLARE_XER_ENCODERS(nons, nn);
+DECLARE_EXER_ENCODERS(nons, nn);
+
+const nons fourty_two := {
+  up := 42.42
+}
+
+const globns fourty_too := {
+  up := 42.42
+}
+
+const universal charstring bstr42 :=
+"<nons>\n" &
+"\t<up>42.420000</up>\n" &
+"</nons>\n\n";
+
+const universal charstring bstr42g :=
+"<globns>\n" &
+"\t<up>42.420000</up>\n" &
+"</globns>\n\n";
+
+const universal charstring estr42g :=
+"<dt:globns xmlns:dt='http://www.example.org/data'>\n" &
+"\t<up>42.420000</up>\n" &
+"</dt:globns>\n\n";
+
+testcase enc_nn() runs on NS
+{
+  CHECK_METHOD(bxer_enc_nn, fourty_two, bstr42);
+  CHECK_METHOD(exer_enc_nn, fourty_two, bstr42);
+  CHECK_METHOD(bxer_enc_gn, fourty_too, bstr42g);
+  CHECK_METHOD(exer_enc_gn, fourty_too, estr42g);
+}
+
+testcase dec_nn() runs on NS
+{
+  CHECK_DECODE(bxer_dec_nn, bstr42, nons, fourty_two);
+  CHECK_DECODE(exer_dec_nn, bstr42, nons, fourty_two);
+  CHECK_DECODE(bxer_dec_gn, bstr42g, globns, fourty_too);
+  CHECK_DECODE(exer_dec_gn, estr42g, globns, fourty_too);
+}
+
+// -- -- -- -- -- -- Empty record with namespace -- -- -- -- -- --
+// HM70032
+
+group prefixed {
+
+type union nochoice
+{
+  record {} nothing
+}
+with {
+  variant "element";
+  variant (nothing) "form as qualified";
+  // variant (nothing) "element"; would have the same effect
+}
+
+}
+with { variant "namespace as 'larry:curly:moe' prefix 'pfx'" }
+
+DECLARE_XER_ENCODERS(nochoice, nc)
+DECLARE_EXER_ENCODERS(nochoice, nc)
+
+const nochoice c_n := { nothing := {} }
+const universal charstring bstr_cn :=
+"<nochoice>\n" &
+"\t<nothing/>\n" &
+"</nochoice>\n\n";
+const universal charstring estr_cn :=
+"<pfx:nochoice xmlns:pfx='larry:curly:moe'>\n" &
+"\t<pfx:nothing/>\n" &
+"</pfx:nochoice>\n\n";
+
+testcase enc_nc() runs on NS
+{
+  CHECK_METHOD(bxer_enc_nc, c_n, bstr_cn);
+  CHECK_METHOD(exer_enc_nc, c_n, estr_cn);
+}
+
+testcase dec_nc() runs on NS
+{
+  CHECK_DECODE(bxer_dec_nc, bstr_cn, nochoice, c_n);
+  CHECK_DECODE(exer_dec_nc, estr_cn, nochoice, c_n);
+}
+
+control {
+  execute(enc_ns());
+  execute(dec_ns());
+
+  execute(enc_fn());
+  execute(dec_fn());
+
+  execute(enc_sb());
+  execute(dec_sb());
+
+  execute(enc_nn());
+  execute(dec_nn());
+
+  execute(enc_nc());
+  execute(dec_nc());
+}
+
+
+}
+with {
+encode "XML"
+variant "namespace as 'http://www.example.org/data' prefix 'dt'"
+}

@@ -1,0 +1,598 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module str_to_OK {	//^In TTCN-3 module `str_to_OK'://
+
+type component PDTestComponent {};
+
+
+/*--- STR2BIT --------------------------------------------------*/
+
+const bitstring s2bcon := str2bit("")
+modulepar bitstring s2bpar  := s2bcon
+modulepar bitstring s2bpar1 := str2bit("000000" & "" & "111111")
+const     bitstring s2bcon2 := str2bit(substr("000000111111",0,6) & "" & substr("000000111111",6,6))
+modulepar bitstring s2bpar2 := str2bit(substr("000000111111",0,6) & "" & substr("000000111111",6,6))
+modulepar bitstring s2bpar3 := str2bit(("000000" <@ lengthof(s2bcon2)/2) & "" & ("111111" @> lengthof(s2bcon2)/2))
+
+testcase str_to_bit() runs on PDTestComponent{
+
+
+	if ((s2bpar == str2bit(""))
+	and (s2bpar == ''B))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2bpar1 == str2bit("000000" & "" & "111111"))
+	and (s2bpar1 == '000000111111'B))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2bpar2 == str2bit(substr("000000111111",0,6) & "" & substr("000000111111",6,6)))
+	and (s2bpar2 == '000000111111'B))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2bpar3 == str2bit(("000000" <@ lengthof(s2bpar2)/2) & "" & ("111111" @> lengthof(s2bpar2)/2)))
+	and (s2bpar3 == '000000111111'B))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+
+	var integer j
+	var charstring cc := ""
+	var bitstring  bb := ''B
+
+	for (j:=0; j<64; j:=j+1) {
+			cc := cc & bit2str(int2bit(j,j))
+			bb := bb & int2bit(j,j)
+			if (bb == str2bit(cc))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	}
+
+}
+
+/*--- STR2FLOAT --------------------------------------------------*/
+
+//const float s2fcon := str2float("")
+const     float s2fcon := str2float("0.0")
+modulepar float s2fpar  := str2float("0.0")
+modulepar float s2fpar1 := str2float("12345678901.0")
+modulepar float s2fpar2 := str2float("000000000000" & "12345678901.0") //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fpar3 := str2float("-12" & "345678901.0")
+modulepar float s2fpar4 := str2float("1.234E3")
+//modulepar float s2fpar5 := str2float("1.234-3")
+modulepar float s2fpar5 := str2float("1.234")
+//modulepar float s2fpar6 := str2float("1,234E3")
+modulepar float s2fpar6 := str2float("1.0")
+//modulepar float s2fpar7 := str2float("--234")
+
+// HL67862
+modulepar float s2fpar7 := str2float("1");
+modulepar float s2fpar7m:= str2float("-1");
+modulepar float s2fpar8m:= str2float("-1.");
+modulepar float s2fpar8 := str2float("1.");
+modulepar float s2fpar9 := str2float("+001"); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fpar10:= str2float("+001."); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fpar11:= str2float("-0");
+modulepar float s2fpar12:= str2float("-0.");
+modulepar float s2fpar13:= str2float("-0.0");
+
+
+
+// modulepar prevents constant folding
+modulepar charstring s2fmp_str := "0.0"
+modulepar charstring s2fmp1_str := "12345678901.0"
+modulepar charstring s2fmp2_str := "000000000000" & "12345678901.0"
+modulepar charstring s2fmp3_str := "-12" & "345678901.0"
+modulepar charstring s2fmp4_str := "1.234E3"
+//modulepar charstring s2fmp5_str := "1.234-3"
+modulepar charstring s2fmp5_str := "1.234"
+//modulepar charstring s2fmp6_str := "1,234E3"
+modulepar charstring s2fmp6_str := "1.0"
+//modulepar charstring s2fmp7_str := "--234"
+
+// HL67862
+modulepar charstring s2fmp7_str := "1";
+modulepar charstring s2fmp7m_str:= "-1";
+modulepar charstring s2fmp8m_str:= "-1.";
+modulepar charstring s2fmp8_str := "1.";
+modulepar charstring s2fmp9_str := "+001";
+modulepar charstring s2fmp10_str:= "+001.";
+modulepar charstring s2fmp11_str:= "-0";
+modulepar charstring s2fmp12_str:= "-0.";
+modulepar charstring s2fmp13_str:= "-0.0";
+
+
+//modulepar float s2fmp := str2float("")
+modulepar float s2fmp := str2float("0.0")
+modulepar float s2fmp1 := str2float("12345678901.0")
+modulepar float s2fmp2 := str2float("000000000000" & "12345678901.0") //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fmp3 := str2float("-12" & "345678901.0")
+modulepar float s2fmp4 := str2float("1.234E3")
+//modulepar float s2fmp5 := str2float("1.234-3")
+modulepar float s2fmp5 := str2float("1.234")
+//modulepar float s2fmp6 := str2float("1,234E3")
+modulepar float s2fmp6 := str2float("1.0")
+//modulepar float s2fmp7 := str2float("--234")
+
+// HL67862
+modulepar float s2fmp7 := str2float("1");
+modulepar float s2fmp7m:= str2float("-1");
+modulepar float s2fmp8m:= str2float("-1.");
+modulepar float s2fmp8 := str2float("1.");
+modulepar float s2fmp9 := str2float("+001"); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fmp10:= str2float("+001."); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+modulepar float s2fmp11:= str2float("-0");
+modulepar float s2fmp12:= str2float("-0.");
+modulepar float s2fmp13:= str2float("-0.0");
+
+
+
+testcase str_to_float() runs on PDTestComponent{ //In testcase definition//
+
+// compile-time
+	if ((s2fpar == str2float("0.0"))
+	and (s2fpar == 0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar1 == str2float("12345678901.0"))
+	and (s2fpar1 == 12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar2 == str2float("000000000000" & "12345678901.0")) //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+	and (s2fpar2 == 12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar3 == str2float("-12" & "345678901.0"))
+	and (s2fpar3 == -12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar4 == str2float("1.234E3"))
+	and (s2fpar4 == 1234.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar5 == str2float("1.234"))
+	and (s2fpar5 == 1.234))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar6 == str2float("1.0"))
+	and (s2fpar6 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar7 == str2float("1"    ))
+	and (s2fpar7 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar7m== str2float("-1"   ))
+	and (s2fpar7m==-1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar8m== str2float("-1."  ))
+	and (s2fpar8m==-1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar8 == str2float("1."   ))
+	and (s2fpar8 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar9 == str2float("+001" )) //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+	and (s2fpar9 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar10== str2float("+001.")) //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+	and (s2fpar10== 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar11== str2float("-0"   ))
+	and (s2fpar11==-0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar12== str2float("-0."  ))
+	and (s2fpar12== -0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fpar13== str2float("-0.0" ))
+	and (s2fpar13== -0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+// run-time
+	if ((s2fmp == str2float(s2fmp_str))
+	and (s2fmp == 0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp1 == str2float(s2fmp1_str))
+	and (s2fmp1 == 12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp2 == str2float("000000000000" & "12345678901.0")) //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2float\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the mantissa of the operand of operation `str2float\(\)'//
+	and (s2fmp2 == 12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp3 == str2float("-12" & "345678901.0"))
+	and (s2fmp3 == -12345678901.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp4 == str2float(s2fmp4_str))
+	and (s2fmp4 == 1234.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp5 == str2float(s2fmp5_str))
+	and (s2fmp5 == 1.234))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp6 == str2float(s2fmp6_str))
+	and (s2fmp6 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp7 == str2float(s2fmp7_str))
+	and (s2fmp7 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp7m == str2float(s2fmp7m_str))
+	and (s2fmp7m ==-1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp8m == str2float(s2fmp8m_str))
+	and (s2fmp8m ==-1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp8 == str2float(s2fmp8_str))
+	and (s2fmp8 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp9 == str2float(s2fmp9_str))
+	and (s2fmp9 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp10 == str2float(s2fmp10_str))
+	and (s2fmp10 == 1.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp11 == str2float(s2fmp11_str))
+	and (s2fmp11 ==-0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp12 == str2float(s2fmp12_str))
+	and (s2fmp12 == -0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2fmp13 == str2float(s2fmp13_str))
+	and (s2fmp13 == -0.0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+}
+
+
+/*--- STR2HEX --------------------------------------------------*/
+
+const     hexstring s2hcon := str2hex("")
+modulepar hexstring s2hpar := s2hcon
+modulepar hexstring s2hpar1 := str2hex("000000" & "" & "111111")
+const     hexstring s2hcon2 := str2hex(substr("000000111111",0,6) & "" & substr("000000111111",6,6))
+modulepar hexstring s2hpar2 := s2hcon2
+modulepar hexstring s2hpar3 := str2hex(("000000" <@ lengthof(s2hcon2)/2) & "" & ("111111" @> lengthof(s2hcon2)/2))
+
+testcase str_to_hex() runs on PDTestComponent{
+
+
+	if ((s2hpar == str2hex(""))
+	and (s2hpar == ''H))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2hpar1 == str2hex("000000" & "" & "111111"))
+	and (s2hpar1 == '000000111111'H))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2hpar2 == str2hex(substr("000000111111",0,6) & "" & substr("000000111111",6,6)))
+	and (s2hpar2 == '000000111111'H))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2hpar3 == str2hex(("000000" <@ lengthof(s2hpar2)/2) & "" & ("111111" @> lengthof(s2hpar2)/2)))
+	and (s2hpar3 == '000000111111'H))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+
+	var integer j
+	var charstring cc := ""
+	var hexstring  hh := ''H
+
+	for (j:=0; j<32; j:=j+1) {
+			cc := cc & hex2str(int2hex(j,j))
+			hh := hh & int2hex(j,j)
+			if (hh == str2hex(cc))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	}
+
+}
+
+/*--- STR2INT --------------------------------------------------*/
+
+const     integer s2icon := str2int("0")
+modulepar integer s2ipar := s2icon
+modulepar integer s2ipar1 := str2int("" & "1234567890")
+modulepar integer s2ipar2 := str2int("12" & "34567890")
+modulepar integer s2ipar3 := str2int("0000000000000000000000" & "1234567890") //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+modulepar integer s2ipar4 := str2int("-12" & "34567890")
+//modulepar integer s2ipar5 := str2int("12ap")
+modulepar integer s2ipar5 := str2int("12")
+//modulepar integer s2ipar6 := str2int("ap")
+modulepar integer s2ipar6 := str2int("1234567891011121314151617181920")
+modulepar integer s2ipar7 := str2int("-1234567891011121314151617181920")
+modulepar integer s2ipar8 := str2int("+1");
+modulepar integer s2ipar9 := str2int("01"); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+modulepar integer s2ipar10 := str2int("+01"); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+modulepar integer s2ipar11 := str2int("-01"); //In module parameter definition// \
+	//In default value//	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+
+testcase str_to_int() runs on PDTestComponent{ //In testcase definition//
+	var charstring vv := "1234567891011121314151617181920"
+	var charstring vv1 := "-1234567891011121314151617181920"
+	var integer ii := str2int("1234567891011121314151617181920")
+	var integer ii1 := str2int("-1234567891011121314151617181920")
+
+	if ((s2ipar == str2int("0"))
+	and (s2ipar == 0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar8 == str2int("+1"))
+	and (s2ipar8 == 1))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar9 == str2int("01"))  //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+	and (s2ipar9 == 1))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar10 == str2int("+01"))  //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+	and (s2ipar10 == 1))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar11 == str2int("-01"))  //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+	and (s2ipar11 == -1))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar1 == str2int("" & "1234567890"))
+	and (s2ipar1 == 1234567890))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar2 == str2int("12" & "34567890"))
+	and (s2ipar2 == 1234567890))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar3 == str2int("00000000000000000000000" & "1234567890"))  //In if statement// \
+	//In the left operand of operation `and'// \
+	//In the right operand of operation `=='// \
+	//In the operand of operation `str2int\(\)'// \
+	//warning: Leading zero digit was detected and ignored in the operand of operation `str2int\(\)'//
+	and (s2ipar3 == 1234567890))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar4 == str2int("-12" & "34567890"))
+	and (s2ipar4 == -1234567890))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((s2ipar5 == str2int("12"))
+	and (s2ipar5 == 12))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	/* Compiler error:
+	if ((s2ipar6 == str2int("ap"))
+	and (s2ipar6 == 0))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	*/
+        // Compile time evaluation.  (Positive/negative.)
+	if ((str2int("1234567891011121314151617181920") == s2ipar6)
+	and (s2ipar6 == str2int("1234567891011121314151617181920")))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int("-1234567891011121314151617181920") == s2ipar7)
+	and (s2ipar7 == str2int("-1234567891011121314151617181920")))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	/* compile-time
+	if ((int2str(str2int("1234567891011121314151617181920")) == "1234567891011121314151617181920")
+	and ("1234567891011121314151617181920" == int2str(str2int("1234567891011121314151617181920"))))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((int2str(str2int("-1234567891011121314151617181920")) == "-1234567891011121314151617181920")
+	and ("-1234567891011121314151617181920" == int2str(str2int("-1234567891011121314151617181920"))))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	*/
+	if ((str2int("1234567891011121314151617181920") - 10 == s2ipar6 - 10)
+	and (s2ipar6 + 10 == str2int("1234567891011121314151617181920") + 10))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int("-1234567891011121314151617181920") + 10 == s2ipar7 + 10)
+	and (s2ipar7 - 10 == str2int("-1234567891011121314151617181920") - 10))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	// Run-time evaluation.  (Positive/negative.)
+	if ((str2int(vv) == ii)
+	and (ii == str2int("1234567891011121314151617181920")))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int("-1234567891011121314151617181920") == ii1)
+	and (ii1 == str2int(vv1)))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((int2str(str2int(vv)) == "1234567891011121314151617181920")
+	and ("1234567891011121314151617181920" == int2str(str2int(vv))))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((int2str(str2int(vv1)) == "-1234567891011121314151617181920")
+	and ("-1234567891011121314151617181920" == int2str(str2int(vv1))))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int(vv) - 10 == ii - 10)
+	and (ii + 10 == str2int("1234567891011121314151617181920") + 10))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int("-1234567891011121314151617181920") + 10 == ii1 + 10)
+	and (ii1 - 10 == str2int(vv1) - 10))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	if ((str2int(vv) == -str2int(vv1))
+	and (str2int(vv1) == -str2int(vv)))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	var integer j
+    	    for (j:=1; j<10; j:=j+1) {
+	    if (str2int(substr("0123456789",0,j+1)) == (str2int(substr("0123456789",0,j))*10 + j))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	}
+}
+
+
+/*--- STR2OCT --------------------------------------------------*/
+
+const     octetstring s2ocon := str2oct("")
+modulepar octetstring s2opar := s2ocon
+modulepar octetstring s2opar1 := str2oct("000000" & "" & "111111")
+const     octetstring s2ocon2 := str2oct(substr("000000111111",0,6) & "" & substr("000000111111",6,6))
+modulepar octetstring s2opar2 := s2ocon2
+modulepar octetstring s2opar3 := str2oct(("000000" <@ lengthof(s2ocon2)/2) & "" & ("111111" @> lengthof(s2ocon2)/2))
+
+testcase str_to_oct() runs on PDTestComponent{
+
+
+	if ((s2opar == str2oct(""))
+	and (s2opar == ''O))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2opar1 == str2oct("000000" & "" & "111111"))
+	and (s2opar1 == '000000111111'O))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2opar2 == str2oct(substr("000000111111",0,6) & "" & substr("000000111111",6,6)))
+	and (s2opar2 == '000000111111'O))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+	if ((s2opar3 == str2oct(("000000" <@ lengthof(s2opar2)/2) & "" & ("111111" @> lengthof(s2opar2)/2)))
+	and (s2opar3 == '000000111111'O))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+
+
+	var integer j
+	var charstring cc := ""
+	var octetstring  oo := ''O
+
+	for (j:=0; j<64; j:=j+1) {
+			cc := cc & oct2str(int2oct(j,j))
+			oo := oo & int2oct(j,j)
+			if (oo == str2oct(cc))
+	     {setverdict(pass);}
+	else {setverdict(fail, __LINE__);}
+	}
+
+}
+
+
+control {
+	execute (str_to_bit());
+	execute (str_to_float());
+	execute (str_to_hex());
+	execute (str_to_int());
+	execute (str_to_oct());
+}
+
+}

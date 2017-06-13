@@ -1,0 +1,38 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  1:6.2.0.6, ensure that component type not allowed for anytype
+ ** @verdict  pass reject
+ ***************************************************/
+
+module NegSyn_060206_anytype_003 {
+
+	type component MyComp{
+		var integer b;
+	}
+	
+	type component GeneralComp extends MyComp {
+	
+		var anytype c;
+	
+	}
+	
+	testcase TC_NegSyn_060206_anytype_003() runs on GeneralComp {
+
+		var MyComp comp := self;
+		c.MyComp := comp; // Component type is not allowed with anytype
+
+		setverdict(fail);
+	}
+
+	control {
+		execute(TC_NegSyn_060206_anytype_003());
+	}
+
+}
+with {
+	extension "anytype MyComp"
+}

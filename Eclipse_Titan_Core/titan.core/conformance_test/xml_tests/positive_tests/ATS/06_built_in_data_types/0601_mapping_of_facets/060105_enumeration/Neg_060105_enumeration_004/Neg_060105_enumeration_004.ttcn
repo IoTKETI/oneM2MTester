@@ -1,0 +1,53 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:6.1.5, disallow enumeration values removed by restriction
+ ** @verdict  pass reject
+ ***************************************************/
+module Neg_060105_enumeration_004 {
+
+    import from schema_Neg_060105_enumeration_004 language "XSD" all;
+    
+    template C2 m_msg := uNKNOWN;
+
+	external function enc_MyType(in C2 pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return C2
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout C2, Raw;
+    } with {extension "internal"}
+
+    type component Comp {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Neg_060105_enumeration_004() runs on Comp system Comp {
+        connect(self:p, self:p1);
+
+        // encode the message
+        p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+        log("template should either be rejected by compiler or by runtime latest while encoding");
+
+        setverdict(fail, "Invalid template should not be encoded");
+
+    }
+
+    control {
+        execute(TC_Neg_060105_enumeration_004(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+}

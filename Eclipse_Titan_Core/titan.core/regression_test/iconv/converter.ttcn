@@ -1,0 +1,61 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module converter
+{
+
+/** Convert from any encoding to universal charstring
+
+@param encoding as a string, e.g. "UTF-8", "CP437", "ISO_8859-1", "WINDOWS-1252"
+@param input octetstring in the given encoding
+@param output as universal charstring
+@return 0 on success, errno otherwise
+*/
+external function o2u(in charstring encoding11, in octetstring input11, out universal charstring output11) return integer;
+
+/** Wrapper around o2u.
+@param input octetstring containing bytes in UTF-8
+@return universal charstring
+*/
+function fromUTF8(in octetstring input17) return universal charstring
+{
+  var universal charstring retval;
+  var integer ret := o2u("UTF-8", input17, retval);
+  if (ret != 0) {
+    setverdict(fail, "Conversion failed: ", ret);
+  }
+  return retval;
+}
+
+/**
+@param encoding as a string, e.g. "UTF-8", "CP437", "ISO_8859-1", "WINDOWS-1252"
+@param input as universal charstring
+@param output octetstring in the given encoding
+@return 0 on success, errno otherwise
+*/
+external function u2o(in charstring encoding33, in universal charstring input33, out octetstring output33) return integer;
+
+/** Wrapper around u2o.
+@param input universal charstring
+@return octetstring containing bytes in UTF-8
+*/
+function toUTF8(in universal charstring input39) return octetstring
+{
+  var octetstring retval;
+  var integer ret := u2o("UTF-8", input39, retval);
+  if (ret != 0) {
+    setverdict(fail, "Conversion failed: ", ret);
+  }
+  return retval;
+}
+
+}

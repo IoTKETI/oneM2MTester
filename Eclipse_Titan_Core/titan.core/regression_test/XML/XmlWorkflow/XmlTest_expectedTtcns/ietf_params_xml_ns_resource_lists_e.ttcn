@@ -1,0 +1,112 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Lovassy, Arpad
+*   Raduly, Csaba
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          ietf_params_xml_ns_resource_lists.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//
+//	Generated from file(s):
+//
+//	- RLXML_small.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "urn:ietf:params:xml:ns:resource-lists" */
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+module ietf_params_xml_ns_resource_lists {
+
+
+import from XSD all;
+
+
+/* This recursive XSD causes xsd2ttcn to segfault */
+
+
+type record ListType
+{
+	record of XSD.String attr,
+	XSD.String name optional,
+	Display_nameType display_name optional,
+	record of record {
+		union {
+			record {
+			} list
+		} choice
+	} sequence_list,
+	record of XSD.String elem_list
+}
+with {
+  variant "name as uncapitalized";
+  variant (attr) "anyAttributes except unqualified, 'urn:ietf:params:xml:ns:resource-lists'";
+  variant (name) "attribute";
+  variant (display_name) "name as 'display-name'";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+  variant (sequence_list[-].choice) "untagged";
+  variant (elem_list) "untagged";
+  variant (elem_list[-]) "anyElement except unqualified, 'urn:ietf:params:xml:ns:resource-lists'";
+};
+
+
+type record Resource_lists
+{
+	record of record {
+		ListType list
+	} sequence_list
+}
+with {
+  variant "name as 'resource-lists'";
+  variant "element";
+  variant (sequence_list) "untagged";
+  variant (sequence_list[-]) "untagged";
+};
+
+
+type record Display_nameType
+{
+	Lang lang optional,
+	XSD.String base
+}
+with {
+  variant "name as 'display-nameType'";
+  variant (lang) "attribute";
+  variant (base) "untagged";
+};
+
+
+type XSD.AnySimpleType Lang
+with {
+  variant "name as uncapitalized";
+  variant "attribute";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'urn:ietf:params:xml:ns:resource-lists'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+  variant "elementFormQualified";
+}

@@ -1,0 +1,415 @@
+.******************************************************************************
+.* Copyright (c) 2000-2017 Ericsson Telecom AB
+.* All rights reserved. This program and the accompanying materials
+.* are made available under the terms of the Eclipse Public License v1.0
+.* which accompanies this distribution, and is available at
+.* http://www.eclipse.org/legal/epl-v10.html
+.*
+.* Contributors:
+.*   Balasko, Jeno
+.*   Delic, Adam
+.*   Szabo, Janos Zoltan – initial implementation
+.*   Szalai, Endre
+.*
+.******************************************************************************/
+:text.
+:lang eng.
+
+.* EDML webpage:       http://cpi.ericsson.se/dwaxe/
+.* EDML2PDF converter: http://dwaxe.ericsson.se/x2pdf
+.* EDML user guide:    http://www.lmc.ericsson.se/~lmcmarg/isit/edml_ug.html
+
+.* Document header information
+:docname.Test Description
+:docno.20/15291-CRL200/5 Uen
+:rev.
+:date.2015-04-27
+
+:prep.ETH/RZD Endre Szalai (+36 1 437 7796)
+:appr.
+:checked.
+
+:title.Test description of the Semantic Analyzer: Adhoc tests
+:contents level=2.
+.*---------------------------------------------------------------------*
+:h1.Introduction
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h2.Revision history
+.*---------------------------------------------------------------------*
+:xmp tab=2.
+REV   DATE         PREPARED   CHANGE
+__________________________________________________
+-     2005-01-31   ETHESI     New document for TITAN R1.6
+:exmp.
+.*---------------------------------------------------------------------*
+:h2.Purpose
+.*---------------------------------------------------------------------*
+This document contains adhoc tests for ASN.1 Semantic Analyser. These test
+cases shall be moved to different test descriptions in forthcoming
+projects.
+.*---------------------------------------------------------------------*
+:h2.Test cases - ASN.1
+.*---------------------------------------------------------------------*
+.*---------------------------------------------------------------------*
+:h3.ASN1::Not unique symbol: EXPORTS
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Not unique symbol: EXPORTS>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   EXPORTS Duplicate-symbol, Duplicate-symbol;
+   IMPORTS ;
+   Duplicate-symbol ::= BOOLEAN
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?Duplicate.+?identifier.+?in.+?SymbolList.+?Duplicate-symbol
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Not unique symbol: IMPORTS
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Not unique symbol: IMPORTS>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS Duplicate-symbol, Duplicate-symbol FROM Module-B;
+   X ::= BOOLEAN
+END
+<END_MODULE>
+<MODULE ASN Module-B ModuleB.asn>
+Module-B DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   Duplicate-symbol ::= BOOLEAN
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?Duplicate.+?identifier.+?in.+?SymbolList.+?Duplicate-symbol
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Not unique assignment: Assignments of a module
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Not unique assignment: Assignments of a module>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   -- TR 677: Duplicate symbol check in a module
+   Duplicate-symbol ::= BOOLEAN
+   Duplicate-symbol ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?Duplicate.+?assignment.+?Duplicate-symbol
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnote\b.+?previous.+?assignment.+?Duplicate-symbol.+?here
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Not unique assignment: Reserved assignment
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Not unique assignment: Reserved assignment>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   -- NOTE: it's not clear how to trigger the error message in SA, if
+   -- the parser always cathces the reserved identifiers.
+   -- in Assignments::chk_uniq(): "`%s' is a reserved identifier"
+   EMBEDDED PDV ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?Duplicated.+?identifier.+?in.+?SymbolList.+?Duplicated-symbol
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?syntax.+?error.+?unexpected.+?embedded
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Symbol is not exported
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Symbol is not exported>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS X, Hidden-symbol FROM Module-B;
+   Z ::= INTEGER
+END
+<END_MODULE>
+<MODULE ASN Module-B ModuleB.asn>
+Module-B DEFINITIONS ::=
+BEGIN
+   EXPORTS X;
+   IMPORTS ;
+   X ::= BOOLEAN
+   Hidden-symbol ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?symbol.+?Hidden-symbol.+?not.+?exported
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Import from a TTCN-3 module
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Import from a TTCN-3 module>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS T3type FROM ModuleB;
+   Z ::= INTEGER
+END
+<END_MODULE>
+<MODULE TTCN ModuleB ModuleB.ttcn>
+module ModuleB {
+   type integer T3type;
+}
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?cannot.+?import.+?from.+?TTCN.*?3.+?module
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Importing from itself
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Importing from itself>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS Z FROM Module-A;
+   Z ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?cannot.+?import.+?from.+?itself
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Duplicated import
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Duplicated import>
+<COMPILE>
+<VERDICT_LEAF PASS>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   -- TR 676: Unnecessary error message when symbol is not unique in the IMPORTS section
+   IMPORTS B FROM Module-B
+           B FROM Module-B;
+   A ::= INTEGER
+END
+<END_MODULE>
+<MODULE ASN Module-B ModuleB.asn>
+Module-B DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   B ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?duplicate.+?import.+?from.+?Module-B
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Invalid module identifier
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Invalid module identifier>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE ASN module-A ModuleA.asn>
+-- catched by the parser or even before (at module recognition)
+-- Therefore it's not clear how to trigger the error message:
+-- in Module::Module: "`%s' is not a valid module identifier"
+module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   Z ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?not.+?valid.+?module.+?identifier
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?im)\berror\b.+?cannot.+?recognize.+?as.+?asn.*?1.+?module
+<END_RESULT>
+<RESULT IF_FAIL COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::No assignment in the referenced module
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::No assignment in the referenced module>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS X, Nonexi FROM Module-B;
+   Z ::= Module-B.Nonexi
+END
+<END_MODULE>
+<MODULE ASN Module-B ModuleB.asn>
+Module-B DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   X ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?not.+?valid.+?module.+?identifier
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+.*---------------------------------------------------------------------*
+:h3.ASN1::Ambiguous assignment reference
+.*---------------------------------------------------------------------*
+:xmp tab=0.
+<TC - ASN1::Ambiguous assignment reference>
+<COMPILE>
+<VERDICT_LEAF FAIL>
+<MODULE ASN Module-A ModuleA.asn>
+Module-A DEFINITIONS ::=
+BEGIN
+   IMPORTS Ambi-ass FROM Module-B
+           Ambi-ass FROM Module-C;
+   Z ::= INTEGER
+   X ::= Ambi-ass
+END
+<END_MODULE>
+<MODULE ASN Module-B ModuleB.asn>
+Module-B DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   Ambi-ass ::= INTEGER
+END
+<END_MODULE>
+<MODULE ASN Module-C ModuleC.asn>
+Module-C DEFINITIONS ::=
+BEGIN
+   IMPORTS ;
+   Ambi-ass ::= INTEGER
+END
+<END_MODULE>
+<RESULT IF_PASS COUNT 1>
+(?im)\berror\b.+?not.+?valid.+?module.+?identifier
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?is)\berror:
+<END_RESULT>
+<RESULT IF_PASS COUNT 1>
+(?im)\bnotify\b.+?\bcode\b.+?\bnot\b.+?\bgenerated\b
+<END_RESULT>
+<END_TC>
+:exmp.
+
+:etext.
+

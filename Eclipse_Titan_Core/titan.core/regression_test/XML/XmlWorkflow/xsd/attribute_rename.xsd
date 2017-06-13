@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema targetNamespace="www.example.org/attribute/rename"
+           elementFormDefault="qualified"
+           xmlns:attrename="www.example.org/attribute/rename"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="GlobalAttrib_"/>
+<xs:element name="MyString_"/>
+
+<xs:simpleType name="MyString">
+	<xs:restriction base="xs:string">
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:attribute name="GlobalAttrib" type="attrename:MyString"/>
+
+<xs:attributeGroup name="attrgroup">
+	<xs:attribute name="birthPlaceAttrGroup" type="attrename:MyString"/>
+</xs:attributeGroup>
+
+<xs:complexType name="Complex">
+	<xs:sequence>
+	</xs:sequence>
+	<xs:attributeGroup ref="attrename:attrgroup"/>
+	<xs:attribute name="AttrfixedMyString" type="attrename:MyString"/>
+	<xs:attribute ref="attrename:GlobalAttrib"/>
+</xs:complexType>
+
+</xs:schema>

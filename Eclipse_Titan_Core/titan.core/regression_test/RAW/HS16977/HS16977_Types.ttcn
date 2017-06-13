@@ -1,0 +1,42 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module HS16977_Types {
+  import from HS16977_Constants all;
+
+  type record t_inner_rec {
+    integer obj_type,
+    integer len,
+    t_union val
+  } with {
+    variant (val) "CROSSTAG(i, obj_type = c_int_choice; f, obj_type = c_float_choice;
+       cs, obj_type = c_cs_choice; outer, obj_type = c_outer_choice; os, OTHERWISE)";
+  } 
+  
+  type union t_union {
+    integer i,
+    float f,
+    charstring cs,
+    octetstring os,
+    t_outer_rec outer
+  }
+
+  type record t_outer_rec {
+    integer len,
+    t_inner_rec inner
+  } with {
+    variant ""
+  }
+
+} with { 
+  encode "RAW";
+}

@@ -1,0 +1,88 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Kulcsar, Endre
+ *   Szabados, Kristof
+ *
+ ******************************************************************************/
+module Test354T
+{
+import from Test354A all;
+
+const MySetType mySetValue1B :=
+{
+field2 := true,
+field1 := 55,
+field3 := '001100'B,
+field4 := 'FFAAFF'O,
+field5 := {
+            field1 := 555,
+	    field2 := true,
+            field4 := 'FF00'O,
+	    field5 := '01010'B,
+	    field6 := a1
+          //  field7 := 4.5 REAL NOT SUPP
+          },
+field6 :=
+          {
+           field5  := '01010'B,
+	   field6  := b2,
+          // field7  := 3.5, REAL NOT SUPP
+           field1  := 444,
+	   field2  := false,
+	   field4  := 'FFEEDDCCBBAA012345678900'O
+	   },
+field7 := {field1 := 5}
+}
+
+const MySetType mySetValue2B :=
+{
+field2 := true,
+field1 := 55,
+field3 := omit,
+field4 := 'AA'O,  // vita targya, hogy ide johet-e omit
+field5 :={
+            field1 := 555,
+	    field2 := true,
+            field4 := 'FF00'O,
+	    field5 := '01010'B,
+	    field6 := a1
+           // field7 := 4.5 REAL NOT SUPP
+          },
+field6 :=
+          {
+           field5  := '01010'B,
+	   field6  := b2,
+          // field7  := 3.5,REAL NOT SUPP
+           field1  := 444,
+	   field2  := false,
+	   field4  := 'ABCD012345678900'O
+	   },
+field7 := {field1 := 5}
+}
+
+type component MyMainComponent
+    {}
+
+testcase Test() runs on MyMainComponent
+{
+
+if ((mySetValue1A == mySetValue1B) and (mySetValue2A ==
+mySetValue2B))
+   {setverdict ( pass );}
+ else {  setverdict ( fail );}
+
+}
+
+control
+    {
+    execute (Test())
+    }
+
+}

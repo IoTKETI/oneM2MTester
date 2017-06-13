@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+#echo "*****************************************************"
+#echo "Ez egy tok primitiv automatizalt teszter V0.0" 
+#echo "ami osszehasonlit ket ASN.1-bol forditott filet."
+#echo "*****************************************************"
+
+TAIL=tail
+tail +4 $0 >/dev/null 2>/dev/null || TAIL='tail -n'
+
+#---------------------------------------------------------
+function_compare()
+{
+
+cat ./${1}A.hh | sed "s/${1}A/${1}B/g" > temp1.hh
+cat ./${1}A.cc | sed "s/${1}A/${1}B/g" > temp1.cc
+
+${TAIL} +4 ./temp1.hh | cat > Dummy1.hh
+${TAIL} +4 ./temp1.cc | cat > Dummy1.cc
+${TAIL} +4 ./${1}B.hh  | cat > Dummy2.hh
+${TAIL} +4 ./${1}B.cc  | cat > Dummy2.cc
+
+    if cmp -s ./Dummy1.hh ./Dummy2.hh 
+      then 
+        if cmp -s ./Dummy1.cc ./Dummy2.cc  
+           then Verdict="pass"
+	       
+           else Verdict="fail: comparing .cc files"
+	       
+        fi
+     else Verdict="fail: comparing .hh files"
+         
+    fi 
+
+if (test -s Dummy1.hh) 
+ then file_present="Yes"
+ else Verdict="fail: missing .hh file"
+fi
+
+if (test -s Dummy1.cc) 
+ then file_present="Yes"
+ else Verdict="fail: missing .cc file"
+fi
+
+if (test -s Dummy2.hh) 
+ then file_present="Yes"
+ else Verdict="fail: missing .hh file"
+fi
+
+if (test -s Dummy2.cc) 
+ then file_present="Yes"
+ else Verdict="fail: missing .cc file"
+fi
+
+
+echo "ASN1:$1 = Verdict: $Verdict"
+rm ./Dummy*.cc ./Dummy*.hh
+rm ./temp1.cc ./temp1.hh
+}
+#---------------------------------------------------------
+
+function_compare Test5
+function_compare Test6
+function_compare Test7
+function_compare Test8
+function_compare Test9
+
+function_compare Test289

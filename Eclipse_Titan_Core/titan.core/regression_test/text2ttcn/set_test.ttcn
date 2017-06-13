@@ -1,0 +1,327 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+/*
+//AUTHOR: 
+//DATE: 
+//VERSION: 
+*/
+module set_test
+{
+
+//=========================================================================
+// Import Part
+//=========================================================================
+import from types all;
+import from functions all;
+
+//=========================================================================
+// Module Parameters
+//=========================================================================
+
+modulepar {
+  //set
+  template SET tspt_set_v0;
+  template SET tspt_set_v1:=  { b:=true };
+  template SET tspt_set_v2:=  { b:=true, cs:= "sth" }
+  template SET tspt_set_v3:=  { b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=99}
+  // these will be overwritten from cfg file:
+  template SET tspt_set_mod4v1 := omit;
+  template SET tspt_set_mod4v2 := omit;
+  template SET tspt_set_mod4v3 := omit;
+  template SET tspt_set_mod4a := omit;
+  template SET tspt_set_mod4q := omit;
+  template SET tspt_set_mod4o := *;
+  template SET tspt_set_mod4c0 := *;
+  template SET tspt_set_mod4c1 := *;
+  template SET tspt_set_mod4c2 := *;
+  template SET tspt_set_mod4c3 := *;
+}
+//=========================================================================
+// Data Types
+//=========================================================================
+
+// Insert data type defintions here if applicable!
+// You can use the data_type skeleton!
+
+//=========================================================================
+// Signatures
+//=========================================================================
+
+// Insert signature definitions here if applicable!
+// You can use the signature skeleton!
+
+//=========================================================================
+//Port Types
+//=========================================================================
+
+// Insert port type defintions here if applicable!
+// You can use the port_type skeleton!
+
+//=========================================================================
+//Component Types
+//=========================================================================
+
+// Insert component type defintions here if applicable!
+// You can use the component_type skeleton!
+
+//=========================================================================
+// Constants
+//=========================================================================
+
+// Insert constants here if applicable!
+// You can use the constant skeleton!
+
+//=========================================================================
+// Templates
+//=========================================================================
+
+// Insert templates here if applicable!
+// You can use the template skeleton!
+
+//=========================================================================
+// Altsteps
+//=========================================================================
+
+// Insert altsteps here if applicable!
+// You can use the altstep skeleton!
+
+//=========================================================================
+// Functions
+//=========================================================================
+
+// Insert functions here if applicable!
+// You can use the function skeleton!
+
+//=========================================================================
+// Testcases
+//=========================================================================
+testcase tc_set_ModulePar() runs on MC {
+  //values:
+  log(tspt_set_v0);   
+  if(log2str(tspt_set_v0) != "<uninitialized template>") {setverdict(fail) } else {setverdict(pass)}
+  log(tspt_set_v1);
+  if(log2str(tspt_set_v1) != "{ b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := <uninitialized template> }") {setverdict(fail) } else {setverdict(pass)}
+  log(tspt_set_v2);
+  if(log2str(tspt_set_v2) != "{ b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := \"sth\" }") {setverdict(fail) } else {setverdict(pass)}
+  log(tspt_set_v3);
+  if(log2str(tspt_set_v3) != "{ b := true, i := 99, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }") {setverdict(fail) } else {setverdict(pass)}
+  //jokers
+  if(log2str(tspt_set_mod4v1) != "{ b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := <uninitialized template> }") {setverdict(fail) } else {setverdict(pass)}
+  if(log2str(tspt_set_mod4v2) != "{ b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := \"sth\" }") {setverdict(fail) } else {setverdict(pass)}
+  if(log2str(tspt_set_mod4v3) != "{ b := true, i := 99, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }") {setverdict(fail) } else {setverdict(pass)}
+  if(log2str(tspt_set_mod4a) != "*") {setverdict(fail) } else {setverdict(pass)};
+  if(log2str(tspt_set_mod4q) != "?") {setverdict(fail) } else {setverdict(pass)};
+  if(log2str(tspt_set_mod4o) != "omit") {setverdict(fail) } else {setverdict(pass)};
+}
+
+testcase tc_set_ModulePar_emb() runs on MC {
+  @try {
+    log(t_rset(tspt_set_v0)); 
+  }
+  @catch( dte_message) {
+    if( match(dte_message, pattern "*Copying an uninitialized/unsupported template*" )) {setverdict(pass)} else {setverdict(fail)};
+  }
+  log(tspt_set_v1);
+  @try {
+    log(t_rset(tspt_set_v1)); 
+  }
+  @catch( dte_message) {
+    if( match(dte_message, pattern "*Copying an uninitialized/unsupported template*" )) {setverdict(pass)} else {setverdict(fail)};
+    log("Hi");
+  }
+  log("Bye");
+  //jokers:
+  log(t_rset(tspt_set_mod4v1));
+  if(log2str(t_rset(tspt_set_mod4v1)) == "{ s := { b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := <uninitialized template> } }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4v2));
+  if(log2str(t_rset(tspt_set_mod4v2)) == "{ s := { b := true, i := <uninitialized template>, f := <uninitialized template>, bs := <uninitialized template>, os := <uninitialized template>, hs := <uninitialized template>, cs := \"sth\" } }" ) {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4a));
+  if(log2str(t_rset(tspt_set_mod4a)) == "{ s := * }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4q));
+  if(log2str(t_rset(tspt_set_mod4q)) == "{ s := ? }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4o));
+  if(log2str(t_rset(tspt_set_mod4o)) == "{ s := omit }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4c1));
+  if(log2str(t_rset(tspt_set_mod4c1)) == "{ s := complement ({ b := true, i := 99, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }) }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4c2));
+  if(log2str(t_rset(tspt_set_mod4c2)) == "{ s := complement ({ b := true, i := 99, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }, omit) }") {setverdict(pass)} else {setverdict(fail)};
+  log(t_rset(tspt_set_mod4c3));
+  if(log2str(t_rset(tspt_set_mod4c3)) == "{ s := complement ({ b := true, i := 0, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }, { b := true, i := 1, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }, { b := true, i := 2, f := 0.000000, bs := omit, os := ?, hs := ?, cs := \"sth\" }) }") {setverdict(pass)} else {setverdict(fail)};
+}
+
+//rset
+//cfg: tspt_set_mod4v3 := { b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=99}
+testcase tc_set_mod4v3_emb() runs on MC {
+  log(t_rset(tspt_set_mod4v3));
+  var RoRSET vl_good_values := {
+    {{ b:=true, i:=99,   f:=0.0, bs:=omit, os:='FF'O,hs:='0'H,  cs:="sth" }},
+    {{ i:=99,   b:=true, f:=0.0, bs:=omit, os:='ABBA'O, hs:='ABC11'H,cs:="sth" }},
+    {{ b:=true, i:=99,   f:=0.0, bs:=omit, os:='EF'O,   hs:='D'H,    cs:="sth" }},
+    {{ b:=true, i:=99,   f:=0.0, bs:=omit, os:='ABBA'O,hs:='A'H, cs:="sth" }}
+  } 
+  var RoRSET vl_wrong_values := { 
+    {omit},
+    {{ b:=true, i:=omit, f:=0.0, bs:=omit, os:='FF'O,  hs:='0'H, cs:="sth" }},
+    {{ b:=true, i:=99,   f:=0.0, bs:=omit, os:=omit,   hs:=omit, cs:="sth" }},
+    {{b:=true, i:=99, f:=0.0, bs:='0110'B, os:='ABBA'O,hs:='A'H, cs:="sth" }}
+    
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4v3),vl_good_values,vl_wrong_values);
+}
+
+testcase tc_set_mod4a_emb() runs on MC {
+  log(t_rset(tspt_set_mod4a));
+  var RoRSET vl_good_values := {
+    {omit},
+    {{ b:=omit, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=99, f:=0.0, bs:=omit, os:='FF'O,hs:='0'H,cs:="sth" }},
+    {{ i:=99, b:=true, f:=0.0, bs:=omit, os:='ABBA'O,hs:='ABC11'H,cs:="sth" }}
+  } 
+  var RoRSET vl_wrong_values := { } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4a),vl_good_values,vl_wrong_values);
+}
+
+testcase tc_set_mod4q_emb() runs on MC {
+  log(t_rset(tspt_set_mod4q));
+  var RoRSET vl_good_values := {  	  	
+    {{ b:=omit, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=99, f:=0.0, bs:=omit, os:='FF'O,hs:='0'H,cs:="sth" }},
+    {{ i:=99, b:=true, f:=0.0, bs:=omit, os:='ABBA'O,hs:='ABC11'H,cs:="sth" }},
+    {{ b:=true, i:=99, f:=0.0, bs:=omit, os:=omit,hs:=omit,cs:="sth" }},
+    {{ b:=true, i:=99, f:=0.0, bs:='0110'B, os:='ABBA'O,hs:='A'H,cs:="sth" }}
+  } 
+  var RoRSET vl_wrong_values := {
+    {omit}     
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4q),vl_good_values,vl_wrong_values);
+}
+
+testcase tc_set_mod4o_emb() runs on MC {
+  log(t_rset(tspt_set_mod4o));
+  var RoRSET vl_good_values := { 
+    {omit}   	  	
+  } 
+  var RoRSET vl_wrong_values := {
+    {{ b:=omit, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=omit, f:=omit, bs:=omit, os:=omit,hs:=omit,cs:=omit}},
+    {{ b:=true, i:=99, f:=0.0, bs:=omit, os:='FF'O,hs:='0'H,cs:="sth" }},
+    {{ i:=99, b:=true, f:=0.0, bs:=omit, os:='ABBA'O,hs:='ABC11'H,cs:="sth" }},
+    {{ b:=true, i:=99, f:=0.0, bs:=omit, os:=omit,hs:=omit,cs:="sth" }},
+    {{ b:=true, i:=99, f:=0.0, bs:='0110'B, os:='ABBA'O,hs:='A'H,cs:="sth" }}  
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4o),vl_good_values,vl_wrong_values);
+}
+// Note: this tests legacy behavior and requires the -M compiler option!
+//tspt_set_mod4c1 := complement({ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=99})
+testcase tc_set_mod4c1_emb() runs on MC {
+  log(t_rset(tspt_set_mod4c1));
+  var RoRSET vl_good_values := {
+    {omit}, 	  	
+    {{ b:=false, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "noth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.1, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=omit,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=100}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=100}}, 
+    {{ b:=false, cs:= "no", f:=1.0, bs:='01'B, os:=omit,hs:=omit,i:=100}}       
+  } 
+  var RoRSET vl_wrong_values := {
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}}   
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4c1),vl_good_values,vl_wrong_values);
+}
+
+//tspt_set_mod4c2 := complement({ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=99}, omit)
+testcase tc_set_mod4c2_emb() runs on MC {
+  log(t_rset(tspt_set_mod4c2));
+  var RoRSET vl_good_values := { 	  	
+    {{ b:=false, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "noth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.1, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=omit,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=100}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=100}}, 
+    {{ b:=false, cs:= "no", f:=1.0, bs:='01'B, os:=omit,hs:=omit,i:=100}}       
+  } 
+  var RoRSET vl_wrong_values := {
+    { omit },
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}}   
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4c2),vl_good_values,vl_wrong_values);
+}
+//complement(omit)
+testcase tc_set_mod4c0_emb() runs on MC {
+  log(t_rset(tspt_set_mod4c0));
+  var RoRSET vl_good_values := { 	  	
+    {{ b:=false, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "noth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.1, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=omit,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=100}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=100}}, 
+    {{ b:=false, cs:= "no", f:=1.0, bs:='01'B, os:=omit,hs:=omit,i:=100}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}}        
+  } 
+  var RoRSET vl_wrong_values := {
+    { omit }
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4c0),vl_good_values,vl_wrong_values);
+}
+//tspt_set_mod4c3 := 
+//complement({ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=0},
+//{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?,i:=1},{ b:=true,i:=2, cs:= "sth", f:=0.0, bs:=omit, os:=?,hs:=?})
+
+testcase tc_set_mod4c3_emb() runs on MC {
+  log(t_rset(tspt_set_mod4c3));
+  var RoRSET vl_good_values := { 	  	
+    {{ b:=false, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=98}},
+    {{ b:=true, cs:= "noth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.1, bs:=omit, os:='00'O,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:=omit,hs:='F'H,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=99}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=100}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:=omit,i:=100}}, 
+    {{ b:=false, cs:= "no", f:=1.0, bs:='01'B, os:=omit,hs:=omit,i:=100}}       
+  } 
+  var RoRSET vl_wrong_values := {       
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=0}},
+    {{ b:=true, cs:= "sth", f:=0.0, bs:=omit, os:='00'O,hs:='F'H,i:=1}},
+    {{ b:=true,i:=2, cs:= "sth", f:=0.0, bs:=omit, os:='01'O,hs:='A'H}}
+  } 
+  f_checkMatchingValues_rset(t_rset(tspt_set_mod4c3),vl_good_values,vl_wrong_values);
+}
+
+//=========================================================================
+// Control
+//=========================================================================
+
+control {
+  log("***set tests *********");
+  execute(tc_set_ModulePar());
+  execute(tc_set_ModulePar_emb());
+  execute(tc_set_mod4v3_emb());
+  execute(tc_set_mod4a_emb());
+  execute(tc_set_mod4q_emb());
+  execute(tc_set_mod4o_emb());
+  execute(tc_set_mod4c1_emb());
+  execute(tc_set_mod4c2_emb());
+  execute(tc_set_mod4c0_emb());
+  execute(tc_set_mod4c3_emb()); 
+}
+
+}  // end of module

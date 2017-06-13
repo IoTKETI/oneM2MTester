@@ -1,0 +1,107 @@
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Baji, Laszlo
+  Balasko, Jeno
+  Farkas, Laszlo
+  Gecse, Roland
+  Szabados, Kristof
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<title>module</title>
+</head>
+<body bgcolor="#DAD3C5" vlink="#0094D2" link="#003258">
+<table align="left" border="0" cellspacing="0" cellpadding="0" valign=top>
+  <tr>
+    <td width=105 height=40><a href="https://projects.eclipse.org/projects/tools.titan"><img src="../images/titan_transparent.gif" border=0 width=105 height=40 align="left" alt="Titan"></a></td>
+  </tr>
+</table>
+<table border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="../titan_main.html" alt="contents"><img border="0" src="../images/ao.jpg" width="53" height="40"></a></td>
+    <td><a href="../titan_index.html" alt="index"><img border="0" src="../images/up.jpg" width="53" height="40"></a></td>
+    <td><a href="modifies.html" alt="previous"><img border="0" src="../images/left.jpg" width="53" height="40"></a></td>
+    <td><a href="modulepar.html" alt="next"><img border="0" src="../images/right.jpg" width="53" height="40"></a></td>
+  </tr>
+</table>
+<p><br clear="all">
+</p>
+<hr>
+<h1>module</h1>
+<hr align="left" width="75%">
+<p>The principal building blocks of TTCN-3 are modules written as free text files: line breaks or paragraph marks may be used without restrictions.&nbsp;
+<ul>
+  <li>A test suite consists of one or more modules; there is no hierarchy between modules;</li>
+  <li>a module contains a module definitions and an (optional) module control part;</li>
+  <li>In the module definitions part, definitions can be collected in named <a href="group.html"><b><font face="Courier New" color="#003258" size="4">group</font></b></a>s.</li>
+  <li>modules can have parameters supplied to the module at run-time and are considered constant during test execution;</li>
+  <li>modules can have attributes giving additional information, like coding rules or the size of a table.</li>
+</ul>
+<p>Related keywords:</p>
+<ul>
+  <li><a href="control.html"><b><font face="Courier New" color="#003258" size="4">control</font></b></a></li>
+  <li><a href="group.html"><b><font face="Courier New" color="#003258" size="4">group</font></b></a></li>
+  <li><a href="modulepar.html"><b><font face="Courier New" color="#003258" size="4">modulepar</font></b></a></li>
+  <li><a href="with.html"><b><font face="Courier New" color="#003258" size="4">with</font></b></a></li>
+</ul>
+<hr align="left" width="50%">
+<div align="center">
+<center>
+<table border="0" width="90%" bgcolor="#FFB599" cellpadding="4">
+  <tr>
+    <td width="100%">
+    <h3 align="center"><font face="Courier New" color="#003258" size="5"><b>module</b></font> <i>module_identifier</i> <font face="Courier New" color="#003258" size="5"><b>{</b></font> [ <i>module_definitions</i>
+    ]&nbsp; [ <font face="Courier New" color="#003258" size="5"><b>control {</b></font><i>module_control</i> <b><font face="Courier New" color="#003258" size="5">}</font></b> ] <b><font
+      face="Courier New" color="#003258" size="5">}</font></b> [ <font face="Courier New" color="#003258" size="5"><b>with </b></font><i>attributes</i> ]</h3>
+    </td>
+  </tr>
+</table>
+</center>
+</div>
+<ul>
+  <li>
+  <p>The <font face="Courier New" color="#003258" size="4"><b>module</b></font> keyword introduces the module definition.</p>
+  </li>
+  <li>
+  <p><i>module_identifier</i> is the&nbsp;name used to refer to the module. Must begin with a letter, may contain letters, numbers and underscore characters.</p>
+  </li>
+  <li>
+  <p>the optional <i>module_definitions</i> part may contain type, constant, template, function, signature, testcase, altstep and group definitions.</p>
+  </li>
+  <li>
+  <p>the optional <i>module_control</i> part states the execution order of the test cases (cf. the keyword <a href="execute.html"><b><font face="Courier New">execute</font></b></a>) and may
+  contain local definitions.</p>
+  </li>
+  <li>
+  <p><i>attributes:</i> see the keyword <b><font face="Courier New"><a href="with.html">with</a></font></b> for details.</p>
+  </li>
+</ul>
+<hr align="left" width="50%">
+<p><a name="parametrized">Example</a>
+<p><font face="Courier New">module Principal {<br>
+modulepar float tsp_hlavni;<br>
+modulepar integer tsp_vypinac, tsp_nouzove;<br>
+<br>
+type component CT {};<br>
+type enumerated Examplg {jeudi, vendredi, samedi};<br>
+<br>
+testcase tcprov() runs on CT { <br>
+/* Imagine Test Case body here */<br>
+};<br>
+control {execute (tc_prov())}</font><br>
+}
+<p>The module Principal declared here has one float (tsp_hlavni) and two integer module parameters (tsp_vypinac, tsp_nouzove), an empty component type (CT) as well as an enumerated type (Examplg)
+defined in the module definitions part. The control part contains the execution of the test case tc_prov.</p>
+<hr align="left" width="25%">
+<hr align="left" width="25%">
+<p><a HREF="BNF.html#ttcn3module">BNF definition</a> of <font face="Courier New"> module</font></p>
+</body>
+</html>

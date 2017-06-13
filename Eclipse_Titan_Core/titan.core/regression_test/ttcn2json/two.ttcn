@@ -1,0 +1,39 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+
+module two {
+  type record of integer Ints with { encode "JSON" };
+
+  type set of universal charstring Strings;
+
+  type float Floats[6];
+
+  type record of Ints Intses with { variant "JSON:extend(alias):(RoRoI)"; };
+
+  type record of bitstring Bits;
+
+  type record of hexstring Hexes;
+
+  type set of octetstring Octets with { variant "JSON: extend(comment):(set of octetstrings)"; };
+
+  type charstring Two__Strings[2];
+
+  type record of verdicttype Verdicts with { variant([-]) "JSON: extend (comment) : (verdict type)"; };
+
+  type integer PosInt (0..infinity);
+  
+  type record of PosInt PosInts;
+
+  external function f_dec_ints(in octetstring os, out Ints x)
+  with { extension "prototype(fast) decode(JSON)" }
+}

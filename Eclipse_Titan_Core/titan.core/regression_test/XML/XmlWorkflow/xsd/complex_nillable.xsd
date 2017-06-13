@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="www.example.org/complex/nillable"> 
+
+
+
+  <xsd:complexType name="conditions-type">
+      <xsd:sequence>
+         <xsd:element name="caller-identity" nillable="true" minOccurs="0">
+            <xsd:complexType>
+               <xsd:choice>
+                  <xsd:element name="anonymous" type="string">
+                  </xsd:element>
+                  <!-- no nilling at the level of identity - use nilling on fcd-caller-identity to remove -->
+                  <xsd:element name="identity" type="string">
+                  </xsd:element>
+               </xsd:choice>
+            </xsd:complexType>
+         </xsd:element>
+         <!-- media is a multiple value parameter -->
+         <xsd:element name="media" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded">
+         </xsd:element>
+         <xsd:element name="status" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded">
+         </xsd:element>
+		 <xsd:element name="identity" type="string" nillable="true" minOccurs="0">
+			
+		</xsd:element>
+         <xsd:element name="request" type="string" nillable="true" minOccurs="0" maxOccurs="unbounded">
+            
+         </xsd:element>
+	</xsd:sequence>
+   </xsd:complexType>
+
+<xsd:element name='anything-nil' nillable='true'/> 
+<xsd:element name='anything-nil2' type="xsd:anyType" nillable='true'/> 
+
+<xsd:element name="common">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element name="integration" nillable="true" minOccurs="0" maxOccurs="5">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="forename" type="xsd:string" nillable="true"/>
+						<xsd:element name="surname" type="xsd:string" nillable="true"/>
+						<xsd:element name="livingAddress" type="xsd:string"/>
+					</xsd:sequence>
+					<xsd:attribute name="bar" type="xsd:integer"/>
+					<xsd:attribute name="foo">
+						<xsd:simpleType>
+							<xsd:restriction base="string">
+								<xsd:length value="7"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+					<xsd:attribute name="goo" type="xsd:integer"/>
+					<xsd:anyAttribute namespace="##targetNamespace"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+
+</xsd:schema>

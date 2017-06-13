@@ -1,0 +1,128 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Raduly, Csaba
+ *
+ ******************************************************************************/
+module float_to_OK {
+
+type component PDTestComponent {};
+
+/*--- FLOAT2INT --------------------------------------------------*/
+
+
+modulepar integer f2ipar1 := float2int(5E-1)
+modulepar integer f2ipar2 := float2int(0.345)
+modulepar integer f2ipar3 := float2int(-0.345)
+modulepar integer f2ipar4 := float2int(-5E0)
+modulepar integer f2ipar5 := float2int(12345678910000.0)
+modulepar integer f2ipar6 := float2int(12345678910e+4)
+modulepar integer f2ipar7 := float2int(4294967296.0)
+
+testcase float_to_int() runs on PDTestComponent{
+
+	if ((f2ipar1 == 0)
+	and (f2ipar1 == float2int(5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2ipar2 == 0)
+	and (f2ipar2 == float2int(0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2ipar3 == 0)
+	and (f2ipar3 == float2int(-0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2ipar4 == -5)
+	and (f2ipar4 == float2int(-5E0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	// Tests added for HL22929.
+    if ((f2ipar5 == 12345678910000)
+	and (f2ipar5 == float2int(12345678910000.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+    if ((f2ipar6 == 123456789100000)
+	and (f2ipar6 == float2int(12345678910e+4)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+    if ((f2ipar7 == 4294967296)
+	and (f2ipar7 == float2int(4294967296.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+    var float f2ivar1 := 12345678910000.0
+    var float f2ivar2 := 12345678910e+4
+    var float f2ivar3 := 4294967296.0
+    if ((float2int(f2ivar1) == 12345678910000)
+	and (float2int(f2ivar1) == float2int(12345678910000.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+    if ((float2int(f2ivar2) == 123456789100000)
+	and (float2int(f2ivar2) == float2int(123456789100000.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+    if ((float2int(f2ivar3) == 4294967296)
+	and (float2int(f2ivar3) == float2int(4294967296.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+
+/*--- FLOAT2STR --------------------------------------------------*/
+
+modulepar charstring f2spar := "1234567890123456789012345678901234567890"
+
+modulepar charstring f2spar1 := float2str(5E-1)
+modulepar charstring f2spar2 := float2str(-5E-1)
+modulepar charstring f2spar3 := float2str(0.345)
+modulepar charstring f2spar4 := float2str(-0.345)
+modulepar charstring f2spar5 := float2str(0.1234567)
+modulepar charstring f2spar6 := float2str(123456748901.0)
+modulepar charstring f2spar7 := float2str(123456758901.0)
+
+
+testcase float_to_str() runs on PDTestComponent{
+
+	if ((f2spar1 == "0.500000")
+	and (f2spar1 == float2str(5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar2 == "-0.500000")
+	and (f2spar2 == float2str(-5E-1)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar3 == "0.345000")
+	and (f2spar3 == float2str(0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar4 == "-0.345000")
+	and (f2spar4 == float2str(-0.345)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar5 == "0.123457")
+	and (f2spar5 == float2str(0.1234567)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar6 == "1.234567e+11")
+	and (f2spar6 == float2str(123456748901.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+	if ((f2spar7 == "1.234568e+11")
+	and (f2spar7 == float2str(123456758901.0)))
+	     {setverdict(pass);}
+	else {setverdict(fail);}
+
+}
+
+control {
+	execute (float_to_int());
+	execute (float_to_str());
+}
+
+}

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2000-2017 Ericsson Telecom AB
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+  Balasko, Jeno
+  Raduly, Csaba
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="JMdict">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="entry"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="entry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ent_seq"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="k_ele"/>
+        <xs:element maxOccurs="unbounded" ref="r_ele"/>
+        <xs:element minOccurs="0" ref="info"/>
+        <xs:element maxOccurs="unbounded" ref="sense"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ent_seq" type="xs:integer"/>
+  <xs:element name="k_ele">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="keb"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ke_inf"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ke_pri"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="keb" type="xs:string"/>
+  <xs:element name="ke_inf" type="xs:NCName"/>
+  <xs:element name="ke_pri" type="xs:NCName"/>
+  <xs:element name="r_ele">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="reb"/>
+        <xs:choice>
+          <xs:element ref="re_nokanji"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="re_restr"/>
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="re_inf"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="re_pri"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="reb" type="xs:string"/>
+  <xs:element name="re_nokanji">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="re_restr" type="xs:string"/>
+  <xs:element name="re_inf" type="xs:NCName"/>
+  <xs:element name="re_pri" type="xs:NCName"/>
+  <xs:element name="info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="audit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="audit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="upd_date"/>
+        <xs:element ref="upd_detl"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="upd_date" type="xs:NMTOKEN"/>
+  <xs:element name="upd_detl" type="xs:string"/>
+  <xs:element name="sense">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="stagk"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="stagr"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pos"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="xref"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ant"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="field"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="misc"/>
+        <xs:element minOccurs="0" ref="s_inf"/>
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="dial"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="lsource"/>
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="gloss"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="stagk" type="xs:string"/>
+  <xs:element name="stagr" type="xs:NCName"/>
+  <xs:element name="pos" type="xs:NCName"/>
+  <xs:element name="xref" type="xs:string"/>
+  <xs:element name="ant" type="xs:string"/>
+  <xs:element name="field" type="xs:NCName"/>
+  <xs:element name="misc" type="xs:NCName"/>
+  <xs:element name="s_inf" type="xs:string"/>
+  <xs:element name="dial" type="xs:NCName"/>
+  <xs:element name="lsource">
+    <xs:complexType mixed="true">
+      <xs:attribute name="ls_wasei" type="xs:NCName"/>
+      <xs:attribute name="lang" type="xs:language" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="gloss">
+    <xs:complexType mixed="true">
+      <xs:attribute name="lang" type="xs:language" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

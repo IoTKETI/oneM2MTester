@@ -1,0 +1,52 @@
+/******************************************************************************
+ * Copyright (C) 2017 ETSI  All Rights Reserved.
+ *
+ * Adrien Kirjak
+ *
+ ** @version  0.0.1
+ ** @purpose  9:7.1.4, a list with minOccurs 0 should not be mapped optional in TTCN-3
+ ** @verdict  pass reject
+ ***************************************************/
+module Neg_070104_minoccurs_and_maxoccurs_001 {
+
+    import from schema_Neg_070104_minoccurs_and_maxoccurs_001 language "XSD" all;
+
+	// foo_list should not be optional
+    template ElemE15b m_msg := {foo_list := omit, bar := 3.0}
+
+	external function enc_MyType(in ElemE15b pdu) return octetstring
+  	 with { extension "prototype (convert) encode(XER:XER_EXTENDED)" }
+  
+  	external function dec_MyType(in octetstring stream) return ElemE15b
+  	 with { extension "prototype (convert) decode(XER:XER_EXTENDED)" }
+
+    /**
+     * @desc The timeout given in seconds after which the test case will be stopped.
+     */
+    modulepar float PX_TC_EXECUTION_TIMEOUT := 5.0;
+
+    type universal charstring Raw;
+
+    type port P message {
+        inout Raw;
+    } with {extension "internal"}
+
+    type component C {
+        port P p;
+		port P p1;
+    }
+
+    testcase TC_Neg_070104_minoccurs_and_maxoccurs_001() runs on C system C {
+        connect(self:p, self:p1);
+
+		p.send(oct2unichar(enc_MyType(valueof(m_msg))));
+        log("template should either be rejected by compiler or by runtime latest while encoding");
+
+        setverdict(fail, "Invalid template should not be encoded");
+    }
+
+    control {
+        execute(TC_Neg_070104_minoccurs_and_maxoccurs_001(), PX_TC_EXECUTION_TIMEOUT);
+    }
+
+}

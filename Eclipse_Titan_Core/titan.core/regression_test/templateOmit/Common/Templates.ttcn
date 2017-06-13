@@ -1,0 +1,58 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+ 
+module Templates {
+
+import from Types all;
+
+/* * * * Templates * * * */
+template integer t_int_value_list := ( 1, 3, 5, 7 );
+template integer t_int_comp_list := complement ( 2, 4, 6, 8 );
+
+template integer t_int_comp_list_p(template integer ti := 2) := complement ( ti, 4, 6, 8 );
+
+template charstring t_char_value_list := ( "a", "aa", "aaa" );
+template charstring t_char_comp_list := complement ( "b", "bb", "bbb" );
+
+template Rec t_rec_value_list := ( { 3.0, '03'O }, { 1.0, '01'O } );
+template Rec t_rec_comp_list := complement ( { 2.0, '02'O }, { 4.0, '04'O } );
+
+template SoBS t_setof_value_list := ( { '1'B, '10'B, '11'B }, { '100'B, '101'B, '110'B } );
+template SoBS t_setof_comp_list := complement ( { '111'B, '1110'B, '1111'B }, { '100'B, '101'B, '110'B } );
+
+template Uni t_uni_value_list := ( { b := true }, { hs := 'DEADBEEF'H }, { ucs := "x" }, { vt := fail } );
+template Uni t_uni_comp_list := complement ( { b := false }, { hs := 'DEADBEEF'H }, { ucs := "x" }, { vt := fail } );
+
+template Enum t_enum_value_list := ( First, Second );
+template Enum t_enum_comp_list := complement ( Second, Third );
+
+template Everything t_every_value_list := { t_int_value_list, t_char_value_list, t_rec_value_list, t_setof_value_list, t_uni_value_list, t_enum_value_list };
+template Everything t_every_comp_list := { t_int_comp_list, t_char_comp_list, t_rec_comp_list, t_setof_comp_list, t_uni_comp_list, t_enum_comp_list };
+
+/* * * * Test values * * * */
+const Everything c_int_omitted   := { omit,  "a", { 1.0, '01'O }, { '1'B, '10'B, '11'B }, { b := true }, First };
+const Everything c_char_omitted  := {    3, omit, { 1.0, '01'O }, { '1'B, '10'B, '11'B }, { b := true }, First };
+const Everything c_rec_omitted   := {    3,  "a",           omit, { '1'B, '10'B, '11'B }, { b := true }, First };
+const Everything c_setof_omitted := {    3,  "a", { 1.0, '01'O },                   omit, { b := true }, First };
+const Everything c_uni_omitted   := {    3,  "a", { 1.0, '01'O }, { '1'B, '10'B, '11'B },          omit, First };
+const Everything c_enum_omitted  := {    3,  "a", { 1.0, '01'O }, { '1'B, '10'B, '11'B }, { b := true },  omit };
+
+// Template for matching the result of a logged matching :)
+template charstring t_unmatched := pattern "*unmatched*";
+
+// Error signal template
+// (this is sent as the reply's 'out' parameter when 'getcall' fails,
+// it is also used in the 'getreply' operations to match error signals)
+template Everything t_bad_call := { -1, ? /* will contain the error message */, { -1.0, ''O }, {}, { b := false }, First };
+
+}

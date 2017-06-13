@@ -1,0 +1,86 @@
+/******************************************************************************
+* Copyright (c) 2000-2017 Ericsson Telecom AB
+*
+* XSD to TTCN-3 Translator
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Balasko, Jeno
+*   Szabo, Bence Janos
+*
+******************************************************************************/
+//
+//  File:          www_example_org_seq_group_reference.ttcn
+//  Description:
+//  References:
+//  Rev:
+//  Prodnr:
+//  Updated:       Thu Aug  6 13:56:12 2014
+//  Contact:       http://ttcn.ericsson.se
+//
+////////////////////////////////////////////////////////////////////////////////
+//	Generated from file(s):
+//	- seq_group_reference.xsd
+//			/* xml version = "1.0" encoding = "UTF-8" */
+//			/* targetnamespace = "www.example.org/seq/group/reference" */
+////////////////////////////////////////////////////////////////////////////////
+//     Modification header(s):
+//-----------------------------------------------------------------------------
+//  Modified by:
+//  Modification date:
+//  Description:
+//  Modification contact:
+//------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+
+
+module www_example_org_seq_group_reference {
+
+
+import from XSD all;
+
+
+type record E15f
+{
+	XSD.String foobarGroup,
+	XSD.String foo,
+	XSD.String bar
+}
+with {
+  variant "name as uncapitalized";
+};
+
+
+type record E15fa
+{
+	record of XSD.String foobarGroup_list,
+	record length(5 .. 10) of FoobarGroup foobarGroup_list_1
+}
+with {
+  variant "name as uncapitalized";
+  variant (foobarGroup_list) "untagged";
+  variant (foobarGroup_list[-]) "name as 'foobarGroup'";
+  variant (foobarGroup_list_1) "untagged";
+};
+
+
+type record FoobarGroup
+{
+	XSD.String foo,
+	XSD.String bar
+}
+with {
+  variant "untagged";
+};
+
+
+}
+with {
+  encode "XML";
+  variant "namespace as 'www.example.org/seq/group/reference' prefix 'ns9'";
+  variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
+}

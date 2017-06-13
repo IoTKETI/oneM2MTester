@@ -1,0 +1,61 @@
+/******************************************************************************
+ * Copyright (c) 2000-2017 Ericsson Telecom AB
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Balasko, Jeno
+ *   Baranyi, Botond
+ *
+ ******************************************************************************/
+module TempRes_SE { //^In TTCN-3 module//
+
+type record Rec {
+  integer i,
+  float f,
+  charstring cs,
+  octetstring os
+}
+
+template (present) Rec t_original(in template (present) integer pt_i) := { //^Referenced template parameter is here$//2
+  i := pt_i, //^warning: Inadequate restriction on the referenced template parameter//2
+  f := ?, //^Referenced template is here$//
+  cs := ?, //^Referenced template is here$//2
+  os := ? //^Referenced template is here$//2
+}
+
+template (present) Rec t_modified(in template (present) integer pt_i, in template (present) float pt_f) //^Referenced template parameter is here$//
+  modifies t_original := {
+  f := pt_f //^warning: Inadequate restriction on the referenced template parameter//
+}
+
+function f_rec_temp(in template (value) Rec pt_rec_temp) { 
+  log(pt_rec_temp);
+}
+
+template float t_f := (-10.0..-1.0); //^Referenced template is here$//
+template charstring t_cs := ("abc", "def") ifpresent; //^Referenced template is here$//
+
+function f_float_temp() return template (value) float { //^In function definition// 
+  return t_f; //^In return statement// //^error: Restriction on return template does not allow usage of value range match$//
+}
+
+control { //^In control part//
+  var template (present) charstring vt_cs := "a";
+
+  var template integer vt_i := 3; //^Referenced template variable is here$//
+
+  f_rec_temp(t_modified(3, f_float_temp())); //^In function instance// //^In actual parameter list of function// \
+  //^In parameter #1 for// //^error: Restriction on template formal parameter does not allow usage of any value$//2
+
+  f_rec_temp(t_original(vt_i)); //^In function instance// //^In actual parameter list of function// \
+  //^In parameter #1 for//2 //^In actual parameter list of template// \
+  //^warning: Inadequate restriction on the referenced template variable// \
+  //^error: Restriction on template formal parameter does not allow usage of any value$//3
+
+  vt_cs := t_cs; //^In variable assignment:$// //^error: Restriction on template does not allow usage of \`ifpresent\'$//
+}
+
+}

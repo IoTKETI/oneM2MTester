@@ -1,0 +1,146 @@
+--/////////////////////////////////////////////////////////////////////////////
+-- Copyright (c) 2000-2017 Ericsson Telecom AB
+-- All rights reserved. This program and the accompanying materials
+-- are made available under the terms of the Eclipse Public License v1.0
+-- which accompanies this distribution, and is available at
+-- http://www.eclipse.org/legal/epl-v10.html
+--
+-- Contributors:
+--   Balasko, Jeno
+--   Forstner, Matyas
+--   Koppany, Csaba
+--   Szabados, Kristof
+--   Szabo, Janos Zoltan – initial implementation
+--
+--/////////////////////////////////////////////////////////////////////////////
+Regr1
+DEFINITIONS
+
+AUTOMATIC TAGS
+EXTENSIBILITY IMPLIED
+
+::=
+
+BEGIN
+
+EXPORTS T4, c4e, c6a;
+IMPORTS ;
+
+T0 ::= NULL
+c0a T0 ::= NULL
+d0a OCTET STRING ::= '0500'H
+
+T1 ::= BOOLEAN
+c1a T1 ::= TRUE
+d1a OCTET STRING ::= '0101FF'H
+c1b T1 ::= FALSE
+d1b OCTET STRING ::= '010100'H
+
+T2 ::= [APPLICATION 1] EXPLICIT [PRIVATE v2] [APPLICATION 3] EXPLICIT
+  [PRIVATE 20021018] T1
+c2a T2 ::= c1a
+d2a OCTET STRING ::= '6109E307DF89C5FE1A01FF'H
+c2b T2 ::= c1b
+d2b OCTET STRING ::= '6109E307DF89C5FE1A0100'H
+
+v1 INTEGER ::= 2002
+v2 INTEGER ::= 3
+v3 INTEGER {v1(v2), v2(v1)} ::= v2 -- 2002
+
+T3 ::= [c3a] EXPLICIT INTEGER {zero(0), v1(1492), v2(v3)}
+c3a T3 ::= v1 -- 1492
+d3a OCTET STRING ::= 'BF8B5404020205D4'H
+c3b T3 ::= v2 -- 2002
+d3b OCTET STRING ::= 'BF8B5404020207D2'H
+
+c3c T3 ::= 0
+d3c OCTET STRING ::= 'BF8B5403020100'H
+c3d T3 ::= 127
+d3d OCTET STRING ::= 'BF8B540302017F'H
+c3e T3 ::= 128
+d3e OCTET STRING ::= 'BF8B540402020080'H
+c3f T3 ::= 32767
+d3f OCTET STRING ::= 'BF8B540402027FFF'H
+c3g T3 ::= 32768
+d3g OCTET STRING ::= 'BF8B54050203008000'H
+c3h T3 ::= 8388607
+d3h OCTET STRING ::= 'BF8B540502037FFFFF'H
+c3i T3 ::= 8388608
+d3i OCTET STRING ::= 'BF8B5406020400800000'H
+c3j T3 ::= 2147483647
+d3j OCTET STRING ::= 'BF8B540602047FFFFFFF'H
+c3k T3 ::= -128
+d3k OCTET STRING ::= 'BF8B5403020180'H
+c3l T3 ::= -129
+d3l OCTET STRING ::= 'BF8B54040202FF7F'H
+c3m T3 ::= -32768
+d3m OCTET STRING ::= 'BF8B540402028000'H
+c3n T3 ::= -32769
+d3n OCTET STRING ::= 'BF8B54050203FF7FFF'H
+c3o T3 ::= -8388608
+d3o OCTET STRING ::= 'BF8B54050203800000'H
+c3p T3 ::= -8388609
+d3p OCTET STRING ::= 'BF8B54060204FF7FFFFF'H
+c3q T3 ::= -2147483648
+d3q OCTET STRING ::= 'BF8B5406020480000000'H
+
+T4 ::= ENUMERATED {three(v2), one, zero(0), minusone(-1), two}
+c4a T4 ::= minusone
+c4b T4 ::= zero
+c4c T4 ::= one
+c4d T4 ::= two
+c4e T4 ::= three
+d4a OCTET STRING ::= '0A01FF'H
+d4b OCTET STRING ::= '0A0100'H
+d4c OCTET STRING ::= '0A0101'H
+d4d OCTET STRING ::= '0A0102'H
+d4e OCTET STRING ::= '0A0103'H
+
+T5 ::= REAL
+c5a T5 ::= PLUS-INFINITY
+c5b T5 ::= MINUS-INFINITY
+c5c T5 ::= 0
+c5d T5 ::= {mantissa v2, base 10, exponent 2} -- 300.0
+c5e T5 ::= {mantissa 3, base 2, exponent 4} -- 48.0
+c5f T5 ::= 0.34
+d5a OCTET STRING ::= '090140'H
+d5b OCTET STRING ::= '090141'H
+d5c OCTET STRING ::= '0900'H
+d5d OCTET STRING ::= '090503 33 2E45 32'H -- 3 .E 2
+d5e OCTET STRING ::= '090703 3438 2E45 2B 30'H -- 48 .E + 0
+d5f OCTET STRING ::= '090703 3334 2E45 2D 32'H -- 34 .E - 2
+
+T6 ::= BIT STRING {first(0), third(v2)}
+c6a T6 ::= '11000011'B
+c6b T6 ::= 'A'H
+c6c T6 ::= {}
+c6d T6 ::= ''H
+c6e T6 ::= '0'B
+c6f T6 ::= {first, third}
+d6a OCTET STRING ::= '030200C3'H
+d6b OCTET STRING ::= '030204A0'H
+d6c OCTET STRING ::= '030100'H
+d6d OCTET STRING ::= d6c
+d6e OCTET STRING ::= '03020700'H
+
+T7 ::= OCTET STRING
+c7a T7 ::= '11000011'B
+c7b T7 ::= 'A'H
+c7c T7 ::= 'FABAB'H
+c7d T7 ::= ''H
+c7e T7 ::= '0'B
+d7a OCTET STRING ::= '0401C3'H
+d7b OCTET STRING ::= '0401A0'H
+d7c OCTET STRING ::= '0403FABAB0'H
+d7d OCTET STRING ::= '0400'H
+d7e OCTET STRING ::= '040100'H
+
+T8 ::= OBJECT IDENTIFIER
+c8a T8 ::= {iso member-body bsi(826) disc(0) ericsson(1249)}
+c8b T8 ::= {itu-t identified-organization etsi(0) reserved(127)
+            etsi-identified-organization(0) ericsson(5) 3 4}
+
+d8a OCTET STRING ::= '06062A863A008961'H
+d8b OCTET STRING ::= '060704007F00050304'H
+
+END
