@@ -52,6 +52,9 @@ Visit [wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
     ![InnoWireless logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/innowireless-logo.png)
 
 ## **Latest News**
+[2017 September]
+- oneM2MTester version 2.1.0 is ready for download!! 
+
 [2017 June]
 - oneM2MTester version 2.0 participated oneM2M conformance test sessions in 2017 ETSI Plugtest event!! 
 
