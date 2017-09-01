@@ -1,0 +1,153 @@
+/******************************************************************************
+* Copyright (c) 2004, 2014  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Eduard Czimbalmos - initial implementation and initial documentation
+*   Istvan Ovary
+*   Peter Dimitrov
+*   Balasko Jeno
+*   Gabor Szalai
+******************************************************************************/
+//
+//  File:               HTTPmsg_Types.ttcn
+//  Description:        HTTP Message and TCP connection handling ASP types
+//  Rev:                R8G
+//  Prodnr:             CNL 113 469
+
+
+module HTTPmsg_Types {
+
+modulepar {
+  boolean tsp_socket_debugging := true;
+  strict_crlf_mode crlf_mode:=WARNING_ONCE;
+}
+
+external function enc_HTTPMessage( in HTTPMessage msg) return octetstring;
+external function dec_HTTPMessage( in octetstring stream, inout HTTPMessage msg, in boolean socket_debugging := tsp_socket_debugging) return integer;
+
+
+type enumerated strict_crlf_mode {ERROR, WARNING, WARNING_ONCE, ACCEPT};
+/* Basic types */
+
+type record HeaderLine {
+  charstring header_name,
+  charstring header_value
+};
+
+type record of HeaderLine HeaderLines;
+
+type record HTTPResponse {
+  // client_id is used only in case of multiple connections, otherwise set it to omit
+  integer client_id optional,
+  integer version_major,
+  integer version_minor,
+  integer statuscode,
+  charstring statustext,
+  HeaderLines header,
+  charstring body
+};
+
+type record HTTPRequest {
+  // client_id is used only in case of multiple connections, otherwise set it to omit
+  integer client_id optional,
+  charstring method,
+  charstring uri,
+  integer version_major,
+  integer version_minor,
+  HeaderLines header,
+  charstring body
+};
+
+type record HTTPResponse_binary_body {
+  // client_id is used only in case of multiple connections, otherwise set it to omit
+  integer client_id optional,
+  integer version_major,
+  integer version_minor,
+  integer statuscode,
+  charstring statustext,
+  HeaderLines header,
+  octetstring body
+};
+
+type record HTTPRequest_binary_body {
+  // client_id is used only in case of multiple connections, otherwise set it to omit
+  integer client_id optional,
+  charstring method,
+  charstring uri,
+  integer version_major,
+  integer version_minor,
+  HeaderLines header,
+  octetstring body
+};
+
+type record HTTP_erronous_msg {
+  // client_id is used only in case of multiple connections, otherwise set it to omit
+  integer client_id optional,
+  charstring msg
+}
+
+type union HTTPMessage {
+  HTTPResponse response,
+  HTTPRequest request,
+  HTTPResponse_binary_body response_binary,
+  HTTPRequest_binary_body request_binary,
+  HTTP_erronous_msg erronous_msg
+};
+
+/*
+ * Connection handling ASPs
+ */
+
+// Closes all connections, or the specified one only.
+// client_id = omit means close all connections.
+// Close comes when a connection gets disconnected
+type record Close {
+  // when sending, client_id shall be used in case of multiple connections
+  // when receiving, client_id determines the client which has disconnected
+  integer client_id optional
+};
+
+type record Connect {
+  charstring hostname,
+  integer portnumber,
+  boolean use_ssl
+};
+
+// Received by the client after Connect is sent.
+// The client_id will be filled with -1 if unsuccessful.
+// Returned client_id shall be used to distinguish between the open connections.
+type record Connect_result {
+  integer client_id
+}
+
+// Received when the server has accepted an incoming connection.
+type record Client_connected {
+  charstring hostname,
+  integer portnumber (1..65535),
+  integer client_id
+};
+
+// Sent when the local end of the connection has to be shut down for writing.
+// Received when the remote end of the connection has been shut down for writing.
+type record Half_close {
+  integer client_id optional
+};
+
+type record Listen {
+  charstring local_hostname optional,
+  integer portnumber,
+  boolean use_ssl
+};
+
+// Received after Listen. Sends back the listening port number, -1 on fail
+type record Listen_result {
+  integer portnumber (-1..65535)
+};
+
+type record Shutdown {};
+
+}
