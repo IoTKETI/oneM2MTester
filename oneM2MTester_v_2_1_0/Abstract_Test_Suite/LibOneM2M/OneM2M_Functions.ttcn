@@ -1464,7 +1464,14 @@ module OneM2M_Functions {
 			
 			if (p_resourceType == int9) {//group
 				if(match(valueof(p_request.primitiveContent.group_.memberIDs), v_defaultListOfURIs )){
-					p_request.primitiveContent.group_.memberIDs := {f_getResourceId(vc_resourcesList[p_parentIndex].resource)};
+				  if(p_parentIndex != -1){ 
+						p_request.primitiveContent.group_.memberIDs := {f_getResourceId(vc_resourcesList[p_parentIndex].resource)};
+				  }else {
+				    	p_request.primitiveContent.group_.memberIDs := {f_getResourceAddress(p_parentIndex)};
+				    
+				  } 
+				  
+				  
 				}
 			}
 			
@@ -1809,12 +1816,11 @@ module OneM2M_Functions {
 			} else if (vc_primitiveScope == e_spRelative) {
 				if(vc_addressingMethod == e_nonHierarchical) {
 					if(p_targetResourceIndex == -1) {
-//						return PX_CSE_ID; 
-						return PX_CSE_ID &  "/" & PX_CSE_NAME; //FIXME @Martin
+
+						return PX_CSE_ID &  "/" & PX_CSE_RESOURCE_ID; 
 					} else {
-//						v_resourceAddress := f_getResourceAddress() & "/" & f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);
-						v_resourceAddress := PX_CSE_ID & "/" & f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);//FIXME @Martin
-						log(__SCOPE__&"-CHECK HERE _____________:\n\n", v_resourceAddress);
+						v_resourceAddress := PX_CSE_ID & "/" & f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);
+						
 						return v_resourceAddress;
 					}
 				} else {
@@ -2308,7 +2314,7 @@ module OneM2M_Functions {
 					v_primitiveContent.subscription.subscriberURI := ?;
 				}
 			}
-			else if(ischosen(p_primitiveContent.remoteCSE)){ //FIXME Added by @Martin
+			else if(ischosen(p_primitiveContent.remoteCSE)){ 
 			  v_primitiveContent := {remoteCSE := mw_contentRemoteCSEBase};
 			  
 			  if(ispresent(p_primitiveContent.remoteCSE.labels)){
