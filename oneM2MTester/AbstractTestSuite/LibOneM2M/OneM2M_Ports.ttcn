@@ -1,0 +1,67 @@
+/**
+ *  Copyright Notification
+ *  No part of this document may be reproduced, in an electronic retrieval system or otherwise, except as authorized by written permission.
+ *  The copyright and the foregoing restriction extend to reproduction in all media.
+ *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
+ *  All rights reserved.
+ *  
+ *  @author     oneM2M
+ *  @version    
+ *  @desc       Port modules for oneM2M Test System       
+ *
+ */
+
+module OneM2M_Ports {
+	
+	import from OneM2M_Types all;
+	
+	/* **************************************
+     * User-defined modules dependencies
+     * **************************************
+	 */
+	 
+	import from OneM2M_DualFaceMapping all;	
+	import from IPL4asp_PortType all;
+	import from IPL4asp_Types all;
+	
+	/* ***************************************
+ 	 * 		oneM2M Ports 
+  	 * ***************************************
+	 */
+	/**
+	 * @desc Port to transport oneM2M primitives
+	 * @desc Output MsgOut   
+	 * @desc Input MsgIn 
+	 * @desc this port is allowed to extend for futher usage  
+     * @desc e.g. extend OneM2MPort to dual-faced port
+	 */
+	type port OneM2MPort message {
+		in 
+			MsgIn,
+			ASP_Event;
+		out 
+			MsgOut;
+	} with {
+	  
+	  extension "user IPL4asp_PT
+	     	out(
+	     		MsgOut 			-> 	ASP_Send 	: function(f_enc_M2MPrimitive_to_ASPSend)
+	     	)
+	     	in(
+	     		ASP_RecvFrom	-> 	MsgIn		: function(f_dec_ASPRecvFrom_to_M2MPrimitive);
+	     		ASP_Event		-> 	ASP_Event	: simple
+	     	)"; 	  
+	     	
+	};
+	
+	/**
+	 * @desc Port to transport Adaptor Control primitives
+	 */
+	type port AdapterControlPort message {
+		in
+			AcResponsePrimitive;
+		out
+			AcRequestPrimitive;
+	}
+
+}//end module

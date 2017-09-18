@@ -444,8 +444,8 @@ namespace OneM2M__DualFaceMapping {
 	//initial mapping functions
 	bool initial_mapping(){
 
-		const char* file_path_l2s 	= "../Lib/Resource_Mapping_Table/long-2-short-mapping.txt";
-		const char* file_path_s2l	= "../Lib/Resource_Mapping_Table/short-2-long-mapping.txt";
+		const char* file_path_l2s 	= "../Lib/ResourceMappingTable/long-2-short-mapping.txt";
+		const char* file_path_s2l	= "../Lib/ResourceMappingTable/short-2-long-mapping.txt";
 		const std::string LONG2SHORT	= "L2S";
 		const std::string SHORT2LONG	= "S2L";
 		bool l2s_flag = long_to_short_name_mapping(file_path_l2s, LONG2SHORT);

@@ -1,0 +1,2399 @@
+/**
+ *  Copyright Notification
+ *  No part of this document may be reproduced, in an electronic retrieval system or otherwise, except as authorized by written permission.
+ *  The copyright and the foregoing restriction extend to reproduction in all media.
+ *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
+ *  All rights reserved.
+ *  
+ *  @author     oneM2M
+ *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/OneM2M_Functions.ttcn $
+ *              $Id: OneM2M_Functions.ttcn 354 2017-08-17 15:06:38Z reinaortega $
+ *  @desc       Module containing functions for oneM2M
+ *
+ */
+module OneM2M_Functions {
+	
+	import from XSD all;
+	import from OneM2M_Templates all;
+	import from OneM2M_Types all;//{type XSD.ID};
+	import from OneM2M_TypesAndValues all;
+	import from OneM2M_TestSystem all;
+	import from OneM2M_Pixits all;
+	import from OneM2M_Pics all;
+//	import from OneM2M_AdditionalTypes all;
+	
+	
+	group ConfigFunctions {
+		
+		/**
+			@desc Ports mapping and default behaviour activation for Config 1
+		*/
+		function f_cf01Up() runs on CseTester {
+				
+			// Variables
+			vc_config := e_cf01;	
+			
+			// Map
+			map(self:mcaPort, system:mcaPort);
+			map(self:acPort, system:acPort);
+			activate(a_default());
+			activate(a_cse_cf01());
+				
+			// Connect
+						
+			//Initialze the IUT
+							
+		} // end f_cf01Up
+		
+		/**
+		 * @desc Ports mapping and default behaviour activation for Config 02
+		 */
+		function f_cf02Up() runs on CseTester {
+				
+			// Variables
+			vc_config := e_cf02;
+				
+			// Map
+			map(self:mcaPort, system:mcaPort);
+			map(self:mccPort, system:mccPort);
+			map(self:acPort, system:acPort);
+			activate(a_default());
+			activate(a_cse_cf02());
+				
+			// Connect
+					
+			//Initialze the IUT
+							
+		} // end f_cf02Up
+		
+		/**
+		 * @desc Ports mapping and default behaviour activation for Config 03
+		 */
+		function f_cf03Up() runs on AeTester {
+		
+			// Variables
+			vc_config := e_cf03;
+			
+			// Map
+			map(self:mcaPort, system:mcaPort);
+			map(self:acPort, system:acPort);
+			activate(a_default());
+			activate(a_ae_cf03());
+		
+			// Connect
+					
+			//Initialze the IUT
+					
+		} // end f_cf03Up
+		
+		/**
+		 * @desc Ports mapping and default behaviour activation for Config 04
+		 */
+		function f_cf04Up() runs on CseTester {
+
+			// Variables
+			vc_config := e_cf04;
+	
+			// Map
+			map(self:mccPort, system:mccPort);
+			map(self:acPort, system:acPort);
+			activate(a_default());
+			activate(a_cse_cf04());
+
+			// Connect
+			
+			//Initialze the IUT
+			
+		} // end f_cf03Up
+
+		/**
+		 * @desc Ports unmapping
+		 * @verdict 
+		 */
+		function f_cfCseTesterDown() runs on CseTester {
+		
+			if(vc_config == e_cf01) {
+				f_cf01Down()
+			} else if (vc_config == e_cf02){
+				f_cf02Down()
+			} 
+		}
+		/**
+		 * @desc Ports unmapping
+		 * @verdict 
+		 */
+		function f_cfAeTesterDown() runs on AeTester {
+		
+			if(vc_config == e_cf03) {
+				f_cf03Down()
+			} 
+		}			
+		/**
+		 * @desc Ports unmapping
+		 * @verdict 
+		 */
+		function f_cf01Down() runs on CseTester {
+		
+			unmap(self:mcaPort, system:mcaPort);
+			unmap(self:acPort, system:acPort);
+		}	
+		/**
+		 * @desc Ports unmapping
+		 * @verdict 
+		 */
+		function f_cf02Down() runs on CseTester {
+		
+			unmap(self:mcaPort, system:mcaPort);
+			unmap(self:mccPort, system:mccPort);
+			unmap(self:acPort, system:acPort);
+		}		
+		/**
+		 * @desc Ports unmapping for Config 03
+		 */
+		function f_cf03Down() runs on AeTester {
+			
+			unmap(self:mcaPort, system:mcaPort);
+			unmap(self:acPort, system:acPort);
+		}
+		
+		/**
+		 * @desc Ports unmapping for Config 04
+		 */
+		function f_cf04Down() runs on CseTester {
+	
+			unmap(self:mccPort, system:mccPort);
+			unmap(self:acPort, system:acPort);
+		}
+		
+	}//end group configFunctions
+	
+	group CseFunctions {
+	
+		group PreambleFunctions {
+
+			/**
+			 * @desc Creation of auxiliar resources ACP for correct execution of the test case
+			 * @param p_allowedOperations Allowed operations for the auxiliar AE resource
+			 * @return Internal ACP resource index
+			 * @verdict 
+			 */
+			function f_cse_preamble_createAcpAux(in template (value) XSD.String p_acpName := c_acpAuxName, in template (value) AccessControlOperations p_allowedOperations := int63) runs on CseTester return integer {//c_CRUDNDi
+			
+				return f_cse_createAccessControlPolicyAux(p_acpName, -,p_allowedOperations);
+			
+			}
+
+	
+			/**
+			 * @desc Creation of auxiliar resources ACP and AE for correct execution of the test case
+			 * @param p_allowedOperations Allowed operations for the auxiliar AE resource
+			 * @return Internal AE resource index
+			 * @verdict 
+			 */
+			function f_cse_preamble_registerAe(template (omit) AcpType p_accessControlPolicyIDs := omit, in template (omit) PoaList p_poaList := omit) runs on CseTester return integer {//c_CRUDNDi
+			
+				var RequestPrimitive v_request;
+				var MsgIn v_response;
+				var integer v_aeAuxIndex := -1;
+								
+				v_request := valueof(m_createAeAux(p_accessControlPolicyIDs, p_poaList));
+				
+				v_request := f_getCreateRequestPrimitive(int2, v_request, -1);
+				
+				mcaPort.send(m_request(v_request));
+				
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass,__SCOPE__&":INFO: Application registered successfuly");
+						if(ischosen(v_response.primitive.responsePrimitive.primitiveContent.aE)) {
+						  	log(__SCOPE__&"-Enter here ....");
+							vc_aeAux := v_response.primitive.responsePrimitive.primitiveContent.aE;
+							
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+						
+							v_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+													
+							
+							if(ispresent(vc_aeAux.aE_ID)){
+								f_sendAcPrimitive("AE-ID_changed", oct2char(unichar2oct(vc_aeAux.aE_ID)));
+							} else {
+								f_sendAcPrimitive("AE-ID_changed", "0");
+							}
+						}
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while registering application");
+						stop;
+					}
+					[] mcaPort.receive {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+						stop;
+					};
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while registering resource");
+						stop;
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+				return v_aeAuxIndex;
+			
+			}
+			
+			/**
+			 * @desc Creation of auxiliar resources ACP and AE for correct execution of the test case
+			 * @param p_allowedOperations Allowed operations for the auxiliar AE resource
+			 * @return Internal AE resource index
+			 * @verdict 
+			 */
+			function f_cse_preamble_registerAeWithId(XSD.ID p_appId, in template (value) AccessControlOperations p_allowedOperations := int63) runs on CseTester return integer {//c_CRUDNDi
+			
+				var RequestPrimitive v_request;
+				var MsgIn v_response;
+				var integer v_aeAuxIndex := -1;
+				var integer v_acpAuxIndex := -1;
+			
+				if(PICS_ACP_SUPPORT){
+					v_acpAuxIndex := f_cse_createAccessControlPolicyAux(p_allowedOperations := p_allowedOperations);
+					vc_acpAuxIndex := v_acpAuxIndex;
+				}
+				
+				if(v_acpAuxIndex != -1) {
+					vc_resourcesIndexToBeDeleted := {v_acpAuxIndex};
+					v_request := valueof(m_createAe(p_appId, {f_getResourceId(vc_resourcesList[v_acpAuxIndex].resource)}, -));
+					
+					//TODO Test, to be removed
+					v_request.to_ := f_getResourceAddress();
+					
+					mcaPort.send(m_request(v_request));
+					//mcaPort.send(m_request(m_createAeAux(p_name, {PX_URI_CSE & PX_CSE_NAME & "/" & PX_ACPAUX_NAME})));
+				} else {
+					mcaPort.send(m_request(m_createAe(p_appId)));
+				}
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&": INFO: Application registered successfuly");
+						if(ischosen(v_response.primitive.responsePrimitive.primitiveContent.aE)) {
+							vc_aeAux := v_response.primitive.responsePrimitive.primitiveContent.aE;
+							
+							v_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+							
+							if(ispresent(vc_aeAux.aE_ID)){
+								f_sendAcPrimitive("AE-ID_changed", oct2char(unichar2oct(vc_aeAux.aE_ID)));
+							} else {
+								f_sendAcPrimitive("AE-ID_changed", "0");
+							}	
+						}
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO))
+					{
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while registering application");
+						stop;
+					}
+					[] mcaPort.receive {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+						stop;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while registering resource");
+						stop;
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+				return v_aeAuxIndex;
+			
+			}
+			
+			function f_cse_preamble_createServiceSubscribedAppRule(in template ListOfM2MID p_allowedAEs := {""}) runs on CseTester return integer {//c_CRUDNDi
+			
+				var integer v_serviceSubscribedAppRuleIndex := -1;
+	
+				v_serviceSubscribedAppRuleIndex := f_cse_createResource(int19, m_createServiceSubscribedAppRule({"None"}, {PX_APP_ID}, valueof(p_allowedAEs)));
+				
+				return v_serviceSubscribedAppRuleIndex;
+			
+			}
+			
+			function f_cse_preamble_subscriptionVerification(out CseTester p_notifyHandler,in integer p_aeIndex, inout integer p_ae2Index, inout template RequestPrimitive p_createRequestPrimitive,in ResourceType p_resourceType, in ResponseStatusCode p_responseStatusCode := int2001) runs on CseTester {
+				if(p_resourceType == int23){
+					p_notifyHandler := CseTester.create("NotifyHandler") alive;
+					p_ae2Index := f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, "MyAe2", {f_getAnnouncementTargetPoA("HTTP", PX_AE2_ADDRESS, "")}), -1); // AE2 is registred
+					if(ischosen(p_createRequestPrimitive.primitiveContent.subscription)){		//this condition is necessary for Subscription TCs where notification URI is set in m_createSubscriptionAdvanced
+						p_createRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(p_ae2Index)}; 
+					}
+					p_notifyHandler.start(f_cse_notifyProcedure_subscriptionVerificationHandler(p_aeIndex, p_responseStatusCode));
+				}
+			}
+		
+		}//end group preambleFunctions
+		
+		group PostambleFunctions {
+	
+			/**
+			 * @desc Deletion of all resources created during the test case execution. IUT gets clean and ready for next execution
+			 * @verdict 
+			 */
+			function f_cse_postamble_deleteResources() runs on CseTester {
+				var integer i;
+				var XSD.ID v_resourceAddress;
+				var RequestPrimitive v_request;
+				
+				if (PX_RUN_POSTAMBLE) {
+					
+					for(i := lengthof(vc_resourcesIndexToBeDeleted) -1; i >=0; i := i - 1) {
+						
+						v_resourceAddress := f_getResourceAddress(vc_resourcesIndexToBeDeleted[i]); 
+						
+						v_request := valueof(m_delete(v_resourceAddress, f_getOriginator(vc_resourcesIndexToBeDeleted[i])));
+						
+						v_request.from_ := f_getOriginator(vc_resourcesIndexToBeDeleted[i]);
+//						
+						mcaPort.send(m_request(v_request));
+						
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
+								tc_ac.stop;
+								log(__SCOPE__&" INFO: Resource " & v_request.to_ & " deleted");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+								tc_ac.stop;
+								log(__SCOPE__&" INFO: Error while deleting resource " & v_request.to_);
+							}
+							[] tc_ac.timeout {
+								log(__SCOPE__&" INFO: No answer while deleting resource " & v_request.to_);
+							}	
+						}	
+						
+					}
+				}
+							
+				f_cse_postamble_default();
+			}
+			
+			/**
+			 * @desc Default postamble
+			 * @verdict 
+			 */
+			function f_cse_postamble_default() runs on CseTester {
+			}
+			
+			function f_is_component_done(in CseTester p_notifyHandler) runs on CseTester {
+			
+				tc_ac.start(10.0);
+				alt {
+					[] p_notifyHandler.done {
+					tc_ac.stop;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__ & "INFO: Notify verification not received");
+					}
+				}
+			} //end f_is_component_done
+			
+			
+		}//end group postambleFunctions
+		
+		group HelpingFunctions {
+	
+			/**
+			 * @desc Creation of a resource
+			 * @param p_resourceType Resource type of the resource to be created
+			 * @param p_requestPrimitive Template request primitive
+			 * @param p_parentIndex Internal resource index which indicates the parent of the resource to be created
+			 * @return Internal resource index of the created resource
+			 * @verdict 
+			 */
+			function f_cse_createResource(in ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive := m_create, integer p_parentIndex := -1) runs on CseTester return integer {
+			
+				var MsgIn v_response;
+				var RequestPrimitive v_request;
+				var integer v_resourceIndex := -1;
+				log(__SCOPE__&"-look HERE ______________:", int2str(p_parentIndex));
+				v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, p_parentIndex);
+			
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Resource type " & int2str(enum2int(p_resourceType)) & " created successfuly");
+						f_checkAttributesToBeSaved(p_resourceType, v_request, v_response.primitive.responsePrimitive);
+						v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, p_resourceType, p_parentIndex);
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while creating resource type " & int2str(enum2int(p_resourceType)));
+					}
+					[] mcaPort.receive {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while creating resource type " & int2str(enum2int(p_resourceType)));
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+				
+				return v_resourceIndex;
+		
+			}
+		
+			/**
+			 * @desc Creation of the auxiliar ACP resource
+			 * @param p_acpName ACP name
+			 * @param p_allowedOperations Allowed operations
+			 * @return Internal resource index of the created auxiliar ACP resource
+			 * @verdict 
+			 */
+			function f_cse_createAccessControlPolicyAux(in template (value) XSD.String p_acpName := c_acpAuxName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63) runs on CseTester return integer{
+				var RequestPrimitive v_request;
+				var MsgIn v_response;
+				var integer v_acpAuxIndex := -1;
+				
+				v_request := valueof(m_createAcpAux(p_acpName := p_acpName, p_allowedOperations := p_allowedOperations));
+				
+				v_request := f_getCreateRequestPrimitive(int1, v_request, -1);
+				
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Resource type " & int2str(1) & " created successfuly");
+						f_checkAttributesToBeSaved(int1, v_request, v_response.primitive.responsePrimitive);
+						v_acpAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int1);
+						vc_acpAuxIndex := v_acpAuxIndex;
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while creating resource type " & int2str(1));
+					}
+					[] mcaPort.receive {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while creating resource type " & int2str(1));
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+			
+				return v_acpAuxIndex;
+	
+			}
+				
+				
+			/**
+			 * @desc Creation of the auxiliar Container resource
+			 * @param p_parentIndex Internal resource index which indicates the parent of the Container resource to be created
+			 * @return Internal resource index of the created Container resource
+			 * @verdict 
+			 */
+			function f_cse_createContainerResourceAux (integer p_parentIndex := -1) runs on CseTester return integer {
+			
+				var RequestPrimitive v_request;
+				var integer v_acpAuxIndex := -1;
+				var integer v_containerResourceIndex := -1;
+				
+				v_acpAuxIndex := f_cse_createAccessControlPolicyAux(p_acpName := c_acpAuxName);//"MyAcp_2"
+				
+				v_request := valueof(m_createContainerBase);
+				v_request.primitiveContent.container.accessControlPolicyIDs := {f_getResourceId(vc_resourcesList[v_acpAuxIndex].resource)};
+				v_request.primitiveContent.container.resourceName := "MyContainerAux";
+				
+				v_containerResourceIndex := f_cse_createResource(int3, v_request, p_parentIndex);
+				
+				return v_containerResourceIndex;		
+		
+			}
+			
+			/**
+			 * @desc 
+			 * @param p_requestPrimitive
+			 * @verdict 
+			 */
+			function f_cse_updateResource(in RequestPrimitive p_requestPrimitive) runs on CseTester {
+				var MsgIn v_response;
+
+				mcaPort.send(m_request(p_requestPrimitive));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Attribute of resource updated successfuly");
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while updating resource");
+					}
+					[] mcaPort.receive{
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while updating resource");
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+				
+			}// end f_cse_updateResource
+			
+			/**
+			 * @desc 
+			 * @param p_resourceIndex
+			 * @verdict 
+			 */
+			function f_cse_retrieveResource(integer p_resourceIndex) runs on CseTester return PrimitiveContent{
+				var MsgIn v_response;
+
+				mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Resource retrieved successfuly");
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while retrieving resource");
+					}
+					[] mcaPort.receive{
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while retrieving resource");
+					}
+				}	
+				
+				f_checkCseTesterStatus();
+				
+				return v_response.primitive.responsePrimitive.primitiveContent;
+				
+			}// end f_cse_retrievingResource
+			
+			/**
+			 * @desc 
+			 * @param p_requestPrimitive
+			 * @verdict 
+			 */
+			function f_cse_deleteResource(in integer p_index, in template (omit) RequestPrimitive p_requestPrimitive := omit) runs on CseTester {
+				var RequestPrimitive v_request;
+				
+				if(not isvalue(p_requestPrimitive)) {
+					v_request := valueof(m_delete(f_getResourceAddress(p_index), f_getOriginator(p_index)));
+				} else {
+					v_request := valueof(p_requestPrimitive);
+				}
+				
+				mcaPort.send(m_request(v_request));
+						
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&"INFO: Resource " & v_request.to_ & " deleted");
+						
+						f_removeElementFromList(vc_resourcesIndexToBeDeleted, p_index);
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&"INFO: Error while deleting resource " & v_request.to_);
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&"INFO: No answer while deleting resource " & v_request.to_);
+					}	
+				}	
+				
+				f_checkCseTesterStatus();
+				
+			}// end f_cse_deleteResource
+			
+			/**
+			 * @desc Check that a resource is present in the IUT (resourceId is known)
+			 * @param p_resourceIndex Resource index 
+			 * @return boolean
+			 */
+			function f_isResourcePresent (integer p_resourceIndex) runs on CseTester return boolean {
+			
+			  	//Check to see if the resource is present or not
+			  	mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+			  	tc_ac.start;
+			  	alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000))) {
+						tc_ac.stop;
+					  	setverdict(pass, testcasename() & ": Resource present: " & f_getResourceAddress(p_resourceIndex));
+					  	return true;
+				  	}
+				  	[] mcaPort.receive(mw_response(mw_responsePrimitive(?, -))) {
+						tc_ac.stop;
+						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
+						return false;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, testcasename() & ": No answer while retrieving resource");
+						return false;
+					}
+			  	}	
+			  	return false;
+			}
+			
+			/**
+			 * @desc Check that a resource is not present in the IUT (resourceId is NOT known)
+			 * @param p_parentIndex Index of the parent resource
+			 * @param p_resourceName Resource name (Hierarchical method is used)
+			 * @return boolean
+			 */
+			function f_isResourceNotPresent (integer p_parentIndex, XSD.String p_resourceName) runs on CseTester return boolean {
+			
+			  	log(testcasename() & ":INFO: Hierarchical method is required to check the non presence of the resource");
+			  	vc_addressingMethod := e_hierarchical;
+			  	//Check to see if the resource has NOT been created
+			  	mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_parentIndex) & "/" & p_resourceName, f_getOriginator(p_parentIndex))));
+			  	tc_ac.start;
+			  	alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(int4004))) {
+						tc_ac.stop;
+						setverdict(pass, testcasename() & ": Resource not present");
+						vc_addressingMethod := PX_ADDRESSING_METHOD;
+						return true;
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(?))) {
+						tc_ac.stop;
+						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
+						vc_addressingMethod := PX_ADDRESSING_METHOD;
+						return false;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, testcasename() & ": No answer while retrieving resource");
+						vc_addressingMethod := PX_ADDRESSING_METHOD;
+						return false;
+					}
+			  	}	
+			  	return false;
+			}
+			
+			/**
+			 * @desc Update of the auxiliar ACP resource
+			 * @param p_allowedOperations New allowed operations
+			 * @verdict 
+			 */
+			function f_cse_updateAcpAuxResource (in template (value) AccessControlOperations p_allowedOperations) runs on CseTester {
+				var RequestPrimitive v_request;
+				
+				v_request := valueof(m_updateAcpBase);
+				
+				v_request.to_ := f_getResourceAddress(vc_acpAuxIndex);
+				v_request.from_ := f_getOriginator(vc_acpAuxIndex);
+				v_request.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {
+					{
+						accessControlOriginators := PX_ACOR, //{"admin:admin"}
+						accessControlOperations := valueof(p_allowedOperations),
+						accessControlContexts_list := {},
+						accessControlAuthenticationFlag := omit, 
+						accessControlObjectDetails_list := {}
+					}
+				};
+							
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK))  {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: " & v_request.to_ & " resource updated successfuly");
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while updating " & v_request.to_ & " resource");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while updating " & v_request.to_ & " resource" );
+					}
+				}		
+				
+				f_checkCseTesterStatus();
+			}   
+			
+			/**
+			 * @desc Function to handle announcement of resources
+			 * @param p_from
+			 * @param p_to
+			 * @verdict 
+			 */
+			 //TODO To finalize this function
+			function f_cse_resourceAnnouncementHandler(template XSD.ID p_from := *, template XSD.ID p_to := ?) runs on CseTester {
+				// Local variables
+				var MsgIn v_request;
+				var ResponsePrimitive v_responsePrimitive;
+				
+				map(self:mccPort, system:mccPort);
+				map(self:acPort, system:acPort);
+
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_request(mw_create(p_from, p_to))) -> value v_request {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__ & ":INFO: Announcement received");
+						v_responsePrimitive := f_getCreateResponsePrimitive(v_request.primitive.requestPrimitive.resourceType, v_request.primitive.requestPrimitive);
+						mcaPort.send(m_response(v_responsePrimitive)); 						
+					}
+					[] mcaPort.receive{
+						tc_ac.stop;
+						setverdict(fail, __SCOPE__ & ":ERROR: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(fail, __SCOPE__ & ":ERROR:  No announcement received");
+					}
+				}
+	
+				unmap(self:mccPort, system:mccPort);
+				unmap(self:acPort, system:acPort); 
+
+			} //end f_cse_resourceAnnouncementHandler			
+    		
+    		function f_checkAttributesToBeSaved (ResourceType p_resourceType, RequestPrimitive p_request, inout ResponsePrimitive p_response) {
+    			select (p_resourceType) {
+    				case (int1) {
+    					if(isvalue(p_response.primitiveContent.accessControlPolicy) and
+    							not(ispresent(p_response.primitiveContent.accessControlPolicy.resourceName))) {
+    						p_response.primitiveContent.accessControlPolicy.resourceName :=  p_request.primitiveContent.accessControlPolicy.resourceName;
+    						log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.accessControlPolicy.resourceName)
+    					}
+    				}
+    				case (int2) {
+    					if(isvalue(p_response.primitiveContent.aE) and
+    							not(ispresent(p_response.primitiveContent.aE.resourceName))) {
+    						p_response.primitiveContent.aE.resourceName :=  p_request.primitiveContent.aE.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.aE.resourceName)
+    					}
+    				}
+    				case (int3) {
+    					if(isvalue(p_response.primitiveContent.container) and
+    							not(ispresent(p_response.primitiveContent.container.resourceName))) {
+    						p_response.primitiveContent.container.resourceName :=  p_request.primitiveContent.container.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.container.resourceName)
+    					}
+    				}
+					case (int4) {
+						if(isvalue(p_response.primitiveContent.contentInstance) and
+								not(ispresent(p_response.primitiveContent.contentInstance.resourceName))) {
+							p_response.primitiveContent.contentInstance.resourceName :=  p_request.primitiveContent.contentInstance.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.contentInstance.resourceName)
+						}
+					}
+    				case (int15) {
+    					if (isvalue(p_response.primitiveContent.pollingChannel) and
+    							not(ispresent(p_response.primitiveContent.pollingChannel.resourceName))) {
+    						p_response.primitiveContent.pollingChannel.resourceName :=  p_request.primitiveContent.pollingChannel.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.pollingChannel.resourceName)
+    					}
+    				}
+					case (int16) {
+						if (isvalue(p_response.primitiveContent.remoteCSE) and
+								not(ispresent(p_response.primitiveContent.remoteCSE.resourceName))) {
+							p_response.primitiveContent.remoteCSE.resourceName :=  p_request.primitiveContent.remoteCSE.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.remoteCSE.resourceName)
+						}
+					}
+    				case (int18) {
+    					if (isvalue(p_response.primitiveContent.schedule) and
+    							not(ispresent(p_response.primitiveContent.schedule.resourceName))) {
+    						p_response.primitiveContent.schedule.resourceName :=  p_request.primitiveContent.schedule.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.schedule.resourceName)
+    					}
+    				}
+    				case (int23) {
+    					if (isvalue(p_response.primitiveContent.subscription) and
+    							not(ispresent(p_response.primitiveContent.subscription.resourceName))) {
+    						p_response.primitiveContent.subscription.resourceName :=  p_request.primitiveContent.subscription.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.subscription.resourceName)
+    					}
+    				}
+    				case (int9) {
+    					if (isvalue(p_response.primitiveContent.group_) and
+    							not(ispresent(p_response.primitiveContent.group_.resourceName))) {
+    						p_response.primitiveContent.group_.resourceName :=  p_request.primitiveContent.group_.resourceName;
+							log(__SCOPE__ & ":INFO: resourceName not returned. Using the one provided in the request: " & p_request.primitiveContent.group_.resourceName)
+    					}
+    				}
+    				case else {
+    					log(__SCOPE__&":WARNING: Resource Type "&int2str(enum2int(p_resourceType))&" not implemented");
+    				}
+    			}
+    
+    			// TODO test that if the resource name is returned is the same resource name as used in the create message
+    		}
+		
+    		function f_compareURIs(in integer p_expectedURIIndex, in XSD.ID p_receivedURI) runs on CseTester return boolean{
+    			// Local variables
+    			var boolean v_matchResult := false;
+    			
+    			if (f_isNonHierarchical(p_receivedURI)) {
+					vc_addressingMethod := e_nonHierarchical;
+    			} else if (f_isHierarchical(p_receivedURI)) {
+					vc_addressingMethod := e_hierarchical;
+    			}
+				if (f_isScopeCseRelative(p_receivedURI)) {
+					vc_primitiveScope := e_cseRelative;
+				}
+				if (f_isScopeSpRelative(p_receivedURI)) {
+					vc_primitiveScope := e_spRelative;
+				}
+				if (f_isScopeAbsolute(p_receivedURI)) {
+					vc_primitiveScope := e_absolute;
+				}
+    			
+    			if(match(f_getResourceAddress(p_expectedURIIndex), p_receivedURI)) {
+					v_matchResult := true;
+				} else {
+					v_matchResult := false;
+				}
+				
+				vc_primitiveScope := PX_PRIMITIVE_SCOPE;
+				vc_addressingMethod := PX_ADDRESSING_METHOD;
+    						
+    			return v_matchResult;
+    
+    		} //end f_compareURIs	
+
+			group NotificationFunctions { 
+				
+				function f_cse_notifyProcedure_subscriptionVerificationHandler(in integer p_creatorIndex, in ResponseStatusCode p_responseStatusCode := int2001) runs on CseTester {
+					// Local variables
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimitive;
+					var template Notification v_notificationRequest := mw_contentNotificationVerification;
+    			
+					map(self:mcaPort, system:mcaPort);
+					map(self:acPort, system:acPort);
+    			
+					//Preparation of expected Notification verification
+					//TODO To add checks for creator and subscription reference
+					//v_notificationRequest.creator := p_creator; TODO To check what address format is to be expected
+					//Some participants use SP relative UNSTRUCTURED
+					//v_notificationRequest.subscriptionReference := "I Don't know which URI is expected"; // TODO mandatory parameter 
+    			
+					//Preparation of Notification response to be sent
+					v_responsePrimitive := valueof(m_responseNotification(p_responseStatusCode, omit));
+    	
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_request(mw_notify(valueof(v_notificationRequest)))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ":INFO: Notification received");
+							v_responsePrimitive.requestIdentifier := v_request.primitive.requestPrimitive.requestIdentifier;
+//							if(f_isHierarchical(v_request.primitive.requestPrimitive.primitiveContent.notification.creator)) {
+//								setverdict(fail, __SCOPE__ & ": Creator cannot contain a hierarchical address");
+//								v_responsePrimitive.responseStatusCode := int4000;
+//							}
+//							if(f_compareURIs(p_creatorIndex, v_request.primitive.requestPrimitive.primitiveContent.notification.creator)) {
+//								setverdict(pass, __SCOPE__ & ": Creator set to originator of the subscription creation primitive");
+//							} else {
+//								setverdict(fail, __SCOPE__ & ": Creator not set to originator of the subscription creation primitive");
+//								v_responsePrimitive.responseStatusCode := int4000;
+//							}
+							mcaPort.send(m_httpResponse(v_responsePrimitive)); 						
+						}
+						[] mcaPort.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value v_request {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ":ERROR: Notification received but verificationRequest isn't set to TRUE");							
+						}
+						[] mcaPort.receive{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ":ERROR: unexpected message received");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ":ERROR:  No notification received");
+						}
+					}
+    	
+					//mcaPort.send(m_response(v_responsePrimitive));	// TODO have to be deleted
+    
+					unmap(self:mcaPort, system:mcaPort);
+					unmap(self:acPort, system:acPort); 
+    
+				} //end f_subscriptionVerificationHandler
+    		
+	    		function f_cse_notifyProcedure_representationHandler(template PrimitiveContent p_primitiveContent) runs on CseTester {
+	    			// Local variables
+	    			var MsgIn v_request;
+	    	
+	    			map(self:mcaPort, system:mcaPort);
+	    			map(self:acPort, system:acPort);
+	    	
+	    			tc_ac.start;
+	    			alt {
+	    				[] mcaPort.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value v_request {
+	    					tc_ac.stop;
+	    					if(f_check_notificationContent(v_request.primitive.requestPrimitive, p_primitiveContent)){
+	    						setverdict(pass, __SCOPE__ & ":INFO: Notification received");
+	    						mcaPort.send(m_response(valueof(m_responseNotification(int2001))));
+	    					}
+	    					else{
+	    						setverdict(fail, __SCOPE__ & ":ERROR: Notification received but the content doesn't match");
+	    					}
+	    				}
+	    				[] mcaPort.receive{
+	    					tc_ac.stop;
+	    					setverdict(fail, __SCOPE__ & ":ERROR: unexpected message received");
+	    				}
+	    				[] tc_ac.timeout {
+	    					setverdict(fail, __SCOPE__ & ":ERROR: No notification received");
+	    				}
+	    			}
+	    	
+	    		
+	    			unmap(self:mcaPort, system:mcaPort);
+	    			unmap(self:acPort, system:acPort); 
+	    	
+	    		} //end f_cse_notifyProcedure_representationHandler
+	    		
+				function f_cse_notifyProcedure_aggregatedNoficationHandler(template PrimitiveContent p_primitiveContent,in integer p_numberOfAggregatedNotification) runs on CseTester {
+					// Local variables
+					var MsgIn v_response;
+    
+					map(self:mcaPort, system:mcaPort);
+					map(self:acPort, system:acPort);
+    
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_request(mw_aggregatedNotifyBase)) -> value v_response {
+							tc_ac.stop;
+							if(p_numberOfAggregatedNotification == lengthof(v_response.primitive.requestPrimitive.primitiveContent.aggregatedNotification.notification_list)){
+								if(f_check_notificationContent(v_response.primitive.requestPrimitive, p_primitiveContent)){
+									setverdict(pass, __SCOPE__ & ": Notification received");
+								}
+								else{
+									setverdict(fail, __SCOPE__ & ": Notification received but the content doesn't match");
+								}
+							}
+							else {
+								setverdict(fail, __SCOPE__ & ": Number of Notification in Aggregatednotification isn't right");
+							}
+						}
+						[] mcaPort.receive{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, unexpected message received");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No notification received");
+						}
+					}
+    	
+					unmap(self:mcaPort, system:mcaPort);
+					unmap(self:acPort, system:acPort); 
+    
+				} //end f_cse_notifyProcedure_aggregatedNotificationHandler
+	    		
+	    		function f_cse_notifyProcedure_subscriptionDeletionHandler( template PrimitiveContent p_primitiveContent) runs on CseTester {
+					var MsgIn v_response;
+	
+					map(self:mcaPort, system:mcaPort);
+					map(self:acPort, system:acPort);
+					
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value v_response {
+							tc_ac.stop;
+							mcaPort.send(m_response(valueof(m_responseNotification(int2001))));
+							if(not(match(v_response.primitive.requestPrimitive.primitiveContent.notification.subscriptionDeletion, true))) {
+								setverdict(fail, __SCOPE__ & ":ERROR: subscriptionDeletion attribute have to be set to TRUE");
+							}
+							if(f_check_notificationContent(v_response.primitive.requestPrimitive, p_primitiveContent)){
+								setverdict(pass, __SCOPE__ & ":INFO: Notification received");
+							}
+							else{
+								setverdict(fail, __SCOPE__ & ":ERROR: Notification received but the content doesn't match");
+							}
+						}
+						[] mcaPort.receive{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ":ERROR: unexpected message received");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ":ERROR: No notification received");
+						}
+					}
+					
+					unmap(self:mcaPort, system:mcaPort);
+					unmap(self:acPort, system:acPort);  
+	
+				} //end f_cse_notifyProcedure_subscriptionDeletionHandler  
+				
+				function f_cse_notifyProcedure_noNotificationHandler() runs on CseTester {
+					// Local variables
+					var MsgIn v_response;
+	
+					map(self:mcaPort, system:mcaPort);
+					map(self:acPort, system:acPort);
+		
+					tc_ac.start(10.0);
+					alt {
+						[] mcaPort.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, Non expected notification received");
+						}
+						[] tc_ac.timeout {
+							setverdict(pass, __SCOPE__ & ": No notification received");
+						}
+					}
+	
+					unmap(self:mcaPort, system:mcaPort);
+					unmap(self:acPort, system:acPort); 
+	
+				} //end f_cse_notifyProcedure_noNotification Handler
+				
+				function f_check_notificationContent(in RequestPrimitive p_requestPrimitive, template PrimitiveContent p_primitiveContent) runs on CseTester return boolean{
+					// Local variables
+					var boolean v_matchResult := false;
+					var integer i;
+					var integer v_numberOfAggregatedNotification;
+    	
+					if (ischosen(p_primitiveContent.aE)){
+						if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource)) {
+							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.aE, p_primitiveContent.aE)
+						}
+						else if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive)) {
+							v_matchResult :=match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.aE, p_primitiveContent.aE)
+						}
+						else if (ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification)) {
+							v_matchResult := true;
+							v_numberOfAggregatedNotification := lengthof(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list);
+							for(i := 0; i< v_numberOfAggregatedNotification; i := i + 1){
+								if(ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.resource)) {
+									if(not (match(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.resource.aE, p_primitiveContent.aE))){
+										v_matchResult := false;
+									}
+								}
+								else if(ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.responsePrimitive)) {
+									if(not (match(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.responsePrimitive.primitiveContent.aE, p_primitiveContent.aE))){
+										v_matchResult := false;
+									}
+								}						
+							}
+							if (i == 0){
+								v_matchResult := false;
+							}
+						}
+    
+					}
+    	
+					if (ischosen(p_primitiveContent.container)){
+						if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource)) {
+							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.container, p_primitiveContent.container)
+						}
+						else if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive)) {
+							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.container, p_primitiveContent.container)
+						}
+					}
+    	
+					return v_matchResult;
+    
+				} //end f_check_notificationContent	
+				
+			}// end of group NotificationFunctions 		
+	    		
+    		/**
+    		 * @desc It determines whether the addressing method of the given address is non-hierarchical. Not valid for CSE-Base as target
+    		 * @param p_resourceAddress
+    		 * @return boolean
+    		 */
+    		function f_isNonHierarchical(XSD.ID p_resourceAddress) runs on Tester return boolean {	
+    			var integer i;
+    			var integer v_nbOfSlashes:= 0;
+    			
+				for (i := 0; i < lengthof(p_resourceAddress); i:= i+1){
+					if(match (p_resourceAddress[i], "/")){
+						v_nbOfSlashes:= v_nbOfSlashes+1;
+					}
+				}
+				
+    			if(f_isScopeCseRelative(p_resourceAddress)) {
+    				if(v_nbOfSlashes == 0 ) {
+    					return true;
+    				} else {
+    					return false;
+    				}
+    				
+    			} else if (f_isScopeSpRelative(p_resourceAddress)){	
+					if(v_nbOfSlashes == 2 ) {
+						return true;
+					} else {
+						return false;
+					}
+    			} else if (f_isScopeAbsolute(p_resourceAddress)){
+					if(v_nbOfSlashes == 4 ) {
+						return true;
+					} else {
+						return false;
+					}
+    			} else {
+    			   return false;
+    			}
+    		}
+			
+    		
+			/**
+			 * @desc It determines whether the addressing method of the given address is hierarchical. Not valid for CSE-Base as target
+			 * @param p_resourceAddress
+			 * @return boolean
+			 */
+			 function f_isHierarchical(XSD.ID p_resourceAddress) runs on Tester return boolean {
+				if(f_isNonHierarchical(p_resourceAddress)) {
+					return false;
+				} else {
+					return true;
+				}	
+    		} 
+			
+			/**
+			 * @desc It determines whether the primitive scope of the given address is CSE-Relative
+			 * @param p_resourceAddress
+			 * @return boolean
+			 */
+			function f_isScopeCseRelative(XSD.ID p_resourceAddress) runs on Tester return boolean { 
+			  if (p_resourceAddress[0] != "/") {
+				return true;
+			  } else {
+			  	return false;
+			  }
+			}
+			
+			/**
+			 * @desc It determines whether the primitive scope of the given address is SP-Relative
+			 * @param p_resourceAddress
+			 * @return boolean
+			 */
+			function f_isScopeSpRelative(XSD.ID p_resourceAddress) runs on Tester return boolean {	
+			  	if ((p_resourceAddress[0] == "/") and (p_resourceAddress[1] != "/")){
+				  return true;
+				} else {
+				  return false;
+				}
+			}
+			
+			/**
+			 * @desc It determines whether the primitive scope of the given address is Absolute
+			 * @param p_resourceAddress
+			 * @return boolean
+			 */
+			function f_isScopeAbsolute(XSD.ID p_resourceAddress) runs on Tester return boolean {
+				if ((p_resourceAddress[0] == "/") and (p_resourceAddress[1] == "/")) {
+				  return true;
+				} else {
+				  return false;
+				}
+			}
+			
+			/**
+			 * @desc Registration of Test System (simulating a CSE) to the CSE IUT (creation of remoteCSE)
+			 * @param p_requestPrimitive Template request primitive
+			 * @return Internal resource index of the created resource
+			 */
+			function f_cse_registerRemoteCse(in template RequestPrimitive p_requestPrimitive) runs on CseTester return integer {
+    			
+				var MsgIn v_response;
+				var RequestPrimitive v_request;
+				var integer v_resourceIndex := -1;
+
+				v_request := f_getCreateRequestPrimitive(int16, p_requestPrimitive, -1);
+
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Resource type RemoteCSE created successfuly");
+						f_checkAttributesToBeSaved(int16, v_request, v_response.primitive.responsePrimitive);
+						v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int16, -1);
+					}
+					[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while creating resource type RemoteCSE");
+					}
+					[] mccPort.receive {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while creating resource type RemoteCSE");
+					}
+				}	
+
+				f_checkCseTesterStatus();
+
+				return v_resourceIndex;
+    		
+    		}
+			
+	
+		}//end group helpingFunctions
+		
+		group CseAltstepFunctions {
+			 
+			/**
+			  * @desc	Cse altstep for config 01
+			  */
+			 altstep a_cse_cf01() runs on CseTester {
+		
+				[] mcaPort.receive {
+					log(__SCOPE__&": WARNING: Unexpected message received");
+					repeat;
+				}
+			 }			
+			 
+			/**
+			  * @desc	Cse altstep for config 02
+			  */
+			 altstep a_cse_cf02() runs on CseTester {
+			
+				[] mcaPort.receive {
+					log(__SCOPE__&": WARNING: Unexpected message received");
+					repeat;
+				}
+				[] mccPort.receive {
+					log(__SCOPE__&": WARNING: Unexpected message received");
+					repeat;
+				}
+			 }
+			 
+			/**
+			  * @desc	Cse altstep for config 04
+			  */
+			 altstep a_cse_cf04() runs on CseTester {
+
+				[] mccPort.receive {
+					log(__SCOPE__&": WARNING: Unexpected message received");
+					repeat;
+				}
+			 }		
+
+		}//end group altstepFunctions	
+		
+	}//end cseFunctions
+	
+	group AeFunctions {
+		
+		group preambleFunctions {
+		
+			/**
+			 * @desc	Waits for AE registration request and process it
+			 * @return 	Internal resource index of AE or -1 in case of failure		
+			 * @verdict	inconc if no AE registration request is received 
+			 */
+			function f_ae_preamble_registerAe() runs on AeTester return integer {
+    		
+				var MsgIn v_request;
+				var PrimitiveContent v_modifiedResource;
+				var integer v_resourceIndex, v_parentIndex;
+				var RequestPrimitive v_rp;
+    		
+				tc_ac.start;
+				alt {    				
+					[] mcaPort.receive(mw_request(mw_createAe)) -> value v_request {
+						tc_ac.stop;
+    					
+						v_rp := v_request.primitive.requestPrimitive;		
+						v_parentIndex := f_getResourceIndex(v_rp.to_);
+						v_resourceIndex := f_ae_createResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType, v_modifiedResource);
+						if(v_resourceIndex != -1) {
+							mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
+							setverdict(pass, __SCOPE__&":INFO: Application registered successfuly");
+						}
+						else {
+							mcaPort.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
+							setverdict(inconc, __SCOPE__&":INFO: AE registration failed");
+						}					
+					}
+    					
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: AE registration request not received");
+						stop;
+					}	     				   	
+				}    
+				
+				f_checkAeTesterStatus();	
+    			
+				return v_resourceIndex;	
+			}	
+						
+		} // end preambleFunctions
+		
+		group helpingFunctions {
+			
+			/**
+			 * @desc   Creates specified resource
+			 * @param  p_resource          Resource to be created
+			 * @param  p_parentIndex       Parent index of resource to be saved
+			 * @param  p_resourceType      Type of the resource to be created
+			 * @param  p_modifiedResource  Assigned and/or modified fields
+			 * @return Internal resource index of the saved resource or -1
+			 */
+			function f_ae_createResource(in PrimitiveContent p_resource, in integer p_parentIndex, in ResourceType p_resourceType, out PrimitiveContent p_modifiedResource) runs on AeTester return integer {
+
+				var integer v_resourceIndex;
+				
+				// AE TODO To review the code (use of indexes, generation of value for certain attributes, etc..)
+				if(p_resourceType == int2 and ispresent(p_resource)) {
+				  	if(ischosen(p_resource.aE)){
+				      	var AE_optional v_ae := p_resource.aE;
+      					var AE_optional v_aeModified;					
+      					
+      					v_resourceIndex := lengthof(vc_resourcesList) - 1;
+      					v_ae.resourceType := p_resourceType;
+      					
+      					v_ae.parentID := int2str(p_parentIndex);
+      					v_ae.creationTime := fx_generateTimestamp();
+      					v_ae.lastModifiedTime := v_ae.creationTime;											
+      					v_ae.resourceID := "ae" & int2char(v_resourceIndex);
+      					v_ae.aE_ID := "ae" & int2char(v_resourceIndex);
+      					v_ae.resourceName := "ae" & int2char(v_resourceIndex);
+      
+      					v_aeModified.parentID := v_ae.parentID;
+      					v_aeModified.creationTime := v_ae.creationTime;
+      					v_aeModified.lastModifiedTime := v_ae.lastModifiedTime;											
+      					v_aeModified.resourceID := v_ae.resourceID;
+      					v_aeModified.aE_ID := v_ae.aE_ID;
+      					v_aeModified.resourceName := v_ae.resourceName;
+      					
+      					p_resource.aE := v_ae;
+      					p_modifiedResource.aE := v_aeModified;
+      					return f_setResource(p_resource, p_resourceType, p_parentIndex);			   
+				    
+				    }
+										
+				}	
+				
+				// TODO: implement other resource types			
+				
+				// Error
+				return -1;
+			}
+			
+		} // end helpingFunctions
+		
+		group altstepFunctions {
+    
+			/**
+			  * @desc	Ae altstep
+			  */
+			 altstep a_ae_default() runs on AeTester {
+
+				var MsgIn v_request; 
+				
+				[] mcaPort.receive(mw_request(?)) -> value v_request {
+					log(__SCOPE__ & ":WARNING: Unexpected request received");
+					mcaPort.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
+					repeat;
+				}
+				    		
+				[] mcaPort.receive {
+					log(__SCOPE__ & ":WARNING: Unexpected message received");
+					repeat;
+				}
+			 }		
+			 
+			/**
+			 * @desc    Waits for CREATE request, stores resource and replies to request 
+			 * @remark  This altstep includes a_ae_default
+			 * @see		a_ae_default
+			 */
+			altstep a_ae_cf03() runs on AeTester {
+				
+				var MsgIn v_request;			
+				var PrimitiveContent v_modifiedResource;
+				var integer v_resourceIndex, v_parentIndex;
+				var RequestPrimitive v_rp;
+				
+				[] mcaPort.receive(mw_request(mw_create)) -> value v_request {	
+					v_rp := v_request.primitive.requestPrimitive;		
+					v_parentIndex := f_getResourceIndex(v_rp.to_);
+					v_resourceIndex := f_ae_createResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType, v_modifiedResource);
+					if(v_resourceIndex != -1) {
+						mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
+					}
+					else {
+						mcaPort.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
+					}					
+					repeat;	
+				}
+				
+				[] a_ae_default();				
+			}
+    		 
+		}//end group altstepFunctions
+		
+	}//end of aeFunctions
+
+
+	group GetSetFunctions {
+	
+		/**
+		 * @desc Creation of a CREATE request primitive from a template request primitive
+		 * @param p_resourceType Type of resource to be created
+		 * @param p_request Template request primitive 
+		 * @param p_parentIndex Internal resource index which indicates the parent of the resource to be created
+		 * @return Created CREATE request primitive
+		 * @verdict 
+		 */
+		function f_getCreateRequestPrimitive(in ResourceType p_resourceType, template RequestPrimitive p_request := m_create, integer p_parentIndex) runs on CseTester return RequestPrimitive {
+			var template ListOfURIs v_defaultListOfURIs := {"NotInitialized"};
+			var template AcpType v_defaultAcpIDs := {"NotInitialized"};
+
+			if(p_resourceType != int2) {
+				p_request.from_ := f_getOriginator(p_parentIndex);
+			}
+			p_request.to_ := f_getResourceAddress(p_parentIndex);
+
+			if (p_resourceType == int1) {//AccessControlPolicy
+				
+			} 
+			
+			if (p_resourceType == int9) {//group
+				if(match(valueof(p_request.primitiveContent.group_.memberIDs), v_defaultListOfURIs )){
+				  if(p_parentIndex != -1){ 
+						p_request.primitiveContent.group_.memberIDs := {f_getResourceId(vc_resourcesList[p_parentIndex].resource)};
+				  }else {
+				    	p_request.primitiveContent.group_.memberIDs := {f_getResourceAddress(p_parentIndex)};
+				    
+				  } 
+				  
+				  
+				}
+			}
+			
+			if(p_resourceType == int3){//container
+				//when a container is created by hosting cse for storing location information, the container is seen as a location container
+				if(PX_IS_LOC_CONTAINER){
+					p_request.primitiveContent.container.locationID := f_getResourceId(vc_resourcesList[p_parentIndex].resource);//resourceID of the locationPolicy
+				}	
+				if(ispresent(p_request.primitiveContent.container.accessControlPolicyIDs)) {
+        			if(match(valueof(p_request.primitiveContent.container.accessControlPolicyIDs), v_defaultAcpIDs )){
+        				p_request.primitiveContent.container.accessControlPolicyIDs := {f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)};
+        			}	
+				}  
+			}
+			
+			if (p_resourceType == int15) {//pollingChannel
+				if(ischosen(vc_resourcesList[p_parentIndex].resource.aE)) {	
+					p_request.from_ := vc_resourcesList[p_parentIndex].resource.aE.aE_ID;
+				}
+			} 
+			
+			if (p_resourceType == int18) {//schedule
+			} 
+
+			if (p_resourceType == int23) {//subscription
+				//notificationURI
+				if(match(valueof(p_request.primitiveContent.subscription.notificationURI), v_defaultListOfURIs )){
+					p_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(p_parentIndex)};
+				}
+				//creator attribute
+			    if(ispresent(p_request.primitiveContent.subscription.creator)) {
+					p_request.primitiveContent.subscription.creator := f_getCreator(p_parentIndex);
+			  	}
+			  	//accessControlPolicyIds
+				if(ispresent(p_request.primitiveContent.subscription.accessControlPolicyIDs)) {
+					if(match(valueof(p_request.primitiveContent.subscription.accessControlPolicyIDs), v_defaultAcpIDs )){
+						p_request.primitiveContent.subscription.accessControlPolicyIDs := {f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)};
+					}	
+				}  
+			}
+			if (p_resourceType == int4) {//contentInstance
+				//creator attribute
+				if(ispresent(p_request.primitiveContent.contentInstance.creator)) {
+					p_request.primitiveContent.contentInstance.creator := f_getCreator(p_parentIndex);
+				}
+			}
+
+			return valueof(p_request);
+		}
+		
+		/**
+		 * @desc Creation of a CREATE response primitive from a template request primitive
+		 * @param p_resourceType Type of resource to be created
+		 * @param p_request Template request primitive 
+		 * @return Created CREATE response primitive
+		 * @verdict 
+		 */
+		//TODO To be completed
+		function f_getCreateResponsePrimitive(in ResourceType p_resourceType, template RequestPrimitive p_request := m_create) runs on CseTester return ResponsePrimitive {
+			var template ResponsePrimitive v_responsePrimitive;
+
+			if(p_resourceType != int2) {
+				v_responsePrimitive.from_ := p_request.to_;
+			}
+			p_request.to_ := p_request.from_;
+
+			if (p_resourceType == int1) {//AccessControlPolicy
+				
+			} 
+			
+			if (p_resourceType == int9) {//group
+				
+			}
+			
+			if(p_resourceType == int3){//container
+					  
+			}
+			
+			if (p_resourceType == int15) {//pollingChannel
+				
+			} 
+			
+			if (p_resourceType == int18) {//schedule
+			} 
+
+			if (p_resourceType == int23) {//subscription
+				
+				
+			}
+
+			return valueof(v_responsePrimitive);
+		}
+
+		/**
+		 * @desc Creation of an UPDATE request primitive from a template request primitive
+		 * @param p_resourceType Type of resource to be created
+		 * @param p_resourceIndex Internal resource index which indicates the resource to be updated
+		 * @param p_request Template request primitive
+		 * @return Created UPDATE request primitive
+		 * @verdict 
+		 */
+		function f_getUpdateRequestPrimitive(in ResourceType p_resourceType, integer p_resourceIndex, template RequestPrimitive p_request) runs on CseTester return RequestPrimitive {
+		
+			p_request.from_ := f_getOriginator(p_resourceIndex);
+
+			p_request.to_ := f_getResourceAddress(p_resourceIndex);
+
+			if (p_resourceType == int3) {//Container
+
+			//TODO
+			} 
+
+			if (p_resourceType == int9) {//group
+				//TODO	
+
+			}
+
+			if (p_resourceType == int18) {//schedule
+				//TODO			
+
+			} 
+
+			if (p_resourceType == int15) {//pollingChannel
+				//TODO		
+			}
+
+			if (p_resourceType == int23) {//subscription
+				//TODO		
+			} 
+
+			return 	valueof(p_request);
+		}
+
+		/**
+		 * @desc Extraction from a primitiveContent field the resourceID attribute
+		 * @param p_contentResource primitiveContent field
+		 * @return resourceID attribute
+		 * @verdict 
+		 */
+		function f_getResourceId(PrimitiveContent p_contentResource) return XSD.ID {
+					
+			if(ischosen(p_contentResource.accessControlPolicy)) {
+				return f_resourceIdCleaner(p_contentResource.accessControlPolicy.resourceID);
+			}
+			if(ischosen(p_contentResource.container)) {
+				return f_resourceIdCleaner(p_contentResource.container.resourceID);
+			}
+			if(ischosen(p_contentResource.contentInstance)) {
+				return f_resourceIdCleaner(p_contentResource.contentInstance.resourceID);
+			}
+			if(ischosen(p_contentResource.schedule)) {
+				return f_resourceIdCleaner(p_contentResource.schedule.resourceID);
+			}
+			if(ischosen(p_contentResource.pollingChannel)) {
+				return f_resourceIdCleaner(p_contentResource.pollingChannel.resourceID);
+			}
+			if(ischosen(p_contentResource.subscription)) {
+				return f_resourceIdCleaner(p_contentResource.subscription.resourceID);
+			}
+			if(ischosen(p_contentResource.group_)) {
+				return f_resourceIdCleaner(p_contentResource.group_.resourceID);
+			}
+			if(ischosen(p_contentResource.aE)) {
+				return f_resourceIdCleaner(p_contentResource.aE.resourceID);
+			}
+			if(ischosen(p_contentResource.serviceSubscribedAppRule)) {
+				return f_resourceIdCleaner(p_contentResource.serviceSubscribedAppRule.resourceID);
+			}
+			log(__SCOPE__&":WARNING: Primitive Content Kind not implemented");
+			
+			return "resourceIDNotFound";
+			
+		}
+			
+		/**
+		 * @desc Extraction from a primitiveContent field the resourceName attribute
+		 * @param p_contentResource primitiveContent field
+		 * @return resourceName attribute
+		 * @verdict 
+		 */
+		function f_getResourceName(PrimitiveContent p_contentResource) return XSD.ID {
+					
+			if(ischosen(p_contentResource.accessControlPolicy)) {
+				return p_contentResource.accessControlPolicy.resourceName;
+			}
+			if(ischosen(p_contentResource.container)) {
+				return p_contentResource.container.resourceName;
+			}
+			if(ischosen(p_contentResource.contentInstance)) {
+				return p_contentResource.contentInstance.resourceName;
+			}
+			if(ischosen(p_contentResource.schedule)) {
+				return p_contentResource.schedule.resourceName;
+			}
+			if(ischosen(p_contentResource.pollingChannel)) {
+				return p_contentResource.pollingChannel.resourceName;
+			}
+			if(ischosen(p_contentResource.subscription)) {
+				return p_contentResource.subscription.resourceName;
+			}
+			if(ischosen(p_contentResource.group_)) {
+				return p_contentResource.group_.resourceName;
+			}
+			if(ischosen(p_contentResource.aE)) {
+				return p_contentResource.aE.resourceName;
+			}
+			if(ischosen(p_contentResource.serviceSubscribedAppRule)) {
+				return p_contentResource.serviceSubscribedAppRule.resourceName;
+			}
+			log(__SCOPE__&":WARNING: Primitive Content Kind not implemented");
+			
+			return "resourceNameNotFound";
+			
+		}
+			
+		/**
+		 * @desc Resolution of the originator field (from) for a given resource
+		 * @param p_targetResourceIndex Internal resource index of the given resource
+		 * @param p_testSystemRole True if TS acting as an AE, False if TS acting as a CSE
+		 * @return Originator for a given resource
+		 * @verdict 
+		 */
+		function f_getOriginator(integer  p_targetResourceIndex := -1, boolean p_testSystemRole := true) runs on CseTester return XSD.AnyURI {
+				
+			if(p_targetResourceIndex == -1) {
+				if(p_testSystemRole) {
+					return PX_SUPER_AE_ID;
+				} else {
+					return PX_SUPER_CSE_ID;
+				}
+			}	
+			
+			if(vc_resourcesList[p_targetResourceIndex].parentIndex == -1) {
+				if(ischosen(vc_resourcesList[p_targetResourceIndex].resource.aE)) {
+					return vc_resourcesList[p_targetResourceIndex].resource.aE.aE_ID;
+				} else if (ischosen(vc_resourcesList[p_targetResourceIndex].resource.remoteCSE)) {
+					return vc_resourcesList[p_targetResourceIndex].resource.remoteCSE.cSE_ID; 
+				} else {
+					return f_getOriginator(vc_resourcesList[p_targetResourceIndex].parentIndex);
+				}
+			} else {
+				return f_getOriginator(vc_resourcesList[p_targetResourceIndex].parentIndex);
+			}
+		}
+		
+		/**
+		 * @desc Resolution of the creator attribute for a given resource
+		 * @param p_targetResourceIndex Internal resource index of the given resource
+		 * @return AE-ID or CSE-ID of the entity creating the given resource
+		 * @verdict 
+		 */
+		function f_getCreator(integer  p_targetResourceIndex := -1) runs on CseTester return XSD.ID {
+				
+			if(p_targetResourceIndex == -1) {
+				return PX_CSE_ID;
+			}	
+				
+			if(ischosen(vc_resourcesList[p_targetResourceIndex].resource.aE)) {
+				return vc_resourcesList[p_targetResourceIndex].resource.aE.aE_ID;
+			} else {
+				return f_getCreator(vc_resourcesList[p_targetResourceIndex].parentIndex);
+			}
+			
+		}
+			
+		/**
+		 * @desc Return of a index of a specific attribute from an attributeList by attributeName
+		 * @param p_attributeList Target attributeList
+		 * @param p_attributeName attributeName to be searched
+		 * @return Index of the attribute in the attributeList
+		 * @verdict 
+		 */
+		function f_getAttribute(in AttributeList p_attributeList, in XSD.NCName p_attributeName) return integer {
+		var integer i;
+			
+		for (i:=0; i < lengthof(p_attributeList); i := i + 1){
+			if(p_attributeList[i] == p_attributeName){
+				return i;
+			}	
+		}
+				
+		return -1;
+			
+		}
+		
+		/**
+		 * @desc Resolution of the announcement target CSE PoA
+		 * @param p_protocolBinding	Protocol Binding
+		 * @param p_announcementTargetAddress	Announcement Target Address
+		 * @param p_announcementTargetResource Announcement Target Resource
+		 * @return p_annoucementTargetPoA Announcemenet Target PoA
+		 */
+		function f_getAnnouncementTargetPoA(in charstring p_protocolBinding := PX_PROTOCOL_BINDING, in charstring p_announcementTargetAddress := PX_CSE1_ADDRESS, charstring p_announcementTargetResource := "CseBaseTester" ) return charstring {
+			
+			if(p_protocolBinding == "HTTP") {
+			 	return "http://" & p_announcementTargetAddress & "/" & p_announcementTargetResource;
+			} else if (p_protocolBinding == "COAP") {
+				return "coap://" & p_announcementTargetAddress & "/" & p_announcementTargetResource;
+			} else if (p_protocolBinding == "MQTT") {
+				return "mqtt://" & PX_SUT_ADDRESS & "/" & p_announcementTargetResource;//TODO
+			} else {
+				return "ws://" & p_announcementTargetAddress & "/" & p_announcementTargetResource;
+			}
+		}
+			
+    		
+		/**
+		 * @desc Resolution of the resource index for a given resource address (URI)
+		 * @param p_address	Resource URI (can be structured/unstructured cseRelative/spRelative/absolute)
+		 * @return Internal resource index of the given resource or -1 in case of error
+		 */
+		function f_getResourceIndex(in XSD.AnyURI p_address) return integer {
+			return -1; //TODO
+		}
+    		
+		/**
+		 * @desc Resolution of the resource address field (to) for a given resource depending on addressing and hierarchical format 
+		 * @param p_targetResourceIndex Internal resource index of the given resource
+		 * @return Resource address for the given resource
+		 * @verdict 
+		 */
+		function f_getResourceAddress(integer  p_targetResourceIndex := -1) runs on Tester return XSD.ID {
+			var XSD.ID v_resourceAddress;
+			
+			if(vc_primitiveScope == e_cseRelative) {
+					
+				if(vc_addressingMethod == e_nonHierarchical) {
+					if(p_targetResourceIndex == -1) {
+						return PX_CSE_RESOURCE_ID;
+					} else {
+						return f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);
+					}
+				} else {
+					if(p_targetResourceIndex == -1) {
+						return PX_CSE_NAME;
+					} else {
+						v_resourceAddress := f_getResourceAddress(vc_resourcesList[p_targetResourceIndex].parentIndex) & "/" & f_getResourceName(vc_resourcesList[p_targetResourceIndex].resource);
+						return v_resourceAddress;
+					}	
+				}
+					
+			} else if (vc_primitiveScope == e_spRelative) {
+				if(vc_addressingMethod == e_nonHierarchical) {
+					if(p_targetResourceIndex == -1) {
+
+						return PX_CSE_ID &  "/" & PX_CSE_RESOURCE_ID; 
+					} else {
+						v_resourceAddress := PX_CSE_ID & "/" & f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);
+						
+						return v_resourceAddress;
+					}
+				} else {
+					if(p_targetResourceIndex == -1) {
+						return PX_CSE_ID & "/" & PX_CSE_NAME;
+					} else {
+						v_resourceAddress := f_getResourceAddress(vc_resourcesList[p_targetResourceIndex].parentIndex) & "/" & f_getResourceName(vc_resourcesList[p_targetResourceIndex].resource);
+						
+						return v_resourceAddress;
+					}
+				}
+			} else if (vc_primitiveScope ==  e_absolute) {
+				if(vc_addressingMethod == e_nonHierarchical) {
+					if(p_targetResourceIndex == -1) {
+						return PX_SP_ID & PX_CSE_ID;
+					} else {
+						v_resourceAddress := f_getResourceAddress() & "/" & f_getResourceId(vc_resourcesList[p_targetResourceIndex].resource);
+						return v_resourceAddress;
+					}
+				} else {
+					if(p_targetResourceIndex == -1) {
+						return PX_SP_ID & PX_CSE_ID & "/" & PX_CSE_NAME;
+					} else {
+						v_resourceAddress := f_getResourceAddress(vc_resourcesList[p_targetResourceIndex].parentIndex) & "/" & f_getResourceName(vc_resourcesList[p_targetResourceIndex].resource);
+						return v_resourceAddress;
+					}	
+				}				
+			} else {
+				return "";
+			}
+				
+		}
+		/**
+		 * @desc Saving of a resource and its parent index in the internal resource list
+		 * @param p_resource Resource to be saved
+		 * @param p_parentIndex Parent index of resource to be saved
+		 * @return Internal resource index of the saved resource
+		 * @verdict 
+		 */
+		function f_setResource(PrimitiveContent p_resource, ResourceType p_resourceType, integer  p_parentIndex := -1) runs on Tester return integer {
+			var integer v_newIndex := -1;	
+			if(isbound(vc_resourcesList)) {
+				vc_resourcesList[lengthof(vc_resourcesList)] := {p_parentIndex, p_resourceType, p_resource};
+			} else {
+				vc_resourcesList[0] := {p_parentIndex, p_resourceType, p_resource};
+			}
+			
+			v_newIndex := lengthof(vc_resourcesList)-1;
+			if(match(int2, p_resourceType) or match(-1, p_parentIndex)) {//If created resource is an AE or created under CSEBase, it needs to be added to the resourceToBeDeleted list
+				vc_resourcesIndexToBeDeleted := vc_resourcesIndexToBeDeleted & {v_newIndex};
+			}
+			
+			return v_newIndex;
+						
+		}
+		
+		/**
+		 * @desc Set Acpid into the requestPrimitive
+		 * @param p_requestPrimitive RequestPrimitive to be modified
+		 * @param p_accessControlPolicyIDs AcpId to be set
+		 * @return 
+		 * @verdict 
+		 */
+		function f_setAcpId(template RequestPrimitive p_requestPrimitive, template AcpType p_accessControlPolicyIDs) runs on CseTester return RequestPrimitive{
+	
+			if (ischosen(p_requestPrimitive.primitiveContent.aE)){
+				p_requestPrimitive.primitiveContent.aE.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.container)){
+				p_requestPrimitive.primitiveContent.container.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.group_)){
+				p_requestPrimitive.primitiveContent.group_.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.serviceSubscribedAppRule)){
+				p_requestPrimitive.primitiveContent.serviceSubscribedAppRule.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.subscription)){
+				p_requestPrimitive.primitiveContent.subscription.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.locationPolicy)){
+				p_requestPrimitive.primitiveContent.locationPolicy.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			} 
+			else if (ischosen(p_requestPrimitive.primitiveContent.delivery)){
+				p_requestPrimitive.primitiveContent.delivery.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.mgmtCmd)){
+				p_requestPrimitive.primitiveContent.mgmtCmd.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}	
+			else if (ischosen(p_requestPrimitive.primitiveContent.node)){
+				p_requestPrimitive.primitiveContent.node.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}	
+			else if (ischosen(p_requestPrimitive.primitiveContent.remoteCSE)){
+				p_requestPrimitive.primitiveContent.remoteCSE.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.request)){
+				p_requestPrimitive.primitiveContent.request.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.statsCollect)){
+				p_requestPrimitive.primitiveContent.statsCollect.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			}
+			else if (ischosen(p_requestPrimitive.primitiveContent.statsConfig)){
+				p_requestPrimitive.primitiveContent.statsConfig.accessControlPolicyIDs := p_accessControlPolicyIDs;
+			} else {
+				log( __SCOPE__, ":INFO: Resource not having acpi attribute. Not possible to set acpi")
+			}
+			return valueof(p_requestPrimitive);					
+		}
+		
+		/**
+		 * @desc Retrieve AE_ID for a given AE resource
+		 * @param p_targetResourceIndex Internal resource index of the given resource
+		 * @return AE_ID of the given resource
+		 */
+		function f_getAeId(integer  p_targetResourceIndex := -1) runs on AeTester return XSD.ID {
+			
+			if(ischosen(vc_resourcesList[p_targetResourceIndex].resource.aE)) {
+				return vc_resourcesList[p_targetResourceIndex].resource.aE.aE_ID;
+			}
+			
+			log(__SCOPE__ & ":WARNING: p_targetResourceIndex does not refer to AE resource");
+			return "";
+			
+		} // end f_getAeId
+    				
+	}//end group getSetFunctions
+	
+	group CommonFunctions {
+		
+		
+		
+		/**
+		 * @desc Sending of an Adapter Control primitive
+		 * @param event Action to be performed by TA
+		 * @param data Corresponding information for the correct execution of the given action
+		 * @verdict 
+		 */
+		function f_checkCseTesterStatus() runs on CseTester {
+			
+			if (getverdict != pass) {
+				 f_cse_postamble_deleteResources();
+				 // Tear down
+				 f_cfCseTesterDown();
+				 stop;
+			}
+		}
+		
+		/**
+		 * @desc Sending of an Adapter Control primitive
+		 * @param event Action to be performed by TA
+		 * @param data Corresponding information for the correct execution of the given action
+		 * @verdict 
+		 */
+		function f_checkAeTesterStatus() runs on AeTester {
+	
+			if (getverdict != pass) {
+				 //f_ae_postamble_deleteResources();
+				 // Tear down
+				 f_cfAeTesterDown();
+				 stop;
+			}
+		}
+		
+		/**
+		 * @desc Sending of an Adapter Control primitive
+		 * @param event Action to be performed by TA
+		 * @param data Corresponding information for the correct execution of the given action
+		 * @verdict 
+		 */
+		function f_sendAcPrimitive(in charstring p_event, in charstring p_data) runs on Tester {
+			
+
+			var charstring v_data := "" & p_data; // clear encoding rules (ttwb issue ?)
+			acPort.send(AcRequestPrimitive:{p_event, {charstring := v_data}});
+			
+		}
+		
+		group AltstepFunctions {
+
+			/**
+			  * @desc	Default altstep
+			  */
+			 altstep a_default() runs on Tester {
+			
+				[] tc_wait.timeout {
+					 setverdict(inconc, __SCOPE__&":INFO: Timeout while awaiting reaction of the IUT prior to Upper Tester action");
+				}
+				[] tc_ac.timeout {
+					setverdict(inconc, __SCOPE__&":INFO: Timeout while awaiting the reception of a message");
+				}
+			 }				 
+
+		}//end group altstepFunctions
+		
+		function f_resourceIdCleaner(in XSD.ID p_resourceID) return XSD.ID {
+			var integer v_length := lengthof(p_resourceID);
+			var integer i;
+			var XSD.ID result := "";
+			
+			for (i := v_length - 1; i>=0; i := i-1){
+				if(p_resourceID[i]=="/"){
+					return result;
+				}
+				else{
+					result := p_resourceID[i] & result;
+				}	
+			}
+			return result;
+		}
+		
+		/**
+		 * @desc It removes the poa from a given url
+		 * @param p_url URL
+		 * @return Resource Identifier
+		 * NOT USED FOR THE TIME BEING
+		 */
+		function f_removePoa(in XSD.ID p_url) return XSD.ID {
+			var integer v_length := lengthof(p_url);
+			var integer i;
+			var integer v_numberOfColons := 0;
+			var boolean v_lookForSlash := false;
+			var boolean v_getURI := false;
+			var XSD.ID v_uri := "";
+			
+			//TODO Process when FQDN is used in the URL
+			for (i := 0; i<v_length; i := i + 1){
+				if(v_getURI) {
+					v_uri := v_uri & p_url[i];
+				} else {
+					if(p_url[i]==":"){
+						v_numberOfColons := v_numberOfColons + 1;
+					}
+					if(v_numberOfColons >= 2) {
+						v_lookForSlash := true;
+					}
+					if(v_lookForSlash) {
+						if(p_url[i]=="/") {
+							v_getURI := true;
+						}
+					}
+				}
+			}
+			
+			
+			if(v_uri == "") {
+				return p_url;
+			} else {
+				return v_uri;
+			}
+		}
+		
+		function f_removeElementFromList (inout IntegerList p_list, in integer p_valueToBeDeleted) {
+			var IntegerList result := {};
+			var integer i;
+			for(i := 0; i < lengthof(p_list); i := i+1){
+				if(p_list[i] != p_valueToBeDeleted){
+					result := result & {p_list[i]};
+				}
+			}
+			p_list := result;
+		}
+		
+		function f_getTemplateFromPrimitiveContent (in template PrimitiveContent p_primitiveContent) return template PrimitiveContent{
+			var template PrimitiveContent v_primitiveContent := omit;
+			
+			if(ischosen(p_primitiveContent.container)){ // Container
+				v_primitiveContent := {container := mw_contentContainerBase};
+				
+				if(ispresent(p_primitiveContent.container.labels)){
+					v_primitiveContent.container.labels := ?;
+				}
+    			if(ispresent(p_primitiveContent.container.accessControlPolicyIDs)){
+    				v_primitiveContent.container.accessControlPolicyIDs := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.dynamicAuthorizationConsultationIDs)){
+    				v_primitiveContent.container.dynamicAuthorizationConsultationIDs := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.announceTo)){
+    				v_primitiveContent.container.announceTo := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.announcedAttribute)){
+    				v_primitiveContent.container.announcedAttribute := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.creator)){
+    				v_primitiveContent.container.creator := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.maxNrOfInstances)){
+    				v_primitiveContent.container.maxNrOfInstances := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.maxByteSize)){
+    				v_primitiveContent.container.maxByteSize := ?;
+    			}
+    			if(ispresent(p_primitiveContent.container.maxInstanceAge)){
+    				v_primitiveContent.container.maxInstanceAge := ?;
+    			}
+				if(ispresent(p_primitiveContent.container.locationID)){
+					v_primitiveContent.container.locationID := ?;
+				}
+				if(ispresent(p_primitiveContent.container.ontologyRef)){
+					v_primitiveContent.container.ontologyRef := ?;
+				}
+				if(ispresent(p_primitiveContent.container.disableRetrieval)){
+					v_primitiveContent.container.disableRetrieval := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.aE)){ // AE
+				v_primitiveContent := {aE := mw_contentAeBase};
+				
+				if(ispresent(p_primitiveContent.aE.labels)){
+					v_primitiveContent.aE.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.accessControlPolicyIDs)){
+					v_primitiveContent.aE.accessControlPolicyIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.dynamicAuthorizationConsultationIDs)){
+					v_primitiveContent.aE.dynamicAuthorizationConsultationIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.announceTo)){
+					v_primitiveContent.aE.announceTo := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.announcedAttribute)){
+					v_primitiveContent.aE.announcedAttribute := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.appName)){
+					v_primitiveContent.aE.appName := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.pointOfAccess)){
+					v_primitiveContent.aE.pointOfAccess := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.ontologyRef)){
+					v_primitiveContent.aE.ontologyRef := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.nodeLink)){
+					v_primitiveContent.aE.nodeLink := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.contentSerialization)){
+					v_primitiveContent.aE.contentSerialization := ?;
+				}
+				if(ispresent(p_primitiveContent.aE.e2eSecInfo)){
+					v_primitiveContent.aE.e2eSecInfo := ?;
+				}	
+			}
+			
+			else if(ischosen(p_primitiveContent.accessControlPolicy)){ // ACP
+				v_primitiveContent := {accessControlPolicy := mw_contentAcpBase};
+	
+				if(ispresent(p_primitiveContent.accessControlPolicy.labels)){
+					v_primitiveContent.accessControlPolicy.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.accessControlPolicy.announceTo)){
+					v_primitiveContent.accessControlPolicy.announceTo := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.contentInstance)){ // ContentInstance
+				v_primitiveContent := {contentInstance := mw_contentContentInstanceBase};
+
+				if(ispresent(p_primitiveContent.contentInstance.labels)){
+					v_primitiveContent.contentInstance.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.announceTo)){
+					v_primitiveContent.contentInstance.announceTo := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.announcedAttribute)){
+					v_primitiveContent.contentInstance.announcedAttribute := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.creator)){
+					v_primitiveContent.contentInstance.creator := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.contentInfo)){
+					v_primitiveContent.contentInstance.contentInfo := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.contentRef)){
+					v_primitiveContent.contentInstance.contentRef := ?;
+				}
+				if(ispresent(p_primitiveContent.contentInstance.ontologyRef)){
+					v_primitiveContent.contentInstance.ontologyRef := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.group_)){ // Group
+				v_primitiveContent := {group_ := mw_contentGroupBase};
+
+				if(ispresent(p_primitiveContent.group_.labels)){
+					v_primitiveContent.group_.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.accessControlPolicyIDs)){
+					v_primitiveContent.group_.accessControlPolicyIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.dynamicAuthorizationConsultationIDs)){
+					v_primitiveContent.group_.dynamicAuthorizationConsultationIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.announceTo)){
+					v_primitiveContent.group_.announceTo := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.announcedAttribute)){
+					v_primitiveContent.group_.announcedAttribute := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.creator)){
+					v_primitiveContent.group_.creator := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.membersAccessControlPolicyIDs)){
+					v_primitiveContent.group_.membersAccessControlPolicyIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.memberTypeValidated)){
+					v_primitiveContent.group_.memberTypeValidated := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.consistencyStrategy)){
+					v_primitiveContent.group_.consistencyStrategy := ?;
+				}
+				if(ispresent(p_primitiveContent.group_.groupName)){
+					v_primitiveContent.group_.groupName := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.pollingChannel)){ // PollingChannel
+				v_primitiveContent := {pollingChannel := mw_contentPollingChannelBase};
+
+				if(ispresent(p_primitiveContent.pollingChannel.labels)){
+					v_primitiveContent.pollingChannel.labels := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.schedule)){ // Schedule
+				v_primitiveContent := {schedule := mw_contentScheduleBase};
+
+				if(ispresent(p_primitiveContent.schedule.labels)){
+					v_primitiveContent.schedule.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.schedule.announceTo)){
+					v_primitiveContent.schedule.announceTo := ?;
+				}
+				if(ispresent(p_primitiveContent.schedule.announcedAttribute)){
+					v_primitiveContent.schedule.announcedAttribute := ?;
+				}
+			}
+			
+			else if(ischosen(p_primitiveContent.subscription)){ // Schedule
+				v_primitiveContent := {subscription := mw_contentSubscriptionBase};
+
+				if(ispresent(p_primitiveContent.subscription.labels)){
+					v_primitiveContent.subscription.labels := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.accessControlPolicyIDs)){
+					v_primitiveContent.subscription.accessControlPolicyIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.dynamicAuthorizationConsultationIDs)){
+					v_primitiveContent.subscription.dynamicAuthorizationConsultationIDs := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.creator)){
+					v_primitiveContent.subscription.creator := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.eventNotificationCriteria)){
+					v_primitiveContent.subscription.eventNotificationCriteria := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.expirationCounter)){
+					v_primitiveContent.subscription.expirationCounter := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.groupID)){
+					v_primitiveContent.subscription.groupID := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.notificationForwardingURI)){
+					v_primitiveContent.subscription.notificationForwardingURI := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.batchNotify)){
+					v_primitiveContent.subscription.batchNotify := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.rateLimit)){
+					v_primitiveContent.subscription.rateLimit := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.preSubscriptionNotify)){
+					v_primitiveContent.subscription.preSubscriptionNotify := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.pendingNotification)){
+					v_primitiveContent.subscription.pendingNotification := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.notificationStoragePriority)){
+					v_primitiveContent.subscription.notificationStoragePriority := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.latestNotify)){
+					v_primitiveContent.subscription.latestNotify := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.notificationContentType)){
+					v_primitiveContent.subscription.notificationContentType := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.notificationEventCat)){
+					v_primitiveContent.subscription.notificationEventCat := ?;
+				}
+				if(ispresent(p_primitiveContent.subscription.subscriberURI)){
+					v_primitiveContent.subscription.subscriberURI := ?;
+				}
+			}
+			else if(ischosen(p_primitiveContent.remoteCSE)){ 
+			  v_primitiveContent := {remoteCSE := mw_contentRemoteCSEBase};
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.labels)){
+			    v_primitiveContent.remoteCSE.labels := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.accessControlPolicyIDs)){
+			    v_primitiveContent.remoteCSE.accessControlPolicyIDs := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.dynamicAuthorizationConsultationIDs)){
+			    v_primitiveContent.remoteCSE.dynamicAuthorizationConsultationIDs := ?;			    
+			  }
+			
+			  if(ispresent(p_primitiveContent.remoteCSE.announceTo)){
+			    v_primitiveContent.remoteCSE.announceTo := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.announcedAttribute)){
+			    v_primitiveContent.remoteCSE.announcedAttribute := ?;			    
+			  }
+			
+			  if(ispresent(p_primitiveContent.remoteCSE.cseType)){
+			    v_primitiveContent.remoteCSE.cseType := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.pointOfAccess)){
+			    v_primitiveContent.remoteCSE.pointOfAccess := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.m2M_Ext_ID)){
+			    v_primitiveContent.remoteCSE.m2M_Ext_ID := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.trigger_Recipient_ID)){
+			    v_primitiveContent.remoteCSE.trigger_Recipient_ID := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.nodeLink)){
+			    v_primitiveContent.remoteCSE.nodeLink := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.triggerReferenceNumber)){
+			    v_primitiveContent.remoteCSE.triggerReferenceNumber := ?;			    
+			  }
+			  
+			  if(ispresent(p_primitiveContent.remoteCSE.e2eSecInfo)){
+			    v_primitiveContent.remoteCSE.e2eSecInfo := ?;			    
+			  }		  
+			  
+			}
+			
+			
+			
+			return v_primitiveContent;
+		}
+		
+		function f_match2PrimitiveContent (in PrimitiveContent p_responsePrimitiveContent, in template PrimitiveContent p_requestPrimitiveContent) runs on CseTester {
+			var template PrimitiveContent v_primitiveContent;
+			var PrimitiveContent v_response;
+			v_response := p_responsePrimitiveContent;
+			v_primitiveContent := f_getTemplateFromPrimitiveContent(p_requestPrimitiveContent);
+			if(not(match(v_response, v_primitiveContent))){
+				setverdict(inconc, __SCOPE__&":INFO: Resource incomplete, some attribute missing ");
+			}
+
+		}
+		
+		
+	}//end of commonFunctions
+	
+	group externalFunctions {
+		
+		/**
+		 * @desc Generates a oneM2M timestamp based on current time. 
+		 * 		 Format shall be YYYYMMDDTHHMMSS 
+		 */		
+		external function fx_generateTimestamp() return charstring;
+
+	} // end externalFunctions
+	
+}  // end of module

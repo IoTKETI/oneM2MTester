@@ -1,0 +1,98 @@
+/**
+ *  @author   ETSI
+ *  @version  $URL: https://oldforge.etsi.org/svn/LibCommon/tags/v1.4.0/ttcn/LibCommon_VerdictControl.ttcn $
+ *            $Id: LibCommon_VerdictControl.ttcn 64 2016-12-14 15:09:43Z berge $
+ *  @desc     Contains generic functions which set test component verdicts
+ *            based on generic function return codes according to established
+ *            test implementation practice. These functions should only be called
+ *            from test case functions (see reusable t3 code methodology) only.
+ *  @remark   End users should be aware that any changes made to the  in
+ *            definitions this module may be overwritten in future releases.
+ *            End users are encouraged to contact the distributers of this
+ *            module regarding their modifications or additions so that future
+ *            updates will include your changes.
+ *  @copyright  ETSI Copyright Notification
+ *                No part may be reproduced except as authorized by written permission.
+ *                The copyright and the foregoing restriction extend to reproduction in all media.
+ *                All rights reserved.
+ *
+ */
+ module LibCommon_VerdictControl {
+
+  /**
+   * @desc  Collection of all possible function return codes.
+   *        This type should be used as a return parameter type
+   *        in all TTCN-3 function definitions (except for
+   *        functions invoked from in TTCN-3 start statements).
+   *        This return value should be used to communicate a
+   *        verdict to the caller _instead of_ literally setting
+   *        a verdict in the function! This warrants a higher
+   *        degree of reuse for the function.
+   */
+  type enumerated FncRetCode {
+    e_success(0),
+    // error codes
+    e_error(1),
+    e_timeout(2)
+  }
+
+  /**
+   * @desc  This function should be used for verdict
+   *        setting after completion of, e.g., the test body
+   *        execution.
+   *        Sets verdicts are INCONC in case of a timeout, FAIL
+   *        in case of an error, and PASS otherwise.
+   * @param p_ret Current execution status
+   */
+  function f_setVerdict ( FncRetCode p_ret ) {
+    if ( p_ret == e_success ) {
+      setverdict(pass);
+    } else if ( p_ret == e_timeout ) {
+      setverdict(inconc);
+    } else {
+      setverdict(fail);
+    }
+  } // end function f_setVerdict
+
+
+  /**
+   * @desc  This function should be used for verdict
+   *        setting after completion of a preamble
+   *        execution.
+   *        Sets verdicts are INCONC in case of a timeout or
+   *        an error, and PASS otherwise.
+   * @param p_ret Preamble execution status
+   */
+  function f_setVerdictPreamble ( FncRetCode p_ret ) {
+	log("f_setVerdictPreamble: This function is deprecated. Use f_setVerdictPreOrPostamble instead. ");
+    f_setVerdictPreOrPostamble(p_ret);
+  } // end function f_setVerdictPreamble
+
+
+  /**
+   * @desc  This function should be used for verdict
+   *        setting after completion of a postamble
+   *        execution.
+   *        Sets verdicts are INCONC in case of a timeout or
+   *        an error, and PASS otherwise.
+   * @param p_ret Postamble execution status
+   */
+  function f_setVerdictPostamble ( FncRetCode p_ret ) {
+	log("f_setVerdictPostamble: This function is deprecated. Use f_setVerdictPreOrPostamble instead. ");
+    f_setVerdictPreOrPostamble(p_ret);
+  } // end function f_setVerdictPostamble
+
+  /**
+   * @desc 	This function should be used for verdict
+	 *			  setting outside the test body.
+	 *		    Sets verdicts are INCONC in case of a timeout or
+	 *        an error
+	 * @param p_ret Postamble execution status
+	 */
+	function f_setVerdictPreOrPostamble ( FncRetCode p_ret ) {
+		if ( p_ret != e_success ) {
+			setverdict(inconc);
+		} 
+	} // end function f_setVerdictPreOrPostamble
+
+} // end module LibCommon_VerdictControl
