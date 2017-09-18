@@ -42,14 +42,14 @@ Visit [wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
   ![KETI logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/KETI_logo.png) 
     ![SJU logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/SejongUniv_logo.png)
     ![Ericsson logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Ericsson_logo.png)
-    ![EGM logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/eGM_logo.png)
+    ![EGM logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/EGM_logo.png)
     ![Huawei logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Huawei_logo.png)
     ![TTA logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/TTA_logo.png) 
     ![DTNC logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/DTC_logo.jpg)
     ![Sensinov logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Sensinov.png) 
     ![InterDigital logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/InterDigital_logo.jpg)
     ![LAAS-CNRS logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/LAAS-CNRS_logo.jpg)
-    ![InnoWireless logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/innowireless-logo.png)
+    ![InnoWireless logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Innowireless_logo.png)
 
 ## **Latest News**
 [2017 September]
