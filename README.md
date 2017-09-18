@@ -45,7 +45,7 @@ Visit [wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
     ![EGM logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/eGM_logo.png)
     ![Huawei logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Huawei_logo.png)
     ![TTA logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/TTA_logo.png) 
-    ![DTNC logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/DT%26C_logo.jpg)
+    ![DTNC logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/DTC_logo.jpg)
     ![Sensinov logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Sensinov.png) 
     ![InterDigital logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/InterDigital_logo.jpg)
     ![LAAS-CNRS logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/LAAS-CNRS_logo.jpg)
