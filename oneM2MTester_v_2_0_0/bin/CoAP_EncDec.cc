@@ -1,1 +1,0 @@
-/home/martin/ketiwork/workspace/oneM2MTester_v_2_0_0/Protocol_Modules/CoAP/CoAP_EncDec.cc
