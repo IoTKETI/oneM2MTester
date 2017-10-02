@@ -15,7 +15,7 @@
   + **InterDigital**,
   + **LAAS-CNRS**,  
   + **InnoWireless**,   
-  + **DTNC**, and 
+  + **DTNC**, 
   + **Huawei**.
 - The project aims to develop and distribute an open source oneM2M conformance testing tool and associated user manuals.    
 
