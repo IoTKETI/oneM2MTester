@@ -1,0 +1,2394 @@
+/**
+ *  Copyright Notification
+ *  No part of this document may be reproduced, in an electronic retrieval system or otherwise, except as authorized by written permission.
+ *  The copyright and the foregoing restriction extend to reproduction in all media.
+ *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
+ *  All rights reserved.
+ *  
+ *  @author     ETSI
+ *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/branches/Release1/ttcn/OneM2M_Testcases.ttcn $
+ *              $Id: OneM2M_Testcases.ttcn 347 2017-08-11 08:48:20Z reinaortega $
+ *  @desc       Module containing test cases for oneM2M
+ *
+ */
+module OneM2M_Testcases_AE {
+
+	import from OneM2M_TestSystem all;
+	import from OneM2M_Templates all;
+	import from OneM2M_Types all;//{type XSD.ID};
+	import from OneM2M_TypesAndValues all;
+	import from OneM2M_Pixits all;
+	import from LibCommon_Time all;
+	import from OneM2M_Pics all;
+	import from OneM2M_Functions all;
+	import from XSD all;
+
+	group AE {
+		
+		group General {
+			
+			group Create {
+						
+				group g_AE_GEN_CRE_001 {
+							
+					/**
+					 * @desc  Check that the IUT sends the creation of a <container> resource using unstructured resource identifier
+					 */
+		
+					testcase TC_AE_GEN_CRE_001_CSR() runs on CseSimu system AeSystem {
+						
+						// Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_001(e_cseRelative);
+					}
+					
+					testcase TC_AE_GEN_CRE_001_SPR() runs on CseSimu system AeSystem {
+												
+						// Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_001(e_spRelative);
+					}
+					
+					testcase TC_AE_GEN_CRE_001_ABS() runs on CseSimu system AeSystem {
+						
+						// Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_001(e_absolute);
+					}
+					
+					function f_AE_GEN_CRE_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
+						
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var UtTriggerAckPrimitive v_trigger_response;
+						
+						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+
+						f_cf03Up();
+						
+						//Send Trigger Message
+						v_utRequest.to_ := f_getResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";
+						f_sendUtPrimitive(v_utRequest);						
+						
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_createContainer(omit,v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container creation request received successfuly");
+							
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while creating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while creating resource");
+								stop;
+							}
+						}
+						
+						// Postamble
+						f_cf03Down();
+					}
+				}//end group g_AE_GEN_CRE_002//end group g_AE_GEN_CRE_002
+					
+				group g_AE_GEN_CRE_002 {
+							
+					/**
+					 * @desc  Check that the IUT sends the creation of a <container> resource using structured resource identifier
+					 */
+
+					testcase TC_AE_GEN_CRE_002_CSR() runs on CseSimu system AeSystem {
+						
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_002(e_cseRelative);
+					}
+
+					testcase TC_AE_GEN_CRE_002_SPR() runs on CseSimu system AeSystem {
+						
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_002(e_spRelative);
+					}
+
+					testcase TC_AE_GEN_CRE_002_ABS() runs on CseSimu system AeSystem {
+						
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_CRE_002(e_absolute);
+					}
+
+					function f_AE_GEN_CRE_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
+	
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var UtTriggerAckPrimitive v_trigger_response;
+						
+						//Test Control
+						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+	
+						f_cf03Up();
+	
+						//Send Trigger Message
+						v_utRequest.to_ := f_getResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";
+						f_sendUtPrimitive(v_utRequest);	
+							
+	
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_createContainer(omit,v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container creation request received successfuly");
+		
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while creating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while creating resource");
+								stop;
+							}
+						}
+	
+						// Postamble
+						f_cf03Down();
+					}
+				
+				} //end group g_AE_GEN_CRE_002
+				
+			} //end group Create
+			
+			group Update {
+						
+				group g_AE_GEN_UPD_001 {
+							
+					/**
+					 * @desc  Check that the IUT sends the update of a <container>  resource using unstructured resource identifier
+					 */
+		
+					testcase TC_AE_GEN_UPD_001_CSR() runs on CseSimu system AeSystem {
+						
+						// Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_001(e_cseRelative);
+					}
+					
+					testcase TC_AE_GEN_UPD_001_SPR() runs on CseSimu system AeSystem {
+						
+					//Test control
+					if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+						setverdict(inconc, __SCOPE__, ": Unstructured-SP-Relative-Resource-ID format support is required to run this test case");
+						stop;
+					}
+						
+						f_AE_GEN_UPD_001(e_spRelative);
+					}
+					
+					testcase TC_AE_GEN_UPD_001_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_001(e_absolute);
+					}
+					
+					function f_AE_GEN_UPD_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
+						
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+						
+						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_cf03Up();
+						
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";
+						f_sendUtPrimitive(v_utRequest);													
+						
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_updateContainer(omit,v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
+							
+								v_responsePrimtive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while updating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while updating resource");
+								stop;
+							}
+						}
+						
+						// Postamble
+						f_cf03Down();
+					}
+				}//end group g_AE_GEN_UPD_001
+					
+				group g_AE_GEN_UPD_002 {
+							
+					/**
+					 * @desc  Check that the IUT sends the update of a <container>  resource using structured resource identifier
+					 */
+
+					testcase TC_AE_GEN_UPD_002_CSR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_002(e_cseRelative);
+					}
+
+					testcase TC_AE_GEN_UPD_002_SPR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_002(e_spRelative);
+					}
+
+					testcase TC_AE_GEN_UPD_002_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_002(e_absolute);
+					}
+
+					function f_AE_GEN_UPD_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
+	
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+						
+						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+	
+						f_cf03Up();
+	
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";
+						f_sendUtPrimitive(v_utRequest);	
+								
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_updateContainer(omit,v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
+							
+								v_responsePrimtive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while updating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while updating resource");
+								stop;
+							}
+						}
+	
+						// Postamble
+						f_cf03Down();
+					}
+				
+				} //end group g_AE_GEN_UPD_002
+				
+			} //end group Update
+			
+			group Retrieve {
+						
+				group g_AE_GEN_RET_001 {
+				
+					/**
+					 * @desc  Check that the IUT sends the retrieval of a <container>  resource using unstructured resource identifier
+					 */
+
+					testcase TC_AE_GEN_RET_001_CSR() runs on CseSimu system AeSystem {
+						
+						// Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_RET_001(e_cseRelative);
+					}
+		
+					testcase TC_AE_GEN_RET_001_SPR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_RET_001(e_spRelative);
+					}
+		
+					testcase TC_AE_GEN_RET_001_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_RET_001(e_absolute);
+					}
+		
+					function f_AE_GEN_RET_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
+			
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequestTemplate;
+						var UtTriggerPrimitive v_utRequest;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+						
+						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+			
+						f_cf03Up();
+			
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequestTemplate := m_utRetrieveResource(f_getResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope),"UNINITIALIZED");
+						f_sendUtPrimitive(v_utRequestTemplate);
+						v_utRequest := valueof(v_utRequestTemplate);
+			
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_retrieveResource(v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
+				
+								v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while retrieving container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while retrieving resource");
+								stop;
+							}
+						}
+			
+						// Postamble
+						f_cf03Down();
+					}
+				}//end group g_AE_GEN_RET_001
+		
+				group g_AE_GEN_RET_002 {
+				
+					/**
+					 * @desc  Check that the IUT sends the retrieval of a <container>  resource using structured resource identifier
+					 */
+
+					testcase TC_AE_GEN_RET_002_CSR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_RET_002(e_cseRelative);
+					}
+
+					testcase TC_AE_GEN_RET_002_SPR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_UPD_002(e_spRelative);
+					}
+
+					testcase TC_AE_GEN_RET_002_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_RET_002(e_absolute);
+					}
+
+					function f_AE_GEN_RET_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
+
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequestTemplate;
+						var UtTriggerPrimitive v_utRequest;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+						
+						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+
+						f_cf03Up();
+
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequestTemplate := m_utRetrieveResource(f_getResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope),"UNINITIALIZED");
+						v_utRequest := valueof(v_utRequestTemplate);
+						f_sendUtPrimitive(v_utRequest);				
+
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_retrieveResource(v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
+				
+								v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while retrieving container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while retrieving resource");
+								stop;
+							}
+						}
+
+						// Postamble
+						f_cf03Down();
+					}
+	
+				} //end group g_AE_GEN_RET_002
+	
+			} //end group Retrieve
+						
+			group Delete {
+						
+				group g_AE_GEN_DEL_001 {
+				
+					/**
+					 * @desc  Check that the IUT sends the deletion of a <container>  resource using unstructured resource identifier
+					 */
+
+					testcase TC_AE_GEN_DEL_001_CSR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_001(e_cseRelative);
+					}
+		
+					testcase TC_AE_GEN_DEL_001_SPR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_001(e_spRelative);
+					}
+		
+					testcase TC_AE_GEN_DEL_001_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_001(e_absolute);
+					}
+		
+					function f_AE_GEN_DEL_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
+			
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+
+						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+			
+						f_cf03Up();
+			
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";
+						f_sendUtPrimitive(v_utRequest);									
+			
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_deleteRequest(v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
+				
+								v_responsePrimtive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while updating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while updating resource");
+								stop;
+							}
+						}
+			
+						// Postamble
+						f_cf03Down();
+					}
+				}//end group g_AE_GEN_DEL_001
+		
+				group g_AE_GEN_DEL_002 {
+				
+					/**
+					 * @desc  Check that the IUT sends the deletion of a <container>  resource using structured resource identifier
+					 */
+
+					testcase TC_AE_GEN_DEL_002_CSR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_CSE_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_002(e_cseRelative);
+					}
+
+					testcase TC_AE_GEN_DEL_002_SPR() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_SP_RELATIVE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-SP-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_002(e_spRelative);
+					}
+
+					testcase TC_AE_GEN_DEL_002_ABS() runs on CseSimu system AeSystem {
+						
+						//Test control
+						if(not(PICS_PRIMITIVE_SCOPE_ABSOLUTE)) {
+							setverdict(inconc, __SCOPE__, ": Structured-Absolute-Resource-ID format support is required to run this test case");
+							stop;
+						}
+						
+						f_AE_GEN_DEL_002(e_absolute);
+					}
+
+					function f_AE_GEN_DEL_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
+
+						var ResponsePrimitive v_responsePrimtive;
+						var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
+						var UtTriggerAckPrimitive v_trigger_response;
+						var integer v_auxInteger;
+						
+						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
+							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
+							stop;
+						}
+
+						f_cf03Up();
+
+						//Send Trigger Message
+						v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope);
+						v_utRequest.from_ := "UNINITIALIZED";			
+						f_sendUtPrimitive(v_utRequest);
+				
+
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_request(mw_deleteRequest(v_utRequest.to_))) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
+				
+								v_responsePrimtive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive(mw_request(?)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Error while updating container");
+								stop;
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__, " : No answer while updating resource");
+								stop;
+							}
+						}
+
+						// Postamble
+						f_cf03Down();
+					}
+	
+				} //end group g_AE_GEN_DEL_002
+	
+			} //end group Delete
+			
+		}//end group General
+
+		group Registration {
+			
+			group Create {
+						
+				/**
+				 * @desc  Check that the IUT sends an AE initial registration request with no AE-ID-STEM provided when it is started
+				 */
+
+				testcase TC_AE_REG_CRE_001() runs on CseSimu system AeSystem {
+
+					//primitives for utPort
+					var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+
+					//primitives for mcaPort
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					f_cf03Up();
+				
+					//Send Trigger Message
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createAe)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : AE registration request is accepted!!");
+							//v_responsePrimtive := valueof(m_responsePrimitiveTemp(int2000, omit));
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+							
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive(mw_request(mw_createAe(*,?,m_contentCreateAe_Invalid))) -> value v_request {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : AE registration request is rejected due to not including mandatory attributes!!");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+	
+					}
+	
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc  Check that the IUT sends a registration CREATE Request with the value of the attribute ATTRIBUTE_NAME  of the AE resource
+				 */
+				
+				group g_AE_REG_CRE_002 {
+				
+					testcase TC_AE_REG_CRE_002_RN() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.resourceName := "UNINITIALIZED";
+						v_createAe.primitiveContent.aE.resourceName := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_ET() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.expirationTime := "20301231T012345";
+						v_createAe.primitiveContent.aE.expirationTime := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_LBL() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.labels := {"UNINITIALIZED"};
+						v_createAe.primitiveContent.aE.labels := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_APN() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.appName := "UNINITIALIZED";
+						v_createAe.primitiveContent.aE.appName := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_API() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.app_ID := "UNINITIALIZED";
+						v_createAe.primitiveContent.aE.app_ID := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_POA() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.pointOfAccess := {"UNINITIALIZED"};
+						v_createAe.primitiveContent.aE.pointOfAccess := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_OR() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.ontologyRef := "UNINITIALIZED";
+						v_createAe.primitiveContent.aE.ontologyRef := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_NL() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.nodeLink := "UNINITIALIZED";
+						v_createAe.primitiveContent.aE.nodeLink := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_RR() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.requestReachability := true;
+						v_createAe.primitiveContent.aE.requestReachability := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+					testcase TC_AE_REG_CRE_002_CSZ() runs on CseSimu system AeSystem {
+						//primitives for utPort
+						var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+						var template RequestPrimitive v_createAe := mw_createAe; 
+						v_utRequest.primitiveContent.aE.contentSerialization := {applicationxml};
+						v_createAe.primitiveContent.aE.contentSerialization := ?;
+						f_AE_REG_CRE_002(v_utRequest,v_createAe);
+					}
+	
+				   function f_AE_REG_CRE_002(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_response) runs on CseSimu {
+	
+					   //primitives for mcaPort
+					   var MsgIn v_request;
+					   var ResponsePrimitive v_responsePrimtive;
+	
+					   f_cf03Up();
+	
+					   //Send Trigger Message
+					   f_sendUtPrimitive(p_utRequest);
+	
+					   //Test behavior
+					   tc_ac.start;
+					   alt{
+						   [] mcaPort.receive(mw_request(p_response)) -> value v_request {
+							   tc_ac.stop;
+							   setverdict(pass, __SCOPE__, " : AE registration request is accepted!!");
+							   //v_responsePrimtive := valueof(m_responsePrimitiveTemp(int2000, omit));
+							   v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+							   //send back responsePrimitive
+							   mcaPort.send(m_response(v_responsePrimtive));
+						   }
+						   [] mcaPort.receive(mw_request(mw_createAe(*,?,m_contentCreateAe_Invalid))) -> value v_request {
+							   tc_ac.stop;
+							   setverdict(fail, __SCOPE__, " : AE registration request is rejected due to not including the optional attribute!");
+						   }
+						   [] tc_ac.timeout{
+							   setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						   }
+	
+					   }
+	
+					   // Postamble
+					   f_cf03Down();
+					}
+				
+				}//End of subgroup AE_REG_CRE_002
+				
+			
+			} // End of subgroup Create
+			
+			group Delete {
+			
+			/**
+				 * @desc Check that the IUT sends AE deregistration request to CSE
+				 */
+	
+				testcase TC_AE_REG_DEL_001() runs on CseSimu system AeSystem {
+	
+					//variables
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+					
+					//primitives for utPort
+					var template UtTriggerPrimitive v_utRequest := mw_deleteRequest;
+	
+					f_cf03Up();
+	
+					f_sendUtPrimitive(v_utRequest);
+	
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_deleteRequest)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : AE deregistration request is accepted!");
+	
+							//v_responsePrimtive := valueof(m_responsePrimitiveTemp(int2000, omit));
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : Error while AE deregistration");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+	
+					}
+					// Postamble
+					f_cf03Down();
+				}
+			
+			}// End Delete subgroup
+
+		}//end Registration subgroup
+
+		group Data_Management_and_Repository {
+			
+			group Create {
+			
+				/**
+				 * @desc Check that the IUT sends a Container creation request when it is triggered
+				 */
+			
+				testcase TC_AE_DMR_CRE_001() runs on CseSimu system AeSystem {
+	
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+					
+					f_cf03Up();
+	
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+					
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createContainer)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Container creation request is accepted!");
+	
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+							
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : Container creation request is rejected due to not including mandatory attributes!!");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+	
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a ContentInstance creation request when it is triggered
+				 */
+				
+				testcase TC_AE_DMR_CRE_002() runs on CseSimu system AeSystem {
+	
+					var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+	
+					//Test component configuration
+					f_cf03Up();
+	
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+	
+					//Test behavior
+					tc_ac.start;
+					alt{
+	
+						//receive MsgIn requestPrimitive
+						[] mcaPort.receive(mw_request(mw_createContentInstance)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : ContentInstance creation request is accepted!!");
+							
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+	
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : ContentInstance creation request is rejected due to not including mandatory attributes!!");
+						}
+	
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+					
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a ContentInstance creation request with optional attribute ATTRIBUTE_NAME 
+				 */
+				 
+				 group g_AE_DMR_CRE_003 {
+				 
+					testcase TC_AE_DMR_CRE_003_CNF() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+						var template RequestPrimitive v_request := mw_createContentInstance;
+						v_utRequest.primitiveContent.contentInstance.contentInfo := "UNINITIALIZED";
+						v_request.primitiveContent.contentInstance.contentInfo := ?;
+						f_AE_DMR_CRE_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_003_RN() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+						var template RequestPrimitive v_request := mw_createContentInstance;
+						v_utRequest.primitiveContent.contentInstance.resourceName := "UNINITIALIZED";
+						v_request.primitiveContent.contentInstance.resourceName := ?;
+						f_AE_DMR_CRE_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_003_ET() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+						var template RequestPrimitive v_request := mw_createContentInstance;
+						v_utRequest.primitiveContent.contentInstance.expirationTime := "20301231T012345";
+						v_request.primitiveContent.contentInstance.expirationTime := ?;
+						f_AE_DMR_CRE_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_003_LBL() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+						var template RequestPrimitive v_request := mw_createContentInstance;
+						v_utRequest.primitiveContent.contentInstance.labels := {"UNINITIALIZED"};
+						v_request.primitiveContent.contentInstance.labels := ?;
+						f_AE_DMR_CRE_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_003_CR() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContentInstance;
+						var template RequestPrimitive v_request := mw_createContentInstance;
+						v_utRequest.primitiveContent.contentInstance.creator := "UNINITIALIZED";
+						v_request.primitiveContent.contentInstance.creator := ?;
+						f_AE_DMR_CRE_003(v_utRequest,v_request);
+					}
+	
+					function f_AE_DMR_CRE_003(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request) runs on CseSimu {
+	
+						var ResponsePrimitive v_responsePrimtive;
+	
+						//Test component configuration
+						f_cf03Up();
+	
+						//send triggering primtive to SUT
+						f_sendUtPrimitive(p_utRequest);
+	
+						//Test behavior
+						tc_ac.start;
+						alt{
+	
+							//receive MsgIn requestPrimitive
+							[] mcaPort.receive(mw_request(p_request)) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : ContentInstance creation request is accepted!!");
+	
+								//set responseStatusCode back to SUT
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+								//send back responsePrimitive
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+	
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : ContentInstance creation request is rejected due to not including the attribute!");
+							}
+	
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+	
+						// Postamble
+						f_cf03Down();
+					}
+				 
+				 }//End of subgroup AE_DMR_CRE_003
+				 
+				 
+				 				
+				/**
+				 * @desc Check that the IUT sends a Container creation request with optional attribute ATTRIBUTE_NAME when it is triggered
+				 */
+				 
+				 group g_AE_DMR_CRE_004 {
+				 
+					testcase TC_AE_DMR_CRE_004_ACPI() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.accessControlPolicyIDs := {"UNINITIALIZED"};
+						v_request.primitiveContent.container.accessControlPolicyIDs := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+				 	
+					testcase TC_AE_DMR_CRE_004_MNI() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.maxNrOfInstances := 1;
+						v_request.primitiveContent.container.maxNrOfInstances := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+				 	
+					testcase TC_AE_DMR_CRE_004_MBS() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.maxByteSize := 1;
+						v_request.primitiveContent.container.maxByteSize := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+				 	
+					testcase TC_AE_DMR_CRE_004_MIA() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.maxInstanceAge := 1;
+						v_request.primitiveContent.container.maxInstanceAge := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+				 	
+					testcase TC_AE_DMR_CRE_004_OR() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.ontologyRef := "UNINITIALIZED";
+						v_request.primitiveContent.container.ontologyRef := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_004_RN() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.resourceName := "UNINITIALIZED";
+						v_request.primitiveContent.container.resourceName := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_004_ET() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.expirationTime := "20301231T012345";
+						v_request.primitiveContent.container.expirationTime := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_004_LBL() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.labels := {"UNINITIALIZED"};
+						v_request.primitiveContent.container.labels := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_CRE_004_CR() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.creator := "UNINITIALIZED";
+						v_request.primitiveContent.container.creator := ?;
+						f_AE_DMR_CRE_004(v_utRequest,v_request);
+					}
+	
+					function f_AE_DMR_CRE_004(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request) runs on CseSimu {
+	
+						var ResponsePrimitive v_responsePrimtive;
+	
+						//Test component configuration
+						f_cf03Up();
+	
+						//send triggering primtive to SUT
+						f_sendUtPrimitive(p_utRequest);
+	
+						//Test behavior
+						tc_ac.start;
+						alt{
+	
+							//receive MsgIn requestPrimitive
+							[] mcaPort.receive(mw_request(p_request)) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container creation request is accepted!!");
+	
+								//set responseStatusCode back to SUT
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+								//send back responsePrimitive
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+	
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Container creation request is rejected due to not including the attribute!");
+							}
+	
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+	
+						// Postamble
+						f_cf03Down();
+					}
+				 
+				 }//End of subgroup AE_DMR_CRE_004
+				 
+			}//End of subgroup Create
+			
+			group Update {
+				
+				group g_AE_DMR_UPD_001 {
+					
+					/**
+					 * @desc Check that the IUT sends an UPDATE Request with the value of the attribute ATTRIBUTE_NAME of the TARGET_RESOURCE_ADDRESS resource 
+					 */
+				
+					testcase TC_AE_DMR_UPD_001_LBL() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						var template RequestPrimitive v_request := mw_createContainer;
+						v_utRequest.primitiveContent.container.labels := {"UNINITIALIZED"};
+						f_AE_DMR_UPD_001(v_utRequest,v_request);
+					}
+			
+					function f_AE_DMR_UPD_001(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request) runs on CseSimu {
+			
+						var ResponsePrimitive v_responsePrimtive;
+						var MsgIn v_request;
+			
+						//Test component configuration
+						f_cf03Up();
+			
+						//send triggering primtive to SUT
+						f_sendUtPrimitive(p_utRequest);
+			
+						//Test behavior
+						tc_ac.start;
+						alt{
+			
+							//receive MsgIn requestPrimitive
+							[] mcaPort.receive(mw_request(p_request)) -> value v_request {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request is accepted!!");
+			
+								if (match(v_request.primitive.requestPrimitive.primitiveContent.container.labels,p_utRequest.primitiveContent.container.labels)){
+									setverdict(fail, __SCOPE__, " : Container update request didn't change the value of the attribute");
+								}else{
+									//set responseStatusCode back to SUT
+									v_responsePrimtive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+			
+									//send back responsePrimitive
+									mcaPort.send(m_response(v_responsePrimtive));
+								}
+							}
+			
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Container update request is rejected due to not including the attribute!");
+							}
+			
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+			
+						// Postamble
+						f_cf03Down();
+					}
+				
+				}
+				
+				group g_AE_DMR_UPD_002 {
+					
+					/**
+					 * @desc Check that the IUT sends an UPDATE Request with the value of the attribute ATTRIBUTE_NAME of the AE resource 
+					 */
+	
+					testcase TC_AE_DMR_UPD_002_ET() runs on CseSimu system AeSystem {						
+						
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.expirationTime := "20301231T012345";
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_APN() runs on CseSimu system AeSystem {
+						
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.appName := "UNINITIALIZED";
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_POA() runs on CseSimu system AeSystem {
+						
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.pointOfAccess := {"http://127.0.0.1:1400/monitor"};
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_OR() runs on CseSimu system AeSystem {
+						
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.ontologyRef := "MyOntologyRef";
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_NL() runs on CseSimu system AeSystem {
+						
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.nodeLink := "/CSE_ID/S-AE-ID-STEM";
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_RR() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_updateAeBase;
+						
+						v_utRequest.primitiveContent.aE.requestReachability := true;
+						
+						f_AE_DMR_UPD_002(v_utRequest);
+					}
+	
+					testcase TC_AE_DMR_UPD_002_CSZ() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequestTestBody := m_updateAeBase;
+						
+						v_utRequestTestBody.primitiveContent.aE.contentSerialization := {applicationxml};
+						
+						f_AE_DMR_UPD_002(v_utRequestTestBody);
+					}
+	
+				   function f_AE_DMR_UPD_002(template UtTriggerPrimitive p_utRequestTestBody) runs on CseSimu {
+	
+						//primitives for mcaPort
+						var MsgIn v_request;
+						var ResponsePrimitive v_responsePrimtive;
+						var integer v_aeIndex := -1;
+						var template RequestPrimitive v_expectedUpdateRequestAe := mw_updateAe();
+						
+	
+						f_cf03Up();
+					   
+						//Preamble
+						v_aeIndex := f_ae_preamble_registerAe();
+	
+						//Send Trigger Message
+						p_utRequestTestBody.to_ := f_getResourceAddress(v_aeIndex);
+						f_sendUtPrimitive(p_utRequestTestBody);
+	
+					   //Test behavior
+					   
+						v_expectedUpdateRequestAe.primitiveContent.aE := mw_contentAeUpdateRequest;
+						v_expectedUpdateRequestAe.primitiveContent := f_getTemplateFromPrimitiveContent(p_utRequestTestBody.primitiveContent);
+					   
+					   tc_ac.start;
+					   alt{
+						   [] mcaPort.receive(mw_request(v_expectedUpdateRequestAe)) -> value v_request {
+							   tc_ac.stop;
+							   setverdict(pass, __SCOPE__, " : AE registration update request is accepted!");
+							   v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+	
+							   //send back responsePrimitive
+							   mcaPort.send(m_response(v_responsePrimtive));
+						   }
+						   [] mcaPort.receive(mw_request(?)) -> value v_request {
+							   tc_ac.stop;
+							   setverdict(fail, __SCOPE__, " : AE registration update request is rejected due to not including the optional attribute!");
+						   }
+						   [] tc_ac.timeout{
+							   setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						   }
+	
+					   }
+	
+					   // Postamble
+					   f_cf03Down();
+					}
+	
+				}//End of subgroup AE_DMR_UPD_002
+				
+				group g_AE_DMR_UPD_003 {
+					
+					/**
+					 * @desc Check that the IUT sends an UPDATE Request with the value of the attribute ATTRIBUTE_NAME of the <container> resource  
+					 */
+					
+					testcase TC_AE_DMR_UPD_003_ET() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						
+						var template RequestPrimitive v_request := mw_updateContainer;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.container.expirationTime := "20301231T012345";
+						v_request.primitiveContent.container.expirationTime := ?;
+						f_AE_DMR_UPD_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_UPD_003_LBL() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						
+						var template RequestPrimitive v_request := mw_updateContainer;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.container.labels := {"UNINITIALIZED"};
+						v_request.primitiveContent.container.labels := ?;
+						f_AE_DMR_UPD_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_UPD_003_MNI() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						
+						var template RequestPrimitive v_request := mw_updateContainer;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.container.maxNrOfInstances := 1;
+						v_request.primitiveContent.container.maxNrOfInstances := ?;
+						f_AE_DMR_UPD_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_UPD_003_MBS() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						
+						var template RequestPrimitive v_request := mw_updateContainer;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.container.maxByteSize := 1;
+						v_request.primitiveContent.container.maxByteSize := ?;
+						f_AE_DMR_UPD_003(v_utRequest,v_request);
+					}
+					
+					testcase TC_AE_DMR_UPD_003_MIA() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						var template RequestPrimitive v_request := mw_updateContainer;
+						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
+                        
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.container.maxInstanceAge := 1;
+						v_request.primitiveContent.container.maxInstanceAge := ?;
+						f_AE_DMR_UPD_003(v_utRequest,v_request);
+					}
+
+					function f_AE_DMR_UPD_003(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request) runs on CseSimu {
+
+						var ResponsePrimitive v_responsePrimtive;
+
+						//Test component configuration
+						f_cf03Up();
+
+						//send triggering primtive to SUT
+						f_sendUtPrimitive(p_utRequest);
+
+						//Test behavior
+						tc_ac.start;
+						alt{
+
+							//receive MsgIn requestPrimitive
+							[] mcaPort.receive(mw_request(p_request)) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Container update request is accepted!!");
+
+								//set responseStatusCode back to SUT
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+								//send back responsePrimitive
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Container update request is rejected due to not including the attribute!");
+							}
+
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+
+						// Postamble
+						f_cf03Down();
+					}
+
+				}
+			
+			}//End of subgroup Update
+
+			group Retrieve {
+				
+				group g_AE_DMR_RET_001{
+							
+					/**
+					 * @desc Check that the IUT sends a RETRIEVE Request on the TARGET_RESOURCE_ADDRESS to CSE 
+					 */
+	
+					testcase TC_AE_DMR_RET_001_CB() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentCSEBase(m_contentCreateCSEBase)), int5);
+						f_AE_DMR_RET_001(int5, f_getResourceAddress(v_auxInteger));
+					}
+				 	
+					testcase TC_AE_DMR_RET_001_AE() runs on CseSimu system AeSystem {
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						f_AE_DMR_RET_001(int2, f_getResourceAddress(v_auxInteger));
+					}
+	
+					function f_AE_DMR_RET_001(ResourceType p_resourceType, XSD.AnyURI p_address) runs on CseSimu {
+		
+						//variables
+						var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (p_address, "UNINITIALIZED");
+						var MsgIn v_request;
+						var ResponsePrimitive v_responsePrimtive;
+		
+						//Test component configuration
+						f_cf03Up();
+		
+						//send triggering primtive to SUT
+						v_utRequest.resourceType := p_resourceType;
+						f_sendUtPrimitive(v_utRequest);
+						
+						//Test behavior
+						tc_ac.start;
+						alt{
+							[] mcaPort.receive(mw_request(mw_retrieveResource(p_address))) -> value v_request {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
+								
+								//set responseStatusCode back to SUT
+								v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+		
+								//send back responsePrimitive
+								mcaPort.send(m_response(v_responsePrimtive));
+								tc_ac.stop;
+							}
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : error while retrieving ressource !");
+							}
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+		
+						// Postamble
+						f_cf03Down();
+					}
+					
+				}//End of TC_AE_DMR_RET_001
+				
+				/**
+				 * @desc Check that the IUT sends a RETRIEVE Request of oldest virtual resource.
+				 */
+	
+				testcase TC_AE_DMR_RET_002() runs on CseSimu system AeSystem {
+	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+	
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (v_address & "/" & c_resourceShortNameOldest, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+	
+					//Test component configuration
+					f_cf03Up();
+	
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+	
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_retrieveResource(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : retrieve attribute oldest request is accepted!");
+	
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+	
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while retrieving attribute !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+	
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a RETRIEVE Request of latest virtual resource.
+				 */
+	
+				testcase TC_AE_DMR_RET_003() runs on CseSimu system AeSystem {
+	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+	
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (v_address & "/" & c_resourceShortNameLatest, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+	
+					//Test component configuration
+					f_cf03Up();
+	
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+	
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_retrieveResource(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : retrieve attribute latest request is accepted!!");
+	
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+	
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while retrieving attribute !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+	
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a <container> resource RETRIEVE Request to CSE
+				 */
+				
+				testcase TC_AE_DMR_RET_004() runs on CseSimu system AeSystem {
+					
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+		
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (v_address, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					v_utRequest.resourceType := int3;
+					f_sendUtPrimitive(v_utRequest);
+	
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_retrieveResource(v_address))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
+			
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while retrieving ressource !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a <contentInstance> resource RETRIEVE Request to CSE
+				 */
+
+				testcase TC_AE_DMR_RET_005 () runs on CseSimu system AeSystem {
+	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContentInstance(m_contentCreateContentInstance)), int4);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (v_address, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					v_utRequest.resourceType := int4;
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_retrieveResource(v_address))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while retrieving ressource !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+
+			}//End of subgroup Retrieve
+			
+			group Delete {
+			
+				/**
+				 * @desc Check that the IUT sends a DELETE Request of oldest virtual resource.
+				 */
+
+				testcase TC_AE_DMR_DEL_001() runs on CseSimu system AeSystem {
+
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utDeleteResource (v_address & "/" & c_resourceShortNameOldest, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_deleteRequest(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : delete attribute oldest request is accepted!!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2002, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while deleting attribute !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+
+				/**
+				 * @desc Check that the IUT sends a DELETE Request of latest virtual resource.
+				 */
+
+				testcase TC_AE_DMR_DEL_002() runs on CseSimu system AeSystem {
+
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utDeleteResource (v_address & "/" & c_resourceShortNameLatest, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_deleteRequest(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : delete attribute latest request is accepted!!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2002, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while deleting attribute !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+
+				/**
+				 * @desc Check that the IUT sends a <container> resource DELETE request to CSE
+				 */
+
+				testcase TC_AE_DMR_DEL_003() runs on CseSimu system AeSystem {
+	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), int3);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utDeleteResource (v_address, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					v_utRequest.resourceType := int3;
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_deleteRequest(v_address))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : delete ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2002, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while deleting ressource !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+
+				/**
+				 * @desc Check that the IUT sends a <contentInstance> resource RETRIEVE Request to CSE
+				 */
+
+				testcase TC_AE_DMR_DEL_004 () runs on CseSimu system AeSystem {
+
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentContentInstance(m_contentCreateContentInstance)),int4);
+					var XSD.AnyURI v_address := f_getResourceAddress(v_auxInteger);
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utDeleteResource (v_address, "UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+
+					//Test component configuration
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					v_utRequest.resourceType := int4;
+					f_sendUtPrimitive(v_utRequest);
+
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_deleteRequest(v_address))) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : delete ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2002, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+							tc_ac.stop;
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : error while deleting ressource !");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+			
+			}
+
+
+		}//end DMR subgroup
+
+		group Subscription_and_Notification {
+			
+			group Create {
+				
+				/**
+				 * @desc Check that the IUT sends a subscription creation request
+				 */
+
+				testcase TC_AE_SUB_CRE_001() runs on CseSimu system AeSystem {
+				
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+				  	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+					v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+
+					f_cf03Up();
+
+					//send triggering primtive to SUT
+					f_sendUtPrimitive(v_utRequest);
+				  	
+					//Test behavior
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createSubscription)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Subscription creation request is accepted!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+		
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : Subscription creation request is rejected due to not including mandatory attributes!!");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+
+					// Postamble
+					f_cf03Down();
+				}
+				
+				group g_AE_SUB_CRE_002 {
+					
+					/**
+					 * @desc Check that the IUT sends a subscription creation request with optional attribute ATTRIBUTE_NAME when it is triggered
+					 */
+				
+					testcase TC_AE_SUB_CRE_002_ACPI() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.accessControlPolicyIDs := {"UNINITIALIZED"};
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.accessControlPolicyIDs := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					
+					testcase TC_AE_SUB_CRE_002_ENC() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.eventNotificationCriteria.createdBefore := "20301231T012345";
+	
+						
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.eventNotificationCriteria.createdBefore := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					
+					testcase TC_AE_SUB_CRE_002_EXC() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.expirationCounter := 1;
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.expirationCounter := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					
+					testcase TC_AE_SUB_CRE_002_NFU() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.notificationForwardingURI := "UNINITIALIZED";
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.notificationForwardingURI := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					
+					testcase TC_AE_SUB_CRE_002_NCT() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.notificationContentType := int1;
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.notificationContentType := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					 
+					testcase TC_AE_SUB_CRE_002_NEC() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.notificationEventCat.alt_1 := 100;
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.notificationEventCat.alt_ := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+					
+					testcase TC_AE_SUB_CRE_002_SU() runs on CseSimu system AeSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateSubscription;
+						var template RequestPrimitive v_requestT := mw_createSubscription;
+
+						var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+						v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+						v_utRequest.primitiveContent.subscription.notificationURI := {"UNINITIALIZED"};
+						v_utRequest.primitiveContent.subscription.subscriberURI := "UNINITIALIZED";
+	
+						v_requestT.to_ := f_getResourceAddress(v_auxInteger);
+						v_requestT.primitiveContent.subscription.notificationURI := ?;
+						v_requestT.primitiveContent.subscription.subscriberURI := ?;
+	
+						f_AE_SUB_CRE_002(v_utRequest, v_requestT);
+					}
+
+					function f_AE_SUB_CRE_002(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request) runs on CseSimu {
+	
+						var MsgIn v_request;
+						var ResponsePrimitive v_responsePrimtive;
+
+						f_cf03Up();
+
+						//send triggering primtive to SUT
+						f_sendUtPrimitive(p_utRequest);
+
+						//Test behavior
+						tc_ac.start;
+						alt{
+							[] mcaPort.receive(mw_request(p_request)) -> value v_request {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__, " : Subscription creation request is accepted!");
+
+								//set responseStatusCode back to SUT
+								v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+								//send back responsePrimitive
+								mcaPort.send(m_response(v_responsePrimtive));
+							}
+							[] mcaPort.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__, " : Subscription creation request is rejected due to not including the optional attribute!");
+							}
+							[] tc_ac.timeout{
+								setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							}
+						}
+
+						// Postamble
+						f_cf03Down();
+
+					}
+				
+				}//End AE_SUB_CRE_002
+			
+			}//End Create Group
+			
+			group Notify {
+				
+				/**
+				 * @desc Check that the IUT sends a Notify Response to the hosting CSE when receiving a Notify request containing a single notification
+				 */
+
+				testcase TC_AE_SUB_NTY_001() runs on CseSimu system AeSystem {
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+  	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+					v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+
+					f_cf03Up();
+
+					//create Ae
+					f_sendUtPrimitive(v_utRequest);
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createAe)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : AE registration request is accepted!!");
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+			
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						} 
+						[] mcaPort.receive(mw_request(mw_createAe(*,?,m_contentCreateAe_Invalid))) -> value v_request {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__, " : AE registration request is rejected due to not including mandatory attributes!!");
+							stop;
+						}
+						[] tc_ac.timeout{
+							setverdict(inconc, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							stop;
+						}
+
+					}
+					
+					//create Subscription
+					v_utRequest := m_utCreateSubscription;
+					v_utRequest.to_ := f_getResourceAddress(-1);
+					f_sendUtPrimitive(v_utRequest);
+					
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createSubscription)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Subscription creation request is accepted!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__, " : Subscription creation request is rejected due to not including mandatory attributes!!");
+						}
+						[] tc_ac.timeout{
+							setverdict(inconc, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+					
+
+					//Test behavior
+					mcaPort.send(m_request(m_notifyRequest));
+					
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Notification response is accepted!");
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : Notification response is rejected due to not including mandatory attributes!");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+ 
+					// Postamble
+					f_cf03Down();
+				}
+				
+				/**
+				 * @desc Check that the IUT sends a Notify Response to the hosting CSE when receiving a Notify request containing aggregated notifications
+				 */
+
+				testcase TC_AE_SUB_NTY_002() runs on CseSimu system AeSystem {
+
+					//variables
+					var template UtTriggerPrimitive v_utRequest := m_createAe("UNINITIALIZED");
+					var MsgIn v_request;
+					var ResponsePrimitive v_responsePrimtive;
+  	
+					var integer v_auxInteger := f_setResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))),int2);
+					v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+
+					f_cf03Up();
+
+					//create Ae
+					f_sendUtPrimitive(v_utRequest);
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createAe)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : AE registration request is accepted!!");
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+			
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						} 
+						[] mcaPort.receive(mw_request(mw_createAe(*,?,m_contentCreateAe_Invalid))) -> value v_request {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__, " : AE registration request is rejected due to not including mandatory attributes!!");
+							stop;
+						}
+						[] tc_ac.timeout{
+							setverdict(inconc, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+							stop;
+						}
+
+					}
+					
+					//create Subscription
+					v_utRequest := m_utCreateSubscription;
+					v_utRequest.to_ := f_getResourceAddress(-1);
+					f_sendUtPrimitive(v_utRequest);
+					
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_request(mw_createSubscription)) -> value v_request {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Subscription creation request is accepted!");
+
+							//set responseStatusCode back to SUT
+							v_responsePrimtive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mcaPort.send(m_response(v_responsePrimtive));
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__, " : Subscription creation request is rejected due to not including mandatory attributes!!");
+						}
+						[] tc_ac.timeout{
+							setverdict(inconc, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+					
+
+					//Test behavior
+					mcaPort.send(m_request(m_notifyAggregatedRequest));
+					
+					tc_ac.start;
+					alt{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, " : Notification response is accepted!");
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, " : Notification response is rejected due to not including mandatory attributes!");
+						}
+						[] tc_ac.timeout{
+							setverdict(fail, __SCOPE__, " : Timeout due to no response received from requested SUT!");
+						}
+					}
+ 
+					// Postamble
+					f_cf03Down();
+				}
+				
+			}//End of Notify group
+
+
+		}//end SUB subgroup
+
+
+	}//end group AE
+	
+	
+	
+
+	
+}

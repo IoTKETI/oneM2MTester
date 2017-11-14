@@ -12,28 +12,17 @@
  */
 
 module OneM2M_Ports {
-	
 	import from OneM2M_Types all;
-	
-	/* **************************************
-     * User-defined modules dependencies
-     * **************************************
-	 */
-	 
 	import from OneM2M_DualFaceMapping all;	
 	import from IPL4asp_PortType all;
 	import from IPL4asp_Types all;
 	
-	/* ***************************************
- 	 * 		oneM2M Ports 
-  	 * ***************************************
-	 */
 	/**
 	 * @desc Port to transport oneM2M primitives
 	 * @desc Output MsgOut   
 	 * @desc Input MsgIn 
 	 * @desc this port is allowed to extend for futher usage  
-     * @desc e.g. extend OneM2MPort to dual-faced port
+	 * @desc e.g. extend OneM2MPort to dual-faced port
 	 */
 	type port OneM2MPort message {
 		in 
@@ -41,8 +30,7 @@ module OneM2M_Ports {
 			ASP_Event;
 		out 
 			MsgOut;
-	} with {
-	  
+	} with {  
 	  extension "user IPL4asp_PT
 	     	out(
 	     		MsgOut 			-> 	ASP_Send 	: function(f_enc_M2MPrimitive_to_ASPSend)
@@ -51,8 +39,27 @@ module OneM2M_Ports {
 	     		ASP_RecvFrom	-> 	MsgIn		: function(f_dec_ASPRecvFrom_to_M2MPrimitive);
 	     		ASP_Event		-> 	ASP_Event	: simple
 	     	)"; 	  
-	     	
 	};
+	
+	/**
+	 * @desc Port to transport control commands to Upper Tester Application
+	 */
+	type port UpperTesterPort message {
+		in 
+			UtTriggerAckPrimitive,
+			ASP_Event;
+		out 
+			UtTriggerPrimitive; 
+	} with {
+	  extension "user IPL4asp_PT
+	     	out(
+	     		UtTriggerPrimitive 			-> 	ASP_Send 	: function(f_enc_M2MPrimitive_to_ASPSend_for_trigger)
+	     	)
+	     	in(
+	     		ASP_RecvFrom	-> 	UtTriggerAckPrimitive		: function(f_dec_ASPRecvFrom_to_M2MPrimitive_for_trigger);
+	     		ASP_Event		-> 	ASP_Event	: simple
+	     	)"; 	  
+	};	
 	
 	/**
 	 * @desc Port to transport Adaptor Control primitives
@@ -63,5 +70,14 @@ module OneM2M_Ports {
 		out
 			AcRequestPrimitive;
 	}
-
+	
+	/**
+	 * @desc Port to exchange information between components
+	 */
+	type port InfoPort message {
+		in
+			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource;
+		out
+			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource;
+	}
 }//end module

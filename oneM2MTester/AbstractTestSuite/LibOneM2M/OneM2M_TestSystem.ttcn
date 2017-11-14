@@ -5,9 +5,9 @@
  *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
  *  All rights reserved.
  *  
- *  @author     oneM2M
- *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/OneM2M_TestSystem.ttcn $
- *              $Id: OneM2M_TestSystem.ttcn 340 2017-08-07 12:08:41Z reinaortega $
+ *  @author     ETSI
+ *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/branches/Release1/ttcn/LibOneM2M/OneM2M_TestSystem.ttcn $
+ *              $Id: OneM2M_TestSystem.ttcn 347 2017-08-11 08:48:20Z reinaortega $
  *  @desc       Test System module for oneM2M
  *
  */
@@ -24,37 +24,57 @@ module OneM2M_TestSystem {
  */	
 	type component Tester {
 		port AdapterControlPort acPort;
+		port InfoPort infoPort;
+		port UpperTesterPort utPort;
 		//timers
 		timer tc_ac := PX_TAC;
-		timer tc_wait;
+		timer tc_wait := PX_TWAIT;
 		//global variables
 		var Configurations vc_config;
 		var MyResourcesList vc_resourcesList;
 		var IntegerList vc_resourcesIndexToBeDeleted := {};
-		var PrimitiveScope vc_primitiveScope := PX_PRIMITIVE_SCOPE;
-		var AddressingMethod vc_addressingMethod := PX_ADDRESSING_METHOD;
-	}
+		//var PrimitiveScope vc_primitiveScope := PX_PRIMITIVE_SCOPE;
+		//var AddressingMethod vc_addressingMethod := PX_ADDRESSING_METHOD;
+		var integer vc_aeAuxIndex;//TODO To be removed
+		var integer vc_acpAuxIndex;
+		var AccessControlPolicy_optional vc_acpAux;
+	};
+	
+	type component AeSimu extends Tester {
+		var AeSimu vc_ae2;
+		port OneM2MPort mcaPort;
+		port OneM2MPort mcaPortIn;
+	
+		//global variables
+		var PrimitiveContent vc_primitiveContentRetrievedResource;
+
+		var MsgIn vc_request;
+		var MsgIn vc_response;
+		var CseSimu vc_cseSimu;//For CF02 when AeSimu is master
+		var boolean vc_auxiliaryAe2Up := false;
+		//var AeSimu vc_ae2;
+	
+	};
 		
-	type component CseTester extends Tester {
+	type component CseSimu extends Tester {
 		port OneM2MPort mcaPort;
 		port OneM2MPort mccPort;
+		port OneM2MPort mccPortIn;
 
 		//global variables
-		var AE_optional vc_aeAux;//TODO To be removed
-		var RemoteCSE_optional vc_remoteCSEAux;//TODO To be removed
-		var AccessControlPolicy_optional vc_acpAux;
-		var integer vc_acpAuxIndex := -1;
-
-	}
+		var AeSimu vc_aeSimu;//For CF02 when CseSimu is master
+		var integer vc_remoteCseIndex;
+		var MsgIn vc_request;
+		var MsgIn vc_response;
+	};
 	
-	type component AeTester extends Tester {
-		port OneM2MPort mcaPort;
-
-		//global variables
-	}
+	type component InCseSimu extends CseSimu {}
+	
+	type component MnCseSimu extends CseSimu {}
 			
 	type component CseSystem {
 		port OneM2MPort mcaPort;
+		port OneM2MPort mcaPortIn;
 		port OneM2MPort mccPort;
 		port AdapterControlPort acPort;
 	}	

@@ -37,11 +37,15 @@ module OneM2M_DualFaceMapping {
 
 	//Serialization encoding for XML, JSON 
 	external function f_serialization_Enc(in charstring p_source, in charstring p_serialization_type) return charstring;
+	external function f_serialization_Enc_for_trigger_msg(in charstring p_source) return charstring;
 	external function f_split(in charstring p_cs, in charstring p_delim) return charstring;
 	external function f_split_uri(in charstring p_cs, in charstring p_delim) return Charstring_List;
 	external function f_replace(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
 	external function f_adressingFormatter(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
 
+	/******************************************************
+	* Function for mcaPort and mccPort encoding           *
+	*******************************************************/
 	function f_enc_M2MPrimitive_to_ASPSend(in MsgOut p_msgout, out ASP_Send p_asp_Send)  {
         var charstring 		v_protocol_type 	:= "";
         var charstring 		v_serial_type 		:= "";   
@@ -278,11 +282,8 @@ module OneM2M_DualFaceMapping {
                 }else{
 					log(__SCOPE__ &"-[warning]NOT SUPPORTED Serialization or Protocol binding TYPE !! ");   		  	  
                 } 	   		     
-			} else if (ischosen(p_msgout.primitive.responsePrimitive)){
-				//TODO
-            	//AE Testing Purpose                          
-			}//end_ischosen_responsePrimitive            	  
-	
+			} 
+			
 			//Generate IPL4ASP message 
 			p_asp_Send.connId		:= connectId_init;
 				
@@ -296,9 +297,8 @@ module OneM2M_DualFaceMapping {
 	} with {extension "prototype(fast)"} // End of Function
 
 	/******************************************************
-	* Decode IPL4ASP message into oneM2M MsgIn Primitive  *
+	* Function for mcaPort and mccPort decoding           *
 	*******************************************************/
-
 	function f_dec_ASPRecvFrom_to_M2MPrimitive(in ASP_RecvFrom p_aspRecvFrom, out MsgIn p_msgin) return integer {
 		var MsgIn v_msgIn;	
   		var ResponsePrimitive v_responsePrimitive;  
@@ -537,4 +537,190 @@ module OneM2M_DualFaceMapping {
     		return 1;
 		}	
 	} with {extension "prototype(backtrack)"} // End of Function
+	
+	/******************************************************
+	* Function for utPort encoding                        *
+	*******************************************************/
+	function f_enc_M2MPrimitive_to_ASPSend_for_trigger(in UtTriggerPrimitive p_msgout, out ASP_Send p_asp_Send) {
+	   	var RequestPrimitive v_reqPrimitive;           
+        var charstring 		v_from				:= ""; 
+        var charstring 		v_to				:= ""; 
+        var charstring 		v_reqID				:= ""; 
+        var integer 		v_ty;                      
+        
+        var charstring 		v_contentType;  
+        var octetstring 	v_encoded_msg; 
+        var charstring 		v_serial_type;
+        var charstring 		v_payload 			:= "";
+        var ConnectionId 	connectId_init 		:= -1;
+        
+        var HTTPRequest v_httpReqMsg;
+		var HTTPMessage v_httpMsgToSend;
+		var charstring v_accept;
+  		
+  		v_reqPrimitive := p_msgout; 
+  		
+        // to 
+        if(ispresent(p_msgout.to_)){
+			v_to := "/"; //oct2char(unichar2oct(v_reqPrimitive.to_));
+			log(__SCOPE__&"-to", v_to); 
+		}
+		
+		// from
+		if(ispresent(p_msgout.from_)) {
+		  v_from := oct2char(unichar2oct(v_reqPrimitive.from_));          
+		}
+		
+		// requestIdentifier
+		if(ispresent(p_msgout.requestIdentifier)) {
+			v_reqID	:= oct2char(unichar2oct(v_reqPrimitive.requestIdentifier));  
+		}
+		
+		// resourceType
+		if(ispresent(p_msgout.resourceType)) {
+		  v_ty := enum2int(v_reqPrimitive.resourceType); 
+		}
+		
+		// primitiveContent
+		if(ispresent(p_msgout.primitiveContent)) {
+			var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
+                  
+        	if(v_bit_stream != ''B) {
+            	var charstring v_char_streamTest := oct2char(bit2oct(v_bit_stream));
+                log(__SCOPE__&" v_char_streamTest ", v_char_streamTest);
+        	} 
+		}     	
+				     	
+		//assemble accept with serialization type
+		v_accept 		:= "application/json";
+  		v_contentType	:= "application/json";
+  		v_serial_type   := "json";
+				     		
+		//original payload with long name representation
+		v_payload := f_encode_requestPrimitive_for_trigger_msg(v_reqPrimitive); log(__SCOPE__&"-v_payload: ", v_payload);
+
+		//serialized payload with short name representation
+		if(v_payload != ""){		log(__SCOPE__& "[DEBUG] _____CHECK HERE !!!_____________________");							  
+			 v_payload := f_serialization_Enc_for_trigger_msg(v_payload); 
+		} else {
+			log(__SCOPE__ &"-[]WARNING]f_encode_requestPrimitive: payload is NULL\n"); 
+		}	     						     		
+		v_httpReqMsg := valueof(t_HTTP_POST_request(connectId_init, v_to, v_accept, v_from, v_reqID, v_contentType, v_payload));   	  	                                  	  
+				     	
+		//Generate IPL4ASP message 
+		v_httpMsgToSend := {
+			request:= v_httpReqMsg	
+		}
+		
+		v_encoded_msg := enc_HTTPMessage(v_httpMsgToSend); 
+
+		p_asp_Send.connId	:= connectId_init;				
+		p_asp_Send.proto 	:= {tcp := {}};
+		p_asp_Send.msg 		:= v_encoded_msg;
+      	      	
+	} with {extension "prototype(fast)"}
+	
+	/******************************************************
+	* Function for utPort dncoding                        *
+	*******************************************************/
+	function f_dec_ASPRecvFrom_to_M2MPrimitive_for_trigger(in ASP_RecvFrom p_aspRecvFrom, out UtTriggerAckPrimitive p_msgin) return integer {
+    	
+  		var octetstring v_aspRecv_msg;  
+  		var UtTriggerAckPrimitive v_msgIn;
+  		var boolean enable_rsp_decode := true; //flag to enable response decoding operation
+  		var ASP_RecvFrom v_ipl4Recv := p_aspRecvFrom;
+  		
+  		if(ispresent(v_ipl4Recv.msg)){    	
+			v_aspRecv_msg := v_ipl4Recv.msg;
+      		log(__SCOPE__&"v_ipl4Recv.msg(ispresent)");
+      	
+            var HTTPMessage v_httpMsg;
+        	var HTTPResponse v_httpResp;
+            var HeaderLines v_headerLines;
+            var HeaderLine v_header;
+            var charstring v_headerName  	:= "";
+            var charstring v_headerValue 	:= "";
+            var charstring v_httpRespBody 	:= "";  
+                	
+         	//decoding HTTP message      	
+            var integer decode_state := dec_HTTPMessage(v_aspRecv_msg, v_httpMsg, tsp_socket_debugging);
+            log(__SCOPE__&"dec_HTTPMessage: return value (if equal to zero then all response are decoded): ", decode_state);
+               		
+            if(0 == decode_state){
+            	log(__SCOPE__&"All message are decoded!!");
+               		  	
+               	if(ischosen(v_httpMsg.response)) {  	
+               		v_httpResp 	:= v_httpMsg.response;
+               		  	  	
+               		if(ispresent(v_httpResp.header)){ // Parsing HTTP headers
+               			v_headerLines 	:= v_httpResp.header;
+               		} else {
+               			return 1;
+               		}
+               		  	  	
+               		if(ispresent(v_httpResp.body)){ // Parsing HTTP body
+               			v_httpRespBody	:= v_httpResp.body; // Message body is optional	
+               		} else {
+						log(__SCOPE__&"-no http body is received!!");
+               		}               		  	  
+				} else {
+               		log(__SCOPE__&"-[ERROR]v_httpMsg.response(): No Response is included in the HTTPMessage !!");
+               		v_msgIn.primitiveContent := omit;
+               	}               		  	
+               		  	
+               	//decode headers
+               	//set X-M2M-RSC and X-M2M-RI
+               	for(var integer i := 0; i < lengthof(v_headerLines); i := i + 1){               		  	  	  	  
+               		v_header 		:= v_headerLines[i];
+               		v_headerName 	:= v_header.header_name;
+               		v_headerValue 	:= v_header.header_value;               		  		
+               		  		
+               		if("X-M2M-RSC" == v_headerName){ // Checking HTTP response
+						log(__SCOPE__&"-[DEBUG] ENTER PARSING HTTP HEADERS!!");
+               		  		  
+               		  	if(not(RSC_OK == v_headerValue or RSC_CREATED == v_headerValue or RSC_UPDATED == v_headerValue or RSC_DELETED == v_headerValue )) {  
+               		  		enable_rsp_decode := false;       		  		  	  
+               		  	}
+               		  	
+               		  	var ResponseStatusCode v_responseStatusCode;	  
+               		  	var integer v_rsc_int := str2int(v_headerValue);               		  		  	
+               		  	int2enum(v_rsc_int, v_responseStatusCode);
+               		  	v_msgIn.responseStatusCode 	:= v_responseStatusCode; 
+               		}
+               		  		
+               		if("X-M2M-RI" == v_headerName){
+               			v_msgIn.requestIdentifier 	:= v_headerValue;  		  		  
+               		}
+				}
+
+        		if(v_httpRespBody != "" and not enable_rsp_decode){
+        			log(__SCOPE__&"-[ERROR]ERROR HTTP MESSAGE!!");
+        		}
+        
+        		if(v_httpRespBody != ""  and enable_rsp_decode){ // Only decode http response body when it is postive response message
+        			// v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, "json"); 
+        		}			
+			} else { 
+               	v_msgIn.primitiveContent := omit;       		
+				log(__SCOPE__&"-[ERROR]dec_HTTPMessage(): fail to decode HTTP message!!");
+            }
+		}
+		
+		// Set optional attributes for responsePrimitive
+		v_msgIn.requestIdentifier 			:= "temp_identifier"; 
+		v_msgIn.primitiveContent 			:= omit;
+		v_msgIn.to_                         := omit;                                             
+		v_msgIn.from_                       := omit;                                        
+		v_msgIn.originatingTimestamp        := omit;
+		v_msgIn.resultExpirationTimestamp   := omit;
+		v_msgIn.eventCategory               := omit;
+		v_msgIn.contentStatus               := omit;
+		v_msgIn.contentOffset            	:= omit;
+		v_msgIn.assignedTokenIdentifiers 	:= omit;
+		v_msgIn.tokenRequestInformation  	:= omit;
+		
+		p_msgin := v_msgIn;
+		
+		return 0;
+  	} with {extension "prototype(backtrack)"}
 } // End_of_module

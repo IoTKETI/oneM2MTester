@@ -1626,9 +1626,8 @@ with {
 type union PrimitiveContent {
 	//TS-0004 - 7.5.2-1 & 7.5.2-2 Common elements to request/response content
 	//ResourceTypes
-	
-	AE_optional aE,
 	AEAnnc_optional aEAnnc,
+	AE_optional aE,
 	AccessControlPolicy_optional accessControlPolicy,
 	AccessControlPolicyAnnc_optional accessControlPolicyAnnc,
 	ContentInstance_optional contentInstance,
@@ -1682,8 +1681,7 @@ type union PrimitiveContent {
 	Schedule_update_invalid schedule_update_invalid,
 	Subscription_update_invalid subscription_update_invalid,
 	LocationPolicy_update_invalid locationPolicy_update_invalid	
-}
-with { //FIXME Added by @Martin
+} with { //@JaeYoung, variant added for supporting JSON encoding/decoding.
   variant (aE) "JSON:name as AE";
   variant (aEAnnc)"JSON: name as AEAnnc";
   variant (accessControlPolicy) "JSON:name as AccessControlPolicy";
@@ -1789,6 +1787,7 @@ with { //FIXME Added by @Martin
   variant (subscription_update_invalid) "name as 'Subscription'";
   variant (locationPolicy_update_invalid) 	"name as 'LocationPolicy'";
 };
+
 
 
 
@@ -2821,7 +2820,7 @@ with {
   variant "untagged";
   variant (sg_resource) "form as qualified";
   variant (sg_resource) "abstract";
-//  variant (cSEBase) "name as capitalized";
+  variant (cSEBase) "name as capitalized";
 };
 
 
@@ -3048,7 +3047,7 @@ type record CSEBase
 	AcpType accessControlPolicyIDs optional,
 	CseTypeID cseType optional,
 	XSD.ID cSE_ID,
-	record of ResourceType supportedResourceType,
+	ResourceTypeList_1 supportedResourceType optional,//TODO Remove inline type
 	PoaList pointOfAccess,
 	XSD.AnyURI nodeLink optional,
 	ListOfURIs dynamicAuthorizationConsultationIDs optional,
@@ -5071,8 +5070,13 @@ with {
 //FIXME To be added
 type union Representation {
 	Resource_2 resource, 
-	ResponsePrimitive responsePrimitive
-};
+	ResponsePrimitive responsePrimitive, 
+	XSD.AnyURI uRI
+}
+with {
+	variant "name as 'representation'";
+	variant (uRI) "name as capitalized";
+  };
 
 type record Notification_1
 {
@@ -5337,7 +5341,7 @@ with {
   variant "element";
   variant (resourceName) "attribute";
   variant (announcedAttribute) "list";
-//  variant (cSEBase) "name as capitalized";
+  variant (cSEBase) "name as capitalized";
   variant (cSE_ID) "name as 'CSE-ID'";
   variant (m2M_Ext_ID) "name as 'M2M-Ext-ID'";
   variant (trigger_Recipient_ID) "name as 'Trigger-Recipient-ID'";
@@ -5399,7 +5403,7 @@ with {
   variant "name as uncapitalized";
   variant "element";
   variant (resourceName) "attribute";
-//  variant (cSEBase) "name as capitalized";
+  variant (cSEBase) "name as capitalized";
   variant (cSE_ID) "name as 'CSE-ID'";
   //variant (requestReachability) "text 'true' as '1'";
   //variant (requestReachability) "text 'false' as '0'";
@@ -5452,6 +5456,12 @@ with {
   variant (localTokenIDs) "list";
   //variant (tokenRequestIndicator) "text 'true' as '1'";
   //variant (tokenRequestIndicator) "text 'false' as '0'";
+  
+  //@JaeYoung, variant added for supporting JSON encoding.
+  variant (roleIDs) "JSON:name as rids";
+  variant (tokens)"JSON: name as tkns";
+  variant (tokenIDs) "JSON:name as tids";
+  variant (localTokenIDs) "JSON:name as ltids";
 };
 
 
@@ -5534,7 +5544,7 @@ with {
 
 type ListOfURIs URIList
 with {
-  variant "element";
+  variant "list";
 };
 
 
@@ -6624,6 +6634,10 @@ with {
 		encode "adapter";
 	}
 	
+	type RequestPrimitive UtTriggerPrimitive;
+		
+	type ResponsePrimitive UtTriggerAckPrimitive;
+	
 	type record AttributeAux {
 		XSD.NCName name,
 		charstring value_ optional
@@ -7612,7 +7626,7 @@ group OptionalResourceTypes {
 	  variant "element";
 	  variant (resourceName) "attribute";
 	  variant (announcedAttribute) "list";
-//	  variant (cSEBase) "name as capitalized";
+	  variant (cSEBase) "name as capitalized";
 	  variant (cSE_ID) "name as 'CSE-ID'";
 	  variant (m2M_Ext_ID) "name as 'M2M-Ext-ID'";
 	  variant (trigger_Recipient_ID) "name as 'Trigger-Recipient-ID'";
@@ -7673,7 +7687,7 @@ group OptionalResourceTypes {
 	  variant "name as uncapitalized";
 	  variant "element";
 	  variant (resourceName) "attribute";
-//	  variant (cSEBase) "name as capitalized";
+	  variant (cSEBase) "name as capitalized";
 	  variant (cSE_ID) "name as 'CSE-ID'";
 	  //variant (requestReachability) "text 'true' as '1'";
 	  //variant (requestReachability) "text 'false' as '0'";
@@ -7841,6 +7855,40 @@ group OptionalResourceTypes {
 	  variant (allowedApp_IDs) "name as 'allowedApp-IDs'";
 	  variant (allowedRole_IDs) "name as 'allowedRole-IDs'";
 	  variant (allowedRole_IDs) "list";
+	  variant (choice) "untagged";
+	  variant (choice.childResource_list) "untagged";
+	  variant (choice.childResource_list[-]) "name as 'childResource'";
+	  variant (choice.subscription_list) "untagged";
+	  variant (choice.subscription_list[-]) "name as 'subscription'";
+	};
+
+	type record ServiceSubscribedNode_optional
+	{
+		ResourceName resourceName optional,
+		ResourceType resourceType optional,
+		XSD.ID resourceID optional,
+		NhURI parentID optional,
+		Timestamp creationTime optional,
+		Timestamp lastModifiedTime optional,
+		Labels labels optional,
+		AcpType accessControlPolicyIDs optional,
+		Timestamp expirationTime optional,
+		ListOfURIs dynamicAuthorizationConsultationIDs optional,
+		NodeID nodeID optional,
+		XSD.ID cSE_ID optional,
+		record of DeviceID deviceIdentifier optional,
+		ListOfURIs ruleLinks optional,
+		union {
+			record length(1 .. infinity) of ChildResourceRef childResource_list,
+			record length(1 .. infinity) of Subscription subscription_list
+		} choice optional
+	}
+	with {
+	  variant "name as uncapitalized";
+	  variant "element";
+	  variant (resourceName) "attribute";
+	  variant (cSE_ID) "name as 'CSE-ID'";
+	  variant (deviceIdentifier) "list";
 	  variant (choice) "untagged";
 	  variant (choice.childResource_list) "untagged";
 	  variant (choice.childResource_list[-]) "name as 'childResource'";
@@ -8328,9 +8376,8 @@ group InvalidTypes {
 		
 		type union Resource_2 {
 			//ResourceTypes
-			AE_optional aE,
 			AEAnnc_optional aEAnnc,
-			
+			AE_optional aE,
 			AccessControlPolicy_optional accessControlPolicy,
 			AccessControlPolicyAnnc_optional accessControlPolicyAnnc,
 			ContentInstance_optional contentInstance,

@@ -8,14 +8,15 @@
 * - zlib License  (https://github.com/leethomason/tinyxml2#license).                    *	
 *																						*
 * Contributors:																			*
-*   Ting Martin MIAO - initial implementation                                   		*   
-*   Nak-Myoung Sung                                                             		*
-*                                                                               		* 
+* JaeYoung Hwang - forest62590@gmail.com                                                *
+* Nak-Myoung Sung                                                                       *
+* Ting Martin MIAO - initial implementation                                   		    *   
+*                                                                 		                *                                                               		* 
 * Updated:  2017-08-31                                                          		*
 *****************************************************************************************/
 // Description:																	
-//    OneM2M_Primitive_EncDec.ttcn  														
-//    Call Titan built-int Codec to encode/decode oneM2M resource primitivies
+// OneM2M_Primitive_EncDec.ttcn  														
+// Call Titan built-int Codec to encode/decode oneM2M resource primitivies
 
 module OneM2M_Primitive_EncDec {
 	
@@ -58,7 +59,6 @@ module OneM2M_Primitive_EncDec {
 	
 	//=============================
 	// JSON encoding
-	// - PrimitiveContent encoding 
 	//=============================
 	
 	//encode primitiveContent for HTTP/COAP communication
@@ -66,8 +66,8 @@ module OneM2M_Primitive_EncDec {
 	with{ extension "prototype (convert) encode(JSON) printing(pretty)" }
 
 	//encode requestPrimitive (AE/CSE originator) for MQTT communication
-	// external function f_enc_JSON_requestPrimitive(in RequestPrimitive p_du) return octetstring
-	// with{ extension "prototype (convert) encode(JSON) printing(pretty)" }
+	external function f_enc_JSON_requestPrimitive(in RequestPrimitive p_du) return octetstring
+	with{ extension "prototype (convert) encode(JSON) printing(pretty)" }
 
 	//encode responsePrimitive (CSE receiver)	
 	external function f_enc_JSON_responsePrimitive(in ResponsePrimitive p_du) return octetstring
@@ -77,73 +77,76 @@ module OneM2M_Primitive_EncDec {
 	with{ 	extension "prototype (backtrack) decode(JSON)"; 
 	  		extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)"  }	
 	  		
-//	external function f_dec_JSON_resourcePrimitive(in octetstring p_stream) return PrimitiveContent
-//	with{ 	extension "prototype (convert) decode(JSON)"  }	
+    //external function f_dec_JSON_resourcePrimitive(in octetstring p_stream) return PrimitiveContent
+    //with{ extension "prototype (convert) decode(JSON)" }	
 	 		
-	
 	//decode requestPrimitive (CSE receiver)
-	// external function f_dec_JSON_requestPrimitive(in octetstring p_stream, out RequestPrimitive p_req) return integer
-	// with{ extension "prototype (backtrack) decode(JSON)"; extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)" }
+	//external function f_dec_JSON_requestPrimitive(in octetstring p_stream, out RequestPrimitive p_req) return integer
+	//with{ extension "prototype (backtrack) decode(JSON)"; extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)" }
 	
 	//decode responsePrimitive (AE/CSE)
 	external function f_dec_JSON_responsePrimitive(in octetstring p_stream, out ResponsePrimitive p_req) return integer
 	with{ 	extension "prototype (backtrack) decode(JSON)"; 
 	  		extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)" }
  
-/************************************************
-* f_encode_requestPrimitive()
-* encode oneM2M request primitives 
-* @p_reqp: RequestPrimitive
-* @v_serial_type: serialization type
-* DEPRECIATED FUNCTION: 
-* Use f_enc_XER_requestPrimitive() for XML and 
-* f_enc_JSON_requestPrimitive() for JSON
-*************************************************
-*/
-function f_encode_requestPrimitive(in RequestPrimitive p_reqp, charstring v_serial_type) return charstring{
-
-  var octetstring v_stream_any;
-  var charstring v_char;
-  var RequestPrimitive v_reqPrimitive := p_reqp;
-
-  if(ispresent(v_reqPrimitive.primitiveContent)){
-   
-    if(JSON_SERIAL ==  v_serial_type){
-       
-       //encode primitiveContent for JSON serialization
-       v_stream_any := f_enc_JSON_resourcePrimitive(v_reqPrimitive.primitiveContent);
-       log(__SCOPE__&" V_STEAM_ANY_JSON converted from bitstring", v_stream_any);
-       
-    }else if(XML_SERIAL ==  v_serial_type){
-   
-      var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
-      if(v_bit_stream != ''B){
-        v_stream_any := bit2oct(v_bit_stream);
-        log(__SCOPE__&" V_STEAM_ANY converted from bitstring", v_stream_any);
-      }
-       
-      
-    }else{
-      log(__SCOPE__ &"[Warning]NOT SUPPORTED SERIALIZATION TYPE !! \n"); 	  		  	  
-    }
+    /************************************************
+    * f_encode_requestPrimitive()
+    * encode oneM2M request primitives 
+    * @p_reqp: RequestPrimitive
+    * @v_serial_type: serialization type
+    * DEPRECIATED FUNCTION: 
+    * Use f_enc_XER_requestPrimitive() for XML and 
+    * f_enc_JSON_requestPrimitive() for JSON
+    **************************************************/
+    function f_encode_requestPrimitive(in RequestPrimitive p_reqp, charstring v_serial_type) return charstring {
+    	var octetstring v_stream_any;
+    	var charstring v_char;
+    	var RequestPrimitive v_reqPrimitive := p_reqp;
     
-    if(v_stream_any != ''O){
-      v_char := oct2char(v_stream_any); log(__SCOPE__&"[DEBUG] encoded requestPrimitive", v_char);
-      return v_char;
-    }else{
-      
-      return "";
-    }
-	
-
-  }else {//XML
-    log(__SCOPE__ &" [Warning]No primitive to encode!!"); 
-	return "";
-  }//  	   		
-
-  
-}//end_f_encode_requestPrimitive 
- 
-
-
+    	if(ispresent(v_reqPrimitive.primitiveContent)){
+       
+    		if(JSON_SERIAL ==  v_serial_type){
+    			//encode primitiveContent for JSON serialization
+    			v_stream_any := f_enc_JSON_resourcePrimitive(v_reqPrimitive.primitiveContent);
+    			log(__SCOPE__&" V_STEAM_ANY_JSON converted from bitstring", v_stream_any);
+        	}else if(XML_SERIAL ==  v_serial_type){
+       
+          		var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
+          		
+          		if(v_bit_stream != ''B) {
+            		v_stream_any := bit2oct(v_bit_stream);
+            		log(__SCOPE__&" V_STEAM_ANY converted from bitstring", v_stream_any);
+          		}
+        	}else{
+          		log(__SCOPE__ &"[Warning]NOT SUPPORTED SERIALIZATION TYPE !! \n"); 	  		  	  
+        	}
+        
+        	if(v_stream_any != ''O){
+          		v_char := oct2char(v_stream_any); log(__SCOPE__&"[DEBUG] encoded requestPrimitive", v_char);
+          		return v_char;
+        	} else {
+    			return "";
+        	}
+		} else {//XML
+        	log(__SCOPE__ &" [Warning]No primitive to encode!!"); 
+    		return "";
+      	}  	   		
+    }//end_f_encode_requestPrimitive 
+    
+    function f_encode_requestPrimitive_for_trigger_msg(in RequestPrimitive p_reqp) return charstring {
+    	var octetstring v_stream_any;
+    	var charstring v_char;
+    	var RequestPrimitive v_reqPrimitive := p_reqp;
+    
+        //encode primitiveContent for JSON serialization
+    	v_stream_any := f_enc_JSON_requestPrimitive(v_reqPrimitive);
+    	log(__SCOPE__&" V_STEAM_ANY_JSON converted from bitstring", v_stream_any);
+    			
+    	if(v_stream_any != ''O){
+          	v_char := oct2char(v_stream_any); log(__SCOPE__&"[DEBUG] encoded requestPrimitive", v_char);
+          	return v_char;
+        } else {
+    		return "";
+        }	   		
+    }//end_f_encode_requestPrimitive_for_trigger_msg 
 }//End_of_namespace
