@@ -775,17 +775,15 @@ namespace OneM2M__DualFaceMapping {
 		Value grandelemObj(objectValue);
 		Value tempObj;
 		Value tempObjClone;
-		
+
 		std::string parent_tag = "";
 		std::string root_tag = "";
 		std::string name_short = "";
 
 		for (Value::iterator iter = jsonSrc.begin(); iter != jsonSrc.end(); iter++) {
-			
+
 			elemName = iter.key();
 			elemObj = jsonSrc.get(elemName.asString(), "");
-
-			CHARSTRING tmp_1(elemName.asCString());
 
 			name_short = getShortName(elemName.asString());
 
@@ -795,12 +793,19 @@ namespace OneM2M__DualFaceMapping {
 
 			parent_tag = name_short;
 
-			if(elemObj.isObject()){ 
+			// CHARSTRING tmp_for_name_checking(elemName.asCString());
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+
+			if(elemObj.isObject()){
 
 				root_tag = name_short;
+
 				elemObjClone = JSONDeepParser(elemObj, elemObjClone, jsonObjClone);
 
 				for (Value::iterator iter = elemObj.begin(); iter != elemObj.end(); ++iter) {
+
 					elemName = iter.key();
 					subelemObj = elemObj.get(elemName.asString(), "");
 
@@ -809,7 +814,7 @@ namespace OneM2M__DualFaceMapping {
 					if(name_short == ""){
 						name_short = elemName.asString();
 					}
-					
+
 					CHARSTRING tmp_1(elemName.asCString());
 
 					if(CONTENT_ATTR == tmp_1){
@@ -817,14 +822,17 @@ namespace OneM2M__DualFaceMapping {
 					}
 
 					bool flag_1 = false;
-					
+
 					parent_tag = name_short;
 
 					if(subelemObj.isObject()){
-						
+
 						for (Value::iterator iter = subelemObj.begin(); iter != subelemObj.end(); ++iter) {
+
 							elemName = iter.key();
+
 							grandelemObj = subelemObj.get(elemName.asString(), "");
+
 							name_short = getShortName(elemName.asString());
 
 							if(name_short == ""){
@@ -837,7 +845,7 @@ namespace OneM2M__DualFaceMapping {
 								flag_1 = true;
 							}
 
-							if(grandelemObj.isArray()) {
+							if(grandelemObj.isArray()){
 								Value elemArrayObj(arrayValue);
 
 								for(unsigned int index = 0; index < grandelemObj.size(); index++){
@@ -875,7 +883,7 @@ namespace OneM2M__DualFaceMapping {
 						for(unsigned int index = 0; index < subelemObj.size(); index++){
 
 							tempObj = subelemObj[index];
-							
+
 							if(tempObj.isString()){
 								elemArrayObj.append(tempObj.asString());
 							}else if(tempObj.isBool()){
@@ -886,13 +894,33 @@ namespace OneM2M__DualFaceMapping {
 								elemArrayObj.append(tempObj.asInt64());
 							}else if(tempObj.isObject()){
 								tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
-								elemArrayObj.append(tempObjClone);								
+								elemArrayObj.append(tempObjClone);
 							}
 							elemObjClone[parent_tag.c_str()] = elemArrayObj;
 						}
-					}					
+
+					}
+
 				}
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
+
+			} else if(elemObj.isString()) {
+				if(	"op" 	== name_short   || "operation" 					== name_short ||
+					"ty" 	== name_short   || "resourceType" 				== name_short ||
+			        "acop" 	== name_short   || "accessControlOperations" 	== name_short ||
+		            "rcn" 	== name_short   || "resultContent" 				== name_short ||
+					"csy"	== name_short	|| "consistencyStrategy" 		== name_short ||
+					"cst"	== name_short	|| "cseType"					== name_short ){ //TODO: add all enumerated type here
+
+					std::string attr_val = getShortName(elemObj.asString());
+					int tmp_int = atoi(attr_val.c_str());
+					jsonObjClone[name_short.c_str()] = tmp_int;
+
+				}else
+					jsonObjClone[name_short.c_str()] = elemObj.asString();
+
+			}else{
+				jsonObjClone[name_short.c_str()] = elemObj;
 			}
 		}
 		return jsonObjClone;
@@ -1025,7 +1053,6 @@ namespace OneM2M__DualFaceMapping {
 					}					
 				}
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
-
 			}else if(elemObj.isString()){
 				jsonObjClone[name_long.c_str()] = elemObj.asString();
 			}else if(elemObj.isInt()){ 
