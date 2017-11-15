@@ -24,7 +24,7 @@ module OneM2M_Primitive_EncDec {
 	import from OneM2M_Constants all;
 	
 	//=============================
-	// XML encoding
+	// XML encoding/decoding
 	//=============================
 	
 	//encode requestPrimitive (AE/CSE originator)
@@ -35,30 +35,27 @@ module OneM2M_Primitive_EncDec {
 	external function f_enc_XER_responsePrimitive(in ResponsePrimitive p_du) return octetstring
 	with{ extension "prototype (convert) encode(XER:XER_EXTENDED)" } 
 	
-	
 	external function f_enc_XER_resourcePrimitive(in PrimitiveContent p_primitive) return octetstring
 	with{ extension "prototype (convert) encode(XER:XER_EXTENDED)" }  
 	
-	
 	//encode resourcePrimitive
 	external function f_dec_XER_resourcePrimitive(in octetstring p_stream, out PrimitiveContent p_decodedValue) return integer
-	with{
-	  	extension "prototype (backtrack) decode(XER:XER_EXTENDED)";
-	  	extension "errorbehavior(ALL:WARNING)"	  
+	with{  extension "prototype (backtrack) decode(XER:XER_EXTENDED)";
+	  	   extension "errorbehavior(ALL:WARNING)"	  
 	}
 		
 	//decode requestPrimitive (CSE receiver)
 	external function f_dec_XER_requestPrimitive(in octetstring p_stream) return RequestPrimitive
-	with{ 	extension "prototype (convert) decode(XER:XER_EXTENDED)";
-	  		extension "errorbehavior(ALL:WARNING)" }
+	with{  extension "prototype (convert) decode(XER:XER_EXTENDED)";
+	  	   extension "errorbehavior(ALL:WARNING)" }
 	  		
 	//decode responsePrimitive (AE/CSE)
 	external function f_dec_XER_responsePrimitive(in octetstring p_stream) return ResponsePrimitive
-	with{ 	extension "prototype (convert) decode(XER:XER_EXTENDED)";
-	  		extension "errorbehavior(ALL:WARNING)" }
+	with{  extension "prototype (convert) decode(XER:XER_EXTENDED)";
+	  	   extension "errorbehavior(ALL:WARNING)" }
 	
 	//=============================
-	// JSON encoding
+	// JSON encoding/decoding
 	//=============================
 	
 	//encode primitiveContent for HTTP/COAP communication
@@ -74,8 +71,8 @@ module OneM2M_Primitive_EncDec {
 	with{ extension "prototype (convert) encode(JSON) printing(pretty)" } 
 
 	external function f_dec_JSON_resourcePrimitive(in octetstring p_stream, out PrimitiveContent p_decodedValue) return integer
-	with{ 	extension "prototype (backtrack) decode(JSON)"; 
-	  		extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)"  }	
+	with{ extension "prototype (backtrack) decode(JSON)"; 
+	  	  extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)"  }	
 	  		
     //external function f_dec_JSON_resourcePrimitive(in octetstring p_stream) return PrimitiveContent
     //with{ extension "prototype (convert) decode(JSON)" }	
@@ -86,8 +83,8 @@ module OneM2M_Primitive_EncDec {
 	
 	//decode responsePrimitive (AE/CSE)
 	external function f_dec_JSON_responsePrimitive(in octetstring p_stream, out ResponsePrimitive p_req) return integer
-	with{ 	extension "prototype (backtrack) decode(JSON)"; 
-	  		extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)" }
+	with{ extension "prototype (backtrack) decode(JSON)"; 
+	  	  extension "errorbehavior(ALL:WARNING,INVAL_MSG:ERROR)" }
  
     /************************************************
     * f_encode_requestPrimitive()
@@ -110,7 +107,6 @@ module OneM2M_Primitive_EncDec {
     			v_stream_any := f_enc_JSON_resourcePrimitive(v_reqPrimitive.primitiveContent);
     			log(__SCOPE__&" V_STEAM_ANY_JSON converted from bitstring", v_stream_any);
         	}else if(XML_SERIAL ==  v_serial_type){
-       
           		var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
           		
           		if(v_bit_stream != ''B) {
@@ -127,11 +123,11 @@ module OneM2M_Primitive_EncDec {
         	} else {
     			return "";
         	}
-		} else {//XML
+		} else {
         	log(__SCOPE__ &" [Warning]No primitive to encode!!"); 
     		return "";
       	}  	   		
-    }//end_f_encode_requestPrimitive 
+    } //end_f_encode_requestPrimitive 
     
     function f_encode_requestPrimitive_for_trigger_msg(in RequestPrimitive p_reqp) return charstring {
     	var octetstring v_stream_any;
@@ -148,5 +144,5 @@ module OneM2M_Primitive_EncDec {
         } else {
     		return "";
         }	   		
-    }//end_f_encode_requestPrimitive_for_trigger_msg 
-}//End_of_namespace
+    } //end_f_encode_requestPrimitive_for_trigger_msg 
+} //End_of_namespace

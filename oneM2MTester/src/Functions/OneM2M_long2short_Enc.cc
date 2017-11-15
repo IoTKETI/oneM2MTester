@@ -1,47 +1,46 @@
 /****************************************************************************************
-* Copyright (c) 2017  Korea Electronics Technology Institute.				*
-* All rights reserved. This program and the accompanying materials			*
-* are made available under the terms of                                         	*
-* - Eclipse Public License v1.0(http://www.eclipse.org/legal/epl-v10.html),     	*
-* - BSD-3 Clause Licence(http://www.iotocean.org/license/),                    		* 
+* Copyright (c) 2017  Korea Electronics Technology Institute.				            *
+* All rights reserved. This program and the accompanying materials			            *
+* are made available under the terms of                                         	    *
+* - Eclipse Public License v1.0(http://www.eclipse.org/legal/epl-v10.html),     	    *
+* - BSD-3 Clause Licence(http://www.iotocean.org/license/),                    		    *
 * - MIT License   (https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE), * 
 * - zlib License  (https://github.com/leethomason/tinyxml2#license).                    *	
-*											*
-* Contributors:										*
-*   Ting Martin MIAO - initial implementation                                   	*   
-*   Nak-Myoung Sung                                                             	*
-*                                                                               	* 
-* Updated:  2017-09-01                                                          	*
+*											                                            *
+* Contributors:										                                    *
+*   JaeYoung Hwang   - forest62590@gmail.com                                   	        *
+*   Nak-Myoung Sung                                                            	        *
+*   Ting Martin MIAO - initial implementation                                           *
+* Updated:  2017-09-01                                                          	    *
 *****************************************************************************************/
 //  File:               OneM2M_long2short_Enc.cc
 //  Description:        Functions for oneM2M long to short, and short to long name conversion,
 //                      and XML, JSON parsing   
 //  Rev:                R2I
 
-#include "OneM2M_DualFaceMapping.hh"
-#include "tinyxml2.h"
-#include "json.h"
-#include "json-forwards.h"
 #include <vector>
 #include <string>
-#include <iostream>
-#include "HashMap.h"
-#include <sstream>
 #include <cctype>
-#include <stdint.h>
+#include <sstream>
 #include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <stdint.h>
 #include <algorithm>
 #include <functional>
+#include "json.h"
+#include "HashMap.h"
+#include "tinyxml2.h"
+#include "json-forwards.h"
 #include "External_function.hh"
-#include <stdlib.h>
+#include "OneM2M_DualFaceMapping.hh"
 
 using namespace tinyxml2;
 using namespace Json;
 using namespace std;
 
 struct MyKeyHash {
-	unsigned long operator()(const std::string& k) const
-	{
+	unsigned long operator()(const std::string& k) const {
 	  	return k.length() % 10;
 	}
 };
@@ -68,10 +67,10 @@ namespace OneM2M__DualFaceMapping {
 	const char* ELEM_LIST_ATTR	= "elem_list";
 
 	/**
-         * @desc encode oneM2M resource primitive e.g. AE, container etc. into primitiveContent primitive
-         * @source_str: resource primitive representation
+     * @desc encode oneM2M resource primitive e.g. AE, container etc. into primitiveContent primitive
+     * @source_str: resource primitive representation
 	 * @serial_type: serialization type in which the resource primitive is represented
-         */
+     */
 	CHARSTRING f__primitiveContent__Dec(const CHARSTRING& source_str, const CHARSTRING& serial_type){
 
 		if(!initial_mapping("allPort")){
@@ -105,6 +104,7 @@ namespace OneM2M__DualFaceMapping {
 			std::string parent_tag = "";
 
 			bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
+
 			if ( !parsingSuccessful ) {
 				TTCN_Logger::log(TTCN_DEBUG, "JsonCPP API parsing error!");
 				return "JsonCPP API parsing error!";
@@ -120,6 +120,7 @@ namespace OneM2M__DualFaceMapping {
 					elemObj = jsonRoot.get(elemName.asString(), "");
 					
 					name_long = getLongName(elemName.asString()); 
+
 					if(name_long == ""){
 						name_long = elemName.asString();
 					}
@@ -127,26 +128,18 @@ namespace OneM2M__DualFaceMapping {
 					parent_tag = name_long;
 					
 					if(elemObj.isArray()){
-						
 						for(unsigned int index = 0; index < elemObj.size(); index++){
 							grandelemObj = elemObj[index];
 							jsonObjClone[parent_tag.c_str()] = grandelemObj;
 						}
-
-
 					}else if(!elemObj.isObject() && !elemObj.isArray()){
 						jsonObjClone[name_long.c_str()] = elemObj;
-
-					}else if(elemObj.isObject()){  
-						
+					}else if(elemObj.isObject()){
 						jsonObjClone[parent_tag.c_str()] = elemObj;
 						jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
-						
 					}
 				}
-
 			}else if(jsonRoot.isArray()){
-			
 				for(unsigned int index = 0; index < jsonRoot.size(); index++){
 					elemObj = jsonRoot[index];
 					jsonObjClone = elemObj;
@@ -163,7 +156,7 @@ namespace OneM2M__DualFaceMapping {
 			CHARSTRING temp_cs(json_str.c_str());
 			encoded_message	= temp_cs;
 
-		}else if("xml" == serial_type){
+		} else if("xml" == serial_type){
 						
 			XMLDocument xmlDoc;
 			xmlDoc.Parse(p_body);			
@@ -181,23 +174,19 @@ namespace OneM2M__DualFaceMapping {
 			XMLNode* pTemp;
 
 			for(pTemp = xmlDoc.FirstChild(); pTemp != NULL; pTemp = xmlDoc.LastChild()){
-				
 				if(pTemp->ToDeclaration()){
-
 					pDecl = pTemp->ToDeclaration();
-					
 				}else if(pTemp->ToElement()){
-
 					pRoot = pTemp->ToElement();
 					XMLPrinter print2;
 					pRoot->Accept(&print2);
-
 					break;	
 				}
 			}
 
 			if(pRoot){
 				pDecl = pRoot->ToDeclaration();
+
 				if(pDecl){
 					//TTCN_Logger::log(TTCN_DEBUG, "pRoot->ToDeclaration()!");
 				}
@@ -205,7 +194,7 @@ namespace OneM2M__DualFaceMapping {
 				pRootElem = pRoot->ToElement();
 
 				if(pRootElem){ 
-					
+
 					name_el = pRootElem->Name(); 
 					name_long = getLongName(name_el);			
 
@@ -217,13 +206,10 @@ namespace OneM2M__DualFaceMapping {
 					pResourceRoot 	= xmlDoclone.NewElement(name_long.c_str());
 			
 					if(pRootElem->Attribute(NAMESPACE_TAG)){
-
 						std::string  val_xmlns_ns = pRootElem->Attribute(NAMESPACE_TAG);
 						pRootClone->SetAttribute(NAMESPACE_TAG, val_xmlns_ns.c_str());
-
-					}else
+					} else
 						pRootClone->SetAttribute(NAMESPACE_TAG, XML_NAMESPACE);
-			
 					if(pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()))){ 
 						std::string val_resourceName = pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()));
 						pResourceRoot->SetAttribute( getLongName(getShortName(RESOURCE_NAME)).c_str(), val_resourceName.c_str() );
@@ -232,8 +218,8 @@ namespace OneM2M__DualFaceMapping {
 					pRootClone->InsertEndChild(pResourceRoot);
 					
 					xmlDoclone.InsertEndChild(pRootClone);
+
 					for(pNode = pRoot->FirstChild(); pNode != NULL; pNode = pNode->NextSibling()){
-						
 						pElem = pNode->ToElement();		
 						DeepParserDec(pElem, &xmlDoclone, pElemClone, pResourceRoot);
 					}
@@ -243,11 +229,10 @@ namespace OneM2M__DualFaceMapping {
 					encoded_message = print.CStr();
 				}
 			}
-
 		}
-
 		return encoded_message;
 	}
+
 	/**
 	 * @desc convert string from uppercase to lowercase
 	 * @p__string: string containing uppercase letters
@@ -273,11 +258,10 @@ namespace OneM2M__DualFaceMapping {
  	 * @p__source: primitiveContent
 	 * @p__serialization__type: serialization type (XML or JSON)
 	 * 
-         */
+     */
 	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type){
 
-//		TTCN_Logger::log(TTCN_DEBUG, "Enter f_serialization_Enc()...");
-
+		//TTCN_Logger::log(TTCN_DEBUG, "Enter f_serialization_Enc()...");
 		if(!initial_mapping("allPort")){
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 		}
@@ -314,7 +298,6 @@ namespace OneM2M__DualFaceMapping {
 			if(jsonRoot.isObject()){  
 
 				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
-					
 					elemName = iter.key();
 					elemObj = jsonRoot.get(elemName.asString(), "");
 			
@@ -330,15 +313,10 @@ namespace OneM2M__DualFaceMapping {
 							grandelemObj = elemObj[index];
 							jsonObjClone[parent_tag.c_str()] = grandelemObj;
 						}
-
 					}else if(!elemObj.isObject() && !elemObj.isArray()){ 
-
 						jsonRootClone[name_short.c_str()] = elemObj;
-
-
-					}else if(elemObj.isObject()){ //go deep parsing child objects
+					}else if(elemObj.isObject()){ // go deep parsing child objects
 						jsonObjClone[parent_tag.c_str()] = elemObj;
-
 						jsonRootClone = JSONDeepParser(jsonObjClone, jsonRootClone, jsonRootClone);
 					}
 										
@@ -392,6 +370,7 @@ namespace OneM2M__DualFaceMapping {
 					name_short = name_el;
 				}
 			}
+
 			XMLDeclaration* xml_declar = xmlDoclone.NewDeclaration();
 			xmlDoclone.InsertFirstChild(xml_declar);
 
@@ -401,13 +380,13 @@ namespace OneM2M__DualFaceMapping {
 				std::string  val_xmlns_ns = pRootElem->Attribute(NAMESPACE_TAG);
 				pRootClone->SetAttribute(NAMESPACE_TAG, val_xmlns_ns.c_str());
 			}
+
 			if(pRootElem->Attribute(XSI_TAG)){
 				std::string  val_xmlns_xsi = pRootElem->Attribute(XSI_TAG);
 				pRootClone->SetAttribute(XSI_TAG, val_xmlns_xsi.c_str());
 			}
 			
 			if(!pRootElem->Attribute(NAMESPACE_TAG) && !pRootElem->Attribute(XSI_TAG)){
-
 				pRootClone->SetAttribute(NAMESPACE_TAG, XML_NAMESPACE);
 				pRootClone->SetAttribute(XSI_TAG, XSI);
 			}
@@ -418,11 +397,10 @@ namespace OneM2M__DualFaceMapping {
 			}				
 
 			xmlDoclone.InsertEndChild(pRootClone);
+
 			for(pNode = pTempNode->FirstChild(); pNode != NULL; pNode = pNode->NextSibling()){
 				pElem = pNode->ToElement();
-				
 				DeepParser(pElem, &xmlDoclone, pElemClone, pRootClone);
-
 			}
 			
 			XMLPrinter print;
@@ -430,17 +408,10 @@ namespace OneM2M__DualFaceMapping {
 			encoded_message = print.CStr();
 
 			return encoded_message;
-
 		}
-
 		return "";
-
 	}
 
-	//===========================
-	// internal functions
-	// mapping long-2-short names
-	//===========================
 	//initial mapping functions
 	bool initial_mapping(std::string port_condition){
 
@@ -526,51 +497,41 @@ namespace OneM2M__DualFaceMapping {
 							
 						}else
 							return false;
-						
-
-						
 					}else
 						return false;
 
 					pos_1 = pos_2 + 1;
 				}
-
 			}else
 				return false;
 		}else
 			return false;
 
 		return flag;
-
-	}//
+	}
 
 
 	/**
-	 * @desc get long/short name from hash mapping table * 
-         */	
+	 * @desc get long/short name from hash mapping table
+     */
 	std::string getShortName(std::string long_name){ 
-
 		std::string short_name = "";
 		bool isOk =  hmap_l2s.get(long_name, short_name);
 		if(isOk)
 			return short_name;
-
 		return "";
-	}//
+	}
 	
 	std::string getLongName(std::string short_name){
-
 		std::string long_name = "";
 		bool isOk =  hmap_s2l.get(short_name, long_name);
 		if(isOk)
 			return long_name;
-
 		return "";
-	}//
+	}
 
 	/**
 	 * @desc split a string with specified delim and get the substr after the delim
-	 *
 	 */
 	CHARSTRING f__split(const CHARSTRING& p__cs, const CHARSTRING& p__delim){
 		
@@ -589,15 +550,14 @@ namespace OneM2M__DualFaceMapping {
 				return tmp_str;
 			}		
 		}
-
 		return "";
 	}
+
 	/**
 	 * @desc find charstring p__str1 in charstring p__source if any and replace with charstring p__str1 with charstring p__str2
 	 * @desc if p__str1 is not found, charstring p__source will not be updated
 	 */
 	CHARSTRING f__replace(const CHARSTRING& p__source, const CHARSTRING& p__str1, const CHARSTRING& p__str2){
-		
 		const char* cs_temp  = (const char*)p__source;
 		const char* cs_temp2 = (const char*)p__str1;
 		const char* cs_temp3 = (const char*)p__str2;
@@ -607,14 +567,11 @@ namespace OneM2M__DualFaceMapping {
 		std::string str2(cs_temp3);
 		std::size_t pos = str_source.find_first_of(str1);
 		while(pos != std::string::npos){
-			
 			str_source.replace(pos, 1, str2);
 			pos = str_source.find_first_of(str1, pos+1);
-
 		}
 		CHARSTRING tmp_str(str_source.c_str());
 		return tmp_str;	
-		
 	}
 
 	/**
@@ -631,18 +588,17 @@ namespace OneM2M__DualFaceMapping {
 		std::string str1(cs_temp2); 
 		std::string str2(cs_temp3); 
 		std::size_t pos = str_source.find_first_of(str1);
+
 		if(pos != std::string::npos){
-			
 			str_source.replace(pos, 1, str2);
-			
 		}
+
 		CHARSTRING tmp_str(str_source.c_str());
 		return tmp_str;	
 	}
 
 	/**
 	 * @desc split a structured uri into single elements that are separated by slash "/"
-	 *
 	 */
 	CoAP__Types::Charstring__List f__split__uri(const CHARSTRING& p__uri, const CHARSTRING& p__delim){
 
@@ -664,23 +620,19 @@ namespace OneM2M__DualFaceMapping {
 			std::vector<std::string> vector_elems = split(uri_str, *delim_str);
 
 			for(unsigned int i = 0; i < vector_elems.size(); i++){
-
 				CHARSTRING tmp_str((vector_elems[i]).c_str());
 			
 				if(tmp_str != ""){				
 					csList[i] = tmp_str;
-				
-				}	
-				
+				}
 			}
 		}
-	
 		return csList;
-
 	}
+
 	/**
 	 * @desc split string with delimiter
-         */
+     */
 	std::vector<std::string> split(const std::string &s, char delim) {
 		std::vector<std::string> elems;
 		stringstream ss(s);
@@ -688,8 +640,9 @@ namespace OneM2M__DualFaceMapping {
 		while (getline(ss, item, delim)) {
 		    elems.push_back(item);
 		}
+
 		return elems;
-       }
+	}
 
 	/**
 	 * @desc Clone one node including children into another node
@@ -701,20 +654,23 @@ namespace OneM2M__DualFaceMapping {
 	void DeepClone(XMLNode *newNode, const XMLNode *nodeSrc, XMLDocument *DocDest, const XMLNode *parent) {
 		const tinyxml2::XMLNode *child = nodeSrc->FirstChild();
 		tinyxml2::XMLNode *newNode2;
-		if (child)
-		{
+
+		if (child) {
 			newNode2 = child->ShallowClone(DocDest);
 			DeepClone(newNode2,child,DocDest,nodeSrc);
 			newNode->InsertFirstChild(newNode2);
-		}
-		else return;
+		} else
+			return;
+
 		const tinyxml2::XMLNode *child2;
 		tinyxml2::XMLNode *lastClone = newNode2;
-		while (1)
-		{
+
+		while (1) {
 			child2 = child->NextSibling();
+
 			if (!child2)
-			break;
+				break;
+
 			tinyxml2::XMLNode *newNode2 = child2->ShallowClone(DocDest);
 			DeepClone(newNode2,child2,DocDest,nodeSrc);
 			newNode->InsertAfterChild(lastClone,newNode2);
@@ -739,6 +695,7 @@ namespace OneM2M__DualFaceMapping {
 
 		name_el = pSrcElem->Name();
 		name_short = getShortName(name_el);
+
 		if(name_short == ""){
 			name_short = name_el;
 		}
@@ -754,20 +711,17 @@ namespace OneM2M__DualFaceMapping {
 
 		if(pSrcElem->FirstChildElement() != NULL){
 			for(XMLElement* pElem = pSrcElem->FirstChildElement(); pElem != NULL; pElem = pElem->NextSiblingElement()){
-
 				XMLElement* pElemClone;
-
 				DeepParser(pElem, xmlDoclone, pElemClone, pSrcElemClone);
 			}
-
-		}else{
+		} else {
 			val_el = pSrcElem->GetText();
+
 			if(!(val_el == NULL))
 				pSrcElemClone->SetText(val_el);
-
 		}
-
 	}
+
 	/**
 	 * @desc Parse each attribute and convert it from short to long name
 	 * @pRootElem: source element
@@ -785,7 +739,7 @@ namespace OneM2M__DualFaceMapping {
 		name_el = pSrcElem->Name();
 		name_long = getLongName(name_el);
 		
-		if( "" == name_long){
+		if( "" == name_long) {
 			name_long = name_el;
 		}
 
@@ -795,24 +749,20 @@ namespace OneM2M__DualFaceMapping {
 
 		if(pSrcElem->FirstChildElement() != NULL){
 			for(XMLElement* pElem = pSrcElem->FirstChildElement(); pElem != NULL; pElem = pElem->NextSiblingElement()){
-
 				XMLElement* pElemClone;
-
 				DeepParserDec(pElem, xmlDoclone, pElemClone, pSrcElemClone);
 			}
-
 		}else{
 			val_el = pSrcElem->GetText();
+
 			if(!(val_el == NULL))
 				pSrcElemClone->SetText(val_el);
-
 		}
-
 	}
 
 	/**
 	 * @jsonSrc: json root element that is parsing
-         * @jsonCurrent: input a jsonCurrent
+     * @jsonCurrent: input a jsonCurrent
 	 * return a jsonParent included the encode json data
 	 */
 	Json::Value JSONDeepParser(Json::Value jsonSrc, Json::Value jsonObjClone, Json::Value jsonTarget){
@@ -830,9 +780,6 @@ namespace OneM2M__DualFaceMapping {
 		std::string root_tag = "";
 		std::string name_short = "";
 
-
-
-
 		for (Value::iterator iter = jsonSrc.begin(); iter != jsonSrc.end(); iter++) {
 			
 			elemName = iter.key();
@@ -841,6 +788,7 @@ namespace OneM2M__DualFaceMapping {
 			CHARSTRING tmp_1(elemName.asCString());
 
 			name_short = getShortName(elemName.asString());
+
 			if(name_short == ""){
 				name_short = elemName.asString();
 			}
@@ -850,15 +798,14 @@ namespace OneM2M__DualFaceMapping {
 			if(elemObj.isObject()){ 
 
 				root_tag = name_short;
-
 				elemObjClone = JSONDeepParser(elemObj, elemObjClone, jsonObjClone);
 
 				for (Value::iterator iter = elemObj.begin(); iter != elemObj.end(); ++iter) {
-
 					elemName = iter.key();
 					subelemObj = elemObj.get(elemName.asString(), "");
 
 					name_short = getShortName(elemName.asString());
+
 					if(name_short == ""){
 						name_short = elemName.asString();
 					}
@@ -876,7 +823,6 @@ namespace OneM2M__DualFaceMapping {
 					if(subelemObj.isObject()){
 						
 						for (Value::iterator iter = subelemObj.begin(); iter != subelemObj.end(); ++iter) {
-							
 							elemName = iter.key();
 							grandelemObj = subelemObj.get(elemName.asString(), "");
 							name_short = getShortName(elemName.asString());
@@ -890,7 +836,6 @@ namespace OneM2M__DualFaceMapping {
 							if(EMBED_VALUES_ATTR == tmp_2){
 								flag_1 = true;
 							}
-
 
 							if(grandelemObj.isArray()) {
 								Value elemArrayObj(arrayValue);
@@ -947,18 +892,16 @@ namespace OneM2M__DualFaceMapping {
 						}
 					}					
 				}
-
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 			}
 		}
 		return jsonObjClone;
 	}
 
-
 	/**
 	 * @desc decoding json formated short name represented data into long name format 
 	 * @jsonSrc: json root element that is parsing
-         * @jsonCurrent: input a jsonCurrent
+     * @jsonCurrent: input a jsonCurrent
 	 * return a jsonParent included the encode json data
 	 */
 	Json::Value JSONDeepParserDec(Json::Value jsonSrc, Json::Value jsonObjClone, Json::Value jsonTarget){
@@ -983,6 +926,7 @@ namespace OneM2M__DualFaceMapping {
 			elemObj = jsonSrc.get(elemName.asString(), "");
 			
 			name_long = getLongName(elemName.asString());
+
 			if(name_long == ""){
 				name_long = elemName.asString();
 			}
@@ -995,11 +939,10 @@ namespace OneM2M__DualFaceMapping {
 				elemObjClone = JSONDeepParserDec(elemObj, elemObjClone, jsonObjClone);
 				
 				for (Value::iterator iter = elemObj.begin(); iter != elemObj.end(); ++iter) {
-
 					elemName = iter.key();
 					subelemObj = elemObj.get(elemName.asString(), "");
-
 					name_long = getLongName(elemName.asString());
+
 					if(name_long == ""){
 						name_long = elemName.asString();
 					}
@@ -1014,6 +957,7 @@ namespace OneM2M__DualFaceMapping {
 							grandelemObj = subelemObj.get(elemName.asString(), "");
 
 							name_long = getLongName(elemName.asString());
+
 							if(name_long == ""){
 								name_long = elemName.asString();
 							}
@@ -1035,44 +979,27 @@ namespace OneM2M__DualFaceMapping {
 
 										subObjClone[name_long.c_str()] = elemArrayObj;
 										elemObjClone[parent_tag.c_str()] = subObjClone;
-										
-
 									}else if(tempObj.isString()){
-										
 										elemArrayObj.append(tempObj.asString());
 										elemObjClone[parent_tag.c_str()] = elemArrayObj;
-
 									}else if(tempObj.isBool()){
-
 										elemArrayObj.append(tempObj.asBool());
 										elemObjClone[parent_tag.c_str()] = elemArrayObj;
-
 									}else if(tempObj.isDouble()){
-
 										elemArrayObj.append(tempObj.asDouble());
 										elemObjClone[parent_tag.c_str()] = elemArrayObj;
-
 									}else if(tempObj.isUInt()){
 										elemArrayObj.append(tempObj.asUInt());
 										elemObjClone[parent_tag.c_str()] = elemArrayObj;
-
 									}else if(tempObj.isObject()){
-
 										tempObjClone = JSONDeepParserDec(tempObj, tempObjClone, subObjClone);
-
 										elemArrayObj.append(tempObjClone);
-
 										subObjClone[name_long.c_str()] = elemArrayObj;
-
 										elemObjClone[parent_tag.c_str()] = subObjClone;
-
 									}
 								}
-
 							}
-
 						}
-
 					}else if(subelemObj.isArray()){
 
 						Value elemArrayObj(arrayValue);
@@ -1082,83 +1009,54 @@ namespace OneM2M__DualFaceMapping {
 							tempObj = subelemObj[index];
 							
 							if(tempObj.isString()){
-						
 								elemArrayObj.append(tempObj.asString());
-
 							}else if(tempObj.isBool()){
-							
 								elemArrayObj.append(tempObj.asBool());
-
 							}else if(tempObj.isDouble()){
-								
 								elemArrayObj.append(tempObj.asDouble());
-
 							}else if(tempObj.isInt64()){
-
 								elemArrayObj.append(tempObj.asInt64());
-
 							}else if(tempObj.isObject()){
-
 								tempObjClone = JSONDeepParserDec(tempObj, tempObjClone, subObjClone);
-
 								elemArrayObj.append(tempObjClone);								
-
 							}
-
 							elemObjClone[parent_tag.c_str()] = elemArrayObj;
 						}
-
 					}					
-
 				}
-
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 
-
 			}else if(elemObj.isString()){
-				
 				jsonObjClone[name_long.c_str()] = elemObj.asString();
-
 			}else if(elemObj.isInt()){ 
 				
 				std::string tmp_str((const char*)(int2str(elemObj.asInt())));
 				
-				
-				if(	"op" 	== name_long   || "operation" 			== name_long || 
-					"ty" 	== name_long   || "resourceType" 		== name_long || 
-	            			"acop" 	== name_long   || "accessControlOperations" 	== name_long ||
-                    			"rcn" 	== name_long   || "resultContent" 		== name_long ||
-					"csy"	== name_long   || "consistencyStrategy" 	== name_long ||
-					"mt"	== name_long   || "memberType" 			== name_long ||
-					"nct"	== name_long   || "notificationContentType"	== name_long ||
-					"cst"	== name_long   || "cseType"			== name_long
-				 ){	
+				if(	"op" 	== name_long   || "operation" 			     == name_long ||
+					"ty" 	== name_long   || "resourceType" 		     == name_long ||
+	            	"acop" 	== name_long   || "accessControlOperations"  == name_long ||
+                    "rcn" 	== name_long   || "resultContent" 		     == name_long ||
+					"csy"	== name_long   || "consistencyStrategy" 	 == name_long ||
+					"mt"	== name_long   || "memberType" 			     == name_long ||
+					"nct"	== name_long   || "notificationContentType"	 == name_long ||
+					"cst"	== name_long   || "cseType"			         == name_long){
+
 					std::string attr_val = getLongName(tmp_str);		
 					jsonObjClone[name_long.c_str()] = attr_val;
-				
-
-				}else							
+				} else
 					jsonObjClone[name_long.c_str()] = elemObj.asInt();
-				
-
 			}else if(elemObj.isInt64()){
-								
 				jsonObjClone[name_long.c_str()] = elemObj;
-	
 			}else if(elemObj.isBool()){
-							
 				jsonObjClone[name_long.c_str()] = elemObj;
-	
 			}else{									
 				jsonObjClone[name_long.c_str()] = elemObj;
 			}
-
 		}
-		
 		return jsonObjClone;
-
 	}
 
+	// Encoding function for triggering request message
 	CHARSTRING f__serialization__Enc__for__trigger__msg(const CHARSTRING& p__source){
 		if(!initial_mapping("utTriggerPort"))
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
@@ -1221,7 +1119,7 @@ namespace OneM2M__DualFaceMapping {
 					} else {
 						jsonRootClone[parent_tag.c_str()] = elemObj;
 					}
-				} else if(elemObj.isObject()){ //go deep parsing child objects
+				} else if(elemObj.isObject()){ // Go deep parsing child objects
 					jsonObjClone[parent_tag.c_str()] = elemObj;
 					jsonRootClone = JSONDeepParser(jsonObjClone, jsonRootClone, jsonRootClone);
 				}
@@ -1229,12 +1127,12 @@ namespace OneM2M__DualFaceMapping {
 		}
 
 		StyledWriter writer;
-		rootTag["rqp"] = jsonRootClone;
+		rootTag["rqp"] = jsonRootClone; // Root tag for triggering message
 		std::string json_str = writer.write(rootTag);
 
 		CHARSTRING temp_cs(json_str.c_str());
 		encoded_message = temp_cs;
-		TTCN_Logger::log(TTCN_DEBUG, (const char*)encoded_message);
+		// TTCN_Logger::log(TTCN_DEBUG, (const char*)encoded_message);
 
 		return encoded_message;
 	}

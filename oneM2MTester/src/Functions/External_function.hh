@@ -1,17 +1,17 @@
 /****************************************************************************************
-* Copyright (c) 2017  Korea Electronics Technology Institute.				*
-* All rights reserved. This program and the accompanying materials			*
-* are made available under the terms of                                         	*
-* - Eclipse Public License v1.0(http://www.eclipse.org/legal/epl-v10.html),     	*
-* - BSD-3 Clause Licence(http://www.iotocean.org/license/),                    		* 
+* Copyright (c) 2017  Korea Electronics Technology Institute.				            *
+* All rights reserved. This program and the accompanying materials			            *
+* are made available under the terms of                                         	    *
+* - Eclipse Public License v1.0(http://www.eclipse.org/legal/epl-v10.html),     	    *
+* - BSD-3 Clause Licence(http://www.iotocean.org/license/),                    		    *
 * - MIT License   (https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE), * 
 * - zlib License  (https://github.com/leethomason/tinyxml2#license).                    *	
-*											*
-* Contributors:										*
-*   Ting Martin MIAO - initial implementation                                   	*   
-*   Nak-Myoung Sung                                                             	*
-*                                                                               	* 
-* Updated:  2017-08-31 Remove Titan version check                                     	*
+*											                                            *
+* Contributors:										                                    *
+*   JaeYoung Hwang   - forest62590@gmail.com                                   	        *
+*   Nak-Myoung Sung                                                            	        *
+*   Ting Martin MIAO - initial implementation                                           *
+* Updated:  2017-09-01                                                          	    *
 *****************************************************************************************/
 //  File:               External_function.hh
 //  Description:        Header files for external functions in oneM2M_DualFaceMapping modules 

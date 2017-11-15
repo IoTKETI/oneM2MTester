@@ -11,82 +11,65 @@
 
 namespace OneM2M__Ports {
 
-InfoPort::InfoPort(const char *par_port_name)
-	: InfoPort_BASE(par_port_name)
-{
+	InfoPort::InfoPort(const char *par_port_name) : InfoPort_BASE(par_port_name) {
 
-}
+	}
 
-InfoPort::~InfoPort()
-{
+	InfoPort::~InfoPort() {
 
-}
+	}
 
-void InfoPort::set_parameter(const char * /*parameter_name*/,
-	const char * /*parameter_value*/)
-{
+	void InfoPort::set_parameter(const char * /*parameter_name*/, const char * /*parameter_value*/) {
 
-}
+	}
 
-/*void AdapterControlPort::Handle_Fd_Event(int fd, boolean is_readable,
-	boolean is_writable, boolean is_error) {}*/
+	/*void AdapterControlPort::Handle_Fd_Event(int fd, boolean is_readable, boolean is_writable, boolean is_error) {}*/
 
-void InfoPort::Handle_Fd_Event_Error(int /*fd*/)
-{
+	void InfoPort::Handle_Fd_Event_Error(int /*fd*/) {
 
-}
+	}
 
-void InfoPort::Handle_Fd_Event_Writable(int /*fd*/)
-{
+	void InfoPort::Handle_Fd_Event_Writable(int /*fd*/) {
 
-}
+	}
 
-void InfoPort::Handle_Fd_Event_Readable(int /*fd*/)
-{
+	void InfoPort::Handle_Fd_Event_Readable(int /*fd*/) {
 
-}
+	}
 
-/*void AdapterControlPort::Handle_Timeout(double time_since_last_call) {}*/
+	/*void AdapterControlPort::Handle_Timeout(double time_since_last_call) {}*/
 
-void InfoPort::user_map(const char * /*system_port*/)
-{
+	void InfoPort::user_map(const char * /*system_port*/) {
 
-}
+	}
 
-void InfoPort::user_unmap(const char * /*system_port*/)
-{
+	void InfoPort::user_unmap(const char * /*system_port*/) {
 
-}
+	}
 
-void InfoPort::user_start()
-{
+	void InfoPort::user_start() {
 
-}
+	}
 
-void InfoPort::user_stop()
-{
+	void InfoPort::user_stop() {
 
-}
+	}
 
-void InfoPort::outgoing_send(const OneM2M__Types::RequestPrimitive&)
-{
+	void InfoPort::outgoing_send(const OneM2M__Types::RequestPrimitive&) {
 
-}
+	}
 
-void InfoPort::outgoing_send(const OneM2M__Types::ResponsePrimitive&)
-{
+	void InfoPort::outgoing_send(const OneM2M__Types::ResponsePrimitive&) {
 
-}
+	}
 
-void InfoPort::outgoing_send(const OneM2M__Types::PrimitiveContent&)
-{
+	void InfoPort::outgoing_send(const OneM2M__Types::PrimitiveContent&) {
 
-}
+	}
 
-void InfoPort::outgoing_send(const OneM2M__Types::MyResource&)
-{
+	void InfoPort::outgoing_send(const OneM2M__Types::MyResource&) {
 
-}
+	}
 
 } /* end of namespace */
 
