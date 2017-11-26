@@ -31,13 +31,14 @@ module OneM2M_TestSystem {
 		timer tc_wait := PX_TWAIT;
 		//global variables
 		var Configurations vc_config;
+		var TestSystemRole vc_testSystemRole;
 		var MyResourcesList vc_resourcesList;
 		var IntegerList vc_resourcesIndexToBeDeleted := {};
-		//var PrimitiveScope vc_primitiveScope := PX_PRIMITIVE_SCOPE;
-		//var AddressingMethod vc_addressingMethod := PX_ADDRESSING_METHOD;
-		var integer vc_aeAuxIndex:=-1;//TODO To be removed @JaeYoung, initialized the vc_aeAuxIndex to -1
+		var integer vc_aeAuxIndex := -1; //TODO To be removed
 		var integer vc_acpAuxIndex;
 		var AccessControlPolicy_optional vc_acpAux;
+		var MsgIn vc_request;
+		var MsgIn vc_response;
 	};
 	
 	type component AeSimu extends Tester {
@@ -48,24 +49,21 @@ module OneM2M_TestSystem {
 		//global variables
 		var PrimitiveContent vc_primitiveContentRetrievedResource;
 
-		var MsgIn vc_request;
-		var MsgIn vc_response;
-		var CseSimu vc_cseSimu;//For CF02 when AeSimu is master
+		var CseSimu vc_cse1;//For CF02 when AeSimu is master
 		var boolean vc_auxiliaryAe2Up := false;
-		//var AeSimu vc_ae2;
-	
 	};
 		
 	type component CseSimu extends Tester {
 		port OneM2MPort mcaPort;
+		port OneM2MPort mcaPortIn;
 		port OneM2MPort mccPort;
 		port OneM2MPort mccPortIn;
 
 		//global variables
-		var AeSimu vc_aeSimu;//For CF02 when CseSimu is master
+		var MyResourcesList vc_localResourcesList;
+		var AeSimu vc_ae1;//For CF02 when CseSimu is master
 		var integer vc_remoteCseIndex;
-		var MsgIn vc_request;
-		var MsgIn vc_response;
+		var integer vc_cSEBaseIndex;	//Index of the CSEBase resource of the Tester inside vc_localResourcesList
 	};
 	
 	type component InCseSimu extends CseSimu {}
@@ -76,12 +74,14 @@ module OneM2M_TestSystem {
 		port OneM2MPort mcaPort;
 		port OneM2MPort mcaPortIn;
 		port OneM2MPort mccPort;
+		port OneM2MPort mccPortIn;
 		port AdapterControlPort acPort;
 	}	
 	
 	type component AeSystem {
 		port OneM2MPort mcaPort;
 		port AdapterControlPort acPort;
+		port UpperTesterPort utPort;
 	}		
 	
 			

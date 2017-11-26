@@ -5,10 +5,10 @@
  *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
  *  All rights reserved.
  *  
- *  @author     oneM2M
- *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/XSD.ttcn $
- *              $Id: XSD.ttcn 234 2017-03-20 16:37:29Z reinaortega $
- *  @desc       XSD Aux
+ *  @author     ETSI
+ *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/branches/Release1/ttcn/LibOneM2M/XSD.ttcn $
+ *              $Id: XSD.ttcn 347 2017-08-11 08:48:20Z reinaortega $
+ *  @desc       Test System module for oneM2M
  *
  */
 module XSD {
@@ -31,10 +31,10 @@ const charstring
   nums := "[0-9]#(1,)",
   ZorTimeZoneExt := "(Z|[+-]((0[0-9]|1[0-3]):[0-5][0-9]|14:00))#(,1)",
   durTime := "(T[0-9]#(1,)"&
-             "(H([0-9]#(1,)(M([0-9]#(1,)(S|.[0-9]#(1,)S))#(,1)|.[0-9]#(1,)S|S))#(,1)|"&
-             "M([0-9]#(1,)(S|.[0-9]#(1,)S)|.[0-9]#(1,)M)#(,1)|"&
-             "S|"&
-             ".[0-9]#(1,)S))";
+			 "(H([0-9]#(1,)(M([0-9]#(1,)(S|.[0-9]#(1,)S))#(,1)|.[0-9]#(1,)S|S))#(,1)|"&
+			 "M([0-9]#(1,)(S|.[0-9]#(1,)S)|.[0-9]#(1,)M)#(,1)|"&
+			 "S|"&
+			 ".[0-9]#(1,)S))";
 
 //anySimpleType
 
@@ -53,9 +53,9 @@ type record AnyType
 }
 with {
 variant "XSD:anyType";
-//variant "embedValues";
-//variant (attr) "anyAttributes";
-//variant (elem_list) "anyElement";
+variant "embedValues";
+variant (attr) "anyAttributes";
+variant (elem_list) "anyElement";
 };
 // String types
 
@@ -209,9 +209,9 @@ variant "XSD:double";
 
 // Time types
 
-type charstring Duration (pattern
-  "{dash}#(,1)P({nums}(Y({nums}(M({nums}D{durTime}#(,1)|{durTime}#(,1))|D{durTime}#(,1))|" &
-  "{durTime}#(,1))|M({nums}D{durTime}#(,1)|{durTime}#(,1))|D{durTime}#(,1))|{durTime})")
+type charstring Duration //(pattern TODO Check the pattern "PT5S" not matching
+  //"{dash}#(,1)P({nums}(Y({nums}(M({nums}D{durTime}#(,1)|{durTime}#(,1))|D{durTime}#(,1))|" &
+  //"{durTime}#(,1))|M({nums}D{durTime}#(,1)|{durTime}#(,1))|D{durTime}#(,1))|{durTime})")
 with {
 variant "XSD:duration";
 };
@@ -305,23 +305,23 @@ type utf8string XMLCompatibleString
 	char(0,0,0,9)..char(0,0,0,9),
 	char(0,0,0,10)..char(0,0,0,10),
 	char(0,0,0,13)..char(0,0,0,13),
-  	char(0,0,0,32)..char(0,0,215,255),
-  	char(0,0,224,0)..char(0,0,255,253),
-  	char(0,1,0,0)..char(0,16,255,253)
+	char(0,0,0,32)..char(0,0,215,255),
+	char(0,0,224,0)..char(0,0,255,253),
+	char(0,1,0,0)..char(0,16,255,253)
 );
 
 type utf8string XMLStringWithNoWhitespace
 (
 	char(0,0,0,33)..char(0,0,215,255),
-  	char(0,0,224,0)..char(0,0,255,253),
-  	char(0,1,0,0)..char(0,16,255,253)
+	char(0,0,224,0)..char(0,0,255,253),
+	char(0,1,0,0)..char(0,16,255,253)
 );
 
 type utf8string XMLStringWithNoCRLFHT
 (
 	char(0,0,0,32)..char(0,0,215,255),
- 	char(0,0,224,0)..char(0,0,255,253),
-  	char(0,1,0,0)..char(0,16,255,253)
+	char(0,0,224,0)..char(0,0,255,253),
+	char(0,1,0,0)..char(0,16,255,253)
 );
 
 }

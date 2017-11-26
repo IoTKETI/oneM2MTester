@@ -870,14 +870,19 @@ module OneM2M_Testcases_CSE {
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
 	                
+					//Test control
+					if(not(PICS_IN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be IN-CSE to run this test case");
+						stop;
+					}
+	                
 					// Test component configuration
 					f_cf01Up();
 	                
 					//Preamble
-					v_cseBaseIndex := f_cse_preamble_createServiceSubscribedProfile({"S*"}); //c_CRUDNDi);
-					
+
 					//Test Body
-					v_request := valueof(m_createAe(PX_APP_ID, omit, omit));	
+					v_request := valueof(m_createAe(PX_APP_ID, omit, "S-AE-ID-STEM"));	
 					
 					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
 					
@@ -885,8 +890,11 @@ module OneM2M_Testcases_CSE {
 					
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
 							tc_ac.stop;
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+							
 							setverdict(pass, __SCOPE__ & ": AE successfully created.");
 						}
 						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
@@ -930,8 +938,11 @@ module OneM2M_Testcases_CSE {
 					mcaPort.send(m_request(v_request));
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response{
 							tc_ac.stop;
+							
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
 							setverdict(pass, __SCOPE__ & ": AE successfully created.");
 						}
 						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
@@ -950,6 +961,25 @@ module OneM2M_Testcases_CSE {
 					f_cf01Down();
 						
 				}
+				
+				/**
+				 * @desc Check that the IUT accepts a create request of <AE> resource with attributes multiplicity equals to 1 and provided preprovisioned SP_relative_AE_ID. 
+				 */
+				
+				testcase TC_CSE_REG_CRE_003() runs on CseSimu system CseSystem{
+					
+					var integer v_remoteCseIndex := -1;
+					
+					//Test Configuration
+					//f_cf02Up();
+					
+					//Preamble
+					v_remoteCseIndex := f_cse_registrationRemoteCse();
+					vc_ae1 := AeSimu.create("AE1") alive;
+					vc_ae1.start(f_cse_preamble_registerAe());
+					
+				
+				}
 		  	  	
 				/**
 				 * @desc Check that the IUT rejects an AE registration (allowed App-ID, not allowed C-AE-ID-STEM provided by AE) 
@@ -966,15 +996,16 @@ module OneM2M_Testcases_CSE {
 					f_cf01Up();
 		  	  	
 					//Preambule
-					//vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);
+					//vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
 					//TODO: create serviceSubscribedProfile, Node, and serviceSubscribedAppRule
 					//v_cseBaseIndex := f_cse_preamble_createServiceSubscribedProfile({"C*"}); //c_CRUDNDi);
 					
 					//Test Body	
 					//v_request := valueof(m_createAe(PX_APP_ID, omit, "C-AE-ID-STEM"));				
 	    											
-					f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "C"));
+					v_request := f_getCreateRequestPrimitive(int2, m_createAe(PX_APP_ID, omit, PX_NOT_ALLOWED_C_AE_IDS[0]), -1);
 			
+					mcaPort.send(m_request(v_request));
 					tc_ac.start;
 					alt {
 						[] mcaPort.receive(mw_response(mw_responsePrimitive(int4005))) {
@@ -1013,25 +1044,25 @@ module OneM2M_Testcases_CSE {
 		  	  	
 					//Preambule
 					//v_cseBaseIndex := f_cse_preamble_createServiceSubscribedAppRule({"S"});//c_CRUDNDi);
-					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);
+					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
 		
 					//Test Body
-					vc_aeSimu.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit)));				
+					vc_ae1.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit)));				
 	    									
 					//v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, v_cseBaseIndex);
 		  	  		
 					//mcaPort.send(m_request(v_request));
 					tc_ac.start;
 					alt{
-						[]mccPort.receive(mw_request(mw_createAEAnnc(f_getResourceAddress(-1,e_hierarchical, e_spRelative) & "/S", "CSE_ID", -))){
+						[]mccPortIn.receive(mw_request(mw_createAEAnnc(f_getResourceAddress(-1,e_hierarchical, e_spRelative) & "/S", "CSE_ID", -))){
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation redirected.");
 						}
-						[]mccPort.receive(mw_request(mw_createAEAnnc(f_getResourceAddress(-1,e_hierarchical, e_absolute) & "/S", "CSE_ID", -))){
+						[]mccPortIn.receive(mw_request(mw_createAEAnnc(f_getResourceAddress(-1,e_hierarchical, e_absolute) & "/S", "CSE_ID", -))){
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation redirected.");
 						}
-						[] mccPort.receive {
+						[] mccPortIn.receive {
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error while creating AE");
 						}
@@ -1040,8 +1071,8 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					/*vc_cseSimu.start(f_cse_receiveCreateRequest(mw_createAEAnnc(-, -, -)));
-					vc_cseSimu.done;*/
+					/*vc_cse1.start(f_cse_receiveCreateRequest(mw_createAEAnnc(-, -, -)));
+					vc_cse1.done;*/
 													
 					// Postamble
 					f_cse_postamble_deleteResourcesCSE();
@@ -1065,15 +1096,17 @@ module OneM2M_Testcases_CSE {
 					f_cf02UpCseSimuMaster();
 		  	  	
 					//Preambule
-					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);
-					vc_aeSimu.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S")));
+					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
+					vc_ae1.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S")));
+					
+					vc_ae1.done;
 					
 					//TODO:
 					//v_request := valueof(m_delete(f_getResourceAddress(v_aeIndex), f_getOriginator(v_aeIndex)));
 					//mcaPort.send(m_request(v_request));
 					
 					//Test Body
-					vc_aeSimu.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S")));
+					vc_ae1.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S")));
 											
 					tc_ac.start;
 	
@@ -1173,13 +1206,13 @@ module OneM2M_Testcases_CSE {
 					f_cf02Up();
 		  	  	
 					//Preambule
-					vc_cseSimu.start(f_cse_registrationRemoteCse(mw_createRemoteCSEBase));
-					vc_cseSimu.done;
+					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));
+					vc_cse1.done;
 					
 					v_aeIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S-AE-ID-STEM"));
 					
-					vc_cseSimu.start(f_cse_resourceAnnouncementHandler());
-					vc_cseSimu.done;
+					vc_cse1.start(f_cse_resourceAnnouncementHandler());
+					vc_cse1.done;
 					
 					//TODO Deregister
 					//f_cse_deleteResource(v_aeIndex);
@@ -1189,8 +1222,8 @@ module OneM2M_Testcases_CSE {
 					//Test Body
 					f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, f_getResourceId(vc_resourcesList[v_aeIndex].resource)));
 					
-					vc_cseSimu.start(f_cse_resourceAnnouncementHandler(PX_CSE_ID, f_getResourceAddress(v_aeIndex, e_nonHierarchical, e_spRelative)));
-					vc_cseSimu.done;
+					vc_cse1.start(f_cse_resourceAnnouncementHandler(PX_CSE_ID, f_getResourceAddress(v_aeIndex, e_nonHierarchical, e_spRelative)));
+					vc_cse1.done;
 					
 					tc_ac.start;
 	
@@ -1225,13 +1258,172 @@ module OneM2M_Testcases_CSE {
 						
 				}; //end TC_CSE_REG_CRE_010
 				
-				group g_CSE_REG_CRE_016 {
+				/**
+				 * @desc Check that the IUT accepts a create request of <AE> resource with attributes multiplicity equals to 1 and asking an CSE relative AE_ID by indicating AE_ID_Stem with character ‘C’.  
+				 * 
+				 */
+				testcase TC_CSE_REG_CRE_011() runs on AeSimu system CseSystem {
+
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var integer v_cseBaseIndex := -1;
+					var ResourceType v_resourceType := int2;
+    
+    
+					// Test component configuration
+					f_cf01Up();
+    
+					//Preamble
+
+					//Test Body
+					v_request := valueof(m_createAe(PX_APP_ID, omit, "C"));	
+	
+					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
+	
+					mcaPort.send(m_request(v_request));
+	
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+							tc_ac.stop;
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+							setverdict(pass, __SCOPE__ & ": AE successfully created.");
+							
+							if(v_response.primitive.responsePrimitive.primitiveContent.aE.resourceID[0] == "C"){
+								setverdict(pass, __SCOPE__ & "Resource ID set correctly.");
+							} else {
+								setverdict(fail, __SCOPE__ & "Resource ID not set correctly.");
+							}
+							
+							if(f_isScopeSpRelative(v_response.primitive.responsePrimitive.primitiveContent.aE.aE_ID)){
+								setverdict(pass, __SCOPE__ & "AE ID set correctly.");
+							} else {
+								setverdict(fail, __SCOPE__ & "AE ID not set correctly.");
+							}
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
+						}
+					}	
+					
+					// Postamble
+					f_cse_postamble_deleteResources();
+	
+					// Tear down
+					f_cf01Down();
+		
+				}
+				
+				/**
+				  * @desc Check that the IUT accepts an AE registration with the optional attribute OPTIONAL_ATTRIBUTE provided   
+				  * 
+				 */
+				group g_CSE_REG_CRE_012 {
+					
+					testcase TC_CSE_REG_CRE_012_AE_LBL() runs on Tester system CseSystem {
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						
+						v_create.primitiveContent.aE.labels := {"labels"};
+						v_ae1.start(TC_CSE_REG_CRE_012(v_create));
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_CRE_012_AE_APN() runs on Tester system CseSystem {
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						
+						v_create.primitiveContent.aE.appName := "AeAppName";
+						v_ae1.start(TC_CSE_REG_CRE_012(v_create));
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_CRE_012_AE_POA() runs on Tester system CseSystem {
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						
+						v_create.primitiveContent.aE.pointOfAccess := {PX_AE1_ADDRESS};
+						v_ae1.start(TC_CSE_REG_CRE_012(v_create));
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_CRE_012_AE_NL() runs on Tester system CseSystem {
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						
+						v_create.primitiveContent.aE.nodeLink := "http://127.0.0.1/";
+						v_ae1.start(TC_CSE_REG_CRE_012(v_create));
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_CRE_012_AE_OR() runs on Tester system CseSystem {
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						
+						v_create.primitiveContent.aE.ontologyRef := "MyOntologyRef";
+						v_ae1.start(TC_CSE_REG_CRE_012(v_create));
+						v_ae1.done;
+					}
+				
+					function TC_CSE_REG_CRE_012(in template RequestPrimitive p_createAe) runs on AeSimu {
+					
+						//Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var ResourceType v_resourceType := int2;	//AE
+										   
+						// Test control
+					
+						// Test component configuration
+						f_cf01Up(); 
+						
+						//Test Body
+						
+						v_request := valueof(p_createAe);
+						v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
+						
+						mcaPort.send(m_request(v_request));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response{
+								tc_ac.stop;
+								
+								f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+								vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+								
+								setverdict(pass, __SCOPE__ & ": AE creation successfull.");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating AE");
+							}
+						}
+						
+						//Postamble
+						f_cse_postamble_deleteResources();
+						
+						// Tear down
+						f_cf01Down();
+					}
+				
+				}
+				
+				
+				group g_CSE_REG_CRE_013 {
 					
 					/**
 					 * @desc Check that the IUT accepts a create request of <remoteCSE> resource with OPTIONAL_ATTRIBUTE. 
 					 * 
 					 */
-					testcase TC_CSE_REG_CRE_016_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_REG_CRE_013_LBL() runs on Tester system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;	
 						const AttributeAux c_optionalAttribute := {"labels", omit};
@@ -1239,12 +1431,12 @@ module OneM2M_Testcases_CSE {
                         						
 						v_createRequest.primitiveContent.remoteCSE.labels := {"MyLabel"};
 						
-						v_cse1.start(f_CSE_REG_CRE_016(v_createRequest, c_optionalAttribute));
+						v_cse1.start(f_CSE_REG_CRE_013(v_createRequest, c_optionalAttribute));
 						v_cse1.done;
 						
 					}
 					
-					testcase TC_CSE_REG_CRE_016_CST() runs on Tester system CseSystem {
+					testcase TC_CSE_REG_CRE_013_CST() runs on Tester system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;	
 						const AttributeAux c_optionalAttribute := {"cseType", omit};
@@ -1252,11 +1444,11 @@ module OneM2M_Testcases_CSE {
 												
 						v_createRequest.primitiveContent.remoteCSE.cseType := int1;
 						
-						v_cse1.start(f_CSE_REG_CRE_016(v_createRequest, c_optionalAttribute));
+						v_cse1.start(f_CSE_REG_CRE_013(v_createRequest, c_optionalAttribute));
 						v_cse1.done;
 					}
 					
-					testcase TC_CSE_REG_CRE_016_POA() runs on Tester system CseSystem {
+					testcase TC_CSE_REG_CRE_013_POA() runs on Tester system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;	
 						const AttributeAux c_optionalAttribute := {"pointOfAccess", omit};
@@ -1264,12 +1456,12 @@ module OneM2M_Testcases_CSE {
 	
 						v_createRequest.primitiveContent.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
 	
-						v_cse1.start(f_CSE_REG_CRE_016(v_createRequest, c_optionalAttribute));
+						v_cse1.start(f_CSE_REG_CRE_013(v_createRequest, c_optionalAttribute));
 						v_cse1.done;
 
 					}
 					
-					testcase TC_CSE_REG_CRE_016_NL() runs on Tester system CseSystem {
+					testcase TC_CSE_REG_CRE_013_NL() runs on Tester system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;	
 						const AttributeAux c_optionalAttribute := {"nodeLink", omit};
@@ -1277,12 +1469,12 @@ module OneM2M_Testcases_CSE {
 
 						v_createRequest.primitiveContent.remoteCSE.nodeLink := c_defaultNodeID;
 
-						v_cse1.start(f_CSE_REG_CRE_016(v_createRequest, c_optionalAttribute));
+						v_cse1.start(f_CSE_REG_CRE_013(v_createRequest, c_optionalAttribute));
 						v_cse1.done;
 
 					}
 					
-					function f_CSE_REG_CRE_016(template RequestPrimitive p_requestPrimitive, in AttributeAux p_optionalAttribute) runs on CseSimu {
+					function f_CSE_REG_CRE_013(template RequestPrimitive p_requestPrimitive, in AttributeAux p_optionalAttribute) runs on CseSimu {
 					
 						// Local variables
 						var MsgIn v_response;
@@ -1321,7 +1513,7 @@ module OneM2M_Testcases_CSE {
 							}
 							[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
 								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Rejected creation of resource type remoteCSE containing attribute" & p_optionalAttribute.name);
+								setverdict(fail, __SCOPE__ & ": Rejected creation of resource type remoteCSE containing attribute " & p_optionalAttribute.name);
 							}
 							[] tc_ac.timeout {
 								setverdict(fail, __SCOPE__ & ": No answer while creating resource type remoteCSE");
@@ -1334,15 +1526,15 @@ module OneM2M_Testcases_CSE {
 						// Tear down
 						f_cf04Down();
 																
-					}//end f_CSE_REG_CRE_BV_016
+					}//end f_CSE_REG_CRE_BV_013
 					
-				}// end group g_CSE_REG_CRE_BV_016	
+				}// end group g_CSE_REG_CRE_BV_013	
 			
 				/**
 				 * @desc Check that the IUT rejects an AE registration (not allowed App-ID) 
 				 * 
 				 */
-				testcase TC_CSE_REG_CRE_019() runs on AeSimu system CseSystem {
+				testcase TC_CSE_REG_CRE_016() runs on AeSimu system CseSystem {
 		  	  	
 					var MsgIn v_response;
 					var RequestPrimitive v_request;
@@ -1385,10 +1577,85 @@ module OneM2M_Testcases_CSE {
 				}
 				
 				/**
+				 * @desc Check that the IUT rejects a create request of <AE> resource that doesn’t include the MANDATORY_ATTRIBUTE
+				 * 
+				 */
+				group g_CSE_REG_CRE_017 {
+					testcase TC_CSE_REG_CRE_017_API() runs on Tester system CseSystem {
+						
+						//Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						
+						v_createRequest.primitiveContent.aE.app_ID := omit;	//Mandatory app_ID field is being set empty
+	
+						v_ae1.start(f_CSE_REG_CRE_017(v_createRequest));
+						v_ae1.done;
+	
+					}//end TC_CSE_REG_CRE_017_API
+					testcase TC_CSE_REG_CRE_017_RR() runs on Tester system CseSystem {
+	
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						
+						v_createRequest.primitiveContent.aE.requestReachability := omit;	//Mandatory requestReachability field is being set empty
+						
+						v_ae1.start(f_CSE_REG_CRE_017(v_createRequest));
+						v_ae1.done;
+
+					}//end TC_CSE_REG_CRE_017_RR
+					
+					function f_CSE_REG_CRE_017(template RequestPrimitive p_createRequestPrimitive) runs on AeSimu {
+						
+						//Local variables
+						var ResourceType v_resourceType := int2;   
+						
+						// Test control
+
+						// Test component configuration
+						f_cf01Up();
+
+						// Test adapter configuration
+
+						// Preamble
+
+						// Test Body
+						f_cse_createResource(v_resourceType, p_createRequestPrimitive);		
+
+						tc_ac.start;
+						alt {
+							 [] mcaPort.receive(mw_response(mw_responsePrimitive(int4000))) { //BAD REQUEST
+								 tc_ac.stop;
+								 setverdict(pass, __SCOPE__ & ": Request successfully rejected");
+							 }
+							 [] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) { 
+								 tc_ac.stop;
+								 setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							 }
+							 [] mcaPort.receive(mw_response(mw_responsePrimitiveOK)){
+								 tc_ac.stop;
+								 setverdict(fail, __SCOPE__ & ": Error, AE has been registered");
+							 }
+							 [] tc_ac.timeout {
+								 setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+							 }
+						}	
+
+						// Postamble
+						f_cse_postamble_deleteResources();
+
+						// Tear down
+						f_cf01Down();
+						
+					}
+				}//end g_CSE_REG_CRE_017
+				
+				/**
 				 * @desc Check that the IUT accepts an create request of <remoteCSE> resource with attributes multiplicity equals to 1. 
 				 *  
 				 */
-				testcase TC_CSE_REG_CRE_022() runs on CseSimu system CseSystem {
+				testcase TC_CSE_REG_CRE_018() runs on CseSimu system CseSystem {
 				
 					// Local variables
 					var MsgIn v_response;
@@ -1436,13 +1703,13 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf04Down();
 
-				}//end TC_CSE_REG_CRE_022
+				}//end TC_CSE_REG_CRE_018
 				
 				/**
 				 * @desc Check that the IUT accepts an create request of <remoteCSE> resource with attributes multiplicity equals to 1 without the preconfigured CSE-ID
 				 *
 				 */
-				testcase TC_CSE_REG_CRE_023() runs on CseSimu system CseSystem {
+				testcase TC_CSE_REG_CRE_019() runs on CseSimu system CseSystem {
 				
 					// Local variables
 					var MsgIn v_response;
@@ -1486,13 +1753,98 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf04Down();
 
-				}//end TC_CSE_REG_CRE_023
+				}//end TC_CSE_REG_CRE_019
+				
+				/**
+	 			 * @desc Check that the IUT accepts a response from IN_CSE on the success update of AEAnnc during AE registration with preprovisioned SP_relative_AE_ID
+				 * 
+				 */
+				 //TODO TO BE FINALIZED
+				testcase TC_CSE_REG_CRE_020() runs on AeSimu system CseSystem {
+
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var integer v_aeIndex := -1;
+					var ResourceType v_resourceType := int2;
+					
+					//Test control
+					if(not(PICS_MN_CSE)) {
+					   setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+					   stop;
+					}
+    
+					// Test component configuration
+					f_cf02Up();
+
+					//Preambule
+					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));
+					vc_cse1.done;
+	
+					v_request := valueof(m_createAe(PX_APP_ID, omit, omit));				
+						
+					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
+
+					mcaPort.send(m_request(v_request));
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response{
+							tc_ac.stop;
+		
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
+							setverdict(pass, __SCOPE__ & ": AE successfully created.");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
+						}
+					}	
+	
+					vc_cse1.start(f_cse_notifyProcedure_updateHandler());
+					vc_cse1.done;
+	
+	                //Test body
+					tc_ac.start;
+
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+							tc_ac.stop;
+							//continue to test the content
+							if (ischosen(v_response.primitive.responsePrimitive.primitiveContent.aE)){
+								if (v_response.primitive.responsePrimitive.primitiveContent.aE.app_ID == PX_APP_ID){
+									setverdict(pass, __SCOPE__ & ": AE creation success.");
+								}else{
+									setverdict(fail, __SCOPE__ & ": Error in AE content.");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": primitiveContent doesn't exist");
+							}
+						}
+						[] mcaPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while creating AE");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
+						}
+					}	
+					
+					// Postamble
+					f_cse_postamble_deleteResources();
+	
+					// Tear down
+					f_cf02Down();
+		
+				}; //end TC_CSE_REG_CRE_020
 				
 				/**
 				 * @desc Check that the IUT rejects the create request of <CSEBase> resource.
 				 * 
 				 */
-				testcase TC_CSE_REG_CRE_025() runs on AeSimu system CseSystem {
+				testcase TC_CSE_REG_CRE_021() runs on AeSimu system CseSystem {
     				
 					// Local variables
 					var MsgIn v_response;
@@ -1536,12 +1888,68 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf01Down();
 
-				}//end TC_CSE_REG_CRE_025
+				}//end TC_CSE_REG_CRE_021
+				
+				/**
+				 * @desc Check that the IUT accepts an AE registration (allowed App-ID, C-AE-ID-STEM not provided by AE)  
+				 * 
+				 */
+				testcase TC_CSE_REG_CRE_022() runs on AeSimu system CseSystem {				
+					
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var ResourceType v_resourceType := int2;
+
+					//Test control
+
+					// Test component configuration
+					f_cf01Up();
+
+					//Preamble
+
+					//Test Body
+					v_request := valueof(m_createAe(PX_APP_ID, omit, "C"));	
+
+					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
+
+					mcaPort.send(m_request(v_request));
+
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+							tc_ac.stop;
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);		
+							setverdict(pass, __SCOPE__ & ": AE successfully registered.");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int2001))) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while registering AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while registering AE");
+						}
+					}	
+					
+					//Check to see if the resource is present or not
+				  	if (f_isResourcePresent(vc_aeAuxIndex)){
+					  	setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+				  	} else {
+					  	setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+				  	}
+				
+					// Postamble
+					f_cse_postamble_deleteResources();
+
+					// Tear down
+					f_cf01Down();
+		
+				}
 				
 				/**
 				 * @desc Check that the IUT rejects the create request of <CSEBase> resource.
 				 * 
-				 */
+				 
 				testcase TC_CSE_REG_CRE_027() runs on AeSimu system CseSystem {
 	
 					// Local variables
@@ -1557,7 +1965,7 @@ module OneM2M_Testcases_CSE {
 					// Test adapter configuration
 
 					// Preamble
-					vc_cseSimu.start(f_cse_registrationRemoteCse(mw_createRemoteCSEBase));
+					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));
 
 					// Test Body
 					f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit));
@@ -1583,13 +1991,13 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf02Down();
 
-				}//end TC_CSE_REG_CRE_027
+				}end TC_CSE_REG_CRE_027*/
 				
 				/**
 				 * @desc Check that the IUT rejects registration of already registered AE (C-AE-ID-STEM provided by AE) 
 				 * 
 				 */
-				testcase TC_CSE_REG_CRE_028() runs on AeSimu system CseSystem {
+				testcase TC_CSE_REG_CRE_023() runs on AeSimu system CseSystem {
 				  
 					var MsgIn v_response;
 					var RequestPrimitive v_request;
@@ -1635,48 +2043,421 @@ module OneM2M_Testcases_CSE {
 				
 				}
 				
-				testcase TC_CSE_REG_CRE_029() runs on CseSimu system CseSystem {
+				/**
+				 * @desc Check that IUT sends a CSE registration request with attributes multiplicity equals to 1 
+				 * 
+				 */
+				testcase TC_CSE_REG_CRE_024() runs on CseSimu system CseSystem {
   
-				var MsgIn v_response;
+					// Local variables
+					var ResponsePrimitive v_responsePrimitive;
+					var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+					var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with attributes multiplicity equals to 1";
+	   
+					// Test control
+
+					// Test component configuration
+					f_cf04Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					//send triggering primitive to SUT
+					f_sendUtPrimitive(v_utRequest,v_action);
+
+					// Test Body
+					tc_ac.start;
+					alt {
+						[] mccPortIn.receive(mw_request(mw_createRemoteCSEBase)) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
+							
+							//set responseStatusCode back to SUT
+							v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+							//send back responsePrimitive
+							mccPortIn.send(m_response(v_responsePrimitive));
+						}
+						[] mccPortIn.receive {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+						}
+						[] tc_ac.timeout {
+							setverdict(inconc, __SCOPE__&":INFO: No request received for creating resource type remoteCSE");
+						}
+					}	
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
+
+					// Tear down
+					f_cf04Down();
+
+				}
 				
-				var RequestPrimitive v_request;
-				var RequestPrimitive v_createRequestPrimitive := valueof(m_createRemoteCSEBase);
-				var ResourceType v_resourceType := int16;
+				/**
+				 * @desc Check that IUT accepts a CSE registration request with attributes multiplicity equals to 1 
+				 * 
+				 */
+				testcase TC_CSE_REG_CRE_025() runs on CseSimu system CseSystem {
+	  
+					// Local variables
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var integer v_resourceIndex := -1;
+					var integer v_localResourceIndex := -1;
+					var PrimitiveContent v_remoteCSEResource;
+	   
+					// Test control
 
-				// Test control
+					// Test component configuration
+					f_cf04Up();
 
-				// Test component configuration
-				f_cf04Up();
+					// Test adapter configuration
 
-				// Test adapter configuration
+					// Preamble
+					v_request := f_getCreateRequestPrimitive(int16, m_createRemoteCSEBase, -1);
+					mccPort.send(m_request(v_request));
 
-				// Preamble
-				v_request := f_getCreateRequestPrimitive(v_resourceType, v_createRequestPrimitive, -1);
+					// Test Body
+					tc_ac.start;
+					alt {
+						[] mccPort.receive(mw_response(mw_responsePrimitiveOK(?))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
+							f_checkAttributesToBeSaved(int16, v_request, v_response.primitive.responsePrimitive);
+							v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int16, -1);
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__&":INFO: Error while creating resource type remoteCSE");
+						}
+						[] mccPort.receive {
+							tc_ac.stop;
+							setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+						}
+						[] tc_ac.timeout {
+							setverdict(inconc, __SCOPE__&":INFO: No answer while creating resource type remoteCSE");
+						}
+					}	
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
 
-				tc_ac.start;
-				alt {
-					[] mccPort.receive(mw_request(mw_createRemoteCSEBase(PX_CSE_ID,f_getResourceAddress(-1)))) -> value v_response {
-						tc_ac.stop;
-						setverdict(pass, __SCOPE__ & ": Resource type remoteCSE created successfully");
-					}
-					[] mccPort.receive {
-						tc_ac.stop;
-						setverdict(fail, __SCOPE__ & ": Error while creating resource type remoteCSE");
-					}
-					[] tc_ac.timeout {
-						setverdict(fail, __SCOPE__ & ": No answer while creating resource type remoteCSE");
-					}
-				}	
-
-				// Postamble
-				f_cse_postamble_deleteResourcesCSE();
-
-				// Tear down
-				f_cf04Down();
-
-			}
+					// Tear down
+					f_cf04Down();
+	
+				}
 				
+				/**
+				 * @desc Check that IUT sends a CSE registration request with OPTIONAL_ATTRIBUTE attribute 
+				 * 
+				 */
+				
+				group g_CSE_REG_CRE_026 {
+					
+					testcase TC_CSE_REG_CRE_026_RN() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute resourceName";
+						v_utRequest.primitiveContent.remoteCSE.resourceName := "UNINITIALIZED";
+						v_request.primitiveContent.remoteCSE.resourceName := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
+					testcase TC_CSE_REG_CRE_026_ET() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute expirationTime";
+						v_utRequest.primitiveContent.remoteCSE.expirationTime := "20301231T012345";
+						v_request.primitiveContent.remoteCSE.expirationTime := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
+					testcase TC_CSE_REG_CRE_026_LBL() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute labels";
+						v_utRequest.primitiveContent.remoteCSE.labels := {"UNINITIALIZED"};
+						v_request.primitiveContent.remoteCSE.labels := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
+					testcase TC_CSE_REG_CRE_026_POA() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute pointOfAccess";
+						v_utRequest.primitiveContent.remoteCSE.pointOfAccess := {"UNINITIALIZED"};
+						v_request.primitiveContent.remoteCSE.pointOfAccess := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
+					testcase TC_CSE_REG_CRE_026_NL() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute nodeLink";
+						v_utRequest.primitiveContent.remoteCSE.nodeLink := "UNINITIALIZED";
+						v_request.primitiveContent.remoteCSE.nodeLink := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
+					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in charstring p_action) runs on CseSimu {
+	  
+						var ResponsePrimitive v_responsePrimitive;
 
+						//Test component configuration
+						f_cf04Up();
+
+						//send triggering primitive to SUT
+						f_sendUtPrimitive(p_utRequest,p_action);
+
+						//Test behavior
+						tc_ac.start;
+						alt{
+
+							//receive MsgIn requestPrimitive
+							[] mccPortIn.receive(mw_request(p_request)) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
+
+								//set responseStatusCode back to SUT
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+
+								//send back responsePrimitive
+								mccPortIn.send(m_response(v_responsePrimitive));
+							}
+							[] mccPortIn.receive {
+								tc_ac.stop;
+								setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+							}
+							[] tc_ac.timeout {
+								setverdict(inconc, __SCOPE__&":INFO: No request received for creating resource type remoteCSE");
+							}
+						}
+
+						// Postamble
+						f_cse_postamble_deleteResourcesCSE();
+	
+						// Tear down
+						f_cf04Down();
+	
+					}
+				}
+				
+				/*testcase TC_CSE_REG_CRE_029() runs on CseSimu system CseSystem {
+  
+					var MsgIn v_response;
+					
+					var RequestPrimitive v_request;
+					var RequestPrimitive v_createRequestPrimitive := valueof(m_createRemoteCSEBase);
+					var ResourceType v_resourceType := int16;
+	
+					// Test control
+	
+					// Test component configuration
+					f_cf04Up();
+	
+					// Test adapter configuration
+	
+					// Preamble
+					v_request := f_getCreateRequestPrimitive(v_resourceType, v_createRequestPrimitive, -1);
+	
+					tc_ac.start;
+					alt {
+						[] mccPort.receive(mw_request(mw_createRemoteCSE(PX_CSE_ID,f_getResourceAddress(-1)))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": Resource type remoteCSE created successfully");
+						}
+						[] mccPort.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while creating resource type remoteCSE");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while creating resource type remoteCSE");
+						}
+					}	
+	
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
+	
+					// Tear down
+					f_cf04Down();
+	
+				}*/
+				
+				
+				/**
+				 * @desc Check that IUT accepts a CSE registration request with cseType attribute set to ‘MN_CSE’
+				 * 
+				 */
+				testcase TC_CSE_REG_CRE_027() runs on CseSimu system CseSystem {
+					//Local variables
+					var ResourceType v_resourceType := int16;	//remoteCSE	
+					var RequestPrimitive v_request;
+					var template PrimitiveContent v_contentResponse;
+					// Test control
+
+					// Test component configuration
+					f_cf04Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					v_request := valueof(m_createRemoteCSEBase);
+					v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+
+					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+					v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE					
+					
+					//Test Body					
+					vc_remoteCseIndex := f_cse_registerRemoteCse(v_request, v_contentResponse);
+					
+					//Check if the resource has been deleted or not
+					if(f_cse_isResourcePresent(vc_remoteCseIndex)) {
+						setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+					} else {
+						setverdict(fail, __SCOPE__ & ":INFO: Resource not created");
+					}	
+
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
+
+					// Tear down
+					f_cf04Down();
+
+				}//end TC_CSE_REG_CRE_027	
+				
+				/**
+				 * @desc Check that IUT accepts  a CSE registration request with OPTIONAL_ATTRIBUTE attribute
+				 * 
+				 */
+				group g_CSE_REG_CRE_028 {
+				
+					testcase TC_CSE_REG_CRE_028_RN() runs on Tester system CseSystem {
+						 //Local variables
+						 var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						 var RequestPrimitive v_request;
+						 var template PrimitiveContent v_contentResponse;
+						 
+						 v_request := valueof(m_createRemoteCSEBase);
+						 v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+						 v_request.primitiveContent.remoteCSE.resourceName := c_defaultRemoteCSEResourceName;
+	
+						 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						 v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE
+					     v_contentResponse.remoteCSE.resourceName := c_defaultRemoteCSEResourceName;
+	
+						 v_cse1.start(f_CSE_REG_CRE_028(v_request, v_contentResponse));
+						 v_cse1.done;
+						
+					}
+					
+					testcase TC_CSE_REG_CRE_028_ET() runs on Tester system CseSystem {
+						 //Local variables
+						 var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						 var RequestPrimitive v_request;
+						 var template PrimitiveContent v_contentResponse;
+		 
+						 v_request := valueof(m_createRemoteCSEBase);
+						 v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+						 v_request.primitiveContent.remoteCSE.expirationTime := "20301231T012345";
+	
+						 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						 v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE
+						 v_contentResponse.remoteCSE.expirationTime := "20301231T012345";
+	
+						 v_cse1.start(f_CSE_REG_CRE_028(v_request, v_contentResponse));
+						 v_cse1.done;
+		
+					}
+					
+					testcase TC_CSE_REG_CRE_028_LBL() runs on Tester system CseSystem {
+						 //Local variables
+						 var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						 var RequestPrimitive v_request;
+						 var template PrimitiveContent v_contentResponse;
+						 var Labels v_labels_1 := {"VALUE_1"};
+		 
+						 v_request := valueof(m_createRemoteCSEBase);
+						 v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+						 v_request.primitiveContent.remoteCSE.labels := v_labels_1;
+		
+						 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						 v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE
+						 v_contentResponse.remoteCSE.labels := v_labels_1;
+		
+						 v_cse1.start(f_CSE_REG_CRE_028(v_request, v_contentResponse));
+						 v_cse1.done;
+		
+					}
+					
+					testcase TC_CSE_REG_CRE_028_POA() runs on Tester system CseSystem {
+						 //Local variables
+						 var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						 var RequestPrimitive v_request;
+						 var template PrimitiveContent v_contentResponse;
+		 
+						 v_request := valueof(m_createRemoteCSEBase);
+						 v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+						 v_request.primitiveContent.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
+		
+						 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						 v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE
+						 v_contentResponse.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
+		
+						 v_cse1.start(f_CSE_REG_CRE_028(v_request, v_contentResponse));
+						 v_cse1.done;
+		
+					}
+					
+					testcase TC_CSE_REG_CRE_028_NL() runs on Tester system CseSystem {
+						 //Local variables
+						 var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						 var RequestPrimitive v_request;
+						 var template PrimitiveContent v_contentResponse;
+	 
+									 v_request := valueof(m_createRemoteCSEBase);
+						 v_request.primitiveContent.remoteCSE.cseType := int2;	//MN_CSE
+						 v_request.primitiveContent.remoteCSE.nodeLink := c_defaultNodeID;
+	
+						 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						 v_contentResponse.remoteCSE.cseType := int2;	//MN_CSE
+						 v_contentResponse.remoteCSE.nodeLink := c_defaultNodeID;
+	
+						 v_cse1.start(f_CSE_REG_CRE_028(v_request, v_contentResponse));
+						 v_cse1.done;
+	
+					}
+					
+					function f_CSE_REG_CRE_028(RequestPrimitive p_request, template PrimitiveContent p_contentResponse) runs on CseSimu{ //system CseSystem {
+						//Local variables
+						var ResourceType v_resourceType := int16;	//remoteCSE	
+						// Test control
+	
+						// Test component configuration
+						f_cf04Up();
+	
+						// Test adapter configuration
+	
+						// Preamble
+						
+						
+						//Test Body					
+						vc_remoteCseIndex := f_cse_registerRemoteCse(p_request, p_contentResponse);
+						
+						//Check if the resource has been deleted or not
+						if(f_cse_isResourcePresent(vc_remoteCseIndex)) {
+							setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+						} else {
+							setverdict(fail, __SCOPE__ & ":INFO: Resource not created");
+						}	
+	
+						// Postamble
+						f_cse_postamble_deleteResourcesCSE();
+	
+						// Tear down
+						f_cf04Down();
+	
+					}//end TC_CSE_REG_CRE_028
+				}//end g_CSE_REG_CRE_028
 			
 			}	//end group Create
 			
@@ -1740,7 +2521,273 @@ module OneM2M_Testcases_CSE {
 				}//end TC_CSE_REG_RET_001
 				
 				/**
-				 * @desc Check that if the IUT is IN-CSE, it accepts an retrieval request of <CSEBase> resource and returns the cseType attribute. cseType Attribute is mandatory for IN-CSE
+				 * @desc Check that the IUT accepts a retrieval request of <CSEBase> resource with the optional ATTRIBUTE
+				 * 
+				 */
+				group g_CSE_REG_RET_002 {
+					
+					testcase TC_CSE_REG_RET_002_CST() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template PrimitiveContent v_contentResponse;
+					
+						v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
+						v_contentResponse.cSEBase.cseType := ?;
+						    
+						v_ae1.start(f_CSE_REG_RET_002(v_contentResponse));
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_002_NL() runs on Tester system CseSystem {
+						//Local variables
+						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						 var template PrimitiveContent v_contentResponse;
+	
+						 v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
+						 v_contentResponse.cSEBase.nodeLink := ?;
+	    
+						 v_ae1.start(f_CSE_REG_RET_002(v_contentResponse));
+						 v_ae1.done;
+					}
+					
+					function f_CSE_REG_RET_002(template PrimitiveContent p_contentResponse) runs on AeSimu {
+						//Local variables
+						 var MsgIn v_response;
+						 var integer v_aeIndex := -1;
+								   
+						 // Test control
+
+						 // Test component configuration
+						 f_cf01Up();
+
+						 // Test adapter configuration
+
+						 // Preamble
+						 v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						 
+						 mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));
+						 tc_ac.start;
+						 alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": Response OK for retrieving for attribute");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+							}
+						}	
+
+						// Postamble
+						f_cse_postamble_deleteResources();
+
+						// Tear down
+						f_cf01Down();
+					} //end f_CSE_REG_RET_002
+					
+				} //end g_CSE_REG_RET_002
+				
+				/**
+				 * @desc Check that the IUT accepts a retrieval request of <AE> resource with attributes multiplicity equals to 1
+				 * 
+				 */
+				 
+				testcase TC_CSE_REG_RET_003() runs on AeSimu system CseSystem {
+					// Local variables
+					var MsgIn v_response;
+					var integer v_aeIndex := -1;
+					var template PrimitiveContent v_contentResponse;
+								   
+					// Test control
+
+					// Test component configuration
+					f_cf01Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+	
+					// Test Body
+					v_contentResponse.aE := mw_contentAeBase;
+	
+					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": Response OK for retrieving");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(v_contentResponse))) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Wrong response status code");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+						}
+					}	
+
+					// Postamble
+					f_cse_postamble_deleteResources();
+
+					// Tear down
+					f_cf01Down();
+	
+				}//end TC_CSE_REG_RET_003
+				
+				/**
+				 * @desc Check that the IUT accepts a retrieval request of <AE> resource with optional ATTRIBUTE
+				 * 
+				 */
+				 
+				group g_CSE_REG_RET_004 {
+					
+					testcase TC_CSE_REG_RET_004_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var Labels v_labels_1 := {"VALUE_1"};
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template PrimitiveContent v_contentResponse;
+						
+						v_createRequest.primitiveContent.aE.labels := v_labels_1;
+	
+						v_contentResponse.aE := mw_contentAeBase;
+						v_contentResponse.aE.labels := ?;
+		    
+						v_ae1.start(f_CSE_REG_RET_004(v_createRequest, v_contentResponse));
+						v_ae1.done;
+					}
+	
+					testcase TC_CSE_REG_RET_004_APN() runs on Tester system CseSystem {
+						//Local variables
+						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template PrimitiveContent v_contentResponse;
+						 
+						 v_createRequest.primitiveContent.aE.appName := "AeAppName";
+
+						 v_contentResponse.aE := mw_contentAeBase;
+						 v_contentResponse.aE.appName := ?;
+
+						 v_ae1.start(f_CSE_REG_RET_004(v_createRequest,v_contentResponse));
+						 v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_004_POA() runs on Tester system CseSystem {
+						//Local variables
+						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template PrimitiveContent v_contentResponse;
+						 
+						 v_createRequest.primitiveContent.aE.pointOfAccess := {PX_AE1_ADDRESS};
+
+						 v_contentResponse.aE := mw_contentAeBase;
+						 v_contentResponse.aE.pointOfAccess := ?;
+
+						 v_ae1.start(f_CSE_REG_RET_004(v_createRequest, v_contentResponse));
+						 v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_004_NL() runs on Tester system CseSystem {
+						//Local variables
+						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template PrimitiveContent v_contentResponse;
+						 
+						 v_createRequest.primitiveContent.aE.nodeLink := "http://127.0.0.1/";
+
+						 v_contentResponse.aE := mw_contentAeBase;
+						 v_contentResponse.aE.nodeLink := ?;
+
+						 v_ae1.start(f_CSE_REG_RET_004(v_createRequest,v_contentResponse));
+						 v_ae1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_004_CSZ() runs on Tester system CseSystem {
+						//Local variables
+						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template PrimitiveContent v_contentResponse;
+						 
+						 v_createRequest.primitiveContent.aE.contentSerialization := {applicationxml};
+
+						 v_contentResponse.aE := mw_contentAeBase;
+						 v_contentResponse.aE.contentSerialization := ?; 
+
+						 v_ae1.start(f_CSE_REG_RET_004(v_createRequest,v_contentResponse));
+						 v_ae1.done;
+					}
+	
+					function f_CSE_REG_RET_004(template RequestPrimitive p_createRequestPrimitive, template PrimitiveContent p_contentResponse) runs on AeSimu {
+						//Local variables
+						 var MsgIn v_response;
+						 var integer v_aeIndex := -1;
+				   
+						 // Test control
+
+						 // Test component configuration
+						 f_cf01Up();
+
+						 // Test adapter configuration
+
+						 // Preamble
+						 v_aeIndex := f_cse_createResource(int2, p_createRequestPrimitive, -1);
+		 
+						 mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+						 tc_ac.start;
+						 alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+							    setverdict(pass, __SCOPE__ & ": Response OK for retrieving for attribute");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+							}
+						}	
+
+						// Postamble
+						f_cse_postamble_deleteResources();
+
+						// Tear down
+						f_cf01Down();
+					} //end f_CSE_REG_RET_004
+	
+				} //end g_CSE_REG_RET_004
+				
+				/**
+				 * @desc Check that the IUT accepts a retrieval request of <CSEBase> resource including the cseType attribute
 				 * 
 				 */
 				testcase TC_CSE_REG_RET_005() runs on AeSimu system CseSystem {
@@ -1766,6 +2813,7 @@ module OneM2M_Testcases_CSE {
 	
 					// Test Body
 					v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
+					v_contentResponse.cSEBase.cseType := int1;
 	
 					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID 
 					
@@ -1773,16 +2821,7 @@ module OneM2M_Testcases_CSE {
 					alt {
 						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
 							tc_ac.stop;
-							if (ispresent(v_response.primitive.responsePrimitive.primitiveContent.cSEBase.cseType)){
-								if (v_response.primitive.responsePrimitive.primitiveContent.cSEBase.cseType==int1){
-									setverdict(pass, __SCOPE__ & ": cseType attribute is set to 1 (IN_CSE)");
-								}else{
-									setverdict(fail, __SCOPE__ & ": Error, cseType attribute is set to " & int2str(enum2int(v_response.primitive.responsePrimitive.primitiveContent.cSEBase.cseType)));
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error, cseType attribute is not present");
-							}
-							
+							setverdict(pass, __SCOPE__ & ": cseType attribute is set to 1 (IN_CSE)");
 						}
 						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(v_contentResponse))) -> value v_response {
 							tc_ac.stop;
@@ -1808,6 +2847,235 @@ module OneM2M_Testcases_CSE {
 					f_cf01Down();
 
 				}//end TC_CSE_REG_RET_BV_005
+				
+				/**
+				 * @desc Check that the IUT accepts a retrieval request of <remoteCSE> resource
+				 * 
+				 */
+				testcase TC_CSE_REG_RET_006() runs on CseSimu system CseSystem {
+				//Local variables
+				 //Local variables
+				 var MsgIn v_response;
+				 var RequestPrimitive v_request;
+				 var ResourceType v_resourceType := int16;	//remoteCSE
+				 var template PrimitiveContent v_contentResponse;
+				 		
+				 // Test control
+
+				 // Test component configuration
+				 f_cf04Up();
+
+				 // Test adapter configuration
+
+				 // Preamble
+				 if(PICS_IN_CSE){
+				     vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
+				    
+					 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+ 
+					 mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					 tc_ac.start;
+					 alt {
+						 [] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(pass, __SCOPE__ & ": Response OK for retrieving");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveOK(v_contentResponse))) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Wrong response status code");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+						 }
+						 [] tc_ac.timeout {
+							 setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+						 }
+					 }
+				    
+				 } else if (PICS_MN_CSE) {
+					vc_remoteCseIndex := f_cse_registrationRemoteCse(m_createRemoteCSEBase);
+					
+					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+					
+					mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					tc_ac.start;
+					alt {
+						 [] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(pass, __SCOPE__ & ": Response OK for retrieving");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveOK(v_contentResponse))) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Wrong response status code");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+						 }
+						 [] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+							 tc_ac.stop;
+							 setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+						 }
+						 [] tc_ac.timeout {
+							 setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+						 }
+					 }
+				 }
+
+				 // Postamble
+				 f_cse_postamble_deleteResourcesCSE();
+
+				 // Tear down
+				 f_cf04Down();
+				 
+				}//end TC_CSE_REG_RET_006
+				
+				/**
+				 * @desc Check that the IUT accepts an retrieval request of <remoteCSE> resource with optional ATTRIBUTE
+				 * 
+				 */
+				group g_CSE_REG_RET_007 {
+					
+					testcase TC_CSE_REG_RET_007_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						var Labels v_labels_1 := {"VALUE_1"};
+						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;
+						var template PrimitiveContent v_contentResponse;
+						
+						v_createRequest.primitiveContent.remoteCSE.labels := v_labels_1;
+
+						v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						v_contentResponse.remoteCSE.labels := ?;
+
+						v_cse1.start(f_CSE_REG_RET_007(v_createRequest, v_contentResponse));
+						v_cse1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_007_CST() runs on Tester system CseSystem {
+						// Local variables
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;
+						var template PrimitiveContent v_contentResponse;
+						
+						v_createRequest.primitiveContent.remoteCSE.cseType := int1;
+
+						v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						v_contentResponse.remoteCSE.cseType := ?;
+
+						v_cse1.start(f_CSE_REG_RET_007(v_createRequest, v_contentResponse));
+						v_cse1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_007_POA() runs on Tester system CseSystem {
+						// Local variables
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;
+						var template PrimitiveContent v_contentResponse;
+						
+						v_createRequest.primitiveContent.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
+
+						v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						v_contentResponse.remoteCSE.pointOfAccess := ?;
+
+						v_cse1.start(f_CSE_REG_RET_007(v_createRequest, v_contentResponse));
+						v_cse1.done;
+					}
+					
+					testcase TC_CSE_REG_RET_007_NL() runs on Tester system CseSystem {
+						// Local variables
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						var template RequestPrimitive v_createRequest := m_createRemoteCSEBase;
+						var template PrimitiveContent v_contentResponse;
+						
+						v_createRequest.primitiveContent.remoteCSE.nodeLink := c_defaultNodeID;
+
+						v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+						v_contentResponse.remoteCSE.nodeLink := ?;
+
+						v_cse1.start(f_CSE_REG_RET_007(v_createRequest, v_contentResponse));
+						v_cse1.done;
+					}
+					
+					function f_CSE_REG_RET_007(template RequestPrimitive p_createRequestPrimitive, template PrimitiveContent p_contentResponse) runs on CseSimu {
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var ResourceType v_resourceType := int16;	//remoteCSE
+						var template PrimitiveContent v_contentResponse;
+ 		
+						// Test control
+
+						// Test component configuration
+						f_cf04Up();
+
+						// Test adapter configuration
+
+						// Preamble
+						if(PICS_IN_CSE){
+							vc_remoteCseIndex := f_cse_registerRemoteCse(p_createRequestPrimitive);
+							mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+						    tc_ac.start;
+							alt {
+								[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Response OK for retrieving for attribute");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+								}
+							}
+						} else if (PICS_MN_CSE){
+							vc_remoteCseIndex := f_cse_registrationRemoteCse(p_createRequestPrimitive);
+							mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+							tc_ac.start;
+							alt {
+								[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Response OK for retrieving for attribute");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+								}
+							}
+						}
+						
+						//Postamble
+  					    f_cse_postamble_deleteResourcesCSE();
+
+						// Tear down
+						f_cf04Down();
+					} // f_CSE_REG_RET_007
+				
+				} //end g_CSE_REG_RET_007
 				
 				/**
 				 * @desc Check that the IUT accepts a retrieval request of <CSEBase> resource and responds with supportedResourceTypes attribute containing a list of the supported resources and pointOfAccess containing the list of physical addresses to be used by Registree to connect to this CSE (e.g. IP address, FQDN).
@@ -1877,8 +3145,122 @@ module OneM2M_Testcases_CSE {
 					f_cf01Down();
 
 				}//end TC_CSE_REG_RET_008
+				
+				/**
+				 * @desc Check that the IUT sends a <remoteCSE> retrieve request on TARGET_REMOTE_CSE_ADDRESS
+				 * 
+				 */
+				testcase TC_CSE_REG_RET_009() runs on CseSimu system CseSystem {
+					//Local variables
+					 //Local variables
+					 var MsgIn v_response;
+					 var RequestPrimitive v_request;
+					 var ResourceType v_resourceType := int16;	//remoteCSE
+					 var template PrimitiveContent v_contentResponse;
+					 var template UtTriggerPrimitive v_utRequest;
+					 var charstring v_action := __SCOPE__ & ": Please, send a valid RETRIEVE Request containing To set to " & PX_CSE1_ADDRESS;
+	 		
+					 // Test control
+					 if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					 }
+	
+					 // Test component configuration
+					 f_cf04Up();
+	
+					 // Test adapter configuration
+	
+					 // Preamble
+					 vc_remoteCseIndex := f_cse_registrationRemoteCse(m_createRemoteCSEBase);
+					 
+					 //Send Trigger Message
+					 v_utRequest := m_utRetrieveResource(f_getLocalResourceAddress(vc_remoteCseIndex), PX_CSE_ID);
+ 				     v_utRequest.from_ := "UNINITIALIZED";
+					 f_sendUtPrimitive(v_utRequest, v_action);
+					 
+					 tc_ac.start;
+					 alt {
+ 						[] mccPortIn.receive(mw_request(mw_retrieveResource(f_getResourceAddress()))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": Retrieve Request received successfully");
+						}
+						[] mccPortIn.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error Retrieve request was not received");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while waiting to receive Retrieve request");
+						}
+	  				 }
+					 // Postamble
+					 f_cse_postamble_deleteResourcesCSE();
+	
+					 // Tear down
+					 f_cf04Down();
+ 
+				}//end TC_CSE_REG_RET_009
+				
+				/**
+				 * @desc Check that IUT accepts a <remoteCSE> retrieve request
+				 * 
+				 */
+				testcase TC_CSE_REG_RET_010() runs on CseSimu system CseSystem {
+					 //Local variables
+					 var MsgIn v_response;
+					 var RequestPrimitive v_request;
+					 var ResourceType v_resourceType := int16;	//remoteCSE
+					 var template PrimitiveContent v_contentResponse;
+					 var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+	
+					 // Test control
+					if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					 }
+	
+					 // Test component configuration
+					 f_cf04Up();
+	
+					 // Test adapter configuration
+	
+					 // Preamble
+					 vc_remoteCseIndex := f_cse_registrationRemoteCse(m_createRemoteCSEBase);
+					 
+					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
+	 
+					 mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					 tc_ac.start;
+					 alt {
+						[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": Response OK for retrieving");
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveOK(v_contentResponse))) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Wrong response status code");
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, resource elements provided not matching expected resource elements");
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while retrieving resource");
+						}
+					 }
+					 // Postamble
+					 f_cse_postamble_deleteResourcesCSE();
+	
+					 // Tear down
+					 f_cf04Down();
+	 
+				}//end TC_CSE_REG_RET_010
 			
-			}	//end group Retrieve
+			}//end group Retrieve
 			
 			group Update{
 			
@@ -1930,8 +3312,256 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf01Down();
 
-				}//end TC_CSE_REG_UPD_BI_001			
+				}; //end TC_CSE_REG_UPD_BI_001
+				
+				/**
+				 * @desc Check that the IUT accepts an update request of <remoteCSE> resource with OPTIONAL_ATTRIBUTE.
+				 * 
+				 */
+				 
+				group g_CSE_REG_UPD_002 {
+					
+					testcase TC_CSE_REG_UPD_002_ET() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+    						
+						v_updateRequest.primitiveContent.remoteCSE.expirationTime := "20301231T012345";
+	
+						v_cse1.start(f_CSE_REG_UPD_002(v_updateRequest));
+						v_cse1.done;
+						
+					}
+					
+					testcase TC_CSE_REG_UPD_002_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+    						
+						v_updateRequest.primitiveContent.remoteCSE.labels := {"MyLabel"};
+	
+						v_cse1.start(f_CSE_REG_UPD_002(v_updateRequest));
+						v_cse1.done;
+	
+					}
+					
+					testcase TC_CSE_REG_UPD_002_POA() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+    					
+						v_updateRequest.primitiveContent.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
+	
+						v_cse1.start(f_CSE_REG_UPD_002(v_updateRequest));
+						v_cse1.done;
+	
+					}
+					
+					testcase TC_CSE_REG_UPD_002_NL() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+    						
+						v_updateRequest.primitiveContent.remoteCSE.nodeLink := c_defaultNodeID;
+	
+						v_cse1.start(f_CSE_REG_UPD_002(v_updateRequest));
+						v_cse1.done;
 
+					}
+					
+					testcase TC_CSE_REG_UPD_002_RR() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+
+						v_updateRequest.primitiveContent.remoteCSE.requestReachability := true;
+
+						v_cse1.start(f_CSE_REG_UPD_002(v_updateRequest));
+						v_cse1.done;
+
+					}
+							
+					function f_CSE_REG_UPD_002(template RequestPrimitive p_requestPrimitive) runs on CseSimu {
+						//Local variables
+					    var MsgIn v_response;
+					    var RequestPrimitive v_request;
+						var ResourceType v_resourceType := int16;	//remoteCSE		
+						// Test control
+
+						// Test component configuration
+						f_cf04Up();
+
+						// Test adapter configuration
+
+						// Preamble
+						vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
+
+						// Test Body
+						v_request := f_getUpdateRequestPrimitive(int16, vc_remoteCseIndex, p_requestPrimitive);
+	
+						mccPort.send(m_request(v_request));
+						tc_ac.start;
+						alt {
+							[] mccPort.receive(mw_response(mw_responsePrimitive(int2004, f_getTemplateFromPrimitiveContent(v_request.primitiveContent)))) -> value v_response {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": Accepted updation for resource type remoteCSE containing attribute ");
+							}
+							[] mccPort.receive(mw_response(mw_responsePrimitiveOK(f_getTemplateFromPrimitiveContent(v_request.primitiveContent)))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code in the response");
+							}
+							[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Accepted updation for resource type remoteCSE without containing attribute ");
+							}
+							[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Rejected updation of resource type remoteCSE containing attribute");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while updating resource type remoteCSE");
+							}
+						}					    
+
+						// Postamble
+						f_cse_postamble_deleteResourcesCSE();
+
+						// Tear down
+						f_cf04Down();
+
+					}//end f_CSE_REG_UPD_002
+				} //end g_CSE_REG_UPD_002
+			    
+				/**
+				  * @desc Check that IUT sends a <remoteCSE> update request with OPTIONAL_ATTRIBUTE attribute.
+			   	  * 
+				 */
+			    group g_CSE_REG_UPD_003 {
+	
+					testcase TC_CSE_REG_UPD_003_ET() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var AttributeList c_optionalAttribute;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+			
+						v_updateRequest.primitiveContent.remoteCSE.expirationTime := "20301231T012345";
+						c_optionalAttribute := {"expirationTime"};
+
+						v_cse1.start(f_CSE_REG_UPD_003(v_updateRequest, c_optionalAttribute));
+						v_cse1.done;
+		
+					}
+	
+					testcase TC_CSE_REG_UPD_003_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var AttributeList c_optionalAttribute;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+			
+						v_updateRequest.primitiveContent.remoteCSE.labels := {"MyLabel"};
+						c_optionalAttribute := {"labels"};
+
+						v_cse1.start(f_CSE_REG_UPD_003(v_updateRequest, c_optionalAttribute));
+						v_cse1.done;
+
+					}
+	
+					testcase TC_CSE_REG_UPD_003_POA() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var AttributeList c_optionalAttribute;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+		
+						v_updateRequest.primitiveContent.remoteCSE.pointOfAccess := {"http://" & PX_CSE1_ADDRESS & "/"};
+						c_optionalAttribute := {"pointofAccess"};
+
+						v_cse1.start(f_CSE_REG_UPD_003(v_updateRequest, c_optionalAttribute));
+						v_cse1.done;
+
+					}
+	
+					testcase TC_CSE_REG_UPD_003_NL() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var AttributeList c_optionalAttribute;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+			
+						v_updateRequest.primitiveContent.remoteCSE.nodeLink := c_defaultNodeID;
+						c_optionalAttribute := {"nodeLink"};
+
+						v_cse1.start(f_CSE_REG_UPD_003(v_updateRequest, c_optionalAttribute));
+						v_cse1.done;
+
+					}
+					
+					testcase TC_CSE_REG_UPD_003_RR() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;	
+						var AttributeList c_optionalAttribute;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+
+						v_updateRequest.primitiveContent.remoteCSE.requestReachability := true;
+						c_optionalAttribute := {"requestReachability"};
+
+						v_cse1.start(f_CSE_REG_UPD_003(v_updateRequest, c_optionalAttribute));
+						v_cse1.done;
+
+					}
+	
+					function f_CSE_REG_UPD_003(template RequestPrimitive p_requestPrimitive, in AttributeList p_attribute) runs on CseSimu {
+						// Local variables
+						//Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var ResourceType v_resourceType := int16;	//remoteCSE
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var charstring v_action := __SCOPE__ & ": Please, send a valid UPDATE Request containing To set to "; // & PX_CSE1_ADDRESS & " and Content containing remoteCSE resource containing a valid attribute " & p_attribute[0];														// Test control
+						if(not(PICS_MN_CSE)) {
+							setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+							stop;
+						}
+
+						// Test component configuration
+						f_cf04Up();
+
+						// Test adapter configuration
+
+						// Preamble
+						vc_remoteCseIndex := f_cse_registrationRemoteCse(m_createRemoteCSEBase);
+						
+						//Send Trigger Message
+					    v_utRequest.to_ := f_getResourceAddress();
+					    v_utRequest.from_ := "UNINITIALIZED";
+					    f_sendUtPrimitive(v_utRequest, v_action);
+
+						// Test Body
+						v_request := f_getUpdateRequestPrimitive(int16, vc_remoteCseIndex, p_requestPrimitive);
+
+						tc_ac.start;
+						alt {
+							[] mccPortIn.receive(mw_request(v_request)) {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": Received request for updation for resource type remoteCSE containing attribute " & p_attribute[0]);
+								f_setResource(v_request.primitiveContent,int16);
+							}
+							[] mccPortIn.receive {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error: Did not receive update request for resource type remoteCSE");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while updating resource type remoteCSE");
+							}
+						}					    
+
+						// Postamble
+						f_cse_postamble_deleteResourcesCSE();
+
+						// Tear down
+						f_cf04Down();
+
+					}//end f_CSE_REG_UPD_003
+				} //end g_CSE_REG_UPD_003
+			    
 			}// end group Update
 			
 			group Delete{
@@ -1980,7 +3610,162 @@ module OneM2M_Testcases_CSE {
 					// Tear down
 					f_cf01Down();
 		
-				}//end TC_CSE_REG_DEL_BI_001			
+				}//end TC_CSE_REG_DEL_001			
+				
+				/**
+				 * @desc Check that IUT accepts a <remoteCSE> delete request on TARGET_REMOTE_CSE_ADDRESS, and deletes the <remoteCSE> resource
+				 * 
+				 */
+				testcase TC_CSE_REG_DEL_002() runs on CseSimu system CseSystem {
+					//Local variables	
+					var RequestPrimitive v_request;
+					// Test control
+
+					// Test component configuration
+					f_cf04Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
+
+					// Test Body
+					v_request := valueof(m_delete(f_getResourceAddress(vc_remoteCseIndex), f_getOriginator(vc_remoteCseIndex)));
+
+					mccPort.send(m_request(v_request));
+					tc_ac.start;
+					alt {
+						[] mccPort.receive(mw_response(mw_responsePrimitive(int2002))) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": Deletion of <remoteCSE> resource has been accepted");
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Wrong response status code in the response");
+						}
+						[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while deleting <remoteCSE> resource");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while deleting resource");
+						}
+					}
+					
+//					Check if the resource has been deleted or not
+					if(f_cse_isResourcePresent(vc_remoteCseIndex)) {
+						setverdict(fail, __SCOPE__ & ":INFO: Resource not deleted");
+					} else {
+						setverdict(pass, __SCOPE__ & ":INFO: Resource deleted");
+					}					    
+
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
+
+					// Tear down
+					f_cf04Down();
+
+				}//end TC_CSE_REG_DEL_002	
+				
+				/**
+				 * @desc Check that the IUT accepts an AE de-registration
+				 * 
+				 */
+				testcase TC_CSE_REG_DEL_003() runs on AeSimu system CseSystem {
+					//Local variables
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var integer v_aeIndex := -1;	
+					// Test control
+
+					// Test component configuration
+					f_cf01Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+
+					// Test Body
+					v_request := valueof(m_delete(f_getResourceAddress(v_aeIndex), f_getOriginator(v_aeIndex)));
+
+					mcaPort.send(m_request(v_request));
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2002))) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": AE has been de-registered successfully");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Wrong response status code in the response");
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while de-registering AE");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while de-registering AE");
+						}
+					}					    
+
+					// Postamble
+					f_cse_postamble_deleteResources();
+
+					// Tear down
+					f_cf01Down();
+
+				}//end TC_CSE_REG_DEL_003	
+				
+				/**
+				 * @desc Check that IUT sends a <remoteCSE> delete request on TARGET_REMOTE_CSE_ADDRESS
+				 * 
+				 */
+				testcase TC_CSE_REG_DEL_004() runs on CseSimu system CseSystem {
+					//Local variables	
+					var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
+					var UtTriggerAckPrimitive v_trigger_response;
+					var integer v_auxInteger;
+					var charstring v_action := __SCOPE__ & ": Please, send a valid DELETE Request containing To set to " & PX_CSE1_ADDRESS;
+					// Test control
+
+					// Test component configuration
+					f_cf04Up();
+
+					// Test adapter configuration
+
+					// Preamble
+					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
+					
+					//Send Trigger Message
+					v_auxInteger := f_setResource(valueof(m_primitiveContentRemoteCSE(m_contentCreateRemoteCSE(omit,omit,omit,omit))), int16);
+					v_utRequest.to_ := f_getResourceAddress(v_auxInteger);
+					v_utRequest.from_ := "UNINITIALIZED";
+					f_sendUtPrimitive(v_utRequest, v_action);	
+
+					// Test Body
+					tc_ac.start;
+					alt {
+						[] mccPortIn.receive(mw_request(mw_deleteRequest( f_getResourceAddress(vc_remoteCseIndex), PX_CSE_ID))) {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__ & ": <remoteCSE> delete request has been received");
+						}
+						[] mccPortIn.receive {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error while receiving <remoteCSE> delete request");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__ & ": No answer while receiving <remoteCSE> delete request");
+						}
+					}					    
+
+					// Postamble
+					f_cse_postamble_deleteResourcesCSE();
+
+					// Tear down
+					f_cf04Down();
+
+				}//end TC_CSE_REG_DEL_004	
 			
 			}// end group Delete
 	  	  	
@@ -2009,7 +3794,7 @@ module OneM2M_Testcases_CSE {
 						if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_ae1);
 							if(not ispresent(v_responsePrimitive.primitiveContent.container.resourceName)){
 								setverdict(fail, __SCOPE__, ": Error, resourceName attribute not provided");
-						}
+							}
 						}
 						
 					}
@@ -2026,8 +3811,9 @@ module OneM2M_Testcases_CSE {
 						
 						 
 																			
-							if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_ae1);
-							if(not ispresent(v_responsePrimitive.primitiveContent.container.resourceName)){
+							if(getverdict == pass){ 
+								v_responsePrimitive := f_getResponsePrimitive(v_ae1);
+								if(not ispresent(v_responsePrimitive.primitiveContent.container.resourceName)){
 									setverdict(fail, __SCOPE__, ": Error, resourceName attribute not provided");
 								}
 							}
@@ -4648,8 +6434,8 @@ module OneM2M_Testcases_CSE {
 						
 						mcaPort.send(m_request(v_request));
 						
-						vc_cseSimu.start(f_cse_receiveCreateRequest(p_requestAnnc));
-						vc_cseSimu.done;	
+						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));
+						vc_cse1.done;	
     								
 						// Postamble
 						f_cse_postamble_deleteResources();
@@ -4878,15 +6664,15 @@ module OneM2M_Testcases_CSE {
 						// Preamble
 						
 						if (PX_IUT_IS_MN_CSE == true) {
-							vc_cseSimu.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
+							vc_cse1.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
 						}else if (PX_IUT_IS_IN_CSE == true) {
-							vc_cseSimu.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
+							vc_cse1.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
 						}	
-						vc_cseSimu.done;						
+						vc_cse1.done;						
 						
-						vc_cseSimu.start(f_cse_resourceAnnouncementHandler());						
+						vc_cse1.start(f_cse_resourceAnnouncementHandler());						
 						v_resourceIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit));						
-						vc_cseSimu.done;
+						vc_cse1.done;
 		
 						if(p_resourceType == int4) {
 							v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_parentIndex);
@@ -4896,11 +6682,11 @@ module OneM2M_Testcases_CSE {
 						// Test Body
 						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
 						
-						vc_cseSimu.start(f_cse_receiveCreateRequest(p_requestAnnc));						
+						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));						
 						mcaPort.send(m_request(v_request));
-						vc_cseSimu.done;	
+						vc_cse1.done;	
     								
-						vc_request.primitive.requestPrimitive := f_getRemoteCseRequestPrimitive(vc_cseSimu);
+						vc_request.primitive.requestPrimitive := f_getRequestPrimitive(vc_cse1);
     								
 						// Postamble
 						f_cse_postamble_deleteResources();
@@ -6418,7 +8204,12 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						
+						if(p_resourceType != int2) {	//ResourceType != AE
+						
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+							
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -6434,10 +8225,10 @@ module OneM2M_Testcases_CSE {
 										
 						} else {	//ResourceType = RemoteCSE
 													
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 								
 						}
 						
@@ -6504,7 +8295,7 @@ module OneM2M_Testcases_CSE {
 					
 					testcase TC_CSE_DMR_RET_014_CNT() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                         
 						v_ae1.start(f_CSE_DMR_RET_014(int3, m_createContainerBase));//Container
 						v_ae1.done;
@@ -6574,10 +8365,10 @@ module OneM2M_Testcases_CSE {
 									
 						} else {	//ResourceType = RemoteCSE
 												
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 							
 						}
 								
@@ -6725,7 +8516,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);	
+						if(p_resourceType != int2) {	//ResourceType != AE
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);	
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -6740,10 +8533,10 @@ module OneM2M_Testcases_CSE {
 							v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
     									
 						} else {
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
 						// Test Body
@@ -6894,7 +8687,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {	//ResourceType != AE
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -6904,15 +8699,15 @@ module OneM2M_Testcases_CSE {
 						}
 						if (p_resourceType!=int16){	//ResourceType != RemoteCSE
 	
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-						
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
+							f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+							
+							v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
     									
 						}else{
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
 						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,	{"pi"}, f_getOriginator(v_aeIndex))));//from AE ID
@@ -7147,7 +8942,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {	//ResourceType != AE
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -7157,15 +8954,15 @@ module OneM2M_Testcases_CSE {
 						}
 						if (p_resourceType!=int16){	//ResourceType != RemoteCSE
 	
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-						
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
+							f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+							
+							v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
     									
 						}else{
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
 						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,
@@ -7228,7 +9025,7 @@ module OneM2M_Testcases_CSE {
 										
 					testcase TC_CSE_DMR_RET_018_CNT_LBL() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                         
 						v_ae1.start(f_CSE_DMR_RET_018(int3, m_createContainerBase));//Container
 						v_ae1.done;
@@ -7288,7 +9085,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {	//ResourceType != AE
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -7298,15 +9097,15 @@ module OneM2M_Testcases_CSE {
 						}
 						if (p_resourceType!=int16){	//ResourceType != RemoteCSE
 	
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-						
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
+							f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+							
+							v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
     									
 						}else{
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
 						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
@@ -7365,7 +9164,7 @@ module OneM2M_Testcases_CSE {
 					
 					testcase TC_CSE_DMR_RET_019_CNT_LBL_AT() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                         
 						v_ae1.start(f_CSE_DMR_RET_019(int3, m_createContainerBase));//Container
 						v_ae1.done;
@@ -7425,7 +9224,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
     				
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {	//ResourceType != AE
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -7435,15 +9236,15 @@ module OneM2M_Testcases_CSE {
 						}
 						if (p_resourceType!=int16){	//ResourceType != RemoteCSE
 	
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-						
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
+							f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+							
+							v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive);//under the CSEBase resource
     									
 						}else{
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_requestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_requestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
 						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
@@ -11530,21 +13331,21 @@ module OneM2M_Testcases_CSE {
 	
 				} // end g_CSE_DMR_UPD_014
 
-				group g_CSE_DMR_UPD_017{
+				group g_CSE_DMR_UPD_015{
 			  		
 					/**
 					 * @desc Check that the IUT updates successfully the value of the optional attribute OPTIONAL_ATTRIBUTE of the RESOURCE_TYPE resource under CSEBase
 					 */
-					testcase TC_CSE_DMR_UPD_017_CSR_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CSR_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
-						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
-						var ResponsePrimitive v_responsePrimitive;
-						var PrimitiveContent v_primitiveContentRetrieveResource;
+					   	var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
+					   	var ResponsePrimitive v_responsePrimitive;
+					   	var PrimitiveContent v_primitiveContentRetrieveResource;
 	
 					   v_updateRequest.primitiveContent.remoteCSE.labels := v_labels;
 	
-					   v_ae1.start(f_CSE_DMR_UPD_017(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
+					   v_ae1.start(f_CSE_DMR_UPD_015(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
 						v_ae1.done;
 						
 						 
@@ -11569,7 +13370,7 @@ module OneM2M_Testcases_CSE {
 					   }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CSR_POA() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CSR_POA() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var PoaList v_poaList := {"http://" & PX_AE2_ADDRESS & "/"};
 					   var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
@@ -11578,7 +13379,7 @@ module OneM2M_Testcases_CSE {
 
 					   v_updateRequest.primitiveContent.remoteCSE.pointOfAccess := v_poaList;
 
-					   v_ae1.start(f_CSE_DMR_UPD_017(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
+					   v_ae1.start(f_CSE_DMR_UPD_015(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
 						v_ae1.done;
 						
 						 
@@ -11603,16 +13404,16 @@ module OneM2M_Testcases_CSE {
 					  }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CSR_NL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CSR_NL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_nodeLink := "MyNodeId";
-						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
-						var ResponsePrimitive v_responsePrimitive;
-						var PrimitiveContent v_primitiveContentRetrieveResource;
+					   	var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
+					   	var ResponsePrimitive v_responsePrimitive;
+					   	var PrimitiveContent v_primitiveContentRetrieveResource;
 
 					   v_updateRequest.primitiveContent.remoteCSE.nodeLink := v_nodeLink;
 
-					   v_ae1.start(f_CSE_DMR_UPD_017(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
+					   v_ae1.start(f_CSE_DMR_UPD_015(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
 						v_ae1.done;
 						
 						 
@@ -11637,7 +13438,7 @@ module OneM2M_Testcases_CSE {
 					  }
 					}
 			  		
-					testcase TC_CSE_DMR_UPD_017_NOD_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_NOD_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateNodeBase;
@@ -11646,7 +13447,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.node.labels := v_labels;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createNodeBase, v_updateRequest));//Node
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createNodeBase, v_updateRequest));//Node
 						v_ae1.done;
 						
 						 
@@ -11671,7 +13472,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_NOD_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_NOD_ACPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateNodeBase;
 						var RequestPrimitive v_updateRequestPrimitive;
@@ -11679,7 +13480,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createNodeBase, v_updateRequest, true));//Node
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createNodeBase, v_updateRequest, true));//Node
 						v_ae1.done;
 						
 						 
@@ -11707,12 +13508,12 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_NOD_HCL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_NOD_HCL() runs on Tester system CseSystem {
 						
 						/* TO BE DONE */
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_AE_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_AE_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -11721,7 +13522,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.aE.labels := v_labels;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_015(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -11746,14 +13547,14 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_AE_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_AE_ACPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateAE;
 						var RequestPrimitive v_updateRequestPrimitive;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int2, m_createAe(PX_APP_ID), v_updateRequest, true));//AE
+						v_ae1.start(f_CSE_DMR_UPD_015(int2, m_createAe(PX_APP_ID), v_updateRequest, true));//AE
 						v_ae1.done;
 						
 						 
@@ -11780,7 +13581,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_AE_APN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_AE_APN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.String v_appName := "MyAppName";
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -11788,7 +13589,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.aE.appName := v_appName;
-						v_ae1.start(f_CSE_DMR_UPD_017(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_015(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -11813,7 +13614,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_AE_POA() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_AE_POA() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var PoaList v_poaList := {"http://" & PX_AE2_ADDRESS & "/"};
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -11821,7 +13622,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.aE.pointOfAccess := v_poaList;
-						v_ae1.start(f_CSE_DMR_UPD_017(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_015(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -11846,7 +13647,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_AE_OR() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_AE_OR() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_ontoLogyRef := "MyOntologyRef";
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -11854,7 +13655,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.aE.ontologyRef := v_ontoLogyRef;
-						v_ae1.start(f_CSE_DMR_UPD_017(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_015(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -11868,7 +13669,7 @@ module OneM2M_Testcases_CSE {
 									 }
 								 }
 							 }
-							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);							
+ 							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);							
  
 							  //Check that the resource has been udpated correctly
 							  if(ischosen(v_primitiveContentRetrieveResource.aE)) {
@@ -11879,7 +13680,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -11888,7 +13689,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.labels := v_labels;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -11913,14 +13714,14 @@ module OneM2M_Testcases_CSE {
 						 }				
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_ACPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
 						var RequestPrimitive v_updateRequestPrimitive;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest, true));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest, true));//Container
 						v_ae1.done;
 						
 						 
@@ -11947,7 +13748,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_MNI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_MNI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.NonNegativeInteger v_maxNrOfInstances := 5;
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -11956,7 +13757,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.maxNrOfInstances := v_maxNrOfInstances;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -11981,7 +13782,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_MBS() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_MBS() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.NonNegativeInteger v_maxByteSize := 512;
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -11990,7 +13791,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.maxByteSize := v_maxByteSize;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -12015,7 +13816,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_MIA() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_MIA() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.NonNegativeInteger v_maxInstanceAge := 1;
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -12024,7 +13825,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.maxInstanceAge := v_maxInstanceAge;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -12049,7 +13850,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_OR() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_OR() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_ontoLogyRef := "MyOntologyRef";
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -12058,7 +13859,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.ontologyRef := v_ontoLogyRef;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -12083,7 +13884,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_CNT_LI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_CNT_LI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_locationID := "MyLocationID";
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -12092,7 +13893,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.locationID := v_locationID;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_015(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -12117,7 +13918,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_ACP_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_ACP_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
@@ -12126,7 +13927,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.accessControlPolicy.labels := v_labels;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
+						v_ae1.start(f_CSE_DMR_UPD_015(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
 						v_ae1.done;
 						
 						 
@@ -12151,14 +13952,14 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_ACPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
 						var RequestPrimitive v_updateRequestPrimitive;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest, true));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest, true));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12185,7 +13986,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12193,7 +13994,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.labels := v_labels;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12218,7 +14019,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_ENC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_ENC() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var EventNotificationCriteria v_eventNotificationCriteria:= valueof(m_eventNotificationCriteria({int3}, -));
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12226,7 +14027,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.eventNotificationCriteria:=v_eventNotificationCriteria ;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12240,7 +14041,7 @@ module OneM2M_Testcases_CSE {
 									 }
 								 }
 							 }
-							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);							
+ 							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);							
  
 							  //Check that the resource has been udpated correctly
 							  if(ischosen(v_primitiveContentRetrieveResource.subscription)) {
@@ -12251,7 +14052,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_EXC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_EXC() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.PositiveInteger v_expirationCounter:=10;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12259,7 +14060,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.expirationCounter:=v_expirationCounter;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12284,7 +14085,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_GPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_GPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_groupID := "MyGroupID";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12292,7 +14093,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.groupID:=v_groupID;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12317,7 +14118,7 @@ module OneM2M_Testcases_CSE {
 						 } 
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_NFU() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_NFU() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.AnyURI v_notificationForwardingURI:= "MyNotificationForwardingURI";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12325,7 +14126,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.notificationForwardingURI:=v_notificationForwardingURI;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12350,7 +14151,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_BN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_BN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var BatchNotify v_batchNotify:= {1, "PT1S"};
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12358,7 +14159,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.batchNotify:=v_batchNotify;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12383,7 +14184,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_RL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_RL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var RateLimit v_rateLimit:= {2, "PT1S"};
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12391,7 +14192,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.rateLimit:=v_rateLimit;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12416,7 +14217,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_PN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_PN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var PendingNotification v_pendingNotification:=int2;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12424,7 +14225,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.pendingNotification:=v_pendingNotification;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12449,7 +14250,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_NSP() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_NSP() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.PositiveInteger v_notificationStoragePriority:=10;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12457,7 +14258,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.notificationStoragePriority:=v_notificationStoragePriority;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12482,7 +14283,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_LN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_LN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.Boolean v_latestNotify:=true;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12490,7 +14291,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.latestNotify:=v_latestNotify;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12515,7 +14316,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_SUB_NEC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_SUB_NEC() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var EventCat v_eventCat:= {alt_1:= 300};
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -12523,7 +14324,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.subscription.notificationEventCat:=v_eventCat;
-						v_ae1.start(f_CSE_DMR_UPD_017(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_015(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -12548,7 +14349,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_GRP_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_GRP_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Labels v_labels := {"MyLabel"};
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -12556,7 +14357,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.group_.labels := v_labels;
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -12581,14 +14382,14 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_GRP_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_GRP_ACPI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
 						var RequestPrimitive v_updateRequestPrimitive;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createGroupBase, v_updateRequest, true));//Group
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createGroupBase, v_updateRequest, true));//Group
 						v_ae1.done;
 						
 						 
@@ -12615,7 +14416,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_GRP_MACP() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_GRP_MACP() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var ListOfURIs v_membersAccessControlPolicyIDs := {"NotInitialized"};
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -12623,7 +14424,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.group_.membersAccessControlPolicyIDs := v_membersAccessControlPolicyIDs;
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -12643,12 +14444,12 @@ module OneM2M_Testcases_CSE {
 							if(ischosen(v_primitiveContentRetrieveResource.group_)) {
 							   if(v_primitiveContentRetrieveResource.group_.membersAccessControlPolicyIDs != v_membersAccessControlPolicyIDs){
 								setverdict(fail, __SCOPE__ & ": Error: Members Access Control Policy IDs attribute not updated correctly")
-								}
+							  	}
 							}
 						 }
 					}
 					
-					testcase TC_CSE_DMR_UPD_017_GRP_GN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_015_GRP_GN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.String v_groupName:="MyGroupName";
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -12656,7 +14457,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.group_.groupName := v_groupName;
-						v_ae1.start(f_CSE_DMR_UPD_017(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_015(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -12681,7 +14482,7 @@ module OneM2M_Testcases_CSE {
 						 }
 					}
 					
-					function f_CSE_DMR_UPD_017(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive, boolean p_secondAcp := false) runs on AeSimu {
+					function f_CSE_DMR_UPD_015(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive, boolean p_secondAcp := false) runs on AeSimu {
 						//Local variables
 						var MsgIn v_response;
 						var AcpType v_acpi;
@@ -12703,7 +14504,9 @@ module OneM2M_Testcases_CSE {
 						// Test adapter configuration
 
 						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {
+							v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 
 						if(p_resourceType != int1) {
 							
@@ -12727,10 +14530,10 @@ module OneM2M_Testcases_CSE {
 
 							v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive);//under the CSEBase resource
 						} else {	//ResourceType = RemoteCSE
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);	
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);	
 						}
 					 
 						//Test Body
@@ -12764,16 +14567,16 @@ module OneM2M_Testcases_CSE {
 						// Tear down
 						f_cf02Down();
 					  
-					} // end function f_CSE_DMR_UPD_017
+					} // end function f_CSE_DMR_UPD_015
 			  		
 				} // end group g_CSE_DMR_UPD_017
 			  	
-				group g_CSE_DMR_UPD_018 {
+				group g_CSE_DMR_UPD_016 {
 			  		
 					/**
 					 * @desc Check that the IUT updates successfully the value of the attribute MANDATORY_ATTRIBUTE of the RESOURCE_TYPE resource under CSEBase
 					*/
-					testcase TC_CSE_DMR_UPD_018_CSR_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_CSR_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
@@ -12782,7 +14585,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.remoteCSE.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
+						v_ae1.start(f_CSE_DMR_UPD_016(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
 						v_ae1.done;
 						
 						 
@@ -12807,7 +14610,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_CSR_RR() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_CSR_RR() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.Boolean v_requestReachability := true;
 						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
@@ -12819,7 +14622,7 @@ module OneM2M_Testcases_CSE {
 						
 						 
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
+						v_ae1.start(f_CSE_DMR_UPD_016(int16, m_createRemoteCSEBase, v_updateRequest));//Remote CSE
 						if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_ae1);
 							//Check attribute 1
 							if(ispresent(v_responsePrimitive.primitiveContent)) {
@@ -12840,7 +14643,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 			  		
-					testcase TC_CSE_DMR_UPD_018_NOD_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_NOD_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateNodeBase;
@@ -12849,7 +14652,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.node.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int9, m_createNodeBase, v_updateRequest));//Node
+						v_ae1.start(f_CSE_DMR_UPD_016(int9, m_createNodeBase, v_updateRequest));//Node
 						v_ae1.done;
 						
 						 
@@ -12874,7 +14677,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_NOD_NI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_NOD_NI() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_updateRequest := m_updateNodeBase;
 						var XSD.Token v_targetId := "TARGET-ID";
@@ -12883,7 +14686,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.node.nodeID := v_targetId;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int9, m_createNodeBase, v_updateRequest));//Node
+						v_ae1.start(f_CSE_DMR_UPD_016(int9, m_createNodeBase, v_updateRequest));//Node
 						v_ae1.done;
 						
 						 
@@ -12908,7 +14711,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_AE_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_AE_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -12917,7 +14720,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.aE.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_016(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -12942,7 +14745,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_AE_RR() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_AE_RR() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.Boolean v_requestReachability := true;
 						var template RequestPrimitive v_updateRequest := m_updateAE;
@@ -12951,7 +14754,7 @@ module OneM2M_Testcases_CSE {
 
 						v_updateRequest.primitiveContent.aE.requestReachability := v_requestReachability;
 
-						v_ae1.start(f_CSE_DMR_UPD_018(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
+						v_ae1.start(f_CSE_DMR_UPD_016(int2, m_createAe(PX_APP_ID), v_updateRequest));//AE
 						v_ae1.done;
 						
 						 
@@ -12976,7 +14779,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_CNT_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_CNT_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
@@ -12985,7 +14788,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.container.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int3, m_createContainerBase, v_updateRequest));//Container
+						v_ae1.start(f_CSE_DMR_UPD_016(int3, m_createContainerBase, v_updateRequest));//Container
 						v_ae1.done;
 						
 						 
@@ -13010,7 +14813,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_ACP_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_ACP_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
@@ -13019,7 +14822,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.accessControlPolicy.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
+						v_ae1.start(f_CSE_DMR_UPD_016(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
 						v_ae1.done;
 						
 						 
@@ -13044,7 +14847,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_ACP_PV() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_ACP_PV() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var SetOfAcrs v_privileges_1 := {{valueof(m_createAcr({PX_SUPER_AE_ID}, int61))}};
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
@@ -13052,7 +14855,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.accessControlPolicy.privileges := v_privileges_1;
-						v_ae1.start(f_CSE_DMR_UPD_018(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
+						v_ae1.start(f_CSE_DMR_UPD_016(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
 						v_ae1.done;
 						
 						 
@@ -13077,7 +14880,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_ACP_PVS() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_ACP_PVS() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var SetOfAcrs v_privileges_1 := {{valueof(m_createAcr({PX_SUPER_AE_ID}, int61))}};
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
@@ -13085,7 +14888,7 @@ module OneM2M_Testcases_CSE {
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 						
 						v_updateRequest.primitiveContent.accessControlPolicy.selfPrivileges := v_privileges_1;
-						v_ae1.start(f_CSE_DMR_UPD_018(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
+						v_ae1.start(f_CSE_DMR_UPD_016(int1, m_createAcpBase, v_updateRequest));//AccessControlPolicy
 						v_ae1.done;
 						
 						 
@@ -13110,7 +14913,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 				    
-					testcase TC_CSE_DMR_UPD_018_SUB_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_SUB_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -13119,7 +14922,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.subscription.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_016(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -13136,7 +14939,7 @@ module OneM2M_Testcases_CSE {
 							
 							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);							
 	 						
-							//Check that the resource has been udpated correctly
+	 						//Check that the resource has been udpated correctly
 						  if(ischosen(v_primitiveContentRetrieveResource.subscription)) {
 							if(v_primitiveContentRetrieveResource.subscription.expirationTime != v_expirationTime){
 							  setverdict(fail, __SCOPE__ & ": Error: Expiration time attribute not updated correctly")
@@ -13145,7 +14948,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_SUB_NU() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_SUB_NU() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var ListOfURIs v_notificationURI := {"NotReachableNotificationURI"};
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -13154,7 +14957,7 @@ module OneM2M_Testcases_CSE {
 											
 						v_updateRequest.primitiveContent.subscription.notificationURI := v_notificationURI;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_016(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -13179,7 +14982,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_SUB_NCT() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_SUB_NCT() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var NotificationContentType v_notificationContentType := int2;
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
@@ -13188,7 +14991,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.subscription.notificationContentType := v_notificationContentType;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
+						v_ae1.start(f_CSE_DMR_UPD_016(int23, m_createSubscriptionBase, v_updateRequest));//Subscription
 						v_ae1.done;
 						
 						 
@@ -13213,7 +15016,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_GRP_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_GRP_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var Timestamp v_expirationTime := "20001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -13222,7 +15025,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.group_.expirationTime := v_expirationTime;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_016(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -13247,7 +15050,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_GRP_MNM() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_GRP_MNM() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var XSD.PositiveInteger v_maxNrOfMembers := 10;
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -13256,7 +15059,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.group_.maxNrOfMembers := v_maxNrOfMembers;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_016(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -13281,7 +15084,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					testcase TC_CSE_DMR_UPD_018_GRP_MID() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_UPD_016_GRP_MID() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var ListOfURIs v_memberIDs := {"NotInitialized"};
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
@@ -13290,7 +15093,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_updateRequest.primitiveContent.group_.memberIDs := v_memberIDs;
 						
-						v_ae1.start(f_CSE_DMR_UPD_018(int9, m_createGroupBase, v_updateRequest));//Group
+						v_ae1.start(f_CSE_DMR_UPD_016(int9, m_createGroupBase, v_updateRequest));//Group
 						v_ae1.done;
 						
 						 
@@ -13315,7 +15118,7 @@ module OneM2M_Testcases_CSE {
 						}
 					}
 					
-					function f_CSE_DMR_UPD_018(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
+					function f_CSE_DMR_UPD_016(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
 						 //Local variables
 						 var MsgIn v_response;
 						 var RequestPrimitive v_request;
@@ -13336,7 +15139,9 @@ module OneM2M_Testcases_CSE {
 						 // Test adapter configuration
 
 						 // Preamble
-						 v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						if(p_resourceType != int2) {
+						 	v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						}
 						
 						if(p_resourceType != int1) {
 							
@@ -13351,10 +15156,10 @@ module OneM2M_Testcases_CSE {
 
 						 v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive);//under the CSEBase resource
 						} else {	//ResourceType = RemoteCSE
-							vc_cseSimu.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
-							vc_cseSimu.done;
+							vc_cse1.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
+							vc_cse1.done;
 							
-							v_resourceIndex := f_getRemoteCseResource(vc_cseSimu);	
+							v_resourceIndex := f_getRemoteCseResource(vc_cse1);	
 						}
 											 
 						//Test Body
@@ -13388,9 +15193,9 @@ module OneM2M_Testcases_CSE {
 						// Tear down
 						f_cf02Down();
 						
-					} //end function f_CSE_DMR_UPD_018
+					} //end function f_CSE_DMR_UPD_016
 			  	
-				} // end group g_CSE_DMR_UPD_018
+				} // end group g_CSE_DMR_UPD_016
 
 			}//end group Update
 			
@@ -13424,7 +15229,7 @@ module OneM2M_Testcases_CSE {
                 
 					testcase TC_CSE_DMR_DEL_001_ACP() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                 
 						v_ae1.start(f_CSE_DMR_DEL_001(int1, m_createAcpBase));//AccessControlPolicy
 						v_ae1.done;
@@ -13519,10 +15324,10 @@ module OneM2M_Testcases_CSE {
 						f_checkAeSimuStatus();
     								
 						//Check to see if the resource is present or not
-						if (f_isResourcePresent(v_resourceIndex)){
-							setverdict(fail, __SCOPE__ & ":INFO: Resource not deleted");
+						if (f_isResourceNotPresent(v_aeIndex, f_getResourceName(vc_resourcesList[v_resourceIndex].resource))){
+							setverdict(pass, __SCOPE__ & ":INFO: Resource deleted");
 						} else {
-							setverdict(pass, __SCOPE__ & ":ERROR: Resource deleted");
+							setverdict(fail, __SCOPE__ & ":ERROR: Resource not deleted");
 						}
                 					
 						// Postamble
@@ -13551,7 +15356,7 @@ module OneM2M_Testcases_CSE {
                 
 					testcase TC_CSE_DMR_DEL_002_GRP() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                 		
 						v_ae1.start(f_CSE_DMR_DEL_002(int9, m_createGroupBase));//Group
 						v_ae1.done;
@@ -13567,7 +15372,7 @@ module OneM2M_Testcases_CSE {
                 
 					testcase TC_CSE_DMR_DEL_002_SCH() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+  						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                 
 						v_ae1.start(f_CSE_DMR_DEL_002(int18, m_createScheduleBase));//Schedule
 						v_ae1.done;
@@ -13575,7 +15380,7 @@ module OneM2M_Testcases_CSE {
                 
 					testcase TC_CSE_DMR_DEL_002_PCH() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                 
 						v_ae1.start(f_CSE_DMR_DEL_002(int15, m_createPollingChannelBase));//PollingChannel
 						v_ae1.done;
@@ -13751,7 +15556,7 @@ module OneM2M_Testcases_CSE {
 					 */
 					testcase TC_CSE_DMR_DEL_004_CNT() runs on Tester system CseSystem {
 						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+ 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
                 		
 						v_ae1.start(f_CSE_DMR_DEL_004(int3, m_createContainerBase, int3, m_createContainerBase));//Container
 						v_ae1.done;
@@ -16371,7 +18176,7 @@ module OneM2M_Testcases_CSE {
 					v_aeIndex := f_cse_preamble_registerAe(); //c_CRUDNDi
 					//TODO: -> register IUT to the remoteCSE
 					//TODO: Create one of the container in a remoteCSE
-					v_containerIndex_1 := f_cse_createResource(int3, m_createContainer_noResourceName, v_aeIndex); // AE child resource
+    				v_containerIndex_1 := f_cse_createResource(int3, m_createContainer_noResourceName, v_aeIndex); // AE child resource
 					v_containerIndex_2 := f_cse_createResource(int3, m_createContainer_noResourceName, v_aeIndex); // AE child resource
 					
 					v_memberId_1 := f_getResourceId(vc_resourcesList[v_containerIndex_1].resource);
@@ -16383,7 +18188,7 @@ module OneM2M_Testcases_CSE {
         
 					//Test Body
 					v_updateRequest.primitiveContent.group_.memberIDs := {v_memberId_1, v_memberId_2};
-					v_request := f_getUpdateRequestPrimitive(c_ResourceTypeGroup, v_groupIndex, v_updateRequest);
+        			v_request := f_getUpdateRequestPrimitive(c_ResourceTypeGroup, v_groupIndex, v_updateRequest);
 
 					mcaPort.send(m_request(v_request));
 					tc_ac.start;
@@ -16500,7 +18305,7 @@ module OneM2M_Testcases_CSE {
 						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2004))) -> value v_response {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": update successful");
-						}
+                      	}
 						 [] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
 							 tc_ac.stop;
 							 setverdict(fail, __SCOPE__ & ": Error while retrieving resource");
@@ -19500,9 +21305,9 @@ module OneM2M_Testcases_CSE {
 	
 							//Postamble
 							//We are forced to delete the Ae because the delete request in the postamble_deleteResources is sent by Ae itself, witch doesn't have privileges
-							if(testcasename() == "TC_CSE_SEC_ACP_001_DEL") {
+						  	if(testcasename() == "TC_CSE_SEC_ACP_001_DEL") {
 								  f_cse_deleteResource(v_aeIndex, m_delete(f_getResourceAddress(v_aeIndex), f_getOriginator()));//Use of PX_SUPER_AE_ID to remove AE
-							}	
+						  	}	
 							f_cse_postamble_deleteResources();
 	
 							//Tear down

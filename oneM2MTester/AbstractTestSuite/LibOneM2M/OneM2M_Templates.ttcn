@@ -5,9 +5,9 @@
  *  © 2016, oneM2M Partners Type 1 (ARIB, ATIS, CCSA, ETSI, TIA, TSDSI, TTA, TTC).
  *  All rights reserved.
  *  
- *  @author     oneM2M
- *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/trunk/ttcn/LibOneM2M/OneM2M_Templates.ttcn $
- *              $Id: OneM2M_Templates.ttcn 356 2017-08-21 12:25:14Z reinaortega $
+ *  @author     ETSI
+ *  @version    $URL: https://oldforge.etsi.org/svn/oneM2M/branches/Release1/ttcn/LibOneM2M/OneM2M_Templates.ttcn $
+ *              $Id: OneM2M_Templates.ttcn 347 2017-08-11 08:48:20Z reinaortega $
  *  @desc       Module containing templates for oneM2M
  *
  */
@@ -37,18 +37,18 @@ module OneM2M_Templates {
 	/* Templates */
 	
 	group Primitives {
-    	/** 
-    	 * @desc Base template for request sending operations
-    	 * @param p_requestPrimitive
-    	 */
-    	template (value) MsgOut m_request(in template (value) RequestPrimitive p_requestPrimitive, in template (omit) AttributeAux_list p_forcedFields := omit) := {
-    		primitive := { requestPrimitive := p_requestPrimitive},
-    		host := PX_SUT_ADDRESS,
-    		xmlNamespace := PX_XML_NAMESPACE,
-    		protocolBinding := PX_PROTOCOL_BINDING,
-    		serialization := PX_SERIALIZATION, 
-    		forcedFields := p_forcedFields
-    	};
+		/** 
+		 * @desc Base template for request sending operations
+		 * @param p_requestPrimitive
+		 */
+		template (value) MsgOut m_request(in template (value) RequestPrimitive p_requestPrimitive, in template (omit) AttributeAux_list p_forcedFields := omit) := {
+			primitive := { requestPrimitive := p_requestPrimitive},
+			host := PX_SUT_ADDRESS,
+			xmlNamespace := PX_XML_NAMESPACE,
+			protocolBinding := PX_PROTOCOL_BINDING,
+			serialization := PX_SERIALIZATION, 
+			forcedFields := p_forcedFields
+		};
     	
 		/** 
 		 * @desc Base template for response sending operations
@@ -76,9 +76,9 @@ module OneM2M_Templates {
 			forcedFields := p_forcedFields
 		};
 		
-    	template MsgIn mw_request(in template (present) RequestPrimitive p_requestPrimitive) := {
-    		primitive := { requestPrimitive := p_requestPrimitive}
-    	};
+		template MsgIn mw_request(in template (present) RequestPrimitive p_requestPrimitive) := {
+			primitive := { requestPrimitive := p_requestPrimitive}
+		};
     	
 		/** 
 		 * @desc Base template for response receiving operations
@@ -106,7 +106,7 @@ module OneM2M_Templates {
 				requestIdentifier := "m_retrieveResource" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := omit,
-				roleIDs := omit, 
+				role := omit, 
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -118,13 +118,9 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
-        	
+			
 			/**
 			 * @desc Base Receive RETRIEVE request primitive
 			 * @param p_targetResourceAddress Target resource address
@@ -136,7 +132,7 @@ module OneM2M_Templates {
 				requestIdentifier := ?,
 				resourceType := ?,
 				primitiveContent := ?,
-				roleIDs := *, 
+				role := *, 
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -148,11 +144,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *,
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
+				discoveryResultType := *
 			};
         	
 			/**
@@ -160,14 +152,14 @@ module OneM2M_Templates {
 			 * @param p_targetResourceAddress Target resource address (including "#AttributeName")
 			 * @param p_originator Originator (from)
 			 */
-        	template (value) RequestPrimitive m_retrieveResourceAttributeToOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
-        		operation := int2,
-        		to_ := p_targetResourceAddress,
-        		from_ := p_originator,
-        		requestIdentifier := "m_retrieveResourceAttributeOptionTo" & f_rnd(1, 1000000),
-        		resourceType := omit,
+			template (value) RequestPrimitive m_retrieveResourceAttributeToOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
+				operation := int2,
+				to_ := p_targetResourceAddress,
+				from_ := p_originator,
+				requestIdentifier := "m_retrieveResourceAttributeOptionTo" & f_rnd(1, 1000000),
+				resourceType := omit,
 				primitiveContent := omit, 
-				roleIDs := omit,
+				role := omit,
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -179,12 +171,8 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
-        	};
+				discoveryResultType := omit
+			};
         	
 			/**
 			 * @desc RETRIEVE request primtive containing the target attributes in the primitiveContent field
@@ -199,7 +187,7 @@ module OneM2M_Templates {
 				requestIdentifier := "m_retrieveResourceAttributeContentOption" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := {attributeList := p_attributeList},
-				roleIDs := omit,
+				role := omit,
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -211,11 +199,7 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
 			
 			/**
@@ -223,7 +207,7 @@ module OneM2M_Templates {
 			  * @param p_targetResourceAddress Target resource address 
 			  * @param p_filterCriteria FilterCriteria
 			  * @param p_originator Originator (from)
-		     */
+			 */
 			template (value) RequestPrimitive m_retrieveResourceFilterUsageOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterUsage p_filterUsage) modifies m_retrieveResource := {
 				requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
 				filterCriteria := {
@@ -241,14 +225,8 @@ module OneM2M_Templates {
 					sizeBelow := omit,
 					contentType_list := {},
 					attribute_list := {},
-					filterUsage := p_filterUsage,
-					limit := omit,
-					semanticsFilter_list := {},
-					filterOperation := omit,
-					contentFilterSyntax := omit,
-					contentFilterQuery := omit,
-					level := omit,
-					offset := omit
+					filterUsage := p_filterUsage, 
+					limit := omit
 				}
 			};
 			
@@ -277,15 +255,10 @@ module OneM2M_Templates {
 					contentType_list := {},
 					attribute_list := {},
 					filterUsage := p_filterUsage, 
-					limit := omit,
-					semanticsFilter_list := {},
-					filterOperation := omit,
-					contentFilterSyntax := omit,
-					contentFilterQuery := omit,
-					level := omit,
-					offset := omit
+					limit := omit
 				}
 			};
+			
 			/**
 			  * @desc RETRIEVE request primtive containing the Discovery Type in the discoveryResultType field and Filter Criteria in the filterCriteria field
 			  * @param p_targetResourceAddress Target resource address 
@@ -310,13 +283,7 @@ module OneM2M_Templates {
 					contentType_list := {},
 					attribute_list := {},
 					filterUsage := p_filterUsage,
-					limit := omit,
-					semanticsFilter_list := {},
-					filterOperation := omit,
-					contentFilterSyntax := omit,
-					contentFilterQuery := omit,
-					level := omit,
-					offset := omit
+					limit := omit
 				},
 				discoveryResultType := p_discResType
 			};
@@ -345,28 +312,22 @@ module OneM2M_Templates {
 						contentType_list := {},
 						attribute_list := {},
 						filterUsage := omit,
-						limit := omit,
-						semanticsFilter_list := {},
-						filterOperation := omit,
-						contentFilterSyntax := omit,
-						contentFilterQuery := omit,
-						level := omit,
-						offset := omit
+						limit := omit
 					}
 				};
 			
-    	}//end group Retrieve
+		}//end group Retrieve
 
-    	group Update {
+		group Update {
     		
-    		template (value) RequestPrimitive m_update := {
+			template (value) RequestPrimitive m_update := {
 				operation := int3,
 				to_ := "NotInitialized",
 				from_ := "NotInitialized",
 				requestIdentifier := "m_update",
 				resourceType := omit,
 				primitiveContent:= omit,
-				roleIDs := omit, 
+				role := omit, 
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -378,13 +339,9 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
-        	
+			
 						
 			template RequestPrimitive mw_update(template XSD.ID p_from := *, template XSD.ID p_to := ?) := {
 				operation := int3,
@@ -393,7 +350,7 @@ module OneM2M_Templates {
 				requestIdentifier := ?,
 				resourceType := ?,
 				primitiveContent:= ?,
-				roleIDs := *, 
+				role := *, 
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -405,11 +362,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *, 
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
+				discoveryResultType := *
 			};
         	
 			/**
@@ -419,7 +372,8 @@ module OneM2M_Templates {
 				requestIdentifier := "m_updateAe",
 				primitiveContent:= {aE := m_contentUpdateAe}
 			};
-        	
+			
+						
 			/**
 			 * @desc Reception template for update Ae resource
 			 */
@@ -507,34 +461,34 @@ module OneM2M_Templates {
 			};
 			
 			template (value) RequestPrimitive m_updateLocationPolicy(XSD.ID p_locResourceAddress, in template (omit) AcpType p_accessControlPolicyIds, in template (value) XSD.Duration p_locationUpdatePeriod) modifies m_update := {
-        	  	to_ 				:= p_locResourceAddress,
-        	  	requestIdentifier	:= "m_updateLocationPolicy",
-        	  	primitiveContent	:= {locationPolicy := m_contentUpdateLocationPolicy(p_accessControlPolicyIds, p_locationUpdatePeriod)}
+				to_ 				:= p_locResourceAddress,
+				requestIdentifier	:= "m_updateLocationPolicy",
+				primitiveContent	:= {locationPolicy := m_contentUpdateLocationPolicy(p_accessControlPolicyIds, p_locationUpdatePeriod)}
 			  };
         	
-        	template (value) RequestPrimitive m_updateNodeBase modifies m_update := {
+			template (value) RequestPrimitive m_updateNodeBase modifies m_update := {
 				requestIdentifier := "m_updateNode",
 				primitiveContent:= {node := m_contentUpdateNode}
-        	}
+			}
         	
-        	template (value) RequestPrimitive m_updateRemoteCSEBase modifies m_update := {
+			template (value) RequestPrimitive m_updateRemoteCSEBase modifies m_update := {
 			   requestIdentifier := "m_updateRemoteCSEBase",
-        	   primitiveContent := {remoteCSE := m_contentUpdateRemoteCSE}
-        	}
+			   primitiveContent := {remoteCSE := m_contentUpdateRemoteCSE}
+			}
         	
-        	template (value) RequestPrimitive m_updateAE modifies m_update := {
+			template (value) RequestPrimitive m_updateAE modifies m_update := {
 				requestIdentifier := "m_updateAE",
 				primitiveContent := {aE := m_contentUpdateAe}
-        	}
+			}
         	
-        	template (value) RequestPrimitive m_updateAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_to := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_stemId := "") modifies m_update:= {
+			template (value) RequestPrimitive m_updateAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_to := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_stemId := "") modifies m_update:= {
 				requestIdentifier := testcasename() & "-m_updateAEAnnc",
 				resourceType := int10002,
 				primitiveContent := {aEAnnc := m_contentUpdateAEAnnc(p_appId,p_stemId)}
 			};
-    	}//end group Update
+		}//end group Update
     	
-    	group Create {
+		group Create {
 
 			template (value) RequestPrimitive m_create := {
 				operation := int1,
@@ -543,7 +497,7 @@ module OneM2M_Templates {
 				requestIdentifier := testcasename() & "-m_create",
 				resourceType := omit,
 				primitiveContent := omit,
-				roleIDs := omit,
+				role := omit,
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -555,12 +509,7 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
-
+				discoveryResultType := omit
 			};
         	
 			/**
@@ -573,7 +522,7 @@ module OneM2M_Templates {
 				requestIdentifier := ?,
 				resourceType := ?,
 				primitiveContent := ?,
-				roleIDs := *,
+				role := *,
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -585,11 +534,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *,
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
+				discoveryResultType := *
 			}
 			
 			
@@ -602,7 +547,6 @@ module OneM2M_Templates {
 			 * @param p_stemId
 			 */
 			template (value) RequestPrimitive m_createAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_to := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_stemId := "") modifies m_create:= {
-				to_ := p_to,
 				from_ := p_from,//PX_AE_ID_STEM,//TODO We should use omit, "s", or "c"
 				requestIdentifier := testcasename() & "-m_createAEAnnc",
 				resourceType := int10002,
@@ -632,11 +576,11 @@ module OneM2M_Templates {
 				primitiveContent := {aE := p_ae}
 			};  
 			        	
-        	template (value) RequestPrimitive m_createAeAux(template (omit) AcpType p_accessControlPolicyIds := omit, in template (omit) PoaList p_poaList) modifies m_create := {
-        		from_ := PX_AE1_ID_STEM,//TODO We should use omit, "s", or "c"
+			template (value) RequestPrimitive m_createAeAux(template (omit) AcpType p_accessControlPolicyIds := omit, in template (omit) PoaList p_poaList) modifies m_create := {
+				from_ := PX_AE1_ID_STEM,//TODO We should use omit, "s", or "c"
 				requestIdentifier := testcasename() & "-m_createAe",
-        		resourceType := int2,
-        		primitiveContent := {aE := m_contentCreateAe(p_accessControlPolicyIds, c_aeAuxName, -, p_poaList)}
+				resourceType := int2,
+				primitiveContent := {aE := m_contentCreateAe(p_accessControlPolicyIds, c_aeAuxName, -, p_poaList)}
 			};
         	
 			/**
@@ -648,12 +592,12 @@ module OneM2M_Templates {
 				primitiveContent := {accessControlPolicy := m_contentCreateAcp ()}
 			};
 				
-        	template (value) RequestPrimitive m_createAcp(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name := c_defaultAccessControlPolicyResourceName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63) modifies m_create := {
-        		to_ := p_parentResourceAddress,
+			template (value) RequestPrimitive m_createAcp(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name := c_defaultAccessControlPolicyResourceName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63) modifies m_create := {
+				to_ := p_parentResourceAddress,
 				requestIdentifier := testcasename() & "-m_createAcp",
-        		resourceType := int1,
-        		primitiveContent := {accessControlPolicy := m_contentCreateAcp (p_name, p_acor, p_allowedOperations)}
-        	};
+				resourceType := int1,
+				primitiveContent := {accessControlPolicy := m_contentCreateAcp (p_name, p_acor, p_allowedOperations)}
+			};
         	
 			/**
 			 * @desc Reception template for CREATE AcpAnnc
@@ -669,11 +613,11 @@ module OneM2M_Templates {
 			/**
 			 * @desc Base CREATE request primitive for AccessControlPolicy resource (AUX)
 			 */
-        	template (value) RequestPrimitive m_createAcpAux(in template (value) XSD.String p_acpName := c_acpAuxName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63 ) modifies m_create := {
+			template (value) RequestPrimitive m_createAcpAux(in template (value) XSD.String p_acpName := c_acpAuxName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63 ) modifies m_create := {
 				requestIdentifier := testcasename() & "-m_createAcpAux",
-        		resourceType := int1,
-        		primitiveContent := {accessControlPolicy := m_contentCreateAcp (p_acpName, p_acor, p_allowedOperations)}
-        	};
+				resourceType := int1,
+				primitiveContent := {accessControlPolicy := m_contentCreateAcp (p_acpName, p_acor, p_allowedOperations)}
+			};
         	
 			/*template (value) RequestPrimitive m_createCSEBase (in ServiceSubscribedAppRule p_serviceSubscribedAppRule) modifies m_create := {
 				from_ := PX_SUPER_USER,
@@ -711,11 +655,19 @@ module OneM2M_Templates {
 			};
 			
 			/**
-			 * @desc CREATE request primitive for remoteCSE resource
+			 * @desc Reception template for CREATE RemoteCSE
+			 */
+			template RequestPrimitive mw_createRemoteCSE(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_create := {
+				resourceType := int16,
+				primitiveContent := {remoteCSE := ?}	//{remoteCSE := m_contentCreateRemoteCSE(p_resourceName, p_accessControlPolicyIds,p_cSEBase, p_cSE_ID)}
+			};
+			
+			/**
+			 * @desc Base reception template for CREATE RemoteCSE
 			 */
 			template RequestPrimitive mw_createRemoteCSEBase(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_create := {
 				resourceType := int16,
-				primitiveContent := ?//{remoteCSE := m_contentCreateRemoteCSE(p_resourceName, p_accessControlPolicyIds,p_cSEBase, p_cSE_ID)}
+				primitiveContent := {remoteCSE := mw_contentCreateRemoteCSEBase}
 			};
 			
 			/**
@@ -725,12 +677,12 @@ module OneM2M_Templates {
 				primitiveContent := {container := m_contentCreateContainer(omit)}
 			};
 	
-    		template (value) RequestPrimitive m_createContainer(XSD.ID p_parentResourceAddress, in template (omit) XSD.String p_resourceName := c_defaultContainerResourceName) modifies m_create := {
-    			to_ := p_parentResourceAddress,
+			template (value) RequestPrimitive m_createContainer(XSD.ID p_parentResourceAddress, in template (omit) XSD.String p_resourceName := c_defaultContainerResourceName) modifies m_create := {
+				to_ := p_parentResourceAddress,
 				requestIdentifier := testcasename() & "-m_createContainer",
-    			resourceType := int3,
-    			primitiveContent := {container := m_contentCreateContainer(p_resourceName)}
-    		};
+				resourceType := int3,
+				primitiveContent := {container := m_contentCreateContainer(p_resourceName)}
+			};
         	
 			/**
 			 * @desc Reception template for CREATE Container
@@ -747,22 +699,6 @@ module OneM2M_Templates {
 				resourceType := int10003,
 				primitiveContent := {containerAnnc := mw_contentCreateContainerAnncBase}
 			};
-			
-			/**
-			 * @desc Reception template for CREATE FlexContainer
-			 */
-			template RequestPrimitive mw_createFlexContainer(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_create := {
-				resourceType := int28, 
-				primitiveContent := {flexContainer := ?}
-			};  
-			
-			/**
-			 * @desc Reception template for CREATE GenericInterworkingOperationInstance
-			 */
-			template RequestPrimitive mw_createGenericIwkOpInstance(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_create := {
-				resourceType := int28,  // FIXME: not found in TS004
-				primitiveContent := {genericInterworkingOperationInstance := ?}
-			}; 
         	
 			/**
 			 * @desc Base CREATE request primitive for Content Instance resource
@@ -780,13 +716,13 @@ module OneM2M_Templates {
 				primitiveContent := {contentInstance := m_contentCreateContentInstance(omit)}
 			};
     		
-    		template (value) RequestPrimitive m_createContentInstance(XSD.ID p_parentResourceAddress, XSD.String p_primitiveContent) modifies m_create := {
-    			to_ := p_parentResourceAddress,
-    			from_ := "admin:admin",
+			template (value) RequestPrimitive m_createContentInstance(XSD.ID p_parentResourceAddress, XSD.String p_primitiveContent) modifies m_create := {
+				to_ := p_parentResourceAddress,
+				from_ := "admin:admin",
 				requestIdentifier := testcasename() & "-m_createContentInstance",
-    			resourceType := int4,
-    			primitiveContent := {contentInstance := m_contentCreateContentInstance(-, p_primitiveContent)}
-    		};
+				resourceType := int4,
+				primitiveContent := {contentInstance := m_contentCreateContentInstance(-, p_primitiveContent)}
+			};
     		
 			/**
 			 * @desc Reception template for CREATE ContentInstanceAnnc
@@ -794,8 +730,8 @@ module OneM2M_Templates {
 			template RequestPrimitive mw_createContentInstanceAnnc(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_create := {
 				resourceType := int10014,
 				primitiveContent := {contentInstanceAnnc := ?}
-			};  
-			
+			}; 
+		
 			/**
 			 * @desc Reception template for CREATE ContentInstance
 			 */
@@ -831,7 +767,7 @@ module OneM2M_Templates {
 				primitiveContent := {group_ := m_contentCreateGroup (1, {"NotInitialized"}, omit, omit)}	//TODO: p_resourceId
 			};
         	
-        	template (value) RequestPrimitive m_createGroup(in template (value) XSD.NonNegativeInteger p_maxNrOfMembers,
+			template (value) RequestPrimitive m_createGroup(in template (value) XSD.NonNegativeInteger p_maxNrOfMembers,
 															in template (value) ListOfURIs p_memberIds := {"NotInitialized"},
 															in template (omit) AcpType p_accessControlPolicyIds,
 															in template (omit) MemberType p_memberType := omit,
@@ -839,9 +775,9 @@ module OneM2M_Templates {
 															in template (omit) ListOfURIs p_membersAccessControlPolicyIDs := omit,
 															in template (omit) XSD.String p_name := "MyGroup") modifies m_create := {
 				requestIdentifier := testcasename() & "-m_createGroup",
-        		resourceType := int9,
-        		primitiveContent := {group_ := m_contentCreateGroup (p_maxNrOfMembers, p_memberIds, p_accessControlPolicyIds, p_memberType, p_consistencyStrategy, p_membersAccessControlPolicyIDs, p_name)}	//TODO: p_resourceId
-        	};
+				resourceType := int9,
+				primitiveContent := {group_ := m_contentCreateGroup (p_maxNrOfMembers, p_memberIds, p_accessControlPolicyIds, p_memberType, p_consistencyStrategy, p_membersAccessControlPolicyIDs, p_name)}	//TODO: p_resourceId
+			};
         	
 			/**
 			 * @desc Reception template for CREATE GroupAnnc
@@ -937,29 +873,29 @@ module OneM2M_Templates {
 				primitiveContent := {pollingChannel := m_contentCreatePollingChannel (-)}
 			};
         	
-        	template (value) RequestPrimitive m_createPollingChannel(XSD.ID p_parentResourceAddress, in template (value)XSD.ID p_originatorId) modifies m_create := {
-        		to_ := p_parentResourceAddress,
-        		from_ := p_originatorId,
+			template (value) RequestPrimitive m_createPollingChannel(XSD.ID p_parentResourceAddress, in template (value)XSD.ID p_originatorId) modifies m_create := {
+				to_ := p_parentResourceAddress,
+				from_ := p_originatorId,
 				requestIdentifier := testcasename() & "-m_createPollingChannel",
-        		resourceType := int15,
-        		primitiveContent := {pollingChannel := m_contentCreatePollingChannel ()}
-        	};
+				resourceType := int15,
+				primitiveContent := {pollingChannel := m_contentCreatePollingChannel ()}
+			};
         	
 			/**
 			 * @desc Base CREATE request primitive for Schedule resource
 			 */
-        	template (value) RequestPrimitive m_createScheduleBase modifies m_create := {
+			template (value) RequestPrimitive m_createScheduleBase modifies m_create := {
 				requestIdentifier := testcasename() & "-m_createSchedule",
-        		resourceType := int18,
-        		primitiveContent := {schedule := m_contentCreateSchedule ({{"0 0 0,1,2 1 1 * *"}})}
-        	};
+				resourceType := int18,
+				primitiveContent := {schedule := m_contentCreateSchedule ({{"0 0 0,1,2 1 1 * *"}})}
+			};
         	
-        	template (value) RequestPrimitive m_createSchedule(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name, in template (value) ScheduleEntries p_scheduleElement ) modifies m_create := {
-        		to_ := p_parentResourceAddress,
+			template (value) RequestPrimitive m_createSchedule(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name, in template (value) ScheduleEntries p_scheduleElement ) modifies m_create := {
+				to_ := p_parentResourceAddress,
 				requestIdentifier := testcasename() & "-m_createSchedule",
-        		resourceType := int18,
-        		primitiveContent := {schedule := m_contentCreateSchedule (p_scheduleElement, p_name)}
-        	};
+				resourceType := int18,
+				primitiveContent := {schedule := m_contentCreateSchedule (p_scheduleElement, p_name)}
+			};
         	
 			/**
 			 * @desc Reception template for CREATE ScheduleAnnc
@@ -1001,13 +937,13 @@ module OneM2M_Templates {
 				primitiveContent := {subscription := m_contentCreateSubscription ({"NotInitialized"})}
 			};
         	
-        	template (value) RequestPrimitive m_createSubscription(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name, in template (value) ListOfURIs p_notificationURI := {"NotInitialized"}) modifies m_create := {
-        		to_ := p_parentResourceAddress,
+			template (value) RequestPrimitive m_createSubscription(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name, in template (value) ListOfURIs p_notificationURI := {"NotInitialized"}) modifies m_create := {
+				to_ := p_parentResourceAddress,
 				requestIdentifier := testcasename() & "-m_createSubscription",
-        		resourceType := int23,
-        		primitiveContent := {subscription := m_contentCreateSubscription (p_notificationURI, p_name)}
-        	};
-        	
+				resourceType := int23,
+				primitiveContent := {subscription := m_contentCreateSubscription (p_notificationURI, p_name)}
+			};
+			
         	/**
 			 * @desc Reception template for CREATE Subscription
 			 */
@@ -1024,12 +960,12 @@ module OneM2M_Templates {
 																		   in template (omit) BatchNotify p_batchNotify := omit,
 																		   in template (omit) XSD.Boolean p_latestNotify := omit,
 																		   in template (omit) XSD.AnyURI p_subscriberURI := omit,
-																		   in template (omit) NotificationContentType p_notificationContentType := int1,
-			                                                               in template (omit) PendingNotification p_pendingNotification) modifies m_createSubscription := {
+																		   in template (omit) NotificationContentType p_notificationContentType := int1, 
+																		   in template (omit) PendingNotification p_pendingNotification) modifies m_createSubscription := {
 				primitiveContent := {subscription := m_contentCreateSubscriptionAdvanced (p_notificationURI, p_name, p_eventNotificationCriteria, p_expirationCounter, p_batchNotify, p_latestNotify, p_subscriberURI, p_notificationContentType, p_pendingNotification)}
 			};
         	
-        	/**
+			/**
 			 * @desc Base CREATE request primitive for Location Policy resource
 			 */
 			template (value) RequestPrimitive m_createLocationPolicyBase modifies m_create := {
@@ -1041,10 +977,10 @@ module OneM2M_Templates {
 			template (value) RequestPrimitive m_createLocationPolicy(in template (value) LocationSource p_locationSource, in template (omit) AcpType p_accessControlPolicyIds, in template (omit) XSD.Duration p_locationUpdatePeriod, in template (omit) NodeID p_locationTargetID, in template (omit) XSD.AnyURI p_locationServerAddress) modifies m_create := {
         		
 				requestIdentifier	:= testcasename() & "-m_createLocationPolicy", //the requestIdentifier is supposed to be set similar as "C190XX7T/001"  by prepending the AE-ID-Stem and slash(‘/’) in front of it
-        	  	resourceType		:= int10,
-        	  	primitiveContent	:= {locationPolicy := m_contentCreateLocationPolicy(p_locationSource, p_accessControlPolicyIds, p_locationUpdatePeriod, p_locationTargetID, p_locationServerAddress) },
-			  	resultContent := int1//default
-        	};
+				resourceType		:= int10,
+				primitiveContent	:= {locationPolicy := m_contentCreateLocationPolicy(p_locationSource, p_accessControlPolicyIds, p_locationUpdatePeriod, p_locationTargetID, p_locationServerAddress) },
+				resultContent := int1//default
+			};
         	
 			/**
 			 * @desc Reception template for CREATE LocationPolicyAnnc
@@ -1062,19 +998,11 @@ module OneM2M_Templates {
 				primitiveContent := {locationPolicyAnnc := mw_contentCreateLocationPolicyAnncBase}
 			}; 
 			
-        	template (value) RequestPrimitive m_createNotification(in template (value) Representation p_resourcePresentation, in template (omit)NotificationEventType p_notifEventType, in template (omit) XSD.AnyURI p_subscriptionReference, in template (omit) XSD.AnyURI p_notifForwardingURI) modifies m_create := {
+			template (value) RequestPrimitive m_createNotification(in template (value) Representation p_resourcePresentation, in template (omit)NotificationEventType p_notifEventType, in template (omit) XSD.AnyURI p_subscriptionReference, in template (omit) XSD.AnyURI p_notifForwardingURI) modifies m_create := {
 			  requestIdentifier	:= testcasename() & "-m_createNotification",
-        	  primitiveContent	:= {notification := m_contentCreateNotification(p_resourcePresentation, p_notifEventType, p_subscriptionReference, p_notifForwardingURI)},
-        	  resultContent		:= int1 //default
+			  primitiveContent	:= {notification := m_contentCreateNotification(p_resourcePresentation, p_notifEventType, p_subscriptionReference, p_notifForwardingURI)},
+			  resultContent		:= int1 //default
         	  
-        	};
-        	
-			/**
-			 * @desc Reception template for SemanticDescriptor creation
-			 */
-			template RequestPrimitive mw_createSemanticDescriptor(template XSD.ID p_from := *, template XSD.ID p_to := ?, template (present) SemanticDescriptor_optional p_semanticDescriptor := mw_contentCreateSemanticDescriptor) modifies mw_create := {
-				resourceType := int24,
-				primitiveContent := {semanticDescriptor := p_semanticDescriptor}
 			};
 			
 			/**
@@ -1104,18 +1032,18 @@ module OneM2M_Templates {
 				primitiveContent := {m2mServiceSubscriptionProfile := m_contentCreatem2mServiceSubscriptionProfileBase}
 			};
 			
-    	}//end group Create
+		}//end group Create
     	
-    	group Delete {
+		group Delete {
     	
 			template (value) RequestPrimitive m_delete(XSD.ID p_resourceAddress, in XSD.ID p_originator := PX_SUPER_AE_ID) := {
-        		operation := int4,
-        		to_ := p_resourceAddress,
-        		from_ := p_originator,
-        		requestIdentifier := testcasename() & "-m_deleteResource" & f_rnd(1, 1000000),
-        		resourceType := omit,
-        		primitiveContent := omit, 
-				roleIDs := omit, 
+				operation := int4,
+				to_ := p_resourceAddress,
+				from_ := p_originator,
+				requestIdentifier := testcasename() & "-m_deleteResource" & f_rnd(1, 1000000),
+				resourceType := omit,
+				primitiveContent := omit, 
+				role := omit, 
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -1127,21 +1055,17 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit, 
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
-
-			template RequestPrimitive mw_deleteRequest(template XSD.ID p_resourceAddress := ?) := {
+			
+			template RequestPrimitive mw_deleteRequest(template XSD.ID p_resourceAddress := ?, template XSD.ID p_from := *) := {
 				operation := int4,
 				to_ := p_resourceAddress,
-				from_ := ?,
+				from_ := p_from,
 				requestIdentifier := ?,
 				resourceType := *,
 				primitiveContent := *, 
-				roleIDs := *, 
+				role := *, 
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -1153,18 +1077,14 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *, 
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
-        	};
+				discoveryResultType := *
+			};
         	
-    	}//end group Delete
+		}//end group Delete
     	
-    	group Notify {
-    		
-			/**
+		group Notify {
+			
+    		/**
 			 * @desc Base NOTIFY request primitive
 			 */
 			template RequestPrimitive m_notifyRequest := {
@@ -1174,7 +1094,7 @@ module OneM2M_Templates {
 				requestIdentifier := testcasename() & "-m_notifyRequest" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := {notification := m_contentCreateNotification_allOmit},
-				roleIDs := omit,
+				role := omit,
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -1186,11 +1106,7 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
 			
 			/**
@@ -1203,7 +1119,7 @@ module OneM2M_Templates {
 				requestIdentifier := testcasename() & "-m_notifyAggregatedRequest" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := {aggregatedNotification := {notification_list := {m_contentCreateNotification_allOmit,m_contentCreateNotification_allOmit}}},
-				roleIDs := omit,
+				role := omit,
 				originatingTimestamp := omit,
 				requestExpirationTimestamp := omit,
 				resultExpirationTimestamp := omit,
@@ -1215,11 +1131,7 @@ module OneM2M_Templates {
 				deliveryAggregation := omit,
 				groupRequestIdentifier := omit,
 				filterCriteria := omit,
-				discoveryResultType := omit,
-				tokens := omit,
-				tokenIDs := omit,
-				localTokenIDs := omit,
-				tokenRequestIndicator := omit
+				discoveryResultType := omit
 			};
     		
     		/**
@@ -1232,7 +1144,7 @@ module OneM2M_Templates {
 				requestIdentifier := ?,
 				resourceType := *,
 				primitiveContent := {notification := mw_contentNotificationBase},
-				roleIDs := *,
+				role := *,
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -1244,11 +1156,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *,
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
+				discoveryResultType := *
 			};
 			
 			/**
@@ -1261,7 +1169,7 @@ module OneM2M_Templates {
 				requestIdentifier := ?,
 				resourceType := *,
 				primitiveContent := { aggregatedNotification := ?},
-				roleIDs := *,
+				role := *,
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
 				resultExpirationTimestamp := *,
@@ -1273,11 +1181,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *,
-				tokens := *,
-				tokenIDs := *,
-				localTokenIDs := *,
-				tokenRequestIndicator := *
+				discoveryResultType := *
 			};
 			
 			/**
@@ -1291,7 +1195,7 @@ module OneM2M_Templates {
 
 			
     		
-    	}//end of group Notify
+		}//end of group Notify
 	}//end group RequestPrimitives
 	
 	group ContentCreate {
@@ -1310,6 +1214,10 @@ module OneM2M_Templates {
 		            
         template PrimitiveContent m_primitiveContentCSEBase(template CSEBase_optional p_cSEBase) := {
 	        cSEBase := p_cSEBase
+		}
+		
+		template PrimitiveContent m_primitiveContentRemoteCSE(template RemoteCSE_optional p_remoteCSE) := {
+			remoteCSE := p_remoteCSE
 		}
 		
 		 template PrimitiveContent mw_primitiveContent := ?;
@@ -1332,7 +1240,6 @@ module OneM2M_Templates {
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
 			link := omit,//M TODO Put the right value
-			dynamicAuthorizationConsultationIDs := omit, //TODO Check whether it is optional or mandatory for create operation			
 			appName := omit,//O
 			app_ID := p_appId,//M
 			aE_ID := omit,//NP
@@ -1341,7 +1248,6 @@ module OneM2M_Templates {
 			nodeLink := p_nodeLink,//NP
 			requestReachability := true,//M
 			contentSerialization := omit,//O
-			e2eSecInfo := omit, //O TODO Check whether it is optional or mandatory for create operation
 			choice := omit//NP
 		};	
 
@@ -1353,17 +1259,16 @@ module OneM2M_Templates {
 		 * @param p_nodeLink Node link
 		 */
 		template AEAnnc_optional mw_contentCreateAEAnnc (in template  Labels p_labels := ?, in template AcpType p_accessControlPolicyIds := ?) := {
-    		resourceName := omit,//NA M
-    		resourceType := omit,//NA M
-    		resourceID := omit,//NA M
-    		parentID := omit,//NA M
-    		creationTime := omit,//NA M
-    		lastModifiedTime := omit,//NA M
-    		labels := p_labels,//MA
-    		accessControlPolicyIDs := p_accessControlPolicyIds,//MA
-    		expirationTime := ?,//MA M
-    		link := ?,//M
-    		dynamicAuthorizationConsultationIDs := omit, //OA			
+			resourceName := omit,//NA M
+			resourceType := omit,//NA M
+			resourceID := omit,//NA M
+			parentID := omit,//NA M
+			creationTime := omit,//NA M
+			lastModifiedTime := omit,//NA M
+			labels := p_labels,//MA
+			accessControlPolicyIDs := p_accessControlPolicyIds,//MA
+			expirationTime := ?,//MA M
+			link := ?,//M
 			appName := omit,//OA
 			app_ID := omit,//OA
 			aE_ID := omit,//OA
@@ -1372,16 +1277,15 @@ module OneM2M_Templates {
 			nodeLink := omit,//OA
 			requestReachability := omit,//OA
 			contentSerialization := omit,//OA
-			e2eSecInfo := ?, //MA
 			choice := omit//NA
 		};	
 		
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for AE resource
-    	 * @param p_name Resource name
-    	 * @param p_accessControlPolicyIds ACP IDs for the AE
-    	 */
-    	template (value) AE_optional m_contentCreateAe (in template (omit) AcpType p_accessControlPolicyIds, in template (omit)  XSD.String p_name := c_defaultAeResourceName, in template (omit) XSD.ID p_appId := PX_APP_ID, in template (omit) PoaList p_poaList) := {
+		/**
+		 * @desc Base primitiveContent for CREATE operation for AE resource
+		 * @param p_name Resource name
+		 * @param p_accessControlPolicyIds ACP IDs for the AE
+		 */
+		template (value) AE_optional m_contentCreateAe (in template (omit) AcpType p_accessControlPolicyIds, in template (omit)  XSD.String p_name := c_defaultAeResourceName, in template (omit) XSD.ID p_appId := PX_APP_ID, in template (omit) PoaList p_poaList) := {
 
 			resourceName := p_name,//O
 			resourceType := omit,//NP
@@ -1392,28 +1296,26 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
-    		announceTo := omit,//O
-    		announcedAttribute := omit,//O
-    		appName := omit,//O
+			announceTo := omit,//O
+			announcedAttribute := omit,//O
+			appName := omit,//O
 			app_ID := p_appId,//M
-    		aE_ID := omit,//NP
-    		pointOfAccess := p_poaList, //O {"http://127.0.0.1:1400/monitor"},//{"http://192.168.1.92:18080/notifications/AE"}, // TODO: Check this => AE PoA
-    		ontologyRef := omit,//O
-    		nodeLink := omit,//NP
-    		requestReachability := true,//M
-    		contentSerialization := omit,//O
-			e2eSecInfo := omit, //O
-    		choice := omit//NP
-    	};	
+			aE_ID := omit,//NP
+			pointOfAccess := p_poaList, //O {"http://127.0.0.1:1400/monitor"},//{"http://192.168.1.92:18080/notifications/AE"}, // TODO: Check this => AE PoA
+			ontologyRef := omit,//O
+			nodeLink := omit,//NP
+			requestReachability := true,//M
+			contentSerialization := omit,//O
+			choice := omit//NP
+		};	
     	
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for AccessControlPolicy resource
-    	 * @param p_name Resource name
-    	 * @param p_acor Allowed originators
-    	 * @param p_allowedOperations Allowed operations
-    	 */
-    	template (value) AccessControlPolicy_optional m_contentCreateAcp (in template (omit) XSD.String p_name := c_defaultAccessControlPolicyResourceName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63 ) := {
+		/**
+		 * @desc Base primitiveContent for CREATE operation for AccessControlPolicy resource
+		 * @param p_name Resource name
+		 * @param p_acor Allowed originators
+		 * @param p_allowedOperations Allowed operations
+		 */
+		template (value) AccessControlPolicy_optional m_contentCreateAcp (in template (omit) XSD.String p_name := c_defaultAccessControlPolicyResourceName, in template (value) ListOfURIs p_acor := PX_ACOR, in template (value) AccessControlOperations p_allowedOperations := int63 ) := {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
 			resourceID := omit,//NP
@@ -1455,9 +1357,7 @@ module OneM2M_Templates {
 		template (value) AccessControlRule m_createAcr (in template (value) ListOfURIs p_acor, in template (value) AccessControlOperations p_allowedOperations) := {
 			accessControlOriginators := p_acor,//{"*"},//{PX_AE_ID_STEM}, //{"admin:admin"},
 			accessControlOperations := p_allowedOperations,
-			accessControlContexts_list := {},
-			accessControlAuthenticationFlag := omit, 
-			accessControlObjectDetails_list := {}
+			accessControlContexts_list := {}
 		}
     	
 		/*template (value) CSEBase_optional m_contentCreateCSEBase (in template (value) ServiceSubscribedAppRule p_serviceSubscribedAppRule) := {
@@ -1500,8 +1400,6 @@ module OneM2M_Templates {
 			supportedResourceType := omit,
 			pointOfAccess := omit,
 			nodeLink := omit,
-			dynamicAuthorizationConsultationIDs := omit,
-			e2eSecInfo := omit, 
 			choice := omit
 		};
 		
@@ -1527,7 +1425,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit,//O
 			stateTag := omit,//NP
 			source := p_source,//M
 			target := p_target,//M
@@ -1539,19 +1436,19 @@ module OneM2M_Templates {
 			
 		};    
     	
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for Group resource
-    	 * @param p_maxNrOfMembers Max number of members
-    	 * @param p_memberIds Member IDs
-    	 * @param p_accessControlPolicyIds ACP IDs for the Group
-    	 * @param p_name Resource name
-    	 */
-    	template (value) Group_optional m_contentCreateGroup (	in template (value) XSD.PositiveInteger p_maxNrOfMembers,
-    															in template (value) ListOfURIs p_memberIds,
-    															in template (omit) AcpType p_accessControlPolicyIds,
-    															in template (omit) MemberType p_memberType := omit,
-    															in template (omit) ConsistencyStrategy p_consistencyStrategy := omit,
-    															in template (omit) ListOfURIs p_membersAccessControlPolicyIDs := omit,
+		/**
+		 * @desc Base primitiveContent for CREATE operation for Group resource
+		 * @param p_maxNrOfMembers Max number of members
+		 * @param p_memberIds Member IDs
+		 * @param p_accessControlPolicyIds ACP IDs for the Group
+		 * @param p_name Resource name
+		 */
+		template (value) Group_optional m_contentCreateGroup (	in template (value) XSD.PositiveInteger p_maxNrOfMembers,
+																in template (value) ListOfURIs p_memberIds,
+																in template (omit) AcpType p_accessControlPolicyIds,
+																in template (omit) MemberType p_memberType := omit,
+																in template (omit) ConsistencyStrategy p_consistencyStrategy := omit,
+																in template (omit) ListOfURIs p_membersAccessControlPolicyIDs := omit,
 																in template (omit) XSD.String p_name := c_defaultGroupResourceName) := {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
@@ -1562,7 +1459,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			creator := omit,//O
@@ -1574,9 +1470,8 @@ module OneM2M_Templates {
 			memberTypeValidated := omit,//NP
 			consistencyStrategy := p_consistencyStrategy,//O
 			groupName := omit,//O
-			semanticSupportIndicator := omit,//O
 			choice := omit//NP
-    	};  
+		};  
     	
 		  /**
 		  * @desc Base reception template of primitiveContent for CREATE operation for GroupAnnc resource
@@ -1592,7 +1487,6 @@ module OneM2M_Templates {
 			  accessControlPolicyIDs := ?,//MA
 			  expirationTime := ?,//MA M
 			  link := ?,
-			  dynamicAuthorizationConsultationIDs := *, //OA
 			  memberType := *, //OA
 			  currentNrOfMembers := *, //OA
 			  maxNrOfMembers := *, //OA
@@ -1601,7 +1495,6 @@ module OneM2M_Templates {
 			  memberTypeValidated := *, //OA
 			  consistencyStrategy := *, //OA
 			  groupName := *, //OA
-			  semanticSupportIndicator := *,//OA
 			  choice := omit //NA
 		  };
     	
@@ -1621,7 +1514,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			mgmtDefinition := omit,//O
@@ -1646,7 +1538,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			mgmtDefinition := omit,//O
@@ -1669,7 +1560,6 @@ module OneM2M_Templates {
 			accessControlPolicyIDs := ?,//MA
 			expirationTime := ?,//MA M
 			link := ?,
-			dynamicAuthorizationConsultationIDs := *, //OA
 			mgmtDefinition := ?, //MA
 			objectIDs := *, //OA
 			objectPaths := *, //OA
@@ -1692,38 +1582,36 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			nodeID := p_nodeId,//M
 			hostedCSELink := omit,//O
-			mgmtClientAddress := omit,//O
 			choice := omit//O
 		};	  	
 		
     	
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for PollingChannel resource
-    	 * @param p_accessControlPolicyIds ACP IDs for the PollingChannel
-    	 * @param p_name Resource name
-    	 */
-    	template (value) PollingChannel_optional m_contentCreatePollingChannel (in template (omit) XSD.String p_name := c_defaultPollingChannelResourceName) := {
+		/**
+		 * @desc Base primitiveContent for CREATE operation for PollingChannel resource
+		 * @param p_accessControlPolicyIds ACP IDs for the PollingChannel
+		 * @param p_name Resource name
+		 */
+		template (value) PollingChannel_optional m_contentCreatePollingChannel (in template (omit) XSD.String p_name := c_defaultPollingChannelResourceName) := {
 			resourceName := p_name,//O
-            resourceType := omit,//NP
-            resourceID := omit,//NP
-            parentID := omit,//NP
-            creationTime := omit,//NP
-            lastModifiedTime := omit,//NP
-            labels := omit,//O
-            expirationTime := omit//O
-    	};   	   	
+			resourceType := omit,//NP
+			resourceID := omit,//NP
+			parentID := omit,//NP
+			creationTime := omit,//NP
+			lastModifiedTime := omit,//NP
+			labels := omit,//O
+			expirationTime := omit//O
+		};   	   	
     	
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for Schedule resource
-    	 * @param p_scheduleElement Schedule
-    	 * @param p_name Resource name
-    	 */
-    	template (value) Schedule_optional m_contentCreateSchedule (in template (value) ScheduleEntries p_scheduleElement,
+		/**
+		 * @desc Base primitiveContent for CREATE operation for Schedule resource
+		 * @param p_scheduleElement Schedule
+		 * @param p_name Resource name
+		 */
+		template (value) Schedule_optional m_contentCreateSchedule (in template (value) ScheduleEntries p_scheduleElement,
 																	in template (omit) XSD.String p_name := c_defaultScheduleResourceName) := {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
@@ -1737,7 +1625,7 @@ module OneM2M_Templates {
 			announcedAttribute := omit,//O
 			scheduleElement := p_scheduleElement,//M
 			choice := omit//NP
-    	};  
+		};  
     	
 		/**
 		 * @desc Base reception template of primitiveContent for CREATE operation for ScheduleAnnc resource
@@ -1756,7 +1644,7 @@ module OneM2M_Templates {
 		};  	
     	
 		template (value) ServiceSubscribedAppRule_optional m_contentCreateServiceSubscribedAppRule (in ListOfM2MID p_applicableCredIDs, in ListOfM2MID p_allowedAppIDs, in ListOfM2MID p_allowedAEs) := {
-		  	resourceName := omit,//TODO TS-0004 7.4.29.1 2 Missing attribute
+			resourceName := omit,//TODO TS-0004 7.4.29.1 2 Missing attribute
 			resourceType := omit,//NP
 			resourceID := omit,//NP
 			parentID := omit,//NP
@@ -1765,11 +1653,9 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
 			applicableCredIDs := p_applicableCredIDs,//O
 			allowedApp_IDs := p_allowedAppIDs,//O
 			allowedAEs := p_allowedAEs,//O
-			allowedRole_IDs := omit,//O
 			choice := omit //O
 		}
 		
@@ -1787,18 +1673,17 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			creator := omit,//O
 			choice := omit//O
 		};  
     	
 
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for Subscription resource
-    	 * @param p_notificationURI Notification URI
-    	 * @param p_name Resource name
-    	 */
-    	template (value) Subscription_optional m_contentCreateSubscription (in template (value) ListOfURIs p_notificationURI,
+		/**
+		 * @desc Base primitiveContent for CREATE operation for Subscription resource
+		 * @param p_notificationURI Notification URI
+		 * @param p_name Resource name
+		 */
+		template (value) Subscription_optional m_contentCreateSubscription (in template (value) ListOfURIs p_notificationURI,
 																			in template (omit) XSD.String p_name := c_defaultSubscriptionResourceName) := {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
@@ -1809,8 +1694,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
-			creator := omit,//O
 			eventNotificationCriteria := omit,//O
 			expirationCounter := omit,//O
 			notificationURI := p_notificationURI,//M
@@ -1824,9 +1707,10 @@ module OneM2M_Templates {
 			latestNotify := omit,//O
 			notificationContentType := omit, //O
 			notificationEventCat := omit,//O
+			creator := omit,//O
 			subscriberURI := omit,//O
 			choice := omit//NP
-    	};   	
+		};   	
     	
 		template (value) Subscription_optional m_contentCreateSubscriptionAdvanced (in template (value) ListOfURIs p_notificationURI,
 																					in template (omit)  XSD.String p_name := c_defaultSubscriptionResourceName,
@@ -1835,8 +1719,8 @@ module OneM2M_Templates {
 																					in template (omit) BatchNotify p_batchNotify,
 																					in template (omit) XSD.Boolean p_latestNotify,
 																					in template (omit) XSD.AnyURI p_subscriberURI,
-																					in template (omit) NotificationContentType p_notificationContentType,
-		                                                                            in template (omit) PendingNotification p_pendingNotification) modifies m_contentCreateSubscription := {
+																					in template (omit) NotificationContentType p_notificationContentType, 
+																					in template (omit) PendingNotification p_pendingNotification) modifies m_contentCreateSubscription := {
 			eventNotificationCriteria := p_eventNotificationCriteria,//O
 			expirationCounter := p_expirationCounter,//O
 			batchNotify := p_batchNotify,//O
@@ -1859,8 +1743,7 @@ module OneM2M_Templates {
 			sizeBelow := omit,
 			operationMonitor_list := {},
 			attribute := p_attribute_list, 
-			notificationEventType_list := p_notificationEventType_list,// TODO this list should be able to be omited see 9.6.8 (TS0001)
-			missingData := omit
+			notificationEventType_list := p_notificationEventType_list// TODO this list should be able to be omited see 9.6.8 (TS0001)
 		};
         
 		template (value) BatchNotify m_batchNotify (in XSD.NonNegativeInteger p_number, in XSD.Duration p_duration := "PT20S") := {
@@ -1872,11 +1755,11 @@ module OneM2M_Templates {
 		
          	
     	
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for ContentInstance resource
-    	 * @param p_primitiveContent Content for the ContentInstance
-    	 */
-    	template (value) ContentInstance_optional m_contentCreateContentInstance(in template (omit) XSD.String p_name := c_defaultContentInstanceResourceName, XSD.String p_primitiveContent := "AnyValue") := {
+		/**
+		 * @desc Base primitiveContent for CREATE operation for ContentInstance resource
+		 * @param p_primitiveContent Content for the ContentInstance
+		 */
+		template (value) ContentInstance_optional m_contentCreateContentInstance(in template (omit) XSD.String p_name := c_defaultContentInstanceResourceName, XSD.String p_primitiveContent := "AnyValue") := {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
 			resourceID := omit,//NP
@@ -1891,12 +1774,10 @@ module OneM2M_Templates {
 			creator := omit,//O
 			contentInfo := "a",//O
 			contentSize := omit,//NP
-			contentRef := omit, //O
 			ontologyRef := omit,//O
-			content := p_primitiveContent,//M
-			choice := omit //O
+			content := p_primitiveContent//M
 		};
-		
+			
 		/**
 		 * @desc Base primitiveContent for CREATE operation for ContentInstanceAnnc resource
 		 * @param p_primitiveContent Content for the ContentInstanceAnnc
@@ -1915,15 +1796,14 @@ module OneM2M_Templates {
 			contentInfo := *,//OA
 			contentSize := *,//OA
 			ontologyRef := *,//OA
-			content := *, //OA
-			choice := omit //O
+			content := * //OA
 		};
 		
-    	/**
-    	 * @desc Base primitiveContent for CREATE operation for Container resource
-    	 * @param p_name Resource name
-    	 */
-    	template (value) Container_optional m_contentCreateContainer (in template (omit) XSD.String p_name := c_defaultContainerResourceName):= {
+		/**
+		 * @desc Base primitiveContent for CREATE operation for Container resource
+		 * @param p_name Resource name
+		 */
+		template (value) Container_optional m_contentCreateContainer (in template (omit) XSD.String p_name := c_defaultContainerResourceName):= {
 			resourceName := p_name,//O
 			resourceType := omit,//NP
 			resourceID := omit,//NP
@@ -1933,7 +1813,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			stateTag := omit,//NP
@@ -1945,12 +1824,11 @@ module OneM2M_Templates {
 			currentByteSize := omit,//NP
 			locationID := omit,//O
 			ontologyRef := omit,//O
-			disableRetrieval := omit, //O
 			choice := omit//NP
-    	};
+		};
     	
 		/**
-		 * @desc Base primitiveContent for CREATE operation for Container resource
+		 * @desc Base primitiveContent for CREATE operation for RemoteCSE resource
 		 * @param p_name Resource name
 		 */
 		template (value) RemoteCSE_optional m_contentCreateRemoteCSE (in template (omit) XSD.String p_name := c_defaultRemoteCSEResourceName, in template (omit) AcpType p_accessControlPolicyIds, in template (omit) XSD.AnyURI p_cSEBase := PX_CSE1_ID, in template (omit) XSD.ID p_cSE_ID := PX_CSE1_ID):= {
@@ -1963,7 +1841,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit,
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			cseType := omit,//O
@@ -1974,9 +1851,33 @@ module OneM2M_Templates {
 			trigger_Recipient_ID := omit,//O
 			requestReachability := true,//M
 			nodeLink := omit,//O
-			triggerReferenceNumber := omit,//O
-			e2eSecInfo := omit,//O
 			choice := omit//O
+		};
+		
+		/**
+	  	* @desc Base reception template of primitiveContent for CREATE operation for remoteCSE resource
+	  	*/
+		template RemoteCSE_optional mw_contentCreateRemoteCSEBase := {
+			resourceName := *,//O
+			resourceType := omit,//NP
+			resourceID := omit,//NP
+			parentID := omit,//NP
+			creationTime := omit,//NP
+			lastModifiedTime := omit,//NP
+			labels := *,//O
+			accessControlPolicyIDs := *,//O
+			expirationTime := *,//O
+			announceTo := *,//O
+			announcedAttribute := *,//O
+			cseType := *,//O
+			pointOfAccess := *,//O
+			cSEBase := ?,//M
+			cSE_ID := ?,//M
+			m2M_Ext_ID := *,//O
+			trigger_Recipient_ID := *,//O
+			requestReachability := ?,//M
+			nodeLink := *,//O
+			choice := *//O
 		};
     	
 		/**
@@ -1993,7 +1894,6 @@ module OneM2M_Templates {
 			accessControlPolicyIDs := ?,//MA
 			expirationTime := ?,//MA M
 			link := ?, //M
-			dynamicAuthorizationConsultationIDs := *, //OA
 			stateTag := *,	//OA
 			maxNrOfInstances := *,	//OA
 			maxByteSize := *, //OA
@@ -2002,33 +1902,31 @@ module OneM2M_Templates {
 			currentByteSize := *, //OA
 			locationID := *, //OA
 			ontologyRef := *, //OA
-			disableRetrieval := *, //OA
 			choice := omit //NA
 		};
     	
 		template (value) LocationPolicy_optional m_contentCreateLocationPolicy (in template (value) LocationSource p_locationSource, in template (omit) AcpType p_accessControlPolicyIds, in template (omit) XSD.Duration p_locationUpdatePeriod, in template (omit) NodeID p_locationTargetID, in template (omit) XSD.AnyURI p_locationServerAddress) := {
-    	  	resourceName 				:= c_defaultLocationPolicyResourceName, //O
-    	  	resourceType				:= omit, //NP
-    	    resourceID					:= omit, //NP
-    	    parentID					:= omit, //NP
-    	  	creationTime				:= omit, //NP
-    	  	lastModifiedTime			:= omit, //NP
-    	  	labels 						:= PX_LABELS,//O
-    	  	accessControlPolicyIDs 	:= p_accessControlPolicyIds, //O
- 	  	  	expirationTime 			:= omit, //O
-      		dynamicAuthorizationConsultationIDs := omit, //O
-    	  	announceTo 				:= omit, 				   //O
-    	  	announcedAttribute		:= omit, 			      //O
-    		locationSource 			:= p_locationSource, //M
-    		locationUpdatePeriod 		:= {p_locationUpdatePeriod}, //O
-    		locationTargetID 			:= p_locationTargetID, 	//O
-    		locationServer 			:= p_locationServerAddress,//O
-    		locationContainerID		:= omit,    		   //NP
-    		locationContainerName 	:= PX_LOCATION_CONTAINER_NAME,//O    		
-    	  	locationStatus				:= omit,              //NP
-    	    choice 					:= omit  	         //NP
+			resourceName 				:= c_defaultLocationPolicyResourceName, //O
+			resourceType				:= omit, //NP
+			resourceID					:= omit, //NP
+			parentID					:= omit, //NP
+			creationTime				:= omit, //NP
+			lastModifiedTime			:= omit, //NP
+			labels 						:= PX_LABELS,//O
+			accessControlPolicyIDs 	:= p_accessControlPolicyIds, //O
+			expirationTime 			:= omit, //O
+			announceTo 				:= omit, 				   //O
+			announcedAttribute		:= omit, 			      //O
+			locationSource 			:= p_locationSource, //M
+			locationUpdatePeriod 		:= p_locationUpdatePeriod, //O
+			locationTargetID 			:= p_locationTargetID, 	//O
+			locationServer 			:= p_locationServerAddress,//O
+			locationContainerID		:= omit,    		   //NP
+			locationContainerName 	:= PX_LOCATION_CONTAINER_NAME,//O    		
+			locationStatus				:= omit,              //NP
+			choice 					:= omit  	         //NP
     	   	  	
-    	};
+		};
     	
 		template (value) LocationPolicy_optional m_contentCreateLocationPolicyBase := {
 				resourceName 				:= c_defaultLocationPolicyResourceName, //O
@@ -2040,7 +1938,6 @@ module OneM2M_Templates {
 				labels 						:= PX_LABELS,//O
 				accessControlPolicyIDs 	:= omit, //O
 				expirationTime 			:= omit, //O
-				dynamicAuthorizationConsultationIDs := omit, //O
 				announceTo 				:= omit, 				   //O
 				announcedAttribute		:= omit, 			      //O
 				locationSource 			:= omit, //M
@@ -2067,7 +1964,6 @@ module OneM2M_Templates {
 		  accessControlPolicyIDs := ?,//MA
 		  expirationTime := ?,//MA M
 		  link := ?,
-		  dynamicAuthorizationConsultationIDs := *, //OA
 		  locationSource := *, //OA
 		  locationUpdatePeriod := *, //OA
 		  locationTargetID := *, //OA
@@ -2077,29 +1973,28 @@ module OneM2M_Templates {
 		  locationStatus := *	//OA
 	  };
     	
-    	template (value) Notification m_contentCreateNotification (in template (value) Representation p_resourcePresentation, 
-    																in template (omit) NotificationEventType p_notifEventType, 
-    																in template (omit) XSD.AnyURI p_subReference, 
-    																in template (omit) XSD.AnyURI p_notifForwardingURI) := {
-    	  notificationEvent := {
-    	    representation := p_resourcePresentation,
-        	operationMonitor := {
-        		operation := omit,
-        	    originator := omit
-        	},
-        	notificationEventType := p_notifEventType    	    
-    	  },
-    	  verificationRequest := omit,
-    	  subscriptionDeletion := omit,
-    	  subscriptionReference := p_subReference,
-    	  creator := omit,
-    	  notificationForwardingURI := p_notifForwardingURI,
-    	  iPEDiscoveryRequest := omit
-    	};
-    			
+		template (value) Notification m_contentCreateNotification (in template (value) Representation p_resourcePresentation, 
+																	in template (omit) NotificationEventType p_notifEventType, 
+																	in template (omit) XSD.AnyURI p_subReference, 
+																	in template (omit) XSD.AnyURI p_notifForwardingURI) := {
+		  notificationEvent := {
+			representation := p_resourcePresentation,
+			operationMonitor := {
+				operation := omit,
+				originator := omit
+			},
+			notificationEventType := p_notifEventType    	    
+		  },
+		  verificationRequest := omit,
+		  subscriptionDeletion := omit,
+		  subscriptionReference := p_subReference,
+		  creator := omit,
+		  notificationForwardingURI := p_notifForwardingURI
+		};
+		
 		template (value) Notification m_contentCreateNotification_allOmit := {
 		  notificationEvent := {
-		  	representation := omit,
+			representation := omit,
 			operationMonitor := {
 				operation := omit,
 				originator := omit
@@ -2110,41 +2005,8 @@ module OneM2M_Templates {
 		  subscriptionDeletion := omit,
 		  subscriptionReference := omit,
 		  creator := omit,
-		  notificationForwardingURI := omit, 
-		  iPEDiscoveryRequest := omit
+		  notificationForwardingURI := omit
 		};
-		/**
-		 * @desc 	Base primitiveContent for CREATE operation for SemanticDescriptor resource
-		 */
-		template SemanticDescriptor_optional mw_contentCreateSemanticDescriptor := {			
-			resourceName := *,                              //O
-			resourceType := omit,                           //NP
-			resourceID := omit,                             //NP
-			parentID := omit,                               //NP
-			creationTime := omit,                           //NP
-			lastModifiedTime := omit,                       //NP
-			labels := *,                                    //O
-			accessControlPolicyIDs := *,                    //O
-			expirationTime := *,                            //O
-			dynamicAuthorizationConsultationIDs := *,       //?
-			announceTo := *,                                //O
-			announcedAttribute := *,                        //O
-			creator := *,                                   //O
-			descriptorRepresentation := ?,                  //M
-			semanticOpExec := omit,                         //NP
-			descriptor := ?,                                //M
-			ontologyRef := *,                               //O
-			relatedSemantics := *,                          //O
-			choice := *                                     //?
-		} 
-		
-		/**
-		 * @desc  primitiveContent for CREATE operation for SemanticDescriptor resource, with specific OntologyRef
-		 * @param p_ontologyRef  Expected OntologyRef value
-		 */
-		template SemanticDescriptor_optional mw_contentCreateSemanticDescriptor_ontologyRef(template XSD.AnyURI p_ontologyRef) modifies mw_contentCreateSemanticDescriptor := {
-			ontologyRef := p_ontologyRef
-		}  
 		
 		/**
 			 * @desc Base primitiveContent for CREATE operation for StatConfig resource
@@ -2160,7 +2022,6 @@ module OneM2M_Templates {
 			labels 						:= PX_LABELS,//O
 			accessControlPolicyIDs 	:= omit, //O
 			expirationTime 			:= omit, //O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			creator                 := omit,
 			choice 					:= omit  	         //NP
 		};
@@ -2179,7 +2040,6 @@ module OneM2M_Templates {
 			labels 						:= PX_LABELS,//O
 			accessControlPolicyIDs 	:= omit, //O
 			expirationTime 			:= omit, //O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			creator                 := omit,
 			statsCollectID          := omit,
 			collectingEntityID      := omit,
@@ -2205,7 +2065,6 @@ module OneM2M_Templates {
 			labels 						:= PX_LABELS,//O
 			accessControlPolicyIDs 	:= omit, //O
 			expirationTime 			:= omit, //O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			choice 					:= omit  	         //NP
 		};
 		
@@ -2223,11 +2082,9 @@ module OneM2M_Templates {
 			labels 						:= PX_LABELS,//O
 			accessControlPolicyIDs 	:= omit, //O
 			expirationTime 			:= omit, //O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			applicableCredIDs       := omit,
 			allowedApp_IDs          := omit,
 			allowedAEs              := omit,
-			allowedRole_IDs			:= omit,
 			choice 					:= omit  	         //NP   
 		};
 		
@@ -2241,14 +2098,12 @@ module OneM2M_Templates {
 			labels 					:= omit, //O
 			accessControlPolicyIDs 	:= omit, //O
 			expirationTime 			:= omit, //M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			nodeID 					:= omit, //M
 			cSE_ID 					:= omit, //O
 			deviceIdentifier 		:= omit, //M
 			ruleLinks 				:= omit, //O
 			choice 					:= omit //O
 		};
-		
 	}//end group ContentCreate
 	
 	group ContentUpdate {
@@ -2266,7 +2121,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			appName := omit,//O
@@ -2277,7 +2131,6 @@ module OneM2M_Templates {
 			nodeLink := omit,//NP
 			requestReachability := omit,//O
 			contentSerialization := omit,//O
-			e2eSecInfo := omit, //O
 			choice := omit//NP
 		};	
     	
@@ -2318,7 +2171,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-	    	dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			creator := omit,//NP
@@ -2330,7 +2182,6 @@ module OneM2M_Templates {
 			memberTypeValidated := omit,//NP
 			consistencyStrategy := omit,//NP
 			groupName := omit,//O
-			semanticSupportIndicator := omit,//O
 			choice := omit//NP
 
 		};
@@ -2352,8 +2203,6 @@ module OneM2M_Templates {
 			supportedResourceType := omit,
 			pointOfAccess := omit,
 			nodeLink := omit,
-			dynamicAuthorizationConsultationIDs := omit,
-			e2eSecInfo := omit, 
 			choice := omit
 
 		};
@@ -2403,8 +2252,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
-			creator := omit,//NP
 			eventNotificationCriteria := omit,//O
 			expirationCounter := omit,//O
 			notificationURI := omit,//O
@@ -2418,6 +2265,7 @@ module OneM2M_Templates {
 			latestNotify := omit,//O
 			notificationContentType := omit,//O
 			notificationEventCat := omit,//O
+			creator := omit,//NP
 			subscriberURI := omit,//NP
 			choice := omit//NP
 		};
@@ -2435,7 +2283,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-    		dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			stateTag := omit,//NP
@@ -2447,7 +2294,6 @@ module OneM2M_Templates {
 			currentByteSize := omit,//NP
 			locationID := omit,//O
 			ontologyRef := omit,//O
-    		disableRetrieval := omit, //NP
 			choice := omit//NP
 		};
 		
@@ -2469,36 +2315,33 @@ module OneM2M_Templates {
 			creator := omit,//O
 			contentInfo := omit,//O
 			contentSize := omit,//NP
-			contentRef := omit, //O
 			ontologyRef := omit,//O
-			content := omit, //M
-			choice := omit //O
+			content := omit //M
 		};
 		
 		template (value) LocationPolicy_optional m_contentUpdateLocationPolicy (in template (omit) AcpType p_accessControlPolicyIds, in template (value) XSD.Duration p_locationUpdatePeriod) := {
-    	  	resourceName 			:= omit,//NP
-    	  	resourceType			:= omit,//NP
-    	    resourceID				:= omit,//NP
-    	    parentID				:= omit,//NP
-    	  	creationTime			:= omit,//NP
-    	  	lastModifiedTime		:= omit,//NP
-    	  	labels 					:= PX_LABELS,//O
-    	  	accessControlPolicyIDs 	:= p_accessControlPolicyIds,//O
-    	  	expirationTime 			:= omit,//O    	  	
-    		dynamicAuthorizationConsultationIDs := omit, //O
-    	  	announceTo 				:= omit,//O
-    	  	announcedAttribute		:= omit,//O
-    		locationSource 			:= omit,//NP
-			locationUpdatePeriod 	:= {p_locationUpdatePeriod}, //O
-    		locationTargetID 		:= omit, //NP
-    		locationServer 			:= omit, //NP
-    		locationContainerID		:= omit, //NP  
-    		locationContainerName 	:= PX_LOCATION_CONTAINER_NAME, //O    		 		
-    	  	locationStatus			:= omit, //NP
-    	    choice 					:= omit  //NP	   	  	
-    	};
+			resourceName 			:= omit,//NP
+			resourceType			:= omit,//NP
+			resourceID				:= omit,//NP
+			parentID				:= omit,//NP
+			creationTime			:= omit,//NP
+			lastModifiedTime		:= omit,//NP
+			labels 					:= PX_LABELS,//O
+			accessControlPolicyIDs 	:= p_accessControlPolicyIds,//O
+			expirationTime 			:= omit,//O    	  	
+			announceTo 				:= omit,//O
+			announcedAttribute		:= omit,//O
+			locationSource 			:= omit,//NP
+			locationUpdatePeriod 	:= p_locationUpdatePeriod, //O
+			locationTargetID 		:= omit, //NP
+			locationServer 			:= omit, //NP
+			locationContainerID		:= omit, //NP  
+			locationContainerName 	:= PX_LOCATION_CONTAINER_NAME, //O    		 		
+			locationStatus			:= omit, //NP
+			choice 					:= omit  //NP	   	  	
+		};
     	
-    	template (value) Node_optional m_contentUpdateNode := {
+		template (value) Node_optional m_contentUpdateNode := {
 			resourceName := omit,
 			resourceType := omit,
 			resourceID := omit,
@@ -2508,16 +2351,14 @@ module OneM2M_Templates {
 			labels := omit,
 			accessControlPolicyIDs := omit,
 			expirationTime := omit,
-			dynamicAuthorizationConsultationIDs := omit,
 			announceTo := omit,
 			announcedAttribute := omit,
 			nodeID := omit,
 			hostedCSELink := omit,
-			mgmtClientAddress := omit,
 			choice := omit
-    	}
+		}
     	
-    	template (value) RemoteCSE_optional m_contentUpdateRemoteCSE := {
+		template (value) RemoteCSE_optional m_contentUpdateRemoteCSE := {
 			resourceName := omit,
 			resourceType := omit,
 			resourceID := omit,
@@ -2527,7 +2368,6 @@ module OneM2M_Templates {
 			labels := omit,
 			accessControlPolicyIDs := omit,
 			expirationTime := omit,
-			dynamicAuthorizationConsultationIDs := omit,
 			announceTo := omit,
 			announcedAttribute := omit,
 			cseType := omit,
@@ -2538,10 +2378,8 @@ module OneM2M_Templates {
 			trigger_Recipient_ID := omit,
 			requestReachability := omit,
 			nodeLink := omit,
-			triggerReferenceNumber := omit,
-			e2eSecInfo := omit,
 			choice := omit
-    	}
+		}
     	
 		template (value) AEAnnc_optional m_contentUpdateAEAnnc (template (omit) XSD.ID p_appId := omit, template (omit) XSD.ID p_stemId := omit) := {
 			resourceName := omit,
@@ -2554,7 +2392,6 @@ module OneM2M_Templates {
 			accessControlPolicyIDs := omit,
 			expirationTime := omit,
 			link := omit,
-			dynamicAuthorizationConsultationIDs := omit,
 			appName := omit,
 			app_ID := p_appId,
 			aE_ID := omit,
@@ -2563,12 +2400,11 @@ module OneM2M_Templates {
 			nodeLink := omit,
 			requestReachability := omit,
 			contentSerialization := omit,
-			e2eSecInfo := omit,
 			choice := omit
-    	}
+		}
  		
 	}//end group ContentUpdate
-
+	
 	group RequestContent {
 		
 		group CreateRequest {
@@ -2613,7 +2449,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := ?,//M
-    		dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			appName := *,//O
@@ -2624,7 +2459,6 @@ module OneM2M_Templates {
 			nodeLink := *,//O
 			requestReachability := ?,//M
 			contentSerialization := *,//O
-			e2eSecInfo:= *, //O
 			choice := *//O
 		};
     	
@@ -2638,7 +2472,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			appName := omit,//O
@@ -2649,7 +2482,6 @@ module OneM2M_Templates {
 			nodeLink := omit,//O
 			requestReachability := omit,//M
 			contentSerialization := omit,//O
-			e2eSecInfo:= omit, //O
 			choice := omit//O
 		};
 		
@@ -2663,7 +2495,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := *,//M
-			dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			appName := *,//O
@@ -2674,7 +2505,6 @@ module OneM2M_Templates {
 			nodeLink := *,//O
 			requestReachability := *,//M
 			contentSerialization := *,//O
-			e2eSecInfo:= *, //O
 			choice := *//O
 		};
     	
@@ -2736,7 +2566,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			locationSource := omit,//M
@@ -2803,7 +2632,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := ?,//M
-    		dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			creator := *,//O
@@ -2815,7 +2643,6 @@ module OneM2M_Templates {
 			memberTypeValidated := *,//O
 			consistencyStrategy := *,//O
 			groupName := *,//O
-			semanticSupportIndicator := *,//O
 			choice := *//O
 		};
 		
@@ -2829,7 +2656,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := *,//M
-			dynamicAuthorizationConsultationIDs := *,//O
 			announceTo := *,//O
 			announcedAttribute := *,//M
 			creator := *,//O
@@ -2841,7 +2667,6 @@ module OneM2M_Templates {
 			memberTypeValidated := *,//M
 			consistencyStrategy := *,//O
 			groupName := *,//O
-			semanticSupportIndicator := *,//O
 			choice := *//O
 		}
 		
@@ -2855,7 +2680,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			announceTo := omit,//O
 			announcedAttribute := omit,//M
 			creator := omit,//O
@@ -2867,7 +2691,6 @@ module OneM2M_Templates {
 			memberTypeValidated := omit,//M
 			consistencyStrategy := omit,//O
 			groupName := omit,//O
-			semanticSupportIndicator := omit,//O
 			choice := omit//O
 		}
 		
@@ -2883,7 +2706,7 @@ module OneM2M_Templates {
 		}
 		
 		template Group_optional mw_contentGroup_rc4 modifies mw_contentGroupBase := {
-			choice := {choice_list := {{subscription := ?}}}	//O
+			choice := {subscription_list := ?}	//O
 		}
 		
 		template Group_optional mw_contentGroup_rc5 modifies mw_contentGroupBase := {
@@ -2900,7 +2723,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			announceTo := omit,//O
 			announcedAttribute := omit,//M
 			creator := omit,//O
@@ -2912,7 +2734,6 @@ module OneM2M_Templates {
 			memberTypeValidated := omit,//M
 			consistencyStrategy := omit,//O
 			groupName := omit,//O
-			semanticSupportIndicator := omit,//O
 			choice := {childResource_list := ?}//O
 		}
 		
@@ -2934,7 +2755,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			description := omit,//O
 			cmdType := omit,//M
 			execReqArgs := omit,//O
@@ -3017,7 +2837,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			cseType := omit,//O
@@ -3028,8 +2847,6 @@ module OneM2M_Templates {
 			trigger_Recipient_ID := omit,//O
 			requestReachability := omit,//M
 			nodeLink := omit,//O
-			triggerReferenceNumber := omit,//O
-			e2eSecInfo := omit,//O
 			choice := omit//O
 		};
 		
@@ -3043,7 +2860,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := ?,//M
-			dynamicAuthorizationConsultationIDs := *,//O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			cseType := *,//O
@@ -3054,8 +2870,6 @@ module OneM2M_Templates {
 			trigger_Recipient_ID := *,//O
 			requestReachability := ?,//M
 			nodeLink := *,//O
-			triggerReferenceNumber := *,//O
-			e2eSecInfo := *,//O
 			choice := *//O
 		};
 		
@@ -3156,7 +2970,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			creator := omit,//O
 			statsCollectID := omit,//M
 			collectingEntityID := omit,//M
@@ -3178,7 +2991,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			creator := omit,//O
 			choice := omit//M
 		}
@@ -3193,8 +3005,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := ?,//M
-    		dynamicAuthorizationConsultationIDs := *, //O
-			creator := *,//O
 			eventNotificationCriteria := *,//O
 			expirationCounter := *,//O
 			notificationURI := ?,//M
@@ -3208,6 +3018,7 @@ module OneM2M_Templates {
 			latestNotify := *,//O
 			notificationContentType := *,//O
 			notificationEventCat := *,//O
+			creator := *,//O
 			subscriberURI := *,//O
 			choice := *//O
 		};
@@ -3221,8 +3032,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := *,//M
-		    dynamicAuthorizationConsultationIDs := *, //O
-			creator := *,//O
 			eventNotificationCriteria := *,//O
 			expirationCounter := *,//O
 			notificationURI := *,//M
@@ -3236,6 +3045,7 @@ module OneM2M_Templates {
 			latestNotify := *,//O
 			notificationContentType := *,//M
 			notificationEventCat := *,//O
+			creator := *,//O
 			subscriberURI := *,//O
 			choice := *//O
 		}
@@ -3250,8 +3060,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
-			creator := omit,//O
 			eventNotificationCriteria := omit,//O
 			expirationCounter := omit,//O
 			notificationURI := omit,//M
@@ -3265,6 +3073,7 @@ module OneM2M_Templates {
 			latestNotify := omit,//O
 			notificationContentType := omit,//M
 			notificationEventCat := omit,//O
+			creator := omit,//O
 			subscriberURI := omit,//O
 			choice := omit//O
 		}
@@ -3285,7 +3094,7 @@ module OneM2M_Templates {
 		}
 		
 		template Subscription_optional mw_contentSubscription_rc4 modifies mw_contentSubscriptionBase := {
-			choice := { choice_list := {{schedule := ?}}}	//O
+			choice := {choice_list := ?}	//O
 		}
 		
 		template Subscription_optional mw_contentSubscription_rc5 modifies mw_contentSubscriptionBase := {
@@ -3302,8 +3111,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-    		dynamicAuthorizationConsultationIDs := omit, //O
-			creator := omit,//O
 			eventNotificationCriteria := omit,//O
 			expirationCounter := omit,//O
 			notificationURI := omit,//M
@@ -3317,6 +3124,7 @@ module OneM2M_Templates {
 			latestNotify := omit,//O
 			notificationContentType := omit,//M
 			notificationEventCat := omit,//O
+			creator := omit,//O
 			subscriberURI := omit,//O
 			choice := {childResource_list := ?}//O
 		}
@@ -3344,15 +3152,11 @@ module OneM2M_Templates {
 			creator := *,//O
 			contentInfo := *,//O
 			contentSize := ?,//M
-			contentRef := *, //O
 			ontologyRef := *,//O
-			content := ?,//M
-			choice := * //O
-			
+			content := ?//M	
 		};
 		
 		template ContentInstance_optional mw_contentContentInstance_rc1 modifies mw_contentContentInstanceBase := {
-			choice := omit	//O
 		}
 		
 		template ContentInstance_optional m_contentContentInstance_allOmit := {
@@ -3370,10 +3174,8 @@ module OneM2M_Templates {
 			creator := omit,//O
 			contentInfo := omit,//O
 			contentSize := omit,//M
-			contentRef := omit,
 			ontologyRef := omit,//O
-			content := omit, //M
-			choice := omit
+			content := omit//M
 		};
 		
 		template Container_optional mw_contentContainerBase := {
@@ -3386,7 +3188,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := ?,//M
-    		dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			stateTag := ?,//M
@@ -3398,7 +3199,6 @@ module OneM2M_Templates {
 			currentByteSize := ?,//M
 			locationID := *,//O
 			ontologyRef := *,//O
-			disableRetrieval := *, //O
 			choice := *//O
 		};
 		
@@ -3412,7 +3212,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := *,//M
-			dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//M
 			stateTag := *,//M
@@ -3424,7 +3223,6 @@ module OneM2M_Templates {
 			currentByteSize := *,//M
 			locationID := *,//O
 			ontologyRef := *,//O
-			disableRetrieval := *, //O
 			choice := *//O
 		}
 		
@@ -3438,7 +3236,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//M
 			stateTag := omit,//M
@@ -3450,7 +3247,6 @@ module OneM2M_Templates {
 			currentByteSize := omit,//M
 			locationID := omit,//O
 			ontologyRef := omit,//O
-			disableRetrieval := omit, //O
 			choice := omit//O
 		}
 		
@@ -3465,7 +3261,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			stateTag := omit,//M
 			source := omit,//M
 			target := omit,//M
@@ -3498,28 +3293,26 @@ module OneM2M_Templates {
 		
 		template Container_optional mw_contentContainer_rc6 modifies mw_contentContainerBase := {
 			resourceName := omit,//M
-            resourceType := omit,//M
-            resourceID := omit,//M
-            parentID := omit,//M
-            creationTime := omit,//M
-            lastModifiedTime := omit,//M
-            labels := omit,//O
-            accessControlPolicyIDs := omit,//O
-            expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
+			resourceType := omit,//M
+			resourceID := omit,//M
+			parentID := omit,//M
+			creationTime := omit,//M
+			lastModifiedTime := omit,//M
+			labels := omit,//O
+			accessControlPolicyIDs := omit,//O
+			expirationTime := omit,//M
 			announceTo := omit,//O
-            announcedAttribute := omit,//M
-            stateTag := omit,//M
-            creator := omit,//M
-            maxNrOfInstances := omit,//O
-            maxByteSize := omit,//O
-            maxInstanceAge := omit,//O
-            currentNrOfInstances := omit,//M
-            currentByteSize := omit,//M
-            locationID := omit,//O
-            ontologyRef := omit,//O
-            disableRetrieval := omit, //O
-            choice := {childResource_list := ?}//O
+			announcedAttribute := omit,//M
+			stateTag := omit,//M
+			creator := omit,//M
+			maxNrOfInstances := omit,//O
+			maxByteSize := omit,//O
+			maxInstanceAge := omit,//O
+			currentNrOfInstances := omit,//M
+			currentByteSize := omit,//M
+			locationID := omit,//O
+			ontologyRef := omit,//O
+			choice := {childResource_list := ?}//O
 		}
 		
 		template Container_optional mw_contentContainer_rc7 modifies mw_contentContainerBase := {
@@ -3536,8 +3329,7 @@ module OneM2M_Templates {
 			subscriptionDeletion := omit,
 			subscriptionReference := omit,
 			creator := omit,
-			notificationForwardingURI := omit,
-			iPEDiscoveryRequest := omit
+			notificationForwardingURI := omit
 		};
 		
 		template Notification mw_contentNotification_any := {
@@ -3546,8 +3338,7 @@ module OneM2M_Templates {
 			subscriptionDeletion := *,
 			subscriptionReference := *,
 			creator := *,
-			notificationForwardingURI := *,
-			iPEDiscoveryRequest := *
+			notificationForwardingURI := *
 		};
 		
 
@@ -3557,8 +3348,7 @@ module OneM2M_Templates {
 			subscriptionDeletion := *,//O
 			subscriptionReference := *,//M //TODO Put it back to ? subscriptionReference is mandatory
 			creator := *,//O
-			notificationForwardingURI := *,//O
-			iPEDiscoveryRequest := *//O
+			notificationForwardingURI := *//O
 		};
 		
 		template Notification mw_contentNotificationVerification modifies mw_contentNotificationBase := {
@@ -3586,12 +3376,10 @@ module OneM2M_Templates {
 			labels := omit,
 			accessControlPolicyIDs := omit,
 			expirationTime := omit,
-			dynamicAuthorizationConsultationIDs := omit,
 			announceTo := omit,
 			announcedAttribute := omit,
 			nodeID := omit,
 			hostedCSELink := omit,
-			mgmtClientAddress := omit,
 			choice := omit			
 			
 		};
@@ -3610,8 +3398,6 @@ module OneM2M_Templates {
 			supportedResourceType := ?,//M
 			pointOfAccess := ?,//M
 			nodeLink := *,//O
-			dynamicAuthorizationConsultationIDs := omit,
-			e2eSecInfo := *,//O			
 			choice := *//O
 		};
 
@@ -3634,7 +3420,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			appName := omit,//O
@@ -3645,8 +3430,7 @@ module OneM2M_Templates {
 			nodeLink := omit,//NP
 			requestReachability := omit,//M
 			contentSerialization := omit,//O
-			e2eSecInfo:= omit, //O
-			choice := omit//O
+			choice := omit//NP
 		};	
         
         template  AE_optional mw_contentCreateAe_invalid  := {
@@ -3659,7 +3443,6 @@ module OneM2M_Templates {
 			labels := *,//O
 			accessControlPolicyIDs := *,//O
 			expirationTime := *,//O
-			dynamicAuthorizationConsultationIDs := *, //O
 			announceTo := *,//O
 			announcedAttribute := *,//O
 			appName := *,//O
@@ -3670,9 +3453,8 @@ module OneM2M_Templates {
 			nodeLink := *,//NP
 			requestReachability := omit,//M
 			contentSerialization := *,//O
-			e2eSecInfo:= *, //O
-			choice := *//O
-		};	
+			choice := *//NP
+		}; 
 
 		template (value) AE_update_invalid m_contentUpdateAe_invalid := {
 			resourceName := omit,//M
@@ -3685,7 +3467,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//O
 			appName := omit,//O
@@ -3696,7 +3477,6 @@ module OneM2M_Templates {
 			nodeLink := omit,//O
 			requestReachability := omit,//M
 			contentSerialization := omit,//O
-			e2eSecInfo:= omit, //O
 			choice := omit//O
 		};
     	
@@ -3728,7 +3508,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit,//O
 			announceTo := omit,//O
 			announcedAttribute := omit,//M
 			creator := omit,//O
@@ -3740,7 +3519,6 @@ module OneM2M_Templates {
 			memberTypeValidated := omit,//M
 			consistencyStrategy := omit,//O
 			groupName := omit,//O
-			semanticSupportIndicator := omit,//O
 			choice := omit//O
 		};
     	
@@ -3783,8 +3561,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
-			creator := omit,//O
 			eventNotificationCriteria := omit,//O
 			expirationCounter := omit,//O
 			notificationURI := omit,//M
@@ -3798,6 +3574,7 @@ module OneM2M_Templates {
 			latestNotify := omit,//O
 			notificationContentType := omit,//M
 			notificationEventCat := omit,//O
+			creator := omit,//O
 			subscriberURI := omit,//O
 			choice := omit//O
 		};
@@ -3813,7 +3590,6 @@ module OneM2M_Templates {
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//M
-			dynamicAuthorizationConsultationIDs := omit, //O
 			announceTo := omit,//O
 			announcedAttribute := omit,//M
 			stateTag := omit,//M
@@ -3825,7 +3601,6 @@ module OneM2M_Templates {
 			currentByteSize := omit,//M
 			locationID := omit,//O
 			ontologyRef := omit,//O
-			disableRetrieval := omit, //O
 			choice := omit//O
 		};		
 				
@@ -3846,11 +3621,7 @@ module OneM2M_Templates {
 			from_ := omit,
 			originatingTimestamp := omit,
 			resultExpirationTimestamp := omit,
-			eventCategory := omit,
-			contentStatus := omit,
-			contentOffset := omit,
-			assignedTokenIdentifiers := omit,
-			tokenRequestInformation := omit
+			eventCategory := omit
 		};
 		
 		/**
@@ -3874,12 +3645,8 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
-    	};
+			eventCategory := *
+		};
     	
 		template ResponsePrimitive mw_responsePrimitiveInverse(ResponseStatusCode p_statusCode) := {
 			responseStatusCode := complement(p_statusCode),
@@ -3889,14 +3656,10 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
+			eventCategory := *
 		};
     	
-    	template ResponsePrimitive mw_responsePrimitiveOK(in template PrimitiveContent p_content := *) := {
+		template ResponsePrimitive mw_responsePrimitiveOK(in template PrimitiveContent p_content := *) := {
 			responseStatusCode := (int2000, int2001, int2002, int2004),
 			requestIdentifier := ?,
 			primitiveContent := p_content,
@@ -3904,29 +3667,21 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
-    	};
+			eventCategory := *
+		};
         		 
-    	template ResponsePrimitive mw_responsePrimitiveKO := {
- 			responseStatusCode := complement(int2000, int2001, int2002, int2004),
+		template ResponsePrimitive mw_responsePrimitiveKO := {
+			responseStatusCode := complement(int2000, int2001, int2002, int2004),
 			requestIdentifier := ?,
 			primitiveContent := *,
 			to_ := *,
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
-    	};
+			eventCategory := *
+		};
     	
-		template ResponsePrimitive mw_responseDiscovery (template URIList p_uriList := ?) := {
+		template ResponsePrimitive mw_responseDiscovery(template URIList p_uriList := ?) := {
 			responseStatusCode := int2000,
 			requestIdentifier := ?,
 			primitiveContent := {uRIList := p_uriList},
@@ -3934,11 +3689,7 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
+			eventCategory := *
 		};
     	
 		template ResponsePrimitive m_responseNotification(ResponseStatusCode p_statusCode, in template(omit) PrimitiveContent p_notification := omit) := {
@@ -3949,13 +3700,9 @@ module OneM2M_Templates {
 			from_ := omit,
 			originatingTimestamp := omit,
 			resultExpirationTimestamp := omit,
-			eventCategory := omit,
-			contentStatus := omit,
-			contentOffset := omit,
-			assignedTokenIdentifiers := omit,
-			tokenRequestInformation := omit
+			eventCategory := omit
 		};
-    	
+		
 		group InfoPortTemplates {
 		
 			template MyResource mw_resource := ?;		
@@ -3963,7 +3710,7 @@ module OneM2M_Templates {
 		}//end group InfoPortTemplates
     	
 	}//end group ResponsePrimitives	
-	
+
 	group UpperTester {
 		template (value) UtTriggerPrimitive m_utCreate := {
 			operation := int1,
@@ -3972,7 +3719,7 @@ module OneM2M_Templates {
 			requestIdentifier := testcasename() & "-m_utCreate" & f_rnd(1, 1000000),
 			resourceType := omit,
 			primitiveContent := omit,
-			roleIDs := omit, 
+			role := omit, 
 			originatingTimestamp := omit,
 			requestExpirationTimestamp := omit,
 			resultExpirationTimestamp := omit,
@@ -3984,13 +3731,9 @@ module OneM2M_Templates {
 			deliveryAggregation := omit,
 			groupRequestIdentifier := omit,
 			filterCriteria := omit,
-			discoveryResultType := omit,
-			tokens := omit,
-			tokenIDs := omit,
-			localTokenIDs := omit, 
-			tokenRequestIndicator := omit
+			discoveryResultType := omit
 		};
-	
+		
 		template (value) UtTriggerPrimitive m_utCreateContainer modifies m_utCreate := {
 			requestIdentifier := testcasename() & "-m_utCreateContainer" & f_rnd(1, 1000000),
 			resourceType := int3,
@@ -4009,6 +3752,12 @@ module OneM2M_Templates {
 			primitiveContent := {subscription := m_contentSubscription}
 		}
 		
+		template (value) UtTriggerPrimitive m_utCreateRemoteCSE modifies m_utCreate := {
+			requestIdentifier := testcasename() & "-m_utCreateRemoteCSE" & f_rnd(1, 1000000),
+			resourceType := int16,
+			primitiveContent := {remoteCSE := m_contentRemoteCSE_allOmit}
+		}
+ 		
 		template (value) UtTriggerPrimitive m_utRetrieveResource(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
 			operation := int2,
 			to_ := p_targetResourceAddress,
@@ -4016,7 +3765,7 @@ module OneM2M_Templates {
 			requestIdentifier := "m_utRetrieveResource" & f_rnd(1, 1000000),
 			resourceType := omit,
 			primitiveContent := omit,
-			roleIDs := omit, 
+			role := omit, 
 			originatingTimestamp := omit,
 			requestExpirationTimestamp := omit,
 			resultExpirationTimestamp := omit,
@@ -4028,11 +3777,7 @@ module OneM2M_Templates {
 			deliveryAggregation := omit,
 			groupRequestIdentifier := omit,
 			filterCriteria := omit,
-			discoveryResultType := omit,
-			tokens := omit,
-			tokenIDs := omit,
-			localTokenIDs := omit, 
-			tokenRequestIndicator := omit
+			discoveryResultType := omit
 		};
 		
 		template (value) UtTriggerPrimitive m_utUpdate := {
@@ -4042,7 +3787,7 @@ module OneM2M_Templates {
 			requestIdentifier := testcasename() & "-m_utUpdate" & f_rnd(1, 1000000),
 			resourceType := omit,
 			primitiveContent := omit,
-			roleIDs := omit, 
+			role := omit, 
 			originatingTimestamp := omit,
 			requestExpirationTimestamp := omit,
 			resultExpirationTimestamp := omit,
@@ -4054,11 +3799,7 @@ module OneM2M_Templates {
 			deliveryAggregation := omit,
 			groupRequestIdentifier := omit,
 			filterCriteria := omit,
-			discoveryResultType := omit,
-			tokens := omit,
-			tokenIDs := omit,
-			localTokenIDs := omit, 
-			tokenRequestIndicator := omit
+			discoveryResultType := omit
 		};
 		
 		template (value) UtTriggerPrimitive m_utUpdateContainer modifies m_utUpdate := {
@@ -4074,7 +3815,7 @@ module OneM2M_Templates {
 			requestIdentifier := testcasename() & "-m_utDeleteRequest" & f_rnd(1, 1000000),
 			resourceType := omit,
 			primitiveContent := omit, 
-			roleIDs := omit, 
+			role := omit, 
 			originatingTimestamp := omit,
 			requestExpirationTimestamp := omit,
 			resultExpirationTimestamp := omit,
@@ -4086,11 +3827,7 @@ module OneM2M_Templates {
 			deliveryAggregation := omit,
 			groupRequestIdentifier := omit,
 			filterCriteria := omit,
-			discoveryResultType := omit,
-			tokens := omit,
-			tokenIDs := omit,
-			localTokenIDs := omit, 
-			tokenRequestIndicator := omit
+			discoveryResultType := omit
 		};
 		
 		template (value) UtTriggerPrimitive m_utDeleteResource(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_utDeleteRequest := {
@@ -4108,11 +3845,7 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *, 
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
+			eventCategory := *
 		}
 		
 		template UtTriggerAckPrimitive mw_utResponseKO := {
@@ -4123,12 +3856,7 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
-
+			eventCategory := *
 		}
 		
 		template UtTriggerAckPrimitive mw_utResponse(ResponseStatusCode p_statusCode) := {
@@ -4139,13 +3867,9 @@ module OneM2M_Templates {
 			from_ := *,
 			originatingTimestamp := *,
 			resultExpirationTimestamp := *,
-			eventCategory := *,
-			contentStatus := *,
-			contentOffset := *,
-			assignedTokenIdentifiers := *,
-			tokenRequestInformation := *
-
+			eventCategory := *
 		}
 	 }	
 	
 }  // end of module
+ 

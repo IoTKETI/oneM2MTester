@@ -27,6 +27,8 @@ module OneM2M_Pixits {
 		
 			modulepar charstring PX_SUT_ADDRESS := "127.0.0.1:8080";
 			
+			modulepar boolean PX_UT_IMPLEMENTED := false;
+			
 			/**
 			 * @desc IUT CSE Name
 			 */	
@@ -57,6 +59,14 @@ module OneM2M_Pixits {
 			 */	
 			modulepar XSD.ID PX_SUPER_CSE_ID				:= "/admin:admin";	
 			
+			modulepar XSD.IDREFS PX_ALLOWED_C_AE_IDS := {"C"};
+			
+			modulepar XSD.IDREFS PX_NOT_ALLOWED_C_AE_IDS := {"MyAe"};
+			
+			modulepar XSD.IDREFS PX_ALLOWED_S_AE_IDS := {"S"};
+			
+			modulepar XSD.IDREFS PX_NOT_ALLOWED_S_AE_IDS := {"MyAe"};
+			
 			modulepar AddressingMethod PX_ADDRESSING_METHOD := e_hierarchical;
 	
 			modulepar PrimitiveScope PX_PRIMITIVE_SCOPE 	:= e_cseRelative;
@@ -67,7 +77,8 @@ module OneM2M_Pixits {
 			
 			modulepar charstring PX_XML_NAMESPACE 			:= "m2m=""http://www.onem2m.org/xml/protocols""";
 			
-			modulepar ListOfURIs PX_ACOR 					:= {"*"};			
+			modulepar ListOfURIs PX_ACOR 					:= {"*"};
+						
 		}
 		
 		group TesterParameters {
@@ -78,10 +89,31 @@ module OneM2M_Pixits {
 	
 			modulepar charstring PX_CSE1_ADDRESS			:= "127.0.0.1:3141";
 	
+
+			/**
+			 * @desc Test System CSE1 Name
+			 */	
+			modulepar XSD.ID PX_CSE1_NAME := "CSE1_NAME";
+		
 			/**
 			 * @desc Test System CSE1-ID with SP-relative-CSE-ID format (relative) according to TS-0001-7.2-1
 			 */		
-			modulepar XSD.ID PX_CSE1_ID					:= "/MyCSEId";
+			modulepar XSD.ID PX_CSE1_ID := "/CSE1_ID";
+			
+			/**
+			 * @desc Test System CSE1 resource ID with Unstructured-CSE-relative-Resource-ID (relative) format according to TS-0001-7.2-1
+			 */			
+			modulepar XSD.ID PX_CSE1_RESOURCE_ID	:= "CSE1_RESOURCE_ID";
+			
+			/**
+			 * @desc CSE1 Supported resource type
+			 */	
+			modulepar ResourceTypeList_1 PX_CSE1_SRT := {int1, int2, int3, int16};
+			 
+			/**
+			 * @desc Test System M2M-SP1-ID with M2M-SP-ID format (absolute) according to TS-0001-7.2-1 Unstructured-CSE-relative -Resource-ID
+			 */
+			modulepar XSD.ID PX_SP1_ID := "//onem2m.org";
 		
 			/**
 			 * @desc Test System AE1-ID with AE-ID-Stem format (relative) according to TS-0001-7.2-1
