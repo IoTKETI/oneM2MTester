@@ -508,7 +508,6 @@ module OneM2M_Functions {
 			
 				var RequestPrimitive v_request;
 				var MsgIn v_response;
-				var integer v_aeAuxIndex := -1;
 								
 				v_request := valueof(m_createAeAux(p_accessControlPolicyIDs, p_poaList));
 				
@@ -564,17 +563,14 @@ module OneM2M_Functions {
 			function f_cse_preamble_registerAeWithId(XSD.ID p_appId, in template (value) AccessControlOperations p_allowedOperations := int63) runs on AeSimu return integer {//c_CRUDNDi
 			
 				var RequestPrimitive v_request;
-				var integer v_aeAuxIndex := -1;
-				var integer v_acpAuxIndex := -1;
-			
+				
 				if(PICS_ACP_SUPPORT){
-					v_acpAuxIndex := f_cse_createAccessControlPolicyAux(p_allowedOperations := p_allowedOperations);
-					vc_acpAuxIndex := v_acpAuxIndex;
+					vc_acpAuxIndex := f_cse_createAccessControlPolicyAux(p_allowedOperations := p_allowedOperations);
 				}
 				
-				if(v_acpAuxIndex != -1) {
-					vc_resourcesIndexToBeDeleted := {v_acpAuxIndex};
-					v_request := valueof(m_createAe(p_appId, {f_getResourceId(vc_resourcesList[v_acpAuxIndex].resource)}, -));
+				if(vc_acpAuxIndex != -1) {
+					vc_resourcesIndexToBeDeleted := {vc_acpAuxIndex};
+					v_request := valueof(m_createAe(p_appId, {f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)}, -));
 					
 					//TODO Test, to be removed
 					v_request.to_ := f_getResourceAddress();
