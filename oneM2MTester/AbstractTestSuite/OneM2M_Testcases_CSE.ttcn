@@ -2199,6 +2199,15 @@ module OneM2M_Testcases_CSE {
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
 					}
 					
+					testcase TC_CSE_REG_CRE_026_CST() runs on CseSimu system CseSystem {
+						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
+						var template RequestPrimitive v_request := mw_createRemoteCSE;
+						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute cseType";
+						v_utRequest.primitiveContent.remoteCSE.cseType := int1;//TODO It should be marked as "UNITIALIZED"
+						v_request.primitiveContent.remoteCSE.cseType := ?;
+						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
+					}
+					
 					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in charstring p_action) runs on CseSimu {
 	  
 						var ResponsePrimitive v_responsePrimitive;
@@ -2226,10 +2235,10 @@ module OneM2M_Testcases_CSE {
 							}
 							[] mccPortIn.receive {
 								tc_ac.stop;
-								setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+								setverdict(fail, __SCOPE__&":INFO: Unexpected message received");
 							}
 							[] tc_ac.timeout {
-								setverdict(inconc, __SCOPE__&":INFO: No request received for creating resource type remoteCSE");
+								setverdict(fail, __SCOPE__&":INFO: No request received for creating resource type remoteCSE");
 							}
 						}
 
@@ -3515,7 +3524,7 @@ module OneM2M_Testcases_CSE {
 						var RequestPrimitive v_request;
 						var ResourceType v_resourceType := int16;	//remoteCSE
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
-						var charstring v_action := __SCOPE__ & ": Please, send a valid UPDATE Request containing To set to "; // & PX_CSE1_ADDRESS & " and Content containing remoteCSE resource containing a valid attribute " & p_attribute[0];														// Test control
+						var charstring v_action := __SCOPE__ & ": Please, send a valid UPDATE Request containing To set to " & PX_CSE1_ADDRESS & " and Content containing remoteCSE resource containing a valid attribute "; // & p_attribute[0];														// Test control
 						if(not(PICS_MN_CSE)) {
 							setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
 							stop;
@@ -5437,794 +5446,408 @@ module OneM2M_Testcases_CSE {
 				group g_CSE_DMR_CRE_012 {
 					
 					/**
-					 * @desc Check that the IUT returns successfully after a CREATE request an empty content of created resource when the ResultContent set to 0 (Nothing)
-					 * 
-					 */
-					testcase TC_CSE_DMR_CRE_012_CNT() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int3, m_createContainerBase));//Container
-						v_ae1.done;
-					}
-
-					testcase TC_CSE_DMR_CRE_012_GRP() runs on Tester system CseSystem {
-						// Local variables
-						
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int9, m_createGroupBase));//Group
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_012_ACP() runs on Tester system CseSystem {
-						// Local variables
-							
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int1, m_createAcpBase));//AccessControlPolicy
-						v_ae1.done;
-					}
-				
-					testcase TC_CSE_DMR_CRE_012_SCH() runs on Tester system CseSystem {
-						// Local variables
-							
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int18, m_createScheduleBase));//Schedule
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_012_PCH() runs on Tester system CseSystem {
-						// Local variables
-							
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int15, m_createPollingChannelBase));//PollingChannel
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_012_SUB() runs on Tester system CseSystem {
-						// Local variables
-						
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						                        
-						v_ae1.start(f_CSE_DMR_CRE_012(int23, m_createSubscriptionBase));//Subscription
-						v_ae1.done;
-					}
-				
-					function f_CSE_DMR_CRE_012(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive) runs on AeSimu {
-    				
-						// Local variables
-						var MsgIn v_response;
-						var RequestPrimitive v_request;
-						var integer v_aeIndex := -1;
-						var integer v_ae2Index := -1;
-											   
-						// Test control
-    				
-						// Test component configuration
-						f_cf01Up(true);
-    				
-						// Test adapter configuration
-    				
-						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-					
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-					
-						// Test Body
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
-						v_request.resultContent := int0;//Attributes
-						
-						mcaPort.send(m_request(v_request));
-						tc_ac.start;
-						alt {
-							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, omit))) -> value v_response {
-								tc_ac.stop;
-								setverdict(pass, __SCOPE__ & ": No content provided with RC set to 0");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(omit))) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong response status code");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Content provided with RC set to 0");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Error while creating resource");
-							}
-							[] tc_ac.timeout {
-								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
-							}
-						}	
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-					
-						// Tear down
-						f_cf01Down();
-    				
-					}//end f_CSE_DMR_CRE_012
-    				
-				} // end g_CSE_DMR_CRE_012							
-
-				group g_CSE_DMR_CRE_013 {
-					
-					/**
-					 * @desc Check that the IUT returns successfully after a CREATE request only hierarchichal address of the created resource when the Result Content is set to 2 (hierarchical address)
-					 * 
-					 */
-					testcase TC_CSE_DMR_CRE_013_CNT() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.uRI := mw_contentContainer_rc2;
-					                        
-						v_ae1.start(f_CSE_DMR_CRE_013(int3, m_createContainerBase, v_contentResponse));//Container
-						v_ae1.done;
-					}
-
-					testcase TC_CSE_DMR_CRE_013_GRP() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.uRI := mw_contentGroup_rc2;
-					
-						v_ae1.start(f_CSE_DMR_CRE_013(int9, m_createGroupBase, v_contentResponse));//Group
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_013_ACP() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-											
-						v_contentResponse.uRI := mw_contentAcp_rc2;
-						
-						v_ae1.start(f_CSE_DMR_CRE_013(int1, m_createAcpBase,v_contentResponse));//AccessControlPolicy
-						v_ae1.done;
-					}
-				
-					testcase TC_CSE_DMR_CRE_013_SCH() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-											
-						v_contentResponse.uRI := mw_contentSchedule_rc2;
-						
-						v_ae1.start(f_CSE_DMR_CRE_013(int18, m_createScheduleBase, v_contentResponse));//Schedule
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_013_PCH() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-											
-						v_contentResponse.uRI := mw_contentPollingChannel_rc2;
-						
-						v_ae1.start(f_CSE_DMR_CRE_013(int15, m_createPollingChannelBase, v_contentResponse));//PollingChannel
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_013_SUB() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-											
-						v_contentResponse.uRI := mw_contentSubscription_rc2;
-
-						v_ae1.start(f_CSE_DMR_CRE_013(int23, m_createSubscriptionBase, v_contentResponse));//Subscription
-						v_ae1.done;
-					}
-				
-					function f_CSE_DMR_CRE_013(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template PrimitiveContent p_contentResponse) runs on AeSimu {
-    				
-						// Local variables
-						var MsgIn v_response;
-						var RequestPrimitive v_request;
-						var integer v_aeIndex := -1;
-						var integer v_ae2Index := -1;
-											   
-						// Test control
-    				
-						// Test component configuration
-						f_cf01Up(true);
-    				
-						// Test adapter configuration
-    				
-						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-						
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-					
-						// Test Body
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
-						v_request.resultContent := int2;//Attributes
-						
-						mcaPort.send(m_request(v_request));
-						tc_ac.start;
-						alt {
-							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, p_contentResponse))) -> value v_response {
-								tc_ac.stop;
-								if(f_isHierarchical(v_response.primitive.responsePrimitive.primitiveContent.uRI)) {
-									setverdict(pass, __SCOPE__ & ": Response returning correctly only the hierarchical address of the created resource");
-								} else {
-									setverdict(fail, __SCOPE__ & ": Response returning the address of the created resource with wrong format");							
-								}
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong response status code");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong content provided with RC set to 2");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Error while creating resource");
-							}
-							[] tc_ac.timeout {
-								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
-							}
-						}	
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-						
-						// Tear down
-						f_cf01Down();
-						
-    				
-					}//end f_CSE_DMR_CRE_013
-    				
-				} // end g_CSE_DMR_CRE_013	
-							
-				group g_CSE_DMR_CRE_014 {
-					
-					/**
-					 * @desc Check that the IUT returns successfully after a CREATE request only attributes and hierarchichal address of the created resource when Result Content is set 3 (attributes and hierarchichal address)
-					 * 
-					 */
-					testcase TC_CSE_DMR_CRE_014_CNT() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentContainer_rc3;
-					                        
-						v_ae1.start(f_CSE_DMR_CRE_014(int3, m_createContainerBase, v_contentResponse));//Container
-						v_ae1.done;
-					}
-
-					testcase TC_CSE_DMR_CRE_014_GRP() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentGroup_rc3;
-					
-						v_ae1.start(f_CSE_DMR_CRE_014(int9, m_createGroupBase, v_contentResponse));//Group
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_014_ACP() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentAcp_rc3;
-						
-						v_ae1.start(f_CSE_DMR_CRE_014(int1, m_createAcpBase,v_contentResponse));//AccessControlPolicy
-						v_ae1.done;
-					}
-				
-					testcase TC_CSE_DMR_CRE_014_SCH() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentSchedule_rc3;
-						
-						v_ae1.start(f_CSE_DMR_CRE_014(int18, m_createScheduleBase, v_contentResponse));//Schedule
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_014_PCH() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentPollingChannel_rc3;
-						
-						v_ae1.start(f_CSE_DMR_CRE_014(int15, m_createPollingChannelBase, v_contentResponse));//PollingChannel
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_014_SUB() runs on Tester system CseSystem {
-						// Local variables
-						var template PrimitiveContent v_contentResponse;
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-					
-						v_contentResponse.resource := mw_contentSubscription_rc3;
-
-						v_ae1.start(f_CSE_DMR_CRE_014(int23, m_createSubscriptionBase, v_contentResponse));//Subscription
-						v_ae1.done;
-					}
-				
-					function f_CSE_DMR_CRE_014(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template PrimitiveContent p_contentResponse) runs on AeSimu {
-    				
-						// Local variables
-						var MsgIn v_response;
-						var RequestPrimitive v_request;
-						var integer v_aeIndex := -1;
-						var integer v_ae2Index := -1;
-											   
-						// Test control
-    				
-						// Test component configuration
-						f_cf01Up(true);
-    				
-						// Test adapter configuration
-    				
-						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-						
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
-											
-						// Test Body
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
-						v_request.resultContent := int3;//Attributes + Hierarchichal Address
-						
-						mcaPort.send(m_request(v_request));
-						tc_ac.start;
-						alt {
-							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, p_contentResponse))) -> value v_response {
-								tc_ac.stop;
-								if(f_isHierarchical(v_response.primitive.responsePrimitive.primitiveContent.resource.uRI)) {
-									setverdict(pass, __SCOPE__ & ": Response returning correctly the hierarchical address of the created resource and resource representation");
-								} else {
-									setverdict(fail, __SCOPE__ & ": Response returning the address of the created resource with wrong format");							
-								}
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong response status code");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong content provided with RC set to 3");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Error while creating resource");
-							}
-							[] tc_ac.timeout {
-								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
-							}
-						}	
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-					
-						// Tear down
-						f_cf01Down();
-    				
-					}//end f_CSE_DMR_CRE_014
-    				
-				} // end g_CSE_DMR_CRE_014
-				
-				group g_CSE_DMR_CRE_015 {
-					
-					/**
 					 * @desc Check that the IUT accepts the creation of a RESOURCE_TYPE resource with the optional attribute OPTIONAL_ATTRIBUTE provided
 					 * 
 					 */
-					testcase TC_CSE_DMR_CRE_015_CNT_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_ACPI() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"accessControlPolicyIDs", omit};
+						const AttributeList c_optionalAttribute := {"accessControlPolicyIDs"};
 						
 						v_createRequest.primitiveContent.container.accessControlPolicyIDs := {"NotInitialized"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));			
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));			
 						v_ae1.done;
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"expirationTime", omit};
+						const AttributeList c_optionalAttribute := {"expirationTime"};
 						
 						v_createRequest.primitiveContent.container.expirationTime := "20301231T012345";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						  
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_LBL() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"labels", omit};
+						const AttributeList c_optionalAttribute := {"labels"};
 						
 						v_createRequest.primitiveContent.container.labels := {"MyLabel"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_MNI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_MNI() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"maxNrOfInstances", omit};
+						const AttributeList c_optionalAttribute := {"maxNrOfInstances"};
 						
 						v_createRequest.primitiveContent.container.maxNrOfInstances := 0;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_MBS() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_MBS() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"maxByteSize", omit};
+						const AttributeList c_optionalAttribute := {"maxByteSize"};
 						
 						v_createRequest.primitiveContent.container.maxByteSize := 0;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_MIA() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_CNT_MIA() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"maxInstanceAge", omit};
+						const AttributeList c_optionalAttribute := {"maxInstanceAge"};
 						
 						v_createRequest.primitiveContent.container.maxInstanceAge := 0;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CNT_OR() runs on Tester system CseSystem { 
+					testcase TC_CSE_DMR_CRE_012_CNT_CR() runs on Tester system CseSystem { 
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						const AttributeAux c_optionalAttribute := {"ontologyRef", omit};
+						const AttributeList c_optionalAttribute := {"creator"};
 						
-						v_createRequest.primitiveContent.container.ontologyRef := "MyOntologyRef";
+						v_createRequest.primitiveContent.container.creator := "Unitialized";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int3, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int3, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}					
 					
-					testcase TC_CSE_DMR_CRE_015_CIN_ET() runs on Tester system CseSystem {//TODO
+					testcase TC_CSE_DMR_CRE_012_CIN_ET() runs on Tester system CseSystem {//TODO
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						const AttributeAux c_optionalAttribute := {"expirationTime", omit};
+						const AttributeList c_optionalAttribute := {"expirationTime"};
 						
 						v_createRequest.primitiveContent.contentInstance.expirationTime := "20301231T012345";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int4, v_createRequest, c_optionalAttribute));			
+						v_ae1.start(f_CSE_DMR_CRE_012(int4, v_createRequest, c_optionalAttribute));			
 						v_ae1.done;
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CIN_LBL() runs on Tester system CseSystem {//TODO
+					testcase TC_CSE_DMR_CRE_012_CIN_LBL() runs on Tester system CseSystem {//TODO
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						const AttributeAux c_optionalAttribute := {"labels", omit};
+						const AttributeList c_optionalAttribute := {"labels"};
 						
 						v_createRequest.primitiveContent.contentInstance.labels := {"MyLabel"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int4, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int4, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						  
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CIN_CR() runs on Tester system CseSystem {//TODO
+					testcase TC_CSE_DMR_CRE_012_CIN_CR() runs on Tester system CseSystem {//TODO
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						const AttributeAux c_optionalAttribute := {"creator", omit};
+						const AttributeList c_optionalAttribute := {"creator"};
 						
-						v_createRequest.primitiveContent.contentInstance.creator := "MyCreator";
+						v_createRequest.primitiveContent.contentInstance.creator := "NotInitialized";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int4, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int4, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CIN_CNF() runs on Tester system CseSystem {//TODO
+					testcase TC_CSE_DMR_CRE_012_CIN_CNF() runs on Tester system CseSystem {//TODO
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						const AttributeAux c_optionalAttribute := {"contentInfo", omit};
+						const AttributeList c_optionalAttribute := {"contentInfo"};
 						
 						v_createRequest.primitiveContent.contentInstance.contentInfo := "MyContentInfo";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int4, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int4, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_CIN_OR() runs on Tester system CseSystem {//TODO
+					testcase TC_CSE_DMR_CRE_012_CIN_OR() runs on Tester system CseSystem {//TODO
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						const AttributeAux c_optionalAttribute := {"ontologyRef", omit};
+						const AttributeList c_optionalAttribute := {"ontologyRef"};
 						
 						v_createRequest.primitiveContent.contentInstance.ontologyRef := "MyOntologyRef";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int4, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int4, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_ACP_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_ACP_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createAcpBase;
-						const AttributeAux c_optionalAttribute := {"expirationTime", omit};
+						const AttributeList c_optionalAttribute := {"expirationTime"};
 						
 						v_createRequest.primitiveContent.accessControlPolicy.expirationTime := "20301231T012345";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int1, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int1, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_ACP_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_ACP_LBL() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createAcpBase;
-						const AttributeAux c_optionalAttribute := {"labels", omit};
+						const AttributeList c_optionalAttribute := {"labels"};
 						
 						v_createRequest.primitiveContent.accessControlPolicy.labels := {"MyLabel"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int1, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int1, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_ACPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_ACPI() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"accessControlPolicyIDs", omit};
+						const AttributeList c_optionalAttribute := {"accessControlPolicyIDs"};
 						
 						v_createRequest.primitiveContent.subscription.accessControlPolicyIDs := {"NotInitialized"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));			
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));			
 						v_ae1.done;
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_ET() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"expirationTime", omit};
+						const AttributeList c_optionalAttribute := {"expirationTime"};
 						
 						v_createRequest.primitiveContent.subscription.expirationTime := "20301231T012345";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						  
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_LBL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_LBL() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"labels", omit};
+						const AttributeList c_optionalAttribute := {"labels"};
 						
 						v_createRequest.primitiveContent.subscription.labels := {"MyLabel"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_ENC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_ENC() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"eventNotificationCriteria", omit};
+						const AttributeList c_optionalAttribute := {"eventNotificationCriteria"};
 						
 						v_createRequest.primitiveContent.subscription.eventNotificationCriteria := valueof(m_eventNotificationCriteria({int1}, -));
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_EXC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_EXC() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"expirationCounter", omit};
+						const AttributeList c_optionalAttribute := {"expirationCounter"};
 						
 						v_createRequest.primitiveContent.subscription.expirationCounter := 1;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_GPI() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_GPI() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"groupID", omit};
+						const AttributeList c_optionalAttribute := {"groupID"};
 						
 						v_createRequest.primitiveContent.subscription.groupID := "MyGroupID";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_NFU() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_NFU() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"notificationForwardingURI", omit};
+						const AttributeList c_optionalAttribute := {"notificationForwardingURI"};
 						
 						v_createRequest.primitiveContent.subscription.notificationForwardingURI := "MyForwardingURI";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_BN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_BN() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"batchNotify", omit};
+						const AttributeList c_optionalAttribute := {"batchNotify"};
 						
 						v_createRequest.primitiveContent.subscription.batchNotify := {0, "PT1S"};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_RL() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_RL() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"rateLimit", omit};
+						const AttributeList c_optionalAttribute := {"rateLimit"};
 						
 						v_createRequest.primitiveContent.subscription.rateLimit := {0, omit};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_PSN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_PSN() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"preSubscriptionNotify", omit};
+						const AttributeList c_optionalAttribute := {"preSubscriptionNotify"};
 						
 						v_createRequest.primitiveContent.subscription.preSubscriptionNotify := 1;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_PN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_PN() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"pendingNotification", omit};
+						const AttributeList c_optionalAttribute := {"pendingNotification"};
 						
 						v_createRequest.primitiveContent.subscription.pendingNotification := int1;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));			
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));			
 						v_ae1.done;
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_NSP() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_NSP() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"notificationStoragePriority", omit};
+						const AttributeList c_optionalAttribute := {"notificationStoragePriority"};
 						
 						v_createRequest.primitiveContent.subscription.notificationStoragePriority := 1;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						  
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_LN() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_LN() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"latestNotify", omit};
+						const AttributeList c_optionalAttribute := {"latestNotify"};
 						
 						v_createRequest.primitiveContent.subscription.latestNotify := true;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_NCT() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_NCT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"notificationContentType", omit};
+						const AttributeList c_optionalAttribute := {"notificationContentType"};
 						
 						v_createRequest.primitiveContent.subscription.notificationContentType := int1;
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_NEC() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_NEC() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"notificationEventCat", omit};
+						const AttributeList c_optionalAttribute := {"notificationEventCat"};
 						
 						v_createRequest.primitiveContent.subscription.notificationEventCat := {alt_1 := 100};
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_CR() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_CR() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"creator", omit};
+						const AttributeList c_optionalAttribute := {"creator"};
 						
 						v_createRequest.primitiveContent.subscription.creator := "MyCreator";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 					
-					testcase TC_CSE_DMR_CRE_015_SUB_SU() runs on Tester system CseSystem {
+					testcase TC_CSE_DMR_CRE_012_SUB_SU() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
-						const AttributeAux c_optionalAttribute := {"subscriberURI", omit};
+						const AttributeList c_optionalAttribute := {"subscriberURI"};
 						
 						v_createRequest.primitiveContent.subscription.subscriberURI := "MySubscriberURI";
 						
-						v_ae1.start(f_CSE_DMR_CRE_015(int23, v_createRequest, c_optionalAttribute));
+						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
 						
 					}
 				
-					function f_CSE_DMR_CRE_015(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, in AttributeAux p_optionalAttribute) runs on AeSimu {
+					function f_CSE_DMR_CRE_012(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, in AttributeList p_optionalAttribute) runs on AeSimu {
     				
 							// Local variables
 							var MsgIn v_response;
@@ -6237,7 +5860,7 @@ module OneM2M_Testcases_CSE {
 							var integer v_resourceIndex := -1;
 											   
 							// Test control
-							if(match(c_accessControlPolicyIDs,p_optionalAttribute.name)) {
+							if(p_optionalAttribute[0] == c_accessControlPolicyIDs) {
 								if(not(PICS_ACP_SUPPORT)) {
 									setverdict(inconc, __SCOPE__ & ": AccessControlPolicy support is required to run this test case");
 									stop;
@@ -6250,7 +5873,7 @@ module OneM2M_Testcases_CSE {
 							// Test adapter configuration
 
 							// Preamble
-							if (match(c_accessControlPolicyIDs, p_optionalAttribute.name)) {
+							if (p_optionalAttribute[0] == c_accessControlPolicyIDs) {
 								v_acpAuxIndex := f_cse_preamble_createAcpAux();//c_CRUDNDi)
 							}     				
 							
@@ -6265,6 +5888,9 @@ module OneM2M_Testcases_CSE {
 							}
 						
 							// Test Body
+							if(p_optionalAttribute[0] == "creator") {
+								p_requestPrimitive.primitiveContent.container.creator := vc_resourcesList[v_parentIndex].resource.aE.aE_ID;
+							}
 							v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
     					
 							mcaPort.send(m_request(v_request));
@@ -6272,7 +5898,7 @@ module OneM2M_Testcases_CSE {
 							alt {
 								[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, f_getTemplateFromPrimitiveContent(v_request.primitiveContent)))) -> value v_response {
 									tc_ac.stop;
-									setverdict(pass, __SCOPE__ & ": Accepted creation for resource type " & int2str(enum2int(p_resourceType)) & " containing attribute " & p_optionalAttribute.name);
+									setverdict(pass, __SCOPE__ & ": Accepted creation for resource type " & int2str(enum2int(p_resourceType)) & " containing attribute " & p_optionalAttribute[0]);
 									f_checkAttributesToBeSaved(p_resourceType, v_request, v_response.primitive.responsePrimitive);
 									v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, p_resourceType, v_parentIndex);
 								}
@@ -6308,405 +5934,17 @@ module OneM2M_Testcases_CSE {
 							// Tear down
 							f_cf01Down();
 						    					    				
-						}//end f_CSE_DMR_CRE_015
+						}//end f_CSE_DMR_CRE_012
 						
-				}// end group g_CSE_DMR_CRE_015		
-				
-				group g_CSE_DMR_CRE_016 {
-					
-					/**
-					 * @desc Check that the IUT accepts the creation of a RESOURCE_TYPE resource with the optional attribute announceTo provided
-					 * 
-					 */
-					testcase TC_CSE_DMR_CRE_016_ACP() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createAcpBase;
-						
-						v_createRequest.primitiveContent.accessControlPolicy.announceTo := {f_getAnnouncementTargetPoA()};
-						                    
-						v_ae1.start(f_CSE_DMR_CRE_016(int1, v_createRequest, mw_createAccessControlPolicyAnnc));//AccessControlPolicy
-						v_ae1.done;
-					}
+				}// end group g_CSE_DMR_CRE_012	
 
-					testcase TC_CSE_DMR_CRE_016_CNT() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						
-						v_createRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
-					
-						v_ae1.start(f_CSE_DMR_CRE_016(int3, v_createRequest, mw_createContainerAnncBase));//Container
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_016_CIN() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						
-						v_createRequest.primitiveContent.contentInstance.announceTo := {f_getAnnouncementTargetPoA()};
-						
-						v_ae1.start(f_CSE_DMR_CRE_016(int4, v_createRequest, mw_createContentInstanceAnncBase));//ContentInstance
-						v_ae1.done;
-					}
-				
-					testcase TC_CSE_DMR_CRE_016_GRP() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createGroupBase;
-						
-						v_createRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
-						
-						v_ae1.start(f_CSE_DMR_CRE_016(int9, v_createRequest, mw_createGroupAnncBase));//Group
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_016_LCP() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createLocationPolicy(int1, omit, omit, omit, omit);
-						
-						v_createRequest.primitiveContent.locationPolicy.announceTo := {f_getAnnouncementTargetPoA()};
-						
-						v_ae1.start(f_CSE_DMR_CRE_016(int10, v_createRequest, mw_createLocationPolicyAnncBase));//LocationPolicy
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_016_MGO() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createMgmtObjBase;
-						
-						v_createRequest.primitiveContent.mgmtResource.announceTo := {f_getAnnouncementTargetPoA()};
-
-						v_ae1.start(f_CSE_DMR_CRE_016(int13, v_createRequest, mw_createMgmtObjAnncBase));//MgmtObj
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_016_NOD() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createNodeBase;
-						
-						v_createRequest.primitiveContent.node.announceTo := {f_getAnnouncementTargetPoA()};
-						
-						v_ae1.start(f_CSE_DMR_CRE_016(int14, v_createRequest, mw_createNodeAnnc));//Node
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_CRE_016_SCH() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createScheduleBase;
-						
-						v_createRequest.primitiveContent.schedule.announceTo := {f_getAnnouncementTargetPoA()};
-
-						v_ae1.start(f_CSE_DMR_CRE_016(int18, v_createRequest, mw_createScheduleAnncBase));//Schedule
-						v_ae1.done;
-					}
-				
-					function f_CSE_DMR_CRE_016(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template (present) RequestPrimitive p_requestAnnc) runs on AeSimu {
-    				
-						// Local variables
-						var MsgIn v_response;
-						var RequestPrimitive v_request;
-						var integer v_parentIndex := -1;
-						var integer v_containerIndex := -1;
-											   
-						// Test control
-    				
-						// Test component configuration
-						f_cf02Up();
-    				
-						// Test adapter configuration
-    				
-						// Preamble
-						v_parentIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-						
-						if(p_resourceType == int4) {
-							v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_parentIndex);
-							v_parentIndex := v_containerIndex;	
-						}
-					
-						// Test Body
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
-						
-						mcaPort.send(m_request(v_request));
-						
-						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));
-						vc_cse1.done;	
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-					
-						// Tear down
-						f_cf02Down();
-    				
-					}//end f_CSE_DMR_CRE_016
-    				
-				} // end g_CSE_DMR_CRE_016			
-				
-				group g_CSE_DMR_CRE_017 {
-
-					/**
-					 * @desc Check that the IUT accepts the creation of a RESOURCE_TYPE resource with the optional attribute announcedAttribute provided
-					 * 
-					 */
-					testcase TC_CSE_DMR_CRE_017_CNT() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createContainerBase;
-						var RequestPrimitive v_requestPrimitive;
-						var XSD.NonNegativeInteger maxByteSize := 512;		//Correct value? Shall be indicated in TP?
-		
-						//v_createRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.container.announceTo := {PX_CSE1_ID};
-						v_createRequest.primitiveContent.container.maxByteSize := maxByteSize;						
-						v_createRequest.primitiveContent.container.announcedAttribute := {"maxByteSize"};		//Correct value? Shall be indicated in TP?
-	
-						v_ae1.start(f_CSE_DMR_CRE_017(int3, v_createRequest, mw_createContainerAnncBase()));//Container
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if maxByteSize attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.containerAnnc.maxByteSize)){
-								if(v_requestPrimitive.primitiveContent.containerAnnc.maxByteSize != maxByteSize){
-									setverdict(fail, __SCOPE__ & ": Error: Value of maxByteSize has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of maxByteSize has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: maxByteSize has not been announced");
-							}
-						}
-					}
-	
-					testcase TC_CSE_DMR_CRE_017_CIN() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
-						var RequestPrimitive v_requestPrimitive;
-						var XSD.NonNegativeInteger v_contentSize := 512;			//Correct value? Shall be indicated in TP?
-		
-						//v_createRequest.primitiveContent.contentInstance.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.contentInstance.announceTo := {PX_CSE1_ID};
-						v_createRequest.primitiveContent.contentInstance.contentSize := v_contentSize;						
-						v_createRequest.primitiveContent.contentInstance.announcedAttribute := {"contentSize"};	//Correct value? Shall be indicated in TP?
-		
-						v_ae1.start(f_CSE_DMR_CRE_017(int4, v_createRequest, mw_createContentInstanceAnncBase()));//ContentInstance
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if contentSize attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.contentInstanceAnnc.contentSize)){
-								if(v_requestPrimitive.primitiveContent.contentInstanceAnnc.contentSize != v_contentSize){
-									setverdict(fail, __SCOPE__ & ": Error: Value of contentSize has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of contentSize has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: contentSize has not been announced");
-							}
-						}
-					}
-
-					testcase TC_CSE_DMR_CRE_017_GRP() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createGroupBase;
-						var RequestPrimitive v_requestPrimitive;
-						var XSD.PositiveInteger maxNrOfMembers := 10;						//Correct value? Shall be indicated in TP?
-		
-						v_createRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.group_.maxNrOfMembers := maxNrOfMembers;
-						v_createRequest.primitiveContent.group_.announcedAttribute := {"maxNrOfMembers"};	//Correct value? Shall be indicated in TP?
-		
-						v_ae1.start(f_CSE_DMR_CRE_017(int9, v_createRequest, mw_createGroupAnncBase()));//Group
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if maxNrOfMembers attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.groupAnnc.maxNrOfMembers)){
-								if(v_requestPrimitive.primitiveContent.groupAnnc.maxNrOfMembers != maxNrOfMembers){
-									setverdict(fail, __SCOPE__ & ": Error: Value of maxNrOfMembers has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of maxNrOfMembers has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: maxNrOfMembers has not been announced");
-							}
-						}
-					}
-	
-					testcase TC_CSE_DMR_CRE_017_LCP() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createLocationPolicy(int1, omit, omit, omit, omit);
-						var RequestPrimitive v_requestPrimitive;
-						var LocationSource locationSource := int1;//Network-based		//Correct value? Shall be indicated in TP?
-		
-						v_createRequest.primitiveContent.locationPolicy.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.locationPolicy.locationSource := locationSource;
-						v_createRequest.primitiveContent.locationPolicy.announcedAttribute := {"locationSource"};		//Correct value? Shall be indicated in TP?
-		
-						v_ae1.start(f_CSE_DMR_CRE_017(int10, v_createRequest, mw_createLocationPolicyAnncBase()));//LocationPolicy
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if locationSource attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.locationPolicyAnnc.locationSource)){
-								if(v_requestPrimitive.primitiveContent.locationPolicyAnnc.locationSource != locationSource){
-									setverdict(fail, __SCOPE__ & ": Error: Value of locationSource has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of locationSource has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: locationSource has not been announced");
-							}
-						}
-					}
-	
-					testcase TC_CSE_DMR_CRE_017_MGO() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createMgmtObjBase;
-						var RequestPrimitive v_requestPrimitive;
-						var XSD.String description := "Description of mgmtObj";	//Correct value? Shall be indicated in TP?
-		
-						v_createRequest.primitiveContent.mgmtResource.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.mgmtResource.description := description;			
-						v_createRequest.primitiveContent.mgmtResource.announcedAttribute := {"description"};			//Correct value? Shall be indicated in TP?
-
-						v_ae1.start(f_CSE_DMR_CRE_017(int13, v_createRequest, mw_createMgmtObjAnncBase()));//MgmtObj
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if description attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.announcedMgmtResource.description)){
-								if(v_requestPrimitive.primitiveContent.announcedMgmtResource.description != description){
-									setverdict(fail, __SCOPE__ & ": Error: Value of description has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of description has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: description has not been announced");
-							}
-						}
-					}
-	
-					testcase TC_CSE_DMR_CRE_017_NOD() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createNodeBase;
-						var RequestPrimitive v_requestPrimitive;
-		
-						v_createRequest.primitiveContent.node.announceTo := {f_getAnnouncementTargetPoA()};
-						
-						//TODO node to be done. hostedCSELink attribute (OA) to be added!!!
-		
-						v_ae1.start(f_CSE_DMR_CRE_017(int14, v_createRequest, mw_createNodeAnnc));//Node
-						v_ae1.done;
-					}
-	
-					testcase TC_CSE_DMR_CRE_017_SCH() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createScheduleBase;
-						var RequestPrimitive v_requestPrimitive;
-						var ScheduleEntries scheduleElement := {{"0,0,0 1 2,1,1,*"}};
-		
-						v_createRequest.primitiveContent.schedule.announceTo := {f_getAnnouncementTargetPoA()};
-						v_createRequest.primitiveContent.schedule.scheduleElement := scheduleElement;			//Correct value? Shall be indicated in TP?
-						v_createRequest.primitiveContent.schedule.announcedAttribute := {"scheduleElement"};			//Correct value? Shall be indicated in TP?
-						
-						v_ae1.start(f_CSE_DMR_CRE_017(int18, v_createRequest, mw_createScheduleAnncBase()));//Schedule
-						v_ae1.done;
-						
-						if(getverdict == pass){ 
-							//Check if scheduleElement attribute has been announced
-							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
-							if (ispresent(v_requestPrimitive.primitiveContent.scheduleAnnc.scheduleElement)){
-								if(v_requestPrimitive.primitiveContent.scheduleAnnc.scheduleElement != scheduleElement){
-									setverdict(fail, __SCOPE__ & ": Error: Value of scheduleElement has not been announced successfully");
-								}else{
-									setverdict(pass, __SCOPE__ & ": Value of scheduleElement has been announced successfully");
-								}
-							}else{
-								setverdict(fail, __SCOPE__ & ": Error: scheduleElement has not been announced");
-							}
-						}
-					}
-
-					function f_CSE_DMR_CRE_017(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template (present) RequestPrimitive p_requestAnnc) runs on AeSimu{
-	
-						// Local variables
-						var MsgIn v_anncRequest;
-						var RequestPrimitive v_request;
-						var integer v_parentIndex := -1;
-						var integer v_containerIndex := -1;
-						var integer v_remoteCseIndex;
-						var integer v_aeAnncIndex;
-						var integer v_resourceIndex;
-							   
-						// Test control
-	
-						// Test component configuration
-						f_cf02Up();
-	
-						// Test adapter configuration
-	
-						// Preamble
-						
-						if (PX_IUT_IS_MN_CSE == true) {
-							vc_cse1.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
-						}else if (PX_IUT_IS_IN_CSE == true) {
-							vc_cse1.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
-						}	
-						vc_cse1.done;						
-						
-						vc_cse1.start(f_cse_resourceAnnouncementHandler());						
-						v_resourceIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit));						
-						vc_cse1.done;
-		
-						if(p_resourceType == int4) {
-							v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_parentIndex);
-							v_parentIndex := v_containerIndex;	
-						}
-	
-						// Test Body
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
-						
-						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));						
-						mcaPort.send(m_request(v_request));
-						vc_cse1.done;	
-    								
-						vc_request.primitive.requestPrimitive := f_getRequestPrimitive(vc_cse1);
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-					
-						// Tear down
-						f_cf02Down();
-						
-						//return v_anncRequest.primitive.requestPrimitive;
-	
-					}//end f_CSE_DMR_CRE_017
-	
-				} // end g_CSE_DMR_CRE_017		
-				
-				group g_CSE_DMR_CRE_020{
+				group g_CSE_DMR_CRE_013{
 					
 					/**
 					 * @desc Check that the IUT rejects the CREATE Request of a contentInstance resource with error “NOT_ACCEPTABLE” when contentSize exceeds maxByteSize
 					 * 
 					 */
-					testcase TC_CSE_DMR_CRE_020() runs on AeSimu system CseSystem {
+					testcase TC_CSE_DMR_CRE_013() runs on AeSimu system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createContainerBase;
 						var MsgIn v_response;
@@ -6758,17 +5996,17 @@ module OneM2M_Testcases_CSE {
 						// Tear down
 						f_cf01Down();
 	    				
-					}//end TC_CSE_DMR_CRE_020
+					}//end TC_CSE_DMR_CRE_013
 		
-				}// end group g_CSE_DMR_CRE_020	
+				}// end group g_CSE_DMR_CRE_013	
 				
-				group g_CSE_DMR_CRE_021{
+				group g_CSE_DMR_CRE_014{
 					
 					/**
 					 * @desc Check that the IUT updates the currentByteSize attribute in a <container> parent resource when a new <contentInstance> resource is created. 
 					 * 
 					 */
-					testcase TC_CSE_DMR_CRE_021() runs on AeSimu system CseSystem {
+					testcase TC_CSE_DMR_CRE_014() runs on AeSimu system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest;
 						var MsgIn v_response;
@@ -6848,9 +6086,785 @@ module OneM2M_Testcases_CSE {
 						// Tear down
 						f_cf01Down();
 		
-					}//end TC_CSE_DMR_CRE_021
+					}//end TC_CSE_DMR_CRE_014
 
-				}// end group g_CSE_DMR_CRE_021		
+				}// end group g_CSE_DMR_CRE_014		
+
+				group g_CSE_DMR_CRE_015 {
+					
+					/**
+					 * @desc Check that the IUT returns successfully after a CREATE request an empty content of created resource when the ResultContent set to 0 (Nothing)
+					 * 
+					 */
+					testcase TC_CSE_DMR_CRE_015_CNT() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int3, m_createContainerBase));//Container
+						v_ae1.done;
+					}
+
+					testcase TC_CSE_DMR_CRE_015_GRP() runs on Tester system CseSystem {
+						// Local variables
+						
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int9, m_createGroupBase));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_015_ACP() runs on Tester system CseSystem {
+						// Local variables
+							
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int1, m_createAcpBase));//AccessControlPolicy
+						v_ae1.done;
+					}
+				
+					testcase TC_CSE_DMR_CRE_015_SCH() runs on Tester system CseSystem {
+						// Local variables
+							
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int18, m_createScheduleBase));//Schedule
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_015_PCH() runs on Tester system CseSystem {
+						// Local variables
+							
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int15, m_createPollingChannelBase));//PollingChannel
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_015_SUB() runs on Tester system CseSystem {
+						// Local variables
+						
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						                        
+						v_ae1.start(f_CSE_DMR_CRE_015(int23, m_createSubscriptionBase));//Subscription
+						v_ae1.done;
+					}
+				
+					function f_CSE_DMR_CRE_015(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive) runs on AeSimu {
+    				
+						// Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var integer v_aeIndex := -1;
+						var integer v_ae2Index := -1;
+											   
+						// Test control
+    				
+						// Test component configuration
+						f_cf01Up(true);
+    				
+						// Test adapter configuration
+    				
+						// Preamble
+						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+					
+						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+					
+						// Test Body
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
+						v_request.resultContent := int0;//Attributes
+						
+						mcaPort.send(m_request(v_request));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, omit))) -> value v_response {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": No content provided with RC set to 0");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(omit))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Content provided with RC set to 0");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating resource");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
+							}
+						}	
+    								
+						// Postamble
+						f_cse_postamble_deleteResources();
+					
+						// Tear down
+						f_cf01Down();
+    				
+					}//end f_CSE_DMR_CRE_015
+    				
+				} // end g_CSE_DMR_CRE_015							
+
+				group g_CSE_DMR_CRE_016 {
+					
+					/**
+					 * @desc Check that the IUT returns successfully after a CREATE request only hierarchichal address of the created resource when the Result Content is set to 2 (hierarchical address)
+					 * 
+					 */
+					testcase TC_CSE_DMR_CRE_016_CNT() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.uRI := mw_contentContainer_rc2;
+					                        
+						v_ae1.start(f_CSE_DMR_CRE_016(int3, m_createContainerBase, v_contentResponse));//Container
+						v_ae1.done;
+					}
+
+					testcase TC_CSE_DMR_CRE_016_GRP() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.uRI := mw_contentGroup_rc2;
+					
+						v_ae1.start(f_CSE_DMR_CRE_016(int9, m_createGroupBase, v_contentResponse));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_016_ACP() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+											
+						v_contentResponse.uRI := mw_contentAcp_rc2;
+						
+						v_ae1.start(f_CSE_DMR_CRE_016(int1, m_createAcpBase,v_contentResponse));//AccessControlPolicy
+						v_ae1.done;
+					}
+				
+					testcase TC_CSE_DMR_CRE_016_SCH() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+											
+						v_contentResponse.uRI := mw_contentSchedule_rc2;
+						
+						v_ae1.start(f_CSE_DMR_CRE_016(int18, m_createScheduleBase, v_contentResponse));//Schedule
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_016_PCH() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+											
+						v_contentResponse.uRI := mw_contentPollingChannel_rc2;
+						
+						v_ae1.start(f_CSE_DMR_CRE_016(int15, m_createPollingChannelBase, v_contentResponse));//PollingChannel
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_016_SUB() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+											
+						v_contentResponse.uRI := mw_contentSubscription_rc2;
+
+						v_ae1.start(f_CSE_DMR_CRE_016(int23, m_createSubscriptionBase, v_contentResponse));//Subscription
+						v_ae1.done;
+					}
+				
+					function f_CSE_DMR_CRE_016(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template PrimitiveContent p_contentResponse) runs on AeSimu {
+    				
+						// Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var integer v_aeIndex := -1;
+						var integer v_ae2Index := -1;
+											   
+						// Test control
+    				
+						// Test component configuration
+						f_cf01Up(true);
+    				
+						// Test adapter configuration
+    				
+						// Preamble
+						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						
+						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+					
+						// Test Body
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
+						v_request.resultContent := int2;//Attributes
+						
+						mcaPort.send(m_request(v_request));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								if(f_isHierarchical(v_response.primitive.responsePrimitive.primitiveContent.uRI)) {
+									setverdict(pass, __SCOPE__ & ": Response returning correctly only the hierarchical address of the created resource");
+								} else {
+									setverdict(fail, __SCOPE__ & ": Response returning the address of the created resource with wrong format");							
+								}
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong content provided with RC set to 2");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating resource");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
+							}
+						}	
+    								
+						// Postamble
+						f_cse_postamble_deleteResources();
+						
+						// Tear down
+						f_cf01Down();
+						
+    				
+					}//end f_CSE_DMR_CRE_016
+    				
+				} // end g_CSE_DMR_CRE_016	
+							
+				group g_CSE_DMR_CRE_017 {
+					
+					/**
+					 * @desc Check that the IUT returns successfully after a CREATE request only attributes and hierarchichal address of the created resource when Result Content is set 3 (attributes and hierarchichal address)
+					 * 
+					 */
+					testcase TC_CSE_DMR_CRE_017_CNT() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentContainer_rc3;
+					                        
+						v_ae1.start(f_CSE_DMR_CRE_017(int3, m_createContainerBase, v_contentResponse));//Container
+						v_ae1.done;
+					}
+
+					testcase TC_CSE_DMR_CRE_017_GRP() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentGroup_rc3;
+					
+						v_ae1.start(f_CSE_DMR_CRE_017(int9, m_createGroupBase, v_contentResponse));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_017_ACP() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentAcp_rc3;
+						
+						v_ae1.start(f_CSE_DMR_CRE_017(int1, m_createAcpBase,v_contentResponse));//AccessControlPolicy
+						v_ae1.done;
+					}
+				
+					testcase TC_CSE_DMR_CRE_017_SCH() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentSchedule_rc3;
+						
+						v_ae1.start(f_CSE_DMR_CRE_017(int18, m_createScheduleBase, v_contentResponse));//Schedule
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_017_PCH() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentPollingChannel_rc3;
+						
+						v_ae1.start(f_CSE_DMR_CRE_017(int15, m_createPollingChannelBase, v_contentResponse));//PollingChannel
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_017_SUB() runs on Tester system CseSystem {
+						// Local variables
+						var template PrimitiveContent v_contentResponse;
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+					
+						v_contentResponse.resource := mw_contentSubscription_rc3;
+
+						v_ae1.start(f_CSE_DMR_CRE_017(int23, m_createSubscriptionBase, v_contentResponse));//Subscription
+						v_ae1.done;
+					}
+				
+					function f_CSE_DMR_CRE_017(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template PrimitiveContent p_contentResponse) runs on AeSimu {
+    				
+						// Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var integer v_aeIndex := -1;
+						var integer v_ae2Index := -1;
+											   
+						// Test control
+    				
+						// Test component configuration
+						f_cf01Up(true);
+    				
+						// Test adapter configuration
+    				
+						// Preamble
+						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						
+						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
+											
+						// Test Body
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
+						v_request.resultContent := int3;//Attributes + Hierarchichal Address
+						
+						mcaPort.send(m_request(v_request));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								if(f_isHierarchical(v_response.primitive.responsePrimitive.primitiveContent.resource.uRI)) {
+									setverdict(pass, __SCOPE__ & ": Response returning correctly the hierarchical address of the created resource and resource representation");
+								} else {
+									setverdict(fail, __SCOPE__ & ": Response returning the address of the created resource with wrong format");							
+								}
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK(p_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong content provided with RC set to 3");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating resource");
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating resource");
+							}
+						}	
+    								
+						// Postamble
+						f_cse_postamble_deleteResources();
+					
+						// Tear down
+						f_cf01Down();
+    				
+					}//end f_CSE_DMR_CRE_017
+    				
+				} // end g_CSE_DMR_CRE_017
+				
+				
+				group g_CSE_DMR_CRE_020 {
+					
+					/**
+					 * @desc Check that the IUT accepts the creation of a RESOURCE_TYPE resource with the optional attribute announceTo provided
+					 * 
+					 */
+					testcase TC_CSE_DMR_CRE_020_ACP() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createAcpBase;
+						
+						v_createRequest.primitiveContent.accessControlPolicy.announceTo := {f_getAnnouncementTargetPoA()};
+						                    
+						v_ae1.start(f_CSE_DMR_CRE_020(int1, v_createRequest, mw_createAccessControlPolicyAnnc));//AccessControlPolicy
+						v_ae1.done;
+					}
+
+					testcase TC_CSE_DMR_CRE_020_CNT() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						
+						v_createRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
+					
+						v_ae1.start(f_CSE_DMR_CRE_020(int3, v_createRequest, mw_createContainerAnncBase));//Container
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_020_CIN() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
+						
+						v_createRequest.primitiveContent.contentInstance.announceTo := {f_getAnnouncementTargetPoA()};
+						
+						v_ae1.start(f_CSE_DMR_CRE_020(int4, v_createRequest, mw_createContentInstanceAnncBase));//ContentInstance
+						v_ae1.done;
+					}
+				
+					testcase TC_CSE_DMR_CRE_020_GRP() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createGroupBase;
+						
+						v_createRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
+						
+						v_ae1.start(f_CSE_DMR_CRE_020(int9, v_createRequest, mw_createGroupAnncBase));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_020_LCP() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createLocationPolicy(int1, omit, omit, omit, omit);
+						
+						v_createRequest.primitiveContent.locationPolicy.announceTo := {f_getAnnouncementTargetPoA()};
+						
+						v_ae1.start(f_CSE_DMR_CRE_020(int10, v_createRequest, mw_createLocationPolicyAnncBase));//LocationPolicy
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_020_MGO() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createMgmtObjBase;
+						
+						v_createRequest.primitiveContent.mgmtResource.announceTo := {f_getAnnouncementTargetPoA()};
+
+						v_ae1.start(f_CSE_DMR_CRE_020(int13, v_createRequest, mw_createMgmtObjAnncBase));//MgmtObj
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_020_NOD() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createNodeBase;
+						
+						v_createRequest.primitiveContent.node.announceTo := {f_getAnnouncementTargetPoA()};
+						
+						v_ae1.start(f_CSE_DMR_CRE_020(int14, v_createRequest, mw_createNodeAnnc));//Node
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_CRE_020_SCH() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createScheduleBase;
+						
+						v_createRequest.primitiveContent.schedule.announceTo := {f_getAnnouncementTargetPoA()};
+
+						v_ae1.start(f_CSE_DMR_CRE_020(int18, v_createRequest, mw_createScheduleAnncBase));//Schedule
+						v_ae1.done;
+					}
+				
+					function f_CSE_DMR_CRE_020(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template (present) RequestPrimitive p_requestAnnc) runs on AeSimu {
+    				
+						// Local variables
+						var MsgIn v_response;
+						var RequestPrimitive v_request;
+						var integer v_parentIndex := -1;
+						var integer v_containerIndex := -1;
+											   
+						// Test control
+    				
+						// Test component configuration
+						f_cf02Up();
+    				
+						// Test adapter configuration
+    				
+						// Preamble
+						v_parentIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						
+						if(p_resourceType == int4) {
+							v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_parentIndex);
+							v_parentIndex := v_containerIndex;	
+						}
+					
+						// Test Body
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
+						
+						mcaPort.send(m_request(v_request));
+						
+						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));
+						vc_cse1.done;	
+    								
+						// Postamble
+						f_cse_postamble_deleteResources();
+					
+						// Tear down
+						f_cf02Down();
+    				
+					}//end f_CSE_DMR_CRE_020
+    				
+				} // end g_CSE_DMR_CRE_020		
+				
+				group g_CSE_DMR_CRE_021 {
+
+					/**
+					 * @desc Check that the IUT accepts the creation of a RESOURCE_TYPE resource with the optional attribute announcedAttribute provided
+					 * 
+					 */
+					testcase TC_CSE_DMR_CRE_021_CNT() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						var RequestPrimitive v_requestPrimitive;
+						var XSD.NonNegativeInteger maxByteSize := 512;		//Correct value? Shall be indicated in TP?
+		
+						//v_createRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.container.announceTo := {PX_CSE1_ID};
+						v_createRequest.primitiveContent.container.maxByteSize := maxByteSize;						
+						v_createRequest.primitiveContent.container.announcedAttribute := {"maxByteSize"};		//Correct value? Shall be indicated in TP?
+	
+						v_ae1.start(f_CSE_DMR_CRE_021(int3, v_createRequest, mw_createContainerAnncBase()));//Container
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if maxByteSize attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.containerAnnc.maxByteSize)){
+								if(v_requestPrimitive.primitiveContent.containerAnnc.maxByteSize != maxByteSize){
+									setverdict(fail, __SCOPE__ & ": Error: Value of maxByteSize has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of maxByteSize has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: maxByteSize has not been announced");
+							}
+						}
+					}
+	
+					testcase TC_CSE_DMR_CRE_021_CIN() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
+						var RequestPrimitive v_requestPrimitive;
+						var XSD.NonNegativeInteger v_contentSize := 512;			//Correct value? Shall be indicated in TP?
+		
+						//v_createRequest.primitiveContent.contentInstance.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.contentInstance.announceTo := {PX_CSE1_ID};
+						v_createRequest.primitiveContent.contentInstance.contentSize := v_contentSize;						
+						v_createRequest.primitiveContent.contentInstance.announcedAttribute := {"contentSize"};	//Correct value? Shall be indicated in TP?
+		
+						v_ae1.start(f_CSE_DMR_CRE_021(int4, v_createRequest, mw_createContentInstanceAnncBase()));//ContentInstance
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if contentSize attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.contentInstanceAnnc.contentSize)){
+								if(v_requestPrimitive.primitiveContent.contentInstanceAnnc.contentSize != v_contentSize){
+									setverdict(fail, __SCOPE__ & ": Error: Value of contentSize has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of contentSize has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: contentSize has not been announced");
+							}
+						}
+					}
+
+					testcase TC_CSE_DMR_CRE_021_GRP() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createGroupBase;
+						var RequestPrimitive v_requestPrimitive;
+						var XSD.PositiveInteger maxNrOfMembers := 10;						//Correct value? Shall be indicated in TP?
+		
+						v_createRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.group_.maxNrOfMembers := maxNrOfMembers;
+						v_createRequest.primitiveContent.group_.announcedAttribute := {"maxNrOfMembers"};	//Correct value? Shall be indicated in TP?
+		
+						v_ae1.start(f_CSE_DMR_CRE_021(int9, v_createRequest, mw_createGroupAnncBase()));//Group
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if maxNrOfMembers attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.groupAnnc.maxNrOfMembers)){
+								if(v_requestPrimitive.primitiveContent.groupAnnc.maxNrOfMembers != maxNrOfMembers){
+									setverdict(fail, __SCOPE__ & ": Error: Value of maxNrOfMembers has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of maxNrOfMembers has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: maxNrOfMembers has not been announced");
+							}
+						}
+					}
+	
+					testcase TC_CSE_DMR_CRE_021_LCP() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createLocationPolicy(int1, omit, omit, omit, omit);
+						var RequestPrimitive v_requestPrimitive;
+						var LocationSource locationSource := int1;//Network-based		//Correct value? Shall be indicated in TP?
+		
+						v_createRequest.primitiveContent.locationPolicy.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.locationPolicy.locationSource := locationSource;
+						v_createRequest.primitiveContent.locationPolicy.announcedAttribute := {"locationSource"};		//Correct value? Shall be indicated in TP?
+		
+						v_ae1.start(f_CSE_DMR_CRE_021(int10, v_createRequest, mw_createLocationPolicyAnncBase()));//LocationPolicy
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if locationSource attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.locationPolicyAnnc.locationSource)){
+								if(v_requestPrimitive.primitiveContent.locationPolicyAnnc.locationSource != locationSource){
+									setverdict(fail, __SCOPE__ & ": Error: Value of locationSource has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of locationSource has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: locationSource has not been announced");
+							}
+						}
+					}
+	
+					testcase TC_CSE_DMR_CRE_021_MGO() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createMgmtObjBase;
+						var RequestPrimitive v_requestPrimitive;
+						var XSD.String description := "Description of mgmtObj";	//Correct value? Shall be indicated in TP?
+		
+						v_createRequest.primitiveContent.mgmtResource.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.mgmtResource.description := description;			
+						v_createRequest.primitiveContent.mgmtResource.announcedAttribute := {"description"};			//Correct value? Shall be indicated in TP?
+
+						v_ae1.start(f_CSE_DMR_CRE_021(int13, v_createRequest, mw_createMgmtObjAnncBase()));//MgmtObj
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if description attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.announcedMgmtResource.description)){
+								if(v_requestPrimitive.primitiveContent.announcedMgmtResource.description != description){
+									setverdict(fail, __SCOPE__ & ": Error: Value of description has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of description has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: description has not been announced");
+							}
+						}
+					}
+	
+					testcase TC_CSE_DMR_CRE_021_NOD() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createNodeBase;
+						var RequestPrimitive v_requestPrimitive;
+		
+						v_createRequest.primitiveContent.node.announceTo := {f_getAnnouncementTargetPoA()};
+						
+						//TODO node to be done. hostedCSELink attribute (OA) to be added!!!
+		
+						v_ae1.start(f_CSE_DMR_CRE_021(int14, v_createRequest, mw_createNodeAnnc));//Node
+						v_ae1.done;
+					}
+	
+					testcase TC_CSE_DMR_CRE_021_SCH() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createScheduleBase;
+						var RequestPrimitive v_requestPrimitive;
+						var ScheduleEntries scheduleElement := {{"0,0,0 1 2,1,1,*"}};
+		
+						v_createRequest.primitiveContent.schedule.announceTo := {f_getAnnouncementTargetPoA()};
+						v_createRequest.primitiveContent.schedule.scheduleElement := scheduleElement;			//Correct value? Shall be indicated in TP?
+						v_createRequest.primitiveContent.schedule.announcedAttribute := {"scheduleElement"};			//Correct value? Shall be indicated in TP?
+						
+						v_ae1.start(f_CSE_DMR_CRE_021(int18, v_createRequest, mw_createScheduleAnncBase()));//Schedule
+						v_ae1.done;
+						
+						if(getverdict == pass){ 
+							//Check if scheduleElement attribute has been announced
+							v_requestPrimitive := f_getRequestPrimitive(v_ae1);
+							if (ispresent(v_requestPrimitive.primitiveContent.scheduleAnnc.scheduleElement)){
+								if(v_requestPrimitive.primitiveContent.scheduleAnnc.scheduleElement != scheduleElement){
+									setverdict(fail, __SCOPE__ & ": Error: Value of scheduleElement has not been announced successfully");
+								}else{
+									setverdict(pass, __SCOPE__ & ": Value of scheduleElement has been announced successfully");
+								}
+							}else{
+								setverdict(fail, __SCOPE__ & ": Error: scheduleElement has not been announced");
+							}
+						}
+					}
+
+					function f_CSE_DMR_CRE_021(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive, template (present) RequestPrimitive p_requestAnnc) runs on AeSimu{
+	
+						// Local variables
+						var MsgIn v_anncRequest;
+						var RequestPrimitive v_request;
+						var integer v_parentIndex := -1;
+						var integer v_containerIndex := -1;
+						var integer v_remoteCseIndex;
+						var integer v_aeAnncIndex;
+						var integer v_resourceIndex;
+							   
+						// Test control
+	
+						// Test component configuration
+						f_cf02Up();
+	
+						// Test adapter configuration
+	
+						// Preamble
+						
+						if (PX_IUT_IS_MN_CSE == true) {
+							vc_cse1.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
+						}else if (PX_IUT_IS_IN_CSE == true) {
+							vc_cse1.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
+						}	
+						vc_cse1.done;						
+						
+						vc_cse1.start(f_cse_resourceAnnouncementHandler());						
+						v_resourceIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit));						
+						vc_cse1.done;
+		
+						if(p_resourceType == int4) {
+							v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_parentIndex);
+							v_parentIndex := v_containerIndex;	
+						}
+	
+						// Test Body
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_parentIndex);
+						
+						vc_cse1.start(f_cse_receiveCreateRequest(p_requestAnnc));						
+						mcaPort.send(m_request(v_request));
+						vc_cse1.done;	
+    								
+						vc_request.primitive.requestPrimitive := f_getRequestPrimitive(vc_cse1);
+    								
+						// Postamble
+						f_cse_postamble_deleteResources();
+					
+						// Tear down
+						f_cf02Down();
+						
+						//return v_anncRequest.primitive.requestPrimitive;
+	
+					}//end f_CSE_DMR_CRE_021
+	
+				} // end g_CSE_DMR_CRE_021	
+				
 				
 			}//end group Create
 			
