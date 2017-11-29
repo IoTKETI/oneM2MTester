@@ -546,11 +546,11 @@ module OneM2M_Templates {
 			 * @param p_appId
 			 * @param p_stemId
 			 */
-			template (value) RequestPrimitive m_createAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_to := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_stemId := "") modifies m_create:= {
+			template (value) RequestPrimitive m_createAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_link) modifies m_create:= {
 				from_ := p_from,//PX_AE_ID_STEM,//TODO We should use omit, "s", or "c"
 				requestIdentifier := testcasename() & "-m_createAEAnnc",
 				resourceType := int10002,
-				primitiveContent := {aEAnnc := m_contentCreateAEAnnc({"Credential-ID:None"}, p_accessControlPolicyIds, p_appId, valueof(p_to) & "/" & p_stemId)}
+				primitiveContent := {aEAnnc := m_contentCreateAEAnnc({"Credential-ID:None"}, p_accessControlPolicyIds, p_appId, p_link)}
 			};
 			
 			/**
@@ -1229,7 +1229,7 @@ module OneM2M_Templates {
 		 * @param p_appId App ID
 		 * @param p_nodeLink Node link
 		 */
-		template AEAnnc_optional m_contentCreateAEAnnc (in template (omit)  Labels p_labels, in template (omit) AcpType p_accessControlPolicyIds, XSD.ID p_appId := PX_APP_ID, in template (omit) XSD.AnyURI p_nodeLink := omit) := {
+		template AEAnnc_optional m_contentCreateAEAnnc (in template (omit)  Labels p_labels, in template (omit) AcpType p_accessControlPolicyIds, XSD.ID p_appId := PX_APP_ID, in template (omit) XSD.AnyURI p_link := omit) := {
 			resourceName := omit,//O TODO 
 			resourceType := omit,//NP
 			resourceID := omit,//NP
@@ -1239,13 +1239,13 @@ module OneM2M_Templates {
 			labels := p_labels,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
 			expirationTime := omit,//O
-			link := omit,//M TODO Put the right value
+			link := p_link,//M TODO Put the right value
 			appName := omit,//O
 			app_ID := p_appId,//M
 			aE_ID := omit,//NP
 			pointOfAccess := omit, //{"http://127.0.0.1:1400/monitor"},//O //{"http://192.168.1.92:18080/notifications/AE"}, // TODO: Check this => AE PoA
 			ontologyRef := omit,//O
-			nodeLink := p_nodeLink,//NP
+			nodeLink := omit,//NP
 			requestReachability := true,//M
 			contentSerialization := omit,//O
 			choice := omit//NP

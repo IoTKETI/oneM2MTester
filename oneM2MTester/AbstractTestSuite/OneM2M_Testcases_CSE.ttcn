@@ -924,6 +924,8 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
 	                
 					// Test component configuration
 					f_cf01Up();
@@ -991,6 +993,8 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
 	                
 					// Test component configuration
 					f_cf01Up();
@@ -1038,6 +1042,8 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
 	                
 					// Test component configuration
 					f_cf02UpCseSimuMaster();
@@ -1091,6 +1097,12 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
+					if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					}
 	                
 					// Test component configuration
 					f_cf02UpCseSimuMaster();
@@ -1146,6 +1158,12 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_aeAnncIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
+					if(not(PICS_IN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					}
 	                
 					// Test component configuration
 					f_cf04Up();
@@ -1154,7 +1172,7 @@ module OneM2M_Testcases_CSE {
 					
 					vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
 									
-					v_aeAnncIndex := f_cse_announceResource(int2, m_createAEAnnc(-, -, -, PX_APP_ID, -));
+					v_aeAnncIndex := f_cse_announceResource(int2, m_createAEAnnc(-, "/" & "SAE1", PX_APP_ID, PX_CSE1_ID & "/" & "SAE1"));
 					
 					//Test Body
 					v_request := valueof(m_updateAEAnnc(-, -, -, PX_APP_ID, -));	//TODO to double check all parameters			
@@ -1201,6 +1219,12 @@ module OneM2M_Testcases_CSE {
 					var MsgIn v_response;
 					var RequestPrimitive v_request;
 					var integer v_aeIndex := -1;
+					
+					//Test control
+					if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					}
 	                
 					// Test component configuration
 					f_cf02Up();
@@ -1268,6 +1292,8 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
     
     
 					// Test component configuration
@@ -1540,6 +1566,8 @@ module OneM2M_Testcases_CSE {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
+					
+					//Test control
 	                
 					// Test component configuration
 					f_cf01Up();
@@ -2054,7 +2082,11 @@ module OneM2M_Testcases_CSE {
 					var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 					var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with attributes multiplicity equals to 1";
 	   
-					// Test control
+					//Test control
+					if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					}
 
 					// Test component configuration
 					f_cf04Up();
@@ -2211,6 +2243,12 @@ module OneM2M_Testcases_CSE {
 					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in charstring p_action) runs on CseSimu {
 	  
 						var ResponsePrimitive v_responsePrimitive;
+						
+						//Test control
+						if(not(PICS_MN_CSE)) {
+							setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+							stop;
+						}
 
 						//Test component configuration
 						f_cf04Up();
@@ -3223,10 +3261,6 @@ module OneM2M_Testcases_CSE {
 					 var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 	
 					 // Test control
-					if(not(PICS_MN_CSE)) {
-						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
-						stop;
-					 }
 	
 					 // Test component configuration
 					 f_cf04Up();
@@ -3736,7 +3770,12 @@ module OneM2M_Testcases_CSE {
 					var UtTriggerAckPrimitive v_trigger_response;
 					var integer v_auxInteger;
 					var charstring v_action := __SCOPE__ & ": Please, send a valid DELETE Request containing To set to " & PX_CSE1_ADDRESS;
-					// Test control
+					
+					//Test control
+					if(not(PICS_MN_CSE)) {
+						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						stop;
+					}
 
 					// Test component configuration
 					f_cf04Up();
