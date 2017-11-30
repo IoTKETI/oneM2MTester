@@ -1637,7 +1637,8 @@ module OneM2M_Testcases_CSE {
 					function f_CSE_REG_CRE_017(template RequestPrimitive p_createRequestPrimitive) runs on AeSimu {
 						
 						//Local variables
-						var ResourceType v_resourceType := int2;   
+						var ResourceType v_resourceType := int2; 
+						var RequestPrimitive v_request;  
 						
 						// Test control
 
@@ -1649,7 +1650,9 @@ module OneM2M_Testcases_CSE {
 						// Preamble
 
 						// Test Body
-						f_cse_createResource(v_resourceType, p_createRequestPrimitive);		
+						v_request := f_getCreateRequestPrimitive(int2, p_createRequestPrimitive, -1);
+						
+						mcaPort.send(m_request(v_request));		
 
 						tc_ac.start;
 						alt {
@@ -4172,6 +4175,25 @@ module OneM2M_Testcases_CSE {
 						}		
 					}
 					
+					testcase TC_CSE_DMR_CRE_001_SUB_CSR() runs on Tester system CseSystem {
+						// Local variables
+						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
+						var ResponsePrimitive v_responsePrimitive;
+						var CseSimu v_cse1 := CseSimu.create("CSE1") alive;
+						
+						v_createRequest.primitiveContent.subscription.resourceName := omit;
+						v_cse1.start(f_CSE_DMR_CRE_001_cseSimu(int23, v_createRequest));//Subscription
+						v_cse1.done;
+						
+						 
+												
+						if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_cse1);
+							if(not ispresent(v_responsePrimitive.primitiveContent.subscription.resourceName)){
+								setverdict(fail, __SCOPE__, ": Error, resourceName attribute not provided");
+							}
+						}		
+					}
+					
 					testcase TC_CSE_DMR_CRE_001_NOD_CB() runs on Tester system CseSystem {
 						// Local variables
 						var template RequestPrimitive v_createRequest := m_createNodeBase;
@@ -4439,6 +4461,80 @@ module OneM2M_Testcases_CSE {
 						return vc_response.primitive.responsePrimitive;
     					    				
 					}//end f_CSE_DMR_CRE_001
+					
+					function f_CSE_DMR_CRE_001_cseSimu(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive) runs on CseSimu return ResponsePrimitive {
+    				
+							// Local variables
+							var MsgIn v_response;
+							var RequestPrimitive v_request;
+							var integer v_parentIndex := -1;
+							var integer v_resourceIndex := -1;
+							var integer v_ae1Index := -1;
+							var integer v_acpAuxIndex := -1;
+							var PoaList v_poaList := {"http://" & PX_AE1_ADDRESS & "/"};
+    										   
+							// Test control
+    				
+							// Test component configuration
+							f_cf02UpCseSimuMaster();
+						
+							// Test adapter configuration
+    				
+							// Preamble
+							vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
+							
+    						if(match(int23, p_resourceType)){
+								vc_ae1.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM, "MyAe", v_poaList), -1)); // AE1 is registered
+								vc_ae1.done;
+								v_ae1Index := f_getResource(vc_ae1);
+								p_requestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae1Index)}; 
+								vc_ae1.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
+							}
+							
+							// Test Body
+    					
+							v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, vc_remoteCseIndex);
+						
+							mccPort.send(m_request(v_request));
+							tc_ac.start;
+							alt {
+								[] mccPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value vc_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Resource type " & int2str(enum2int(p_resourceType)) & " created successfully");
+									f_checkAttributesToBeSaved(p_resourceType, v_request, vc_response.primitive.responsePrimitive);
+									v_resourceIndex := f_setResource(vc_response.primitive.responsePrimitive.primitiveContent, p_resourceType, vc_remoteCseIndex);
+								}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value vc_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+									}
+								[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value vc_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while creating resource type " & int2str(enum2int(p_resourceType)));
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while creating resource type " & int2str(enum2int(p_resourceType)));
+								}
+							}	
+    					
+							f_checkCseSimuStatus();
+    								
+							//Check to see if the resource is present or not
+							if (f_isResourcePresentCseSimu(v_resourceIndex)){
+								setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+							} else {
+								setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+							}
+    								
+							// Postamble
+							f_cse_postamble_deleteResourcesCSE();
+						
+							// Tear down
+							f_cf02DownCseSimuMaster();
+						
+							return vc_response.primitive.responsePrimitive;
+    					    				
+						}//end f_CSE_DMR_CRE_001_cseSimu
     				
 				} // end g_CSE_DMR_CRE_001
 								

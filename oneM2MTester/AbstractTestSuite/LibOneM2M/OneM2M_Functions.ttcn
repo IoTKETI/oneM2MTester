@@ -162,6 +162,7 @@ module OneM2M_Functions {
 			
 			// Map
 			map(self:mcaPort, system:mcaPort);
+			map(self:mcaPortIn, system:mcaPortIn);
 			map(self:acPort, system:acPort);
 			
 			activate(a_default());
@@ -992,6 +993,35 @@ module OneM2M_Functions {
 						return true;
 					}
 					[] mcaPort.receive(mw_response(mw_responsePrimitive(?, -))) {
+						tc_ac.stop;
+						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
+						return false;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, testcasename() & ": No answer while retrieving resource");
+						return false;
+					}
+				}	
+				return false;
+			}
+			
+			/**
+			 * @desc Check that a resource is present in the IUT (resourceId is known) by using RETRIEVE operation
+			 * @param p_resourceIndex Resource index of the resource to be checked
+			 * @return boolean
+			 */
+			function f_isResourcePresentCseSimu (integer p_resourceIndex) runs on CseSimu return boolean {
+			
+				//Check to see if the resource is present or not
+				mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				tc_ac.start;
+				alt {
+					[] mccPort.receive(mw_response(mw_responsePrimitive(int2000))) {
+						tc_ac.stop;
+						setverdict(pass, testcasename() & ": Resource present: " & f_getResourceAddress(p_resourceIndex));
+						return true;
+					}
+					[] mccPort.receive(mw_response(mw_responsePrimitive(?, -))) {
 						tc_ac.stop;
 						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
 						return false;
