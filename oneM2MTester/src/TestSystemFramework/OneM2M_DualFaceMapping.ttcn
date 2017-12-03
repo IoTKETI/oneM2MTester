@@ -83,6 +83,14 @@ module OneM2M_DualFaceMapping {
     		 
     			//test encvalue(primitiveContent) to be removed  
     			if(ispresent(v_reqPrimitive.primitiveContent)) {
+    			  	
+    			  	// @TaeHyun Kim, thyun.kim@synctechno.com
+					// forcedFields 
+					if(ispresent(p_msgout.forcedFields)){
+						v_reqPrimitive.primitiveContent := f_applyForcedAttribute(v_reqPrimitive.primitiveContent, p_msgout.forcedFields);        
+						log(__SCOPE__&"-Input Forced Fields: ", p_msgout.forcedFields); 
+					}	
+					
     		    	var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
                   
                 	if(v_bit_stream != ''B) {
@@ -715,4 +723,66 @@ module OneM2M_DualFaceMapping {
 		
 		return 0;
   	} with {extension "prototype(backtrack)"}
+  	
+  	function f_applyForcedAttribute(PrimitiveContent p_contentResource, AttributeAux_list p_forcedFields) return PrimitiveContent {
+					
+		if(ischosen(p_contentResource.accessControlPolicy)) {
+			//p_contentResource.accessControlPolicy;
+		}
+		
+		if(ischosen(p_contentResource.container)) {
+			
+			//p_contentResource.container;
+			for(var integer i:=0; i < lengthof(p_forcedFields); i:=i+1) {
+
+				if(p_forcedFields[i].name == "maxByteSize") {
+					p_contentResource.container.maxByteSize := str2int(p_forcedFields[i].value_);
+			  	}
+		
+				if(p_forcedFields[i].name == "maxNrOfInstances") {
+					p_contentResource.container.maxNrOfInstances := str2int(p_forcedFields[i].value_);
+				}
+				  
+				if(p_forcedFields[i].name == "maxInstanceAge") {
+					p_contentResource.container.maxInstanceAge := str2int(p_forcedFields[i].value_);
+				}
+			}
+		}
+			
+		if(ischosen(p_contentResource.contentInstance)) {
+			//p_contentResource.contentInstance;
+		}
+			
+		if(ischosen(p_contentResource.schedule)) {
+			//p_contentResource.schedule;
+		}
+			
+		if(ischosen(p_contentResource.pollingChannel)) {
+			//p_contentResource.pollingChannel;
+		}
+			
+		if(ischosen(p_contentResource.subscription)) {
+			//p_contentResource.subscription;
+		}
+			
+		if(ischosen(p_contentResource.group_)) {
+			//p_contentResource.group_;
+		}
+			
+		if(ischosen(p_contentResource.aE)) {
+			//p_contentResource.aE;
+		}
+			
+		if(ischosen(p_contentResource.serviceSubscribedAppRule)) {
+			//p_contentResource.serviceSubscribedAppRule;
+		}
+			
+		if(ischosen(p_contentResource.remoteCSE)) {
+			//p_contentResource.remoteCSE;
+		}
+			
+		log(__SCOPE__&":WARNING: Primitive Content Kind not implemented");
+		
+		return p_contentResource;
+	}
 } // End_of_module
