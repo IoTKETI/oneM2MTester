@@ -178,15 +178,23 @@ module OneM2M_Functions {
 		function f_cf03Up() runs on CseSimu {
 		
 			// Variables
+			var PrimitiveContent v_cSEBaseResource;
 			vc_config := e_cf03;
 			vc_testSystemRole := e_cse;		
 			
 			// Map
 			map(self:mcaPortIn, system:mcaPortIn);//TODO To be consistent, we should use mcaPortIn for AE testing
 			map(self:acPort, system:acPort);
-			map(self:utPort, system:utPort);
+			if(PX_UT_IMPLEMENTED) {
+				map(self:utPort, system:utPort);
+			}
 			activate(a_default());
 			activate(a_ae_cf03());
+			
+			//Creation of CSEBase
+			
+			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
+			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
 		
 			// Connect
 					
@@ -274,7 +282,9 @@ module OneM2M_Functions {
 		function f_cf03Down() runs on CseSimu {
 			
 			unmap(self:mcaPortIn, system:mcaPortIn);
-			unmap(self:utPort, system:utPort);
+			if(PX_UT_IMPLEMENTED){
+				unmap(self:utPort, system:utPort);
+			}
 			unmap(self:acPort, system:acPort);
 		}
 		
@@ -664,10 +674,10 @@ module OneM2M_Functions {
 			 * @param p_responseStatusCode Response Status Code to be sent in response to the subscription verification request
 			 * @verdict 
 			 */
-			function f_cse_preamble_subscriptionVerification(inout integer p_ae2Index, inout template RequestPrimitive p_createRequestPrimitive,in ResourceType p_resourceType, in ResponseStatusCode p_responseStatusCode := int2001) runs on AeSimu {
+			function f_cse_preamble_subscriptionVerification(inout integer p_ae2Index, inout template RequestPrimitive p_createRequestPrimitive,in ResourceType p_resourceType, in ResponseStatusCode p_responseStatusCode := int2000) runs on AeSimu {
 				if(p_resourceType == int23){
 					
-					vc_ae2.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, "MyAe2", {f_getAnnouncementTargetPoA("HTTP", PX_AE2_ADDRESS, "")}), -1)); // AE2 is registred
+					vc_ae2.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, {f_getAnnouncementTargetPoA("HTTP", PX_AE2_ADDRESS, "")}), -1)); // AE2 is registred
 					
 					f_checkComponentDoneAndGetVerdict(vc_ae2);
 					
@@ -1309,7 +1319,7 @@ module OneM2M_Functions {
 				 * @param p_responseStatusCode Response Status Code to be used for the response to the verification request
 				 * @verdict 
 				 */
-				function f_cse_notifyProcedure_subscriptionVerificationHandler(in ResponseStatusCode p_responseStatusCode := int2001) runs on AeSimu {
+				function f_cse_notifyProcedure_subscriptionVerificationHandler(in ResponseStatusCode p_responseStatusCode := int2000) runs on AeSimu {
 					// Local variables
 					var ResponsePrimitive v_responsePrimitive;
 					var template Notification v_notificationRequest := mw_contentNotificationVerification;
@@ -1771,6 +1781,7 @@ module OneM2M_Functions {
 					v_myResource.cSEBase.resourceID := "CSEBase" & int2str(v_resourceIndex);
 					v_myResource.cSEBase.parentID := omit;		//Following TS-0001, it must be NULL
 					v_myResource.cSEBase.creationTime := fx_generateTimestamp();
+					v_myResource.cSEBase.creationTime := "20171231T012345";
 					v_myResource.cSEBase.lastModifiedTime := v_myResource.cSEBase.creationTime;		
 					v_myResource.cSEBase.cSE_ID := PX_CSE1_ID;
 					v_myResource.cSEBase.supportedResourceType := PX_CSE1_SRT;
@@ -1792,6 +1803,7 @@ module OneM2M_Functions {
 						v_myResource.remoteCSE.resourceID := "remoteCSE" & int2str(v_resourceIndex);
 						v_myResource.remoteCSE.parentID := f_getResourceId(vc_localResourcesList[p_parentIndex].resource);
 						v_myResource.remoteCSE.creationTime := fx_generateTimestamp();
+						v_myResource.remoteCSE.creationTime := "20171231T012345";
 						if(not(ispresent(p_resource.remoteCSE.expirationTime))) {
 							v_myResource.remoteCSE.expirationTime := "20301231T012345";
 						}
@@ -1916,18 +1928,19 @@ module OneM2M_Functions {
      		
 				tc_ac.start;
 				alt {    				
-					[] mcaPort.receive(mw_request(mw_createAe)) -> value v_request {
+					[] mcaPortIn.receive(mw_request(mw_createAe)) -> value v_request {
 						tc_ac.stop;
     					
 						v_rp := v_request.primitive.requestPrimitive;		
 						v_parentIndex := f_getResourceIndex(v_rp.to_);
-						v_resourceIndex := f_ae_createResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType, v_modifiedResource);
+						v_modifiedResource := f_ae_generateLocalResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType);
+						v_resourceIndex := f_setLocalResource(v_modifiedResource, int2, v_parentIndex);
 						if(v_resourceIndex != -1) {
-							mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
+							mcaPortIn.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
 							setverdict(pass, __SCOPE__&":INFO: Application registered successfuly");
 						}
 						else {
-							mcaPort.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
+							mcaPortIn.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
 							setverdict(inconc, __SCOPE__&":INFO: AE registration failed");
 						}					
 					}
@@ -1971,7 +1984,8 @@ module OneM2M_Functions {
     					
 						v_rp := v_request.primitive.requestPrimitive;		
 						v_parentIndex := f_getResourceIndex(v_rp.to_);
-						v_resourceIndex := f_ae_createResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType, v_modifiedResource);
+						v_modifiedResource := f_ae_generateLocalResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType);
+						v_resourceIndex := f_setLocalResource(v_modifiedResource, int2, v_parentIndex);
 						if(v_resourceIndex != -1) {
 							mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
 							setverdict(pass, __SCOPE__&":INFO: Container created successfuly");
@@ -2005,36 +2019,46 @@ module OneM2M_Functions {
 			 * @param  p_modifiedResource  Assigned and/or modified fields
 			 * @return Internal resource index of the saved resource or -1
 			 */
-			function f_ae_createResource(in PrimitiveContent p_resource, in integer p_parentIndex, in ResourceType p_resourceType, out PrimitiveContent p_modifiedResource) runs on CseSimu return integer {
+			function f_ae_generateLocalResource(in PrimitiveContent p_resource, in integer p_parentIndex, in ResourceType p_resourceType) runs on CseSimu return PrimitiveContent {
 
 				var integer v_resourceIndex;
+				var PrimitiveContent v_primitiveContent;
 				
 				// AE TODO To review the code (use of indexes, generation of value for certain attributes, etc..)
 				if(p_resourceType == int2 and ispresent(p_resource)) {
 					if(ischosen(p_resource.aE)){
-						var AE_optional v_ae := p_resource.aE;
-						var AE_optional v_aeModified;					
+						var AE_optional v_content := p_resource.aE;
+						
+						v_resourceIndex := lengthof(vc_localResourcesList) - 1;
+						v_content.resourceType := p_resourceType;
       					
-						v_resourceIndex := lengthof(vc_resourcesList) - 1;
-						v_ae.resourceType := p_resourceType;
+						v_content.parentID := PX_CSE1_ID;
+						v_content.creationTime := fx_generateTimestamp();
+						v_content.lastModifiedTime := v_content.creationTime;											
+						v_content.resourceID := "ae" & int2str(v_resourceIndex);
+						v_content.aE_ID := "Cae" & int2str(v_resourceIndex);
+						v_content.resourceName := "ae" & int2str(v_resourceIndex);
+      					v_primitiveContent := {aE := v_content};
+						return v_primitiveContent;
+				    
+					}
+										
+				}	
+				
+				if(p_resourceType == int3 and ispresent(p_resource)) {
+					if(ischosen(p_resource.container)){
+						var Container_optional v_content := p_resource.container;
+						
+						v_resourceIndex := lengthof(vc_localResourcesList) - 1;
+						v_content.resourceType := p_resourceType;
       					
-						v_ae.parentID := int2str(p_parentIndex);
-						v_ae.creationTime := fx_generateTimestamp();
-						v_ae.lastModifiedTime := v_ae.creationTime;											
-						v_ae.resourceID := "ae" & int2char(v_resourceIndex);
-						v_ae.aE_ID := "ae" & int2char(v_resourceIndex);
-						v_ae.resourceName := "ae" & int2char(v_resourceIndex);
-      
-						v_aeModified.parentID := v_ae.parentID;
-						v_aeModified.creationTime := v_ae.creationTime;
-						v_aeModified.lastModifiedTime := v_ae.lastModifiedTime;											
-						v_aeModified.resourceID := v_ae.resourceID;
-						v_aeModified.aE_ID := v_ae.aE_ID;
-						v_aeModified.resourceName := v_ae.resourceName;
-      					
-						p_resource.aE := v_ae;
-						p_modifiedResource.aE := v_aeModified;
-						return f_setResource(p_resource, p_resourceType, p_parentIndex, false);			   
+						v_content.parentID := PX_CSE1_ID;
+						v_content.creationTime := fx_generateTimestamp();
+						v_content.lastModifiedTime := v_content.creationTime;											
+						v_content.resourceID := "cnt" & int2str(v_resourceIndex);
+						v_content.resourceName := "cnt" & int2str(v_resourceIndex);
+						v_primitiveContent := {container := v_content};
+						return v_primitiveContent;
 				    
 					}
 										
@@ -2043,7 +2067,7 @@ module OneM2M_Functions {
 				// TODO: implement other resource types			
 				
 				// Error
-				return -1;
+				return p_resource;
 			}
 			
 		} // end helpingFunctions
@@ -2084,7 +2108,8 @@ module OneM2M_Functions {
 				[] mcaPort.receive(mw_request(mw_create)) -> value v_request {	
 					v_rp := v_request.primitive.requestPrimitive;		
 					v_parentIndex := f_getResourceIndex(v_rp.to_);
-					v_resourceIndex := f_ae_createResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType, v_modifiedResource);
+					v_modifiedResource := f_ae_generateLocalResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType);
+					v_resourceIndex := f_setLocalResource(v_modifiedResource, v_rp.resourceType, v_parentIndex);
 					if(v_resourceIndex != -1) {
 						mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
 					}
@@ -2315,6 +2340,21 @@ module OneM2M_Functions {
 			if(ischosen(p_contentResource.remoteCSE)) {
 				return f_resourceIdCleaner(p_contentResource.remoteCSE.resourceID);
 			}
+			if(ischosen(p_contentResource.cSEBase)) {
+				return f_resourceIdCleaner(p_contentResource.cSEBase.resourceID);
+			}
+			if(ischosen(p_contentResource.m2mServiceSubscriptionProfile)) {
+				return p_contentResource.m2mServiceSubscriptionProfile.resourceName;
+			}
+			if(ischosen(p_contentResource.node)) {
+				return p_contentResource.node.resourceName;
+			}
+			if(ischosen(p_contentResource.statsConfig)) {
+				return p_contentResource.statsConfig.resourceName;
+			}
+			if(ischosen(p_contentResource.statsCollect)) {
+				return p_contentResource.statsCollect.resourceName;
+			}
 
 			log(__SCOPE__&":WARNING: Primitive Content Kind not implemented");
 			
@@ -2360,6 +2400,22 @@ module OneM2M_Functions {
 			if(ischosen(p_contentResource.remoteCSE)) {
 				return p_contentResource.remoteCSE.resourceName;
 			}
+			if(ischosen(p_contentResource.cSEBase)) {
+				return p_contentResource.cSEBase.resourceName;
+			}
+			if(ischosen(p_contentResource.m2mServiceSubscriptionProfile)) {
+				return p_contentResource.m2mServiceSubscriptionProfile.resourceName;
+			}
+			if(ischosen(p_contentResource.node)) {
+				return p_contentResource.node.resourceName;
+			}
+			if(ischosen(p_contentResource.statsConfig)) {
+				return p_contentResource.statsConfig.resourceName;
+			}
+			if(ischosen(p_contentResource.statsCollect)) {
+				return p_contentResource.statsCollect.resourceName;
+			}
+			
 			log(__SCOPE__&":WARNING: Primitive Content Kind not implemented");
 			
 			return "resourceNameNotFound";
@@ -2462,8 +2518,8 @@ module OneM2M_Functions {
 		 * @param p_address	Resource URI (can be structured/unstructured cseRelative/spRelative/absolute)
 		 * @return Internal resource index of the given resource or -1 in case of error
 		 */
-		function f_getResourceIndex(in XSD.AnyURI p_address) return integer {
-			return -1; //TODO
+		function f_getResourceIndex(in XSD.AnyURI p_address) runs on CseSimu return integer {
+			return vc_cSEBaseIndex; //TODO
 		}
     		
 		/**
@@ -2551,7 +2607,7 @@ module OneM2M_Functions {
 					if(p_targetResourceIndex == -1) {
 						return PX_CSE1_NAME;
 					} else {
-						v_resourceAddress := f_getResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
+						v_resourceAddress := f_getLocalResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
 						return v_resourceAddress;
 					}	
 				}
@@ -2568,7 +2624,7 @@ module OneM2M_Functions {
 					if(p_targetResourceIndex == -1) {
 						return PX_CSE1_ID & "/" & PX_CSE1_NAME;
 					} else {
-						v_resourceAddress := f_getResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
+						v_resourceAddress := f_getLocalResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
 						return v_resourceAddress;
 					}
 				}
@@ -2577,14 +2633,14 @@ module OneM2M_Functions {
 					if(p_targetResourceIndex == -1) {
 						return PX_SP1_ID & PX_CSE1_ID;
 					} else {
-						v_resourceAddress := f_getResourceAddress(-, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceId(vc_localResourcesList[p_targetResourceIndex].resource);
+						v_resourceAddress := f_getLocalResourceAddress(-, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceId(vc_localResourcesList[p_targetResourceIndex].resource);
 						return v_resourceAddress;
 					}
 				} else {
 					if(p_targetResourceIndex == -1) {
 						return PX_SP1_ID & PX_CSE1_ID & "/" & PX_CSE1_NAME;
 					} else {
-						v_resourceAddress := f_getResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
+						v_resourceAddress := f_getLocalResourceAddress(vc_localResourcesList[p_targetResourceIndex].parentIndex, p_addressingMethod, p_primitiveScope) & "/" & f_getResourceName(vc_localResourcesList[p_targetResourceIndex].resource);
 						return v_resourceAddress;
 					}	
 				}				
