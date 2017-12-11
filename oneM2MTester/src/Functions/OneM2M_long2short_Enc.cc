@@ -73,7 +73,7 @@ namespace OneM2M__DualFaceMapping {
      */
 	CHARSTRING f__primitiveContent__Dec(const CHARSTRING& source_str, const CHARSTRING& serial_type){
 
-		if(!initial_mapping("allPort")){
+		if(!initial_mapping()){
 			TTCN_Logger::log(TTCN_DEBUG, "\n[WARNING]oneM2M lon&short mapping initialization failed!!\n\n");
 		}
 
@@ -262,7 +262,7 @@ namespace OneM2M__DualFaceMapping {
 	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type){
 
 		//TTCN_Logger::log(TTCN_DEBUG, "Enter f_serialization_Enc()...");
-		if(!initial_mapping("allPort")){
+		if(!initial_mapping()){
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 		}
 
@@ -413,18 +413,13 @@ namespace OneM2M__DualFaceMapping {
 	}
 
 	//initial mapping functions
-	bool initial_mapping(std::string port_condition){
+	bool initial_mapping(){
 
 		const char* file_path_l2s = "";
 		const char* file_path_s2l = "";
 
-		if(!port_condition.compare("utTriggerPort")) {
-			file_path_l2s 	= "../oneM2MTester/Lib/ResourceMappingTable/long_to_short_mapping_for_trigger.txt";
-			file_path_s2l	= "../oneM2MTester/Lib/ResourceMappingTable/short_to_long_mapping_for_trigger.txt";
-		} else if(!port_condition.compare("allPort")){
-			file_path_l2s 	= "../oneM2MTester/Lib/ResourceMappingTable/long_to_short_mapping.txt";
-			file_path_s2l	= "../oneM2MTester/Lib/ResourceMappingTable/short_to_long_mapping.txt";
-		}
+		file_path_l2s 	= "../oneM2MTester/Lib/ResourceMappingTable/long_to_short_mapping.txt";
+		file_path_s2l	= "../oneM2MTester/Lib/ResourceMappingTable/short_to_long_mapping.txt";
 
 		const std::string LONG2SHORT	= "L2S";
 		const std::string SHORT2LONG	= "S2L";
@@ -1041,7 +1036,10 @@ namespace OneM2M__DualFaceMapping {
 							}else if(tempObj.isBool()){
 								elemArrayObj.append(tempObj.asBool());
 							}else if(tempObj.isDouble()){
-								elemArrayObj.append(tempObj.asDouble());
+								int convertedIntValue = float2int(tempObj.asDouble());
+								std::string tmp_str((const char*)(int2str(convertedIntValue)));
+								std::string attr_val = getLongName(tmp_str);
+								elemArrayObj.append(attr_val);
 							}else if(tempObj.isInt64()){
 								elemArrayObj.append(tempObj.asInt64());
 							}else if(tempObj.isObject()){
@@ -1085,7 +1083,7 @@ namespace OneM2M__DualFaceMapping {
 
 	// Encoding function for triggering request message
 	CHARSTRING f__serialization__Enc__for__trigger__msg(const CHARSTRING& p__source){
-		if(!initial_mapping("utTriggerPort"))
+		if(!initial_mapping())
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 
 		const char* p_body = (const char*)p__source;
