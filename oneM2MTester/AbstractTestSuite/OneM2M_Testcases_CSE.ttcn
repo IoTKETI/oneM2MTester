@@ -337,7 +337,7 @@ module OneM2M_Testcases_CSE {
 						v_addressingMethod := e_nonHierarchical;
 						v_primitiveScope := p_primitiveScope;
 						
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex, v_addressingMethod, v_primitiveScope), f_getOriginator(v_resourceIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex, v_addressingMethod, v_primitiveScope), f_getOriginator(v_resourceIndex))));
 						tc_ac.start;
 						alt {
 							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000))) {
@@ -429,7 +429,7 @@ module OneM2M_Testcases_CSE {
 						v_addressingMethod := e_hierarchical;
 						v_primitiveScope := p_primitiveScope;
 						
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex, v_addressingMethod, v_primitiveScope), f_getOriginator(v_resourceIndex))));tc_ac.start;
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex, v_addressingMethod, v_primitiveScope), f_getOriginator(v_resourceIndex))));tc_ac.start;
 						alt {
 							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000))) {
 								tc_ac.stop;
@@ -1322,7 +1322,8 @@ module OneM2M_Testcases_CSE {
 								setverdict(fail, __SCOPE__ & "Resource ID not set correctly.");
 							}
 							
-							if(f_isScopeSpRelative(v_response.primitive.responsePrimitive.primitiveContent.aE.aE_ID)){
+							// @JaeYoung: f_isScopeSpRelative -> f_isScopeCseRelative
+							if(f_isScopeCseRelative(v_response.primitive.responsePrimitive.primitiveContent.aE.aE_ID)){
 								setverdict(pass, __SCOPE__ & "AE ID set correctly.");
 							} else {
 								setverdict(fail, __SCOPE__ & "AE ID not set correctly.");
@@ -2536,7 +2537,7 @@ module OneM2M_Testcases_CSE {
 					// Test Body
 					v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
 					
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
 	
 					tc_ac.start;
 					alt {
@@ -2614,7 +2615,7 @@ module OneM2M_Testcases_CSE {
 						 // Preamble
 						 v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
 						 
-						 mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));
+						 mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));
 						 tc_ac.start;
 						 alt {
 							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
@@ -2671,7 +2672,7 @@ module OneM2M_Testcases_CSE {
 					// Test Body
 					v_contentResponse.aE := mw_contentAeBase;
 	
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
 
 					tc_ac.start;
 					alt {
@@ -2802,7 +2803,7 @@ module OneM2M_Testcases_CSE {
 						 // Preamble
 						 v_aeIndex := f_cse_createResource(int2, p_createRequestPrimitive, -1);
 		 
-						 mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+						 mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
 						 tc_ac.start;
 						 alt {
 							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
@@ -2864,7 +2865,7 @@ module OneM2M_Testcases_CSE {
 					v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
 					v_contentResponse.cSEBase.cseType := int1;
 	
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID 
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID 
 					
 					tc_ac.start;
 					alt {
@@ -2922,7 +2923,7 @@ module OneM2M_Testcases_CSE {
 				    
 					 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
  
-					 mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					 mccPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
 					 tc_ac.start;
 					 alt {
 						 [] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
@@ -2951,7 +2952,7 @@ module OneM2M_Testcases_CSE {
 					
 					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
 					
-					mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					mccPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
 					tc_ac.start;
 					alt {
 						 [] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
@@ -3067,7 +3068,7 @@ module OneM2M_Testcases_CSE {
 						// Preamble
 						if(PICS_IN_CSE){
 							vc_remoteCseIndex := f_cse_registerRemoteCse(p_createRequestPrimitive);
-							mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+							mccPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
 						    tc_ac.start;
 							alt {
 								[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
@@ -3092,7 +3093,7 @@ module OneM2M_Testcases_CSE {
 							}
 						} else if (PICS_MN_CSE){
 							vc_remoteCseIndex := f_cse_registrationRemoteCse(p_createRequestPrimitive);
-							mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+							mccPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
 							tc_ac.start;
 							alt {
 								[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, p_contentResponse))) -> value v_response {
@@ -3150,7 +3151,7 @@ module OneM2M_Testcases_CSE {
 					// Test Body
 					v_contentResponse.cSEBase := mw_contentCSEBase_rc1;
 
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
 
 					tc_ac.start;
 					alt {
@@ -3230,7 +3231,7 @@ module OneM2M_Testcases_CSE {
 					 
 					 tc_ac.start;
 					 alt {
- 						[] mccPortIn.receive(mw_request(mw_retrieveResource(f_getResourceAddress()))) -> value v_response {
+ 						[] mccPortIn.receive(mw_request(mw_retrieve(f_getResourceAddress()))) -> value v_response {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": Retrieve Request received successfully");
 						}
@@ -3274,7 +3275,7 @@ module OneM2M_Testcases_CSE {
 					 
 					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
 	 
-					 mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
+					 mccPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(vc_remoteCseIndex))));
 					 tc_ac.start;
 					 alt {
 						[] mccPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse))) -> value v_response {
@@ -3796,7 +3797,7 @@ module OneM2M_Testcases_CSE {
 					// Test Body
 					tc_ac.start;
 					alt {
-						[] mccPortIn.receive(mw_request(mw_deleteRequest( f_getResourceAddress(vc_remoteCseIndex), PX_CSE_ID))) {
+						[] mccPortIn.receive(mw_request(mw_delete( f_getResourceAddress(vc_remoteCseIndex), PX_CSE_ID))) {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": <remoteCSE> delete request has been received");
 						}
@@ -5391,7 +5392,7 @@ module OneM2M_Testcases_CSE {
 						v_contentInstanceIndex := f_cse_createResource(int4, m_createContentInstanceBase, v_containerIndex);
 					
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
 						
 						v_contentResponse.container := mw_contentContainerBase;
 						
@@ -5974,7 +5975,7 @@ module OneM2M_Testcases_CSE {
 						var template RequestPrimitive v_createRequest := m_createSubscriptionBase;
 						const AttributeList c_optionalAttribute := {"subscriberURI"};
 						
-						v_createRequest.primitiveContent.subscription.subscriberURI := "MySubscriberURI";
+						v_createRequest.primitiveContent.subscription.subscriberURI := "NotInitialized";
 						
 						v_ae1.start(f_CSE_DMR_CRE_012(int23, v_createRequest, c_optionalAttribute));
 						v_ae1.done;
@@ -6194,7 +6195,7 @@ module OneM2M_Testcases_CSE {
 						}	
 						
 						//Check currentByteSize
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7135,7 +7136,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_parentIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7207,7 +7208,7 @@ module OneM2M_Testcases_CSE {
 							v_targetResourceAddress := f_getResourceAddress(v_aeIndex) & "/" & v_resourceName;
 						}
 						
-						mcaPort.send(m_request(m_retrieveResource(v_targetResourceAddress, f_getOriginator(v_aeIndex))));
+						mcaPort.send(m_request(m_retrieve(v_targetResourceAddress, f_getOriginator(v_aeIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7327,7 +7328,7 @@ module OneM2M_Testcases_CSE {
 						f_cse_updateAcpAuxResource(int61); //c_CUDNDi
 								
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7460,7 +7461,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeToOption(f_getResourceAddress(v_resourceIndex) & v_attribute, f_getOriginator(v_resourceIndex))));
+						mcaPort.send(m_request(m_retrieveAttributeToOption(f_getResourceAddress(v_resourceIndex) & v_attribute, f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7597,7 +7598,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,	{"pi"}, f_getOriginator(v_resourceIndex))));
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,	{"pi"}, f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
 						alt {
@@ -7740,7 +7741,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,
 																						{"pi", "ct"}, f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
@@ -7854,7 +7855,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex),
 																						{"lbl"}, f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
@@ -7963,7 +7964,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex),
 																						{"lbl", "at"}, f_getOriginator(v_resourceIndex))));
 
 						tc_ac.start;
@@ -8018,7 +8019,7 @@ module OneM2M_Testcases_CSE {
 						v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_aeIndex); 	
 		
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameLatest, f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameLatest, f_getOriginator(v_containerIndex))));
 
 						tc_ac.start;
 						alt {
@@ -8083,7 +8084,7 @@ module OneM2M_Testcases_CSE {
 						v_contentResponse.contentInstance.resourceName := vc_resourcesList[v_contentInstanceIndex1].resource.contentInstance.resourceName;
     									
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameOldest, f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameOldest, f_getOriginator(v_containerIndex))));
 
 						tc_ac.start;
 						alt {
@@ -8142,7 +8143,7 @@ module OneM2M_Testcases_CSE {
 						v_containerIndex := f_cse_createResource(int3, m_createContainerBase, v_aeIndex); 	
 		
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameOldest, f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameOldest, f_getOriginator(v_containerIndex))));
 
 						tc_ac.start;
 						alt {
@@ -8210,7 +8211,7 @@ module OneM2M_Testcases_CSE {
 						 
     					
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameLatest, f_getOriginator(v_containerIndex))));
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex) & "/" & c_resourceShortNameLatest, f_getOriginator(v_containerIndex))));
 
 						tc_ac.start;
 						alt {
@@ -8385,7 +8386,7 @@ module OneM2M_Testcases_CSE {
 						}
 						
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_aeIndex))));//from AE ID
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
 						alt {
@@ -8536,7 +8537,7 @@ module OneM2M_Testcases_CSE {
 						}
 								
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_aeIndex))));//from AE ID
+						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
 						alt {
@@ -8703,7 +8704,7 @@ module OneM2M_Testcases_CSE {
 						}
 						
 						// Test Body
-						mcaPort.send(m_request(m_retrieveResourceAttributeToOption(f_getResourceAddress(v_resourceIndex) & v_attribute, f_getOriginator(v_aeIndex))));//from AE ID
+						mcaPort.send(m_request(m_retrieveAttributeToOption(f_getResourceAddress(v_resourceIndex) & v_attribute, f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
 						alt {
@@ -8877,7 +8878,7 @@ module OneM2M_Testcases_CSE {
 							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,	{"pi"}, f_getOriginator(v_aeIndex))));//from AE ID
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,	{"pi"}, f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
 						alt {
@@ -9136,7 +9137,7 @@ module OneM2M_Testcases_CSE {
 							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex) ,
 																						{"pi", "ct"}, f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
@@ -9283,7 +9284,7 @@ module OneM2M_Testcases_CSE {
 							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex),
 																						{"lbl"}, f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
@@ -9426,7 +9427,7 @@ module OneM2M_Testcases_CSE {
 							v_resourceIndex := f_getRemoteCseResource(vc_cse1);
 						}
 						
-						mcaPort.send(m_request(m_retrieveResourceAttributeContentOption(f_getResourceAddress(v_resourceIndex),
+						mcaPort.send(m_request(m_retrieveAttributeContentOption(f_getResourceAddress(v_resourceIndex),
 																						{"lbl", "at"}, f_getOriginator(v_aeIndex))));//from AE ID
 
 						tc_ac.start;
@@ -9510,7 +9511,7 @@ module OneM2M_Testcases_CSE {
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 				
 							
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := p_resultContent;
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -9649,7 +9650,7 @@ module OneM2M_Testcases_CSE {
 						}
 						
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := int1;//Attributes
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -9793,7 +9794,7 @@ module OneM2M_Testcases_CSE {
 						}
 							
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := int4;//Attributes and child resources
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -9937,7 +9938,7 @@ module OneM2M_Testcases_CSE {
 						}				
 							
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := int5;//attributes and child resource references
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -10080,7 +10081,7 @@ module OneM2M_Testcases_CSE {
 						}				
 							
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := int6;//Child resource references
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -10223,7 +10224,7 @@ module OneM2M_Testcases_CSE {
 						}				
 							
 						// Test Body
-						v_request := valueof(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
+						v_request := valueof(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex)));
 						v_request.resultContent := int6;//Child resource references
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -12431,7 +12432,7 @@ module OneM2M_Testcases_CSE {
 							v_updateRequest := f_getUpdateRequestPrimitive(int3, v_containerIndex, v_updateRequest);
 							f_cse_updateResource(v_updateRequest);
 
-							mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
+							mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_containerIndex), f_getOriginator(v_containerIndex))));
 
 							tc_ac.start;
 							alt {
@@ -15903,7 +15904,7 @@ module OneM2M_Testcases_CSE {
             	
             	
             	
-							mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
+							mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
             
 							tc_ac.start;
 							alt {
@@ -16060,7 +16061,7 @@ module OneM2M_Testcases_CSE {
 						
 						f_checkAeSimuStatus();
 			       		            	
-						mcaPort.send(m_request(m_retrieveResource((f_getResourceAddress(v_contentInstanceIndex_2)), f_getOriginator(v_contentInstanceIndex_2))));
+						mcaPort.send(m_request(m_retrieve((f_getResourceAddress(v_contentInstanceIndex_2)), f_getOriginator(v_contentInstanceIndex_2))));
 					            
 						tc_ac.start;
 						alt {
@@ -16205,7 +16206,7 @@ module OneM2M_Testcases_CSE {
 						   
 						f_checkAeSimuStatus();
 						   
-						mcaPort.send(m_request(m_retrieveResource((f_getResourceAddress(v_contentInstanceIndex_1)), f_getOriginator(v_contentInstanceIndex_1))));
+						mcaPort.send(m_request(m_retrieve((f_getResourceAddress(v_contentInstanceIndex_1)), f_getOriginator(v_contentInstanceIndex_1))));
 					            
 						tc_ac.start;
 						alt {
@@ -16638,7 +16639,7 @@ module OneM2M_Testcases_CSE {
 			  v_locContainerResourceIndex	:= f_cse_createResource(int3, v_container_request_preamble, v_locPolicyResourceIndex);//created container index
 			  			  	
 			  //Test Body - retrieve the created container resource
-			  mcaPort.send(m_request(valueof(m_retrieveResource(f_getResourceAddress(v_locContainerResourceIndex), f_getOriginator(v_locContainerResourceIndex))))); 
+			  mcaPort.send(m_request(valueof(m_retrieve(f_getResourceAddress(v_locContainerResourceIndex), f_getOriginator(v_locContainerResourceIndex))))); 
 			  tc_ac.start;
 			  alt{
 				[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
@@ -16839,7 +16840,7 @@ module OneM2M_Testcases_CSE {
 				v_subscriptionResourceIndex		:= f_cse_createResource(int23, v_subscription_request_preamble, v_locContainerResourceIndex);
 				
 			  //Test Body - retrieve the <latest> resource of the created container resource linked with the locationPolicy resource
-			  mcaPort.send(m_request(valueof(m_retrieveResource(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
+			  mcaPort.send(m_request(valueof(m_retrieve(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
 			  tc_ac.start;
 			  alt{
 				[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
@@ -16902,7 +16903,7 @@ module OneM2M_Testcases_CSE {
 				v_subscriptionResourceIndex		:= f_cse_createResource(int23, v_subscription_request_preamble, v_locContainerResourceIndex);
 				
 			  //Test Body - retrieve the <latest> resource of the created container resource linked with the locationPolicy resource
-			  mcaPort.send(m_request(valueof(m_retrieveResource(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
+			  mcaPort.send(m_request(valueof(m_retrieve(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
 			  tc_ac.start;
 			  alt{
 				[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
@@ -16964,7 +16965,7 @@ module OneM2M_Testcases_CSE {
 				v_subscriptionResourceIndex		:= f_cse_createResource(int23, v_subscription_request_preamble, v_locContainerResourceIndex);
 				
 			  //Test Body - retrieve the <latest> resource of the created container resource linked with the locationPolicy resource
-			  mcaPort.send(m_request(valueof(m_retrieveResource(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
+			  mcaPort.send(m_request(valueof(m_retrieve(f_getResourceAddress(v_locContainerResourceIndex) & "/" & "latest", f_getOriginator(v_locContainerResourceIndex)))));
 			  tc_ac.start;
 			  alt{
 				[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
@@ -17095,7 +17096,7 @@ module OneM2M_Testcases_CSE {
 			  v_locPolicyResourceIndex	:= f_cse_createResource(int10, v_locpolicy_request_preamble, v_aeAuxIndex);//created locationpolicy index
 				
 			  //Test Body - retrieve the created locationpolicy resource
-			  mcaPort.send(m_request(valueof(m_retrieveResource(f_getResourceAddress(v_locPolicyResourceIndex), f_getOriginator(v_locPolicyResourceIndex))))); 
+			  mcaPort.send(m_request(valueof(m_retrieve(f_getResourceAddress(v_locPolicyResourceIndex), f_getOriginator(v_locPolicyResourceIndex))))); 
 			  tc_ac.start;
 			  alt{
 				[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
@@ -17651,7 +17652,7 @@ module OneM2M_Testcases_CSE {
 					v_fanoutPointAddress := f_getResourceAddress(v_groupIndex) & "/" & c_resourceShortNameFanOutPoint & "/" & c_resourceShortNameLatest;
 					
 					// Test Body
-					mcaPort.send(m_request(m_retrieveResource(v_fanoutPointAddress, f_getOriginator(v_aeIndex_1)))); //TODO see if it is correct or if we have to use PX_SUPER_ADMIN
+					mcaPort.send(m_request(m_retrieve(v_fanoutPointAddress, f_getOriginator(v_aeIndex_1)))); //TODO see if it is correct or if we have to use PX_SUPER_ADMIN
 					tc_ac.start;
 					alt {
 						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000))) -> value v_response {
@@ -18555,7 +18556,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_GMG_001_RET() runs on Tester system CseSystem { //Retrieve
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						
-						v_ae1.start(f_CSE_GMG_001(m_retrieveResource("Temporary", "Temporary"), int2000));
+						v_ae1.start(f_CSE_GMG_001(m_retrieve("Temporary", "Temporary"), int2000));
 						v_ae1.done;
 					}//end TC_CSE_GMG_001_RET
 	
@@ -18672,7 +18673,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_GMG_002_RET() runs on Tester system CseSystem { //Retrieve
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-						v_ae1.start(f_CSE_GMG_002(m_retrieveResource("Temporary", "Temporary"), int61));//c_CUDNDi
+						v_ae1.start(f_CSE_GMG_002(m_retrieve("Temporary", "Temporary"), int61));//c_CUDNDi
 						v_ae1.done;
 					}//end TC_CSE_GMG_002_RET
 	
@@ -18777,7 +18778,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_GMG_003_RET() runs on Tester system CseSystem { //Retrieve
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-						v_ae1.start(f_CSE_GMG_003(m_retrieveResource("Temporary", "Temporary"), int2000));
+						v_ae1.start(f_CSE_GMG_003(m_retrieve("Temporary", "Temporary"), int2000));
 						v_ae1.done;
 					}//end TC_CSE_GMG_003_RET
 	
@@ -18894,7 +18895,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_GMG_004_RET() runs on Tester system CseSystem { //Retrieve
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-						v_ae1.start(f_CSE_GMG_004(m_retrieveResource("Temporary", "Temporary"), int61));//c_CUDNDi
+						v_ae1.start(f_CSE_GMG_004(m_retrieve("Temporary", "Temporary"), int61));//c_CUDNDi
 						v_ae1.done;
 					}//end TC_CSE_GMG_004_RET
 	
@@ -19006,7 +19007,7 @@ module OneM2M_Testcases_CSE {
 						var template PrimitiveContent v_contentResponse;
 						v_contentResponse.container := mw_contentContainerBase;
 						
-						v_ae1.start(f_CSE_GMG_005(m_retrieveResource("Temporary", "Temporary"), v_contentResponse, int2000));
+						v_ae1.start(f_CSE_GMG_005(m_retrieve("Temporary", "Temporary"), v_contentResponse, int2000));
 						v_ae1.done;
 					}//end TC_CSE_GMG_005_RET
 	
@@ -19133,7 +19134,7 @@ module OneM2M_Testcases_CSE {
 						var template PrimitiveContent v_contentResponse;
 						v_contentResponse.container := mw_contentContainerBase;
 						
-						v_ae1.start(f_CSE_GMG_006(m_retrieveResource("Temporary", "Temporary"), v_contentResponse, int2000));
+						v_ae1.start(f_CSE_GMG_006(m_retrieve("Temporary", "Temporary"), v_contentResponse, int2000));
 						v_ae1.done;
 					}//end TC_CSE_GMG_006_RET
 	
@@ -19268,7 +19269,7 @@ module OneM2M_Testcases_CSE {
 				
 				v_resourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_aeIndex);
 				v_childResourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_resourceIndex);
-				v_request := valueof(m_retrieveResourceFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
+				v_request := valueof(m_retrieveFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
 				mcaPort.send(m_request(v_request));
 				tc_ac.start;
 				alt {
@@ -19323,7 +19324,7 @@ module OneM2M_Testcases_CSE {
 				v_resourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_aeIndex);
 				v_childResourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_resourceIndex);
 				//v_request := valueof(m_retrieveResourceFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
-				v_request := valueof(m_retrieveResourceFilterUsageOptionLabel(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1, v_labels));
+				v_request := valueof(m_retrieveFilterUsageOptionLabel(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1, v_labels));
 				mcaPort.send(m_request(v_request));
 				tc_ac.start;
 				alt {
@@ -19383,7 +19384,7 @@ module OneM2M_Testcases_CSE {
 				
 				v_resourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_aeIndex);
 				v_childResourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_resourceIndex);
-				v_request := valueof(m_retrieveResourceDiscResTypeFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int2, int1));
+				v_request := valueof(m_retrieveDiscResTypeFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int2, int1));
 				mcaPort.send(m_request(v_request));
 				tc_ac.start;
 				alt {
@@ -19449,7 +19450,7 @@ module OneM2M_Testcases_CSE {
 				
 				v_resourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_aeIndex);
 				v_childResourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_resourceIndex);
-				v_request := valueof(m_retrieveResourceFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
+				v_request := valueof(m_retrieveFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
 				mcaPort.send(m_request(v_request));
 				tc_ac.start;
 				alt {
@@ -19500,9 +19501,9 @@ module OneM2M_Testcases_CSE {
 				v_aeIndex := f_cse_preamble_registerAe();//AE1 is registred;
 				
 				if(PX_ADDRESSING_METHOD == e_nonHierarchical and (PX_PRIMITIVE_SCOPE == e_cseRelative)) {
-					v_request := valueof(m_retrieveResourceFilterUsageOption(v_resourceId, f_getOriginator(v_aeIndex), int1));
+					v_request := valueof(m_retrieveFilterUsageOption(v_resourceId, f_getOriginator(v_aeIndex), int1));
 				} else {
-					v_request := valueof(m_retrieveResourceFilterUsageOption(f_getResourceAddress(v_aeIndex) & "/" & v_resourceId, f_getOriginator(v_resourceIndex), int1));
+					v_request := valueof(m_retrieveFilterUsageOption(f_getResourceAddress(v_aeIndex) & "/" & v_resourceId, f_getOriginator(v_resourceIndex), int1));
 				}
 			
 				mcaPort.send(m_request(v_request));
@@ -19558,7 +19559,7 @@ module OneM2M_Testcases_CSE {
 			    
 				v_resourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_aeIndex);
 				v_childResourceIndex := f_cse_createResource(c_containerResourceType, m_createContainerBase, v_resourceIndex); 
-				v_request := valueof(m_retrieveResourceFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
+				v_request := valueof(m_retrieveFilterUsageOption(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex), int1));
 				v_request.filterCriteria.expireBefore := "20171231T012345";
 				v_request.filterCriteria.expireAfter := "20181231T012345";
 				mcaPort.send(m_request(v_request));
@@ -20457,7 +20458,7 @@ module OneM2M_Testcases_CSE {
 					
 					f_checkComponentDoneAndGetVerdict(vc_ae2);
 					
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 	
 					tc_ac.start;
 					alt {
@@ -20539,7 +20540,7 @@ module OneM2M_Testcases_CSE {
 					
 					f_checkComponentDoneAndGetVerdict(vc_ae2);
 
-					mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 
 					tc_ac.start;
 					alt {
@@ -21239,6 +21240,142 @@ module OneM2M_Testcases_CSE {
 						f_cf01Down();
 
 					}//end TC_CSE_SEC_ACP_CRE_002
+
+					/**
+					 * @desc Check that the IUT accepts the creation of a accessControlPolicy resource with privileges attribute having empty rules
+					 * 
+					 */
+					testcase TC_CSE_SEC_ACP_CRE_003() runs on AeSimu system CseSystem {
+						// Local variables
+						var MsgIn v_response;
+						var integer v_acpIndex := -1;
+						var template PrimitiveContent v_contentResponse;
+						var RequestPrimitive v_createRequest := valueof(m_createAcpBase);
+						const ResourceType c_accessControlPolicyType := int1;
+
+						// Test control
+
+						// Test component configuration
+						f_cf01Up();
+
+						// Test adapter configuration
+
+						// Preamble
+						v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {};
+						
+						v_contentResponse.accessControlPolicy := mw_contentAcp_rc1;
+						v_contentResponse.accessControlPolicy.privileges.accessControlRule_list := {};
+						
+						// Test Body
+						v_createRequest := f_getCreateRequestPrimitive(c_accessControlPolicyType, v_createRequest, -1);
+						
+						mcaPort.send(m_request(v_createRequest));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001, v_contentResponse))) -> value v_response {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": Resource type " & int2str(enum2int(c_accessControlPolicyType)) & " created successfully");
+								f_checkAttributesToBeSaved(c_accessControlPolicyType, v_createRequest, v_response.primitive.responsePrimitive);
+								v_acpIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int1, -, -);
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Resource type " & int2str(enum2int(c_accessControlPolicyType)) & " created successfully, but wrong ACP representation");
+								f_checkAttributesToBeSaved(c_accessControlPolicyType, v_createRequest, v_response.primitive.responsePrimitive);
+								v_acpIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int1, -, -);
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}							
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating resource type " & int2str(enum2int(c_accessControlPolicyType)));
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating resource type " & int2str(enum2int(c_accessControlPolicyType)));
+							}
+						}
+
+						f_checkAeSimuStatus();
+    						
+						//Check to see if the resource is present or not
+						if(f_isResourcePresent(v_acpIndex)) {
+							setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+						} else {
+							setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+						}
+
+						//Postamble
+						f_cse_postamble_deleteResources();
+
+						//Tear down
+						f_cf01Down();
+
+					}//end TC_CSE_SEC_ACP_CRE_003
+
+					/**
+					 * @desc Check that the IUT responds with an error when the creation of a accessControlPolicy resource with selfPrivileges attribute having empty rules
+					 * 
+					 */
+					testcase TC_CSE_SEC_ACP_CRE_004() runs on AeSimu system CseSystem {
+						// Local variables
+						var MsgIn v_response;
+						var integer v_acpIndex := -1;
+						var RequestPrimitive v_createRequest := valueof(m_createAcpBase);
+						const ResourceType c_accessControlPolicyType := int1;
+
+						// Test control
+
+						// Test component configuration
+						f_cf01Up();
+
+						// Test adapter configuration
+
+						// Preamble
+						v_createRequest.primitiveContent.accessControlPolicy.selfPrivileges.accessControlRule_list := {};
+						
+						// Test Body
+						v_createRequest := f_getCreateRequestPrimitive(c_accessControlPolicyType, v_createRequest, -1);
+						
+						mcaPort.send(m_request(v_createRequest));
+						tc_ac.start;
+						alt {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int4000))) -> value v_response {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ": Resource type " & int2str(enum2int(c_accessControlPolicyType)) & " creation correctly rejected due to empty selfPriviles accessControlRules");
+							}
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Wrong response status code");
+							}							
+							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+								tc_ac.stop;
+								setverdict(fail, __SCOPE__ & ": Error while creating resource type " & int2str(enum2int(c_accessControlPolicyType)));
+								f_checkAttributesToBeSaved(c_accessControlPolicyType, v_createRequest, v_response.primitive.responsePrimitive);
+								v_acpIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int1, -, -);
+							}
+							[] tc_ac.timeout {
+								setverdict(fail, __SCOPE__ & ": No answer while creating resource type " & int2str(enum2int(c_accessControlPolicyType)));
+							}
+						}
+
+						f_checkAeSimuStatus();
+    						
+						//Check to see if the resource is present or not
+						if(f_isResourceNotPresent(-1, v_createRequest.primitiveContent.accessControlPolicy.resourceName)) {
+							setverdict(pass, __SCOPE__ & ":INFO: Resource not created");
+						} else {
+							setverdict(fail, __SCOPE__ & ":ERROR: Resource created");
+						}
+
+						//Postamble
+						f_cse_postamble_deleteResources();
+
+						//Tear down
+						f_cf01Down();
+
+					}//end TC_CSE_SEC_ACP_CRE_004
 				
 				}// end of group Create
 			
@@ -21439,7 +21576,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_001_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_001(m_retrieveResource("Temporary", "Temporary")));	
+							v_ae1.start(f_CSE_SEC_ACP_001(m_retrieve("Temporary", "Temporary")));	
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_001_RET
 	
@@ -21542,7 +21679,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_002_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_002(m_retrieveResource("Temporary", "Temporary"), int2000));	
+							v_ae1.start(f_CSE_SEC_ACP_002(m_retrieve("Temporary", "Temporary"), int2000));	
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_002_RET
 	
@@ -21652,7 +21789,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_003_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_003(m_retrieveResource("Temporary", "Temporary"), int2000));	
+							v_ae1.start(f_CSE_SEC_ACP_003(m_retrieve("Temporary", "Temporary"), int2000));	
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_003_03
 						
@@ -21768,7 +21905,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_004_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_004(m_retrieveResource("Temporary", "Temporary"), int2000));	
+							v_ae1.start(f_CSE_SEC_ACP_004(m_retrieve("Temporary", "Temporary"), int2000));	
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_004_RET
 		
@@ -21835,6 +21972,587 @@ module OneM2M_Testcases_CSE {
 	
 					}//end g_CSE_SEC_ACP_004
 					
+					group g_CSE_SEC_ACP_005 {
+						
+						/**
+						 * @desc Check that the IUT responds successfully when the AE tries an OPERATION on a AE_RESOURCE_TYPE resource and that the request is within accessControlTimeWindow context.
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_005_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_005(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_005_CRE
+		
+						testcase TC_CSE_SEC_ACP_005_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_005(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_005_UPD
+		
+						testcase TC_CSE_SEC_ACP_005_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_005(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_005_RET
+		
+						testcase TC_CSE_SEC_ACP_005_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_005(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_005_DEL
+	
+						function f_CSE_SEC_ACP_005(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var charstring v_currentTime;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_currentTime := fx_generateTimestamp();
+							v_accessControlRule.accessControlContexts_list := {{{"* * * * * " & f_getYear(v_currentTime)}, omit, omit}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(p_responseStatusCode))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Successful operation on resource type int2 (Ae)");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while operation on resource type int2 (Ae)");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation on resource type int2 (Ae)");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_005
+	
+					}//end g_CSE_SEC_ACP_005
+					
+					group g_CSE_SEC_ACP_006 {
+						
+						/**
+						 * @desc Check that the IUT responds with an error when the AE tries an OPERATION on a AE_RESOURCE_TYPE resource out of accessControlTimeWindow context.
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_006_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_006(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_006_CRE
+		
+						testcase TC_CSE_SEC_ACP_006_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_006(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_006_UPD
+		
+						testcase TC_CSE_SEC_ACP_006_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_006(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_006_RET
+		
+						testcase TC_CSE_SEC_ACP_006_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_006(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_006_DEL
+	
+						function f_CSE_SEC_ACP_006(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_accessControlRule.accessControlContexts_list := {{{"* * * * * 3000"}, omit, omit}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(int4103))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Operation denied due to lack of privileges, out of accessControlTimeWindow");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error operation have been accpeted without having privileges");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_006
+	
+					}//end g_CSE_SEC_ACP_006
+
+					group g_CSE_SEC_ACP_007 {
+						
+						/**
+						 * @desc Check that the IUT responds successfully when the AE tries an OPERATION on a AE_RESOURCE_TYPE resource and that the request is within accessControlLocationRegion context.
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_007_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_007(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_007_CRE
+		
+						testcase TC_CSE_SEC_ACP_007_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_007(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_007_UPD
+		
+						testcase TC_CSE_SEC_ACP_007_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_007(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_007_RET
+		
+						testcase TC_CSE_SEC_ACP_007_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_007(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_007_DEL
+	
+						function f_CSE_SEC_ACP_007(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_accessControlRule.accessControlContexts_list := {{omit, omit, { choice := { countryCode := {"ES"}}}}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							//TODO How to indicate the location of the Originator (AE1)?
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(p_responseStatusCode))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Successful operation on resource type int2 (Ae)");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while operation on resource type int2 (Ae)");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation on resource type int2 (Ae)");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_007
+	
+					}//end g_CSE_SEC_ACP_007
+					
+					group g_CSE_SEC_ACP_008 {
+						
+						/**
+						 * @desc Check that the IUT responds with an error when the AE tries an OPERATION on a AE_RESOURCE_TYPE resource out of accessControlLocationRegion context
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_008_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_008(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_008_CRE
+		
+						testcase TC_CSE_SEC_ACP_008_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_008(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_008_UPD
+		
+						testcase TC_CSE_SEC_ACP_008_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_008(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_008_RET
+		
+						testcase TC_CSE_SEC_ACP_008_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_008(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_008_DEL
+	
+						function f_CSE_SEC_ACP_008(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_accessControlRule.accessControlContexts_list := {{omit, omit, { choice := { countryCode := {"ES"}}}}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							//TODO How to indicate the location of the Originator (AE1)?
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(int4103))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Operation denied due to lack of privileges, out of accessControlTimeWindow");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error operation have been accpeted without having privileges");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_008
+	
+					}//end g_CSE_SEC_ACP_008
+
+					group g_CSE_SEC_ACP_009 {
+						
+						/**
+						 * @desc Check that the IUT responds successfully when the AE tries an OPERATION on a TARGET_RESOURCE_TYPE resource and that the request is within accessControlIpAddresses context.
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_009_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_009(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_009_CRE
+		
+						testcase TC_CSE_SEC_ACP_009_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_009(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_009_UPD
+		
+						testcase TC_CSE_SEC_ACP_009_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_009(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_009_RET
+		
+						testcase TC_CSE_SEC_ACP_009_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_009(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_009_DEL
+	
+						function f_CSE_SEC_ACP_009(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_accessControlRule.accessControlContexts_list := {{omit, {{f_getIpv4Address(PX_AE1_ADDRESS)}, omit}, omit}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(p_responseStatusCode))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Successful operation on resource type int2 (Ae)");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error while operation on resource type int2 (Ae)");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation on resource type int2 (Ae)");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_009
+	
+					}//end g_CSE_SEC_ACP_009
+					
+					group g_CSE_SEC_ACP_010 {
+						
+						/**
+						 * @desc Check that the IUT responds with an error when the AE tries an OPERATION on a AE_RESOURCE_TYPE resource out of accessControlIpAddresses context.
+						 * 
+						 */
+						testcase TC_CSE_SEC_ACP_010_CRE() runs on Tester system CseSystem { //Create
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_010(m_createContainerBase, int2001));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_010_CRE
+		
+						testcase TC_CSE_SEC_ACP_010_UPD() runs on Tester system CseSystem { //Update
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+							var template RequestPrimitive v_updateRequest := m_updateAeBase;
+							var Labels v_labels_1:= {"VALUE_1"};
+							v_updateRequest.primitiveContent.aE.labels := v_labels_1;
+
+							v_ae1.start(f_CSE_SEC_ACP_010(v_updateRequest, int2004));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_010_UPD
+		
+						testcase TC_CSE_SEC_ACP_010_RET() runs on Tester system CseSystem { //Retrieve
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_010(m_retrieve("Temporary", "Temporary"), int2000));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_010_RET
+		
+						testcase TC_CSE_SEC_ACP_010_DEL() runs on Tester system CseSystem { //Delete
+							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+
+							v_ae1.start(f_CSE_SEC_ACP_010(m_delete("Temporary", "Temporary"), int2002));	
+							v_ae1.done;
+						}//end TC_CSE_SEC_ACP_010_DEL
+	
+						function f_CSE_SEC_ACP_010(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
+							// Local variables
+							var MsgIn v_response;
+							var integer v_aeIndex := -1;
+							var integer v_acpIndex := -1;
+							var RequestPrimitive v_createRequest;
+							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
+			
+							// Test control
+	
+							// Test component configuration
+							f_cf01Up();
+	
+							// Test adapter configuration
+	
+							// Preamble
+							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
+							v_accessControlRule.accessControlContexts_list := {{omit, {{f_getIpv4Address(PX_AE2_ADDRESS)}, omit}, omit}};
+							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
+							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
+			
+							// Test Body
+							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
+							p_requestPrimitive.from_ := f_getOriginator(v_aeIndex);
+							p_requestPrimitive.requestIdentifier := valueof(p_requestPrimitive.requestIdentifier) & f_rnd(1, 1000000);
+			
+							mcaPort.send(m_request(valueof(p_requestPrimitive)));
+							tc_ac.start;
+							alt {
+								[] mcaPort.receive(mw_response(mw_responsePrimitive(int4103))) -> value v_response {
+									tc_ac.stop;
+									setverdict(pass, __SCOPE__ & ": Operation denied due to lack of privileges, out of accessControlTimeWindow");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Wrong response status code");
+								}
+								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+									tc_ac.stop;
+									setverdict(fail, __SCOPE__ & ": Error operation have been accpeted without having privileges");
+								}
+								[] tc_ac.timeout {
+									setverdict(fail, __SCOPE__ & ": No answer while executing operation");
+								}
+							}
+	
+	
+							//Postamble
+							f_cse_postamble_deleteResources();
+	
+							//Tear down
+							f_cf01Down();
+	
+						}//end f_CSE_SEC_ACP_010
+	
+					}//end g_CSE_SEC_ACP_010
+
+
 					group g_CSE_SEC_ACP_011 {
 						
 						/**
@@ -21861,7 +22579,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_011_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_011(m_retrieveResource("Temporary", "Temporary"), int2000));	
+							v_ae1.start(f_CSE_SEC_ACP_011(m_retrieve("Temporary", "Temporary"), int2000));	
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_011_RET
 	
@@ -21950,7 +22668,7 @@ module OneM2M_Testcases_CSE {
 						testcase TC_CSE_SEC_ACP_012_RET() runs on Tester system CseSystem { //Retrieve
 							var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 
-							v_ae1.start(f_CSE_SEC_ACP_012(m_retrieveResource("Temporary", "Temporary"), int61));
+							v_ae1.start(f_CSE_SEC_ACP_012(m_retrieve("Temporary", "Temporary"), int61));
 							v_ae1.done;
 						}//end TC_CSE_SEC_ACP_012_RET
 	

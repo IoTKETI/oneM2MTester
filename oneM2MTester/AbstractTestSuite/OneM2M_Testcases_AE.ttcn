@@ -450,7 +450,7 @@ module OneM2M_Testcases_AE {
 			
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.to_))) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
 				
@@ -538,7 +538,7 @@ module OneM2M_Testcases_AE {
 
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.to_))) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
 				
@@ -630,7 +630,7 @@ module OneM2M_Testcases_AE {
 			
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.to_))) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 				
@@ -718,7 +718,7 @@ module OneM2M_Testcases_AE {
 
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.to_))) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 				
@@ -957,7 +957,7 @@ module OneM2M_Testcases_AE {
 					var charstring v_action :=  __SCOPE__ & ": Please, send a valid AE DELETE Registration Request";
 					
 					//primitives for utPort
-					var template UtTriggerPrimitive v_utRequest := mw_deleteRequest;
+					var template UtTriggerPrimitive v_utRequest := mw_delete;
 	
 					f_cf03Up();
 	
@@ -966,7 +966,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_deleteRequest)) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_delete)) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : AE deregistration request is accepted!");
 	
@@ -1635,7 +1635,7 @@ module OneM2M_Testcases_AE {
 						//Test behavior
 						tc_ac.start;
 						alt{
-							[] mcaPortIn.receive(mw_request(mw_retrieveResource(p_address))) -> value v_request {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(p_address))) -> value v_request {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
 								
@@ -1685,7 +1685,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_retrieve(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : retrieve attribute oldest request is accepted!");
 	
@@ -1733,7 +1733,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_retrieve(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : retrieve attribute latest request is accepted!!");
 	
@@ -1782,7 +1782,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_address))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_retrieve(v_address))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
 			
@@ -1831,7 +1831,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_retrieveResource(v_address))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_retrieve(v_address))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : retrieve ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
 
@@ -1883,7 +1883,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_delete(v_address & "/" & c_resourceShortNameOldest))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : delete attribute oldest request is accepted!!");
 
@@ -1931,7 +1931,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_delete(v_address & "/" & c_resourceShortNameLatest))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : delete attribute latest request is accepted!!");
 
@@ -1980,7 +1980,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_address))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_delete(v_address))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : delete ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
 
@@ -2029,7 +2029,7 @@ module OneM2M_Testcases_AE {
 					//Test behavior
 					tc_ac.start;
 					alt{
-						[] mcaPortIn.receive(mw_request(mw_deleteRequest(v_address))) -> value v_request {
+						[] mcaPortIn.receive(mw_request(mw_delete(v_address))) -> value v_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__, " : delete ressource type " & int2str(enum2int(v_request.primitive.requestPrimitive.resourceType)) & " request is accepted!!");
 
@@ -2346,7 +2346,7 @@ module OneM2M_Testcases_AE {
 					
 
 					//Test behavior
-					mcaPortIn.send(m_request(m_notifyRequest));
+					mcaPortIn.send(m_request(m_notify));
 					
 					tc_ac.start;
 					alt{
@@ -2437,7 +2437,7 @@ module OneM2M_Testcases_AE {
 					
 
 					//Test behavior
-					mcaPortIn.send(m_request(m_notifyAggregatedRequest));
+					mcaPortIn.send(m_request(m_notifyAggregatedNotification));
 					
 					tc_ac.start;
 					alt{

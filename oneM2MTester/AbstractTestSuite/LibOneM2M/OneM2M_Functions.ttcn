@@ -922,7 +922,7 @@ module OneM2M_Functions {
 			 */
 			function f_cse_retrieveResource(integer p_resourceIndex) runs on AeSimu return PrimitiveContent{
 
-				mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				mcaPort.send(m_request(m_retrieve(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
 				tc_ac.start;
 				alt {
 					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value vc_response {
@@ -994,7 +994,7 @@ module OneM2M_Functions {
 			function f_isResourcePresent (integer p_resourceIndex) runs on AeSimu return boolean {
 			
 				//Check to see if the resource is present or not
-				mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				mcaPort.send(m_request(m_retrieve(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
 				tc_ac.start;
 				alt {
 					[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000))) {
@@ -1023,7 +1023,7 @@ module OneM2M_Functions {
 			function f_isResourcePresentCseSimu (integer p_resourceIndex) runs on CseSimu return boolean {
 			
 				//Check to see if the resource is present or not
-				mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				mccPort.send(m_request(m_retrieve(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
 				tc_ac.start;
 				alt {
 					[] mccPort.receive(mw_response(mw_responsePrimitive(int2000))) {
@@ -1055,7 +1055,7 @@ module OneM2M_Functions {
 				log(testcasename() & ":INFO: Hierarchical addressing method is required to check the non presence of the resource");
 				
 				//Check to see if the resource has NOT been created
-				mcaPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_parentIndex, e_hierarchical) & "/" & p_resourceName, f_getOriginator(p_parentIndex))));
+				mcaPort.send(m_request(m_retrieve(f_getResourceAddress(p_parentIndex, e_hierarchical) & "/" & p_resourceName, f_getOriginator(p_parentIndex))));
 				tc_ac.start;
 				alt {
 					[] mcaPort.receive(mw_response(mw_responsePrimitive(int4004))) {
@@ -1335,11 +1335,11 @@ module OneM2M_Functions {
     	
 					tc_ac.start;
 					alt {
-						[] mcaPortIn.receive(mw_request(mw_notify(v_notificationRequest))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(v_notificationRequest))) -> value vc_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ":INFO: Notification received");
 						}
-						[] mcaPortIn.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value vc_request {
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ":ERROR: Notification received but verificationRequest isn't set to TRUE");							
 						}
@@ -1377,7 +1377,7 @@ module OneM2M_Functions {
 					
 					tc_ac.start;
 					alt {
-						[] mcaPortIn.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value vc_request {
 							tc_ac.stop;
 							if(f_check_notificationContent(vc_request.primitive.requestPrimitive, p_primitiveContent)){
 								setverdict(pass, __SCOPE__ & ":INFO: Notification received");
@@ -1413,7 +1413,7 @@ module OneM2M_Functions {
     
 					tc_ac.start;
 					alt {
-						[] mcaPortIn.receive(mw_request(mw_aggregatedNotifyBase)) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyAggregatedNotification)) -> value vc_request {
 							tc_ac.stop;
 							if(p_numberOfAggregatedNotification == lengthof(vc_request.primitive.requestPrimitive.primitiveContent.aggregatedNotification.notification_list)){
 								if(f_check_notificationContent(vc_response.primitive.requestPrimitive, p_primitiveContent)){
@@ -1431,7 +1431,7 @@ module OneM2M_Functions {
 							v_responsePrimitive.requestIdentifier := vc_request.primitive.requestPrimitive.requestIdentifier;
 							mcaPortIn.send(m_response(v_responsePrimitive));
 						}
-						[] mcaPortIn.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value vc_request {
 							tc_ac.stop;
 							if(f_check_notificationContent(vc_request.primitive.requestPrimitive, p_primitiveContent)){
 								setverdict(pass, __SCOPE__ & ":INFO: Notification received");
@@ -1469,7 +1469,7 @@ module OneM2M_Functions {
 					var ResponsePrimitive v_responsePrimitive;
 					tc_ac.start;
 					alt {
-						[] mcaPortIn.receive(mw_request(mw_notify(p_notification))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(p_notification))) -> value vc_request {
 							tc_ac.stop;
 							v_responsePrimitive := valueof(m_responseNotification(int2001, omit));
 							v_responsePrimitive.requestIdentifier := vc_request.primitive.requestPrimitive.requestIdentifier;
@@ -1498,7 +1498,7 @@ module OneM2M_Functions {
 		
 					tc_ac.start(10.0);
 					alt {
-						[] mcaPortIn.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value vc_request {
+						[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value vc_request {
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error, Non expected notification received");
 						}
@@ -1582,7 +1582,7 @@ module OneM2M_Functions {
 
 					tc_ac.start;
 					alt {
-						[] mccPortIn.receive(mw_request(mw_notify(v_notificationRequest))) -> value vc_request {
+						[] mccPortIn.receive(mw_request(mw_notifyNotification(v_notificationRequest))) -> value vc_request {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ":INFO: Notification received");
 						}
@@ -1617,7 +1617,7 @@ module OneM2M_Functions {
 			function f_cse_isResourcePresent (integer p_resourceIndex) runs on CseSimu return boolean {
 
 				//Check to see if the resource is present or not
-				mccPort.send(m_request(m_retrieveResource(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
+				mccPort.send(m_request(m_retrieve(f_getResourceAddress(p_resourceIndex), f_getOriginator(p_resourceIndex))));
 				tc_ac.start;
 				alt {
 					[] mccPort.receive(mw_response(mw_responsePrimitive(int2000))) {
@@ -1851,7 +1851,7 @@ module OneM2M_Functions {
 				var MsgIn v_request;
 				var ResponsePrimitive v_responsePrimitive;
 
-				[] mcaPortIn.receive(mw_request(mw_notify(mw_contentNotification(?)))) -> value v_request {
+				[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value v_request {
 					//Send response 
 					v_responsePrimitive := valueof(m_responseNotification(int2001, omit));
 					v_responsePrimitive.requestIdentifier := v_request.primitive.requestPrimitive.requestIdentifier;
@@ -2196,6 +2196,12 @@ module OneM2M_Functions {
 				if(match(valueof(p_request.primitiveContent.subscription.notificationURI), v_defaultListOfURIs )){
 					p_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(p_parentIndex)};
 				}
+				//subscriberURI
+				if(ispresent(p_request.primitiveContent.subscription.subscriberURI)) {
+					if(match(valueof(p_request.primitiveContent.subscription.subscriberURI), "NotInitialized" )){
+						p_request.primitiveContent.subscription.subscriberURI := f_getResourceAddress(vc_aeAuxIndex);
+					}
+				}
 				//creator attribute
 				if(ispresent(p_request.primitiveContent.subscription.creator)) {
 					p_request.primitiveContent.subscription.creator := f_getCreator(p_parentIndex);
@@ -2499,7 +2505,7 @@ module OneM2M_Functions {
 		 * @param p_announcementTargetResource Announcement Target Resource
 		 * @return p_annoucementTargetPoA Announcemenet Target PoA
 		 */
-		function f_getAnnouncementTargetPoA(in charstring p_protocolBinding := PX_PROTOCOL_BINDING, in charstring p_announcementTargetAddress := PX_CSE1_ADDRESS, charstring p_announcementTargetResource := "CseBaseTester" ) return charstring {
+		function f_getAnnouncementTargetPoA(in charstring p_protocolBinding := PX_PROTOCOL_BINDING, in charstring p_announcementTargetAddress := PX_CSE1_ADDRESS, charstring p_announcementTargetResource := "" ) return charstring {
 						
 			if(p_protocolBinding == "HTTP") {
 				return "http://" & p_announcementTargetAddress & "/" & p_announcementTargetResource;
@@ -2857,7 +2863,7 @@ module OneM2M_Functions {
 		 * @param p_resourceAddress
 		 * @return boolean
 		 */
-		function f_isScopeSpRelative(XSD.ID p_resourceAddress) runs on Tester return boolean {	
+		function f_isScopeSpRelative(XSD.ID p_resourceAddress) runs on Tester return boolean {				
 			if ((p_resourceAddress[0] == "/") and (p_resourceAddress[1] != "/")){
 			  return true;
 			} else {
@@ -3379,6 +3385,41 @@ module OneM2M_Functions {
 			}
 
 		}		
+		
+		/**
+		 * @desc Retrieve Year from a given timestamp
+		 * @param p_timestamp Given timestamp
+		 * @return Year
+		 */
+		function f_getYear(charstring p_timestamp) runs on Tester return charstring {
+			
+			var charstring v_year;
+			var integer i;
+			
+			for(i := 0; i < 3; i := i+1){
+				v_year := v_year & p_timestamp[i];
+			}
+			return v_year;
+			
+		} // end f_getYear
+		
+		/**
+		 * @desc Retrieve IP address from a given address which includes port information separated by :
+		 * @param p_addressPort Given address
+		 * @return IPv4 Address
+		 */
+		function f_getIpv4Address(charstring p_addressPort) runs on Tester return charstring {
+			
+			var charstring v_ipv4Address;
+			var integer i:= 0;
+			
+			while ((i < lengthof(p_addressPort)-1) and (p_addressPort[i] != ":")){
+				v_ipv4Address := v_ipv4Address & p_addressPort[i];
+				i := i + 1;
+			}
+			return v_ipv4Address;
+			
+		} // end f_getIpv4Address
 		
 	}//end of commonFunctions
 	

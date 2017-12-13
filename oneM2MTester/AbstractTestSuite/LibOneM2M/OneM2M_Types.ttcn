@@ -95,19 +95,19 @@ module OneM2M_Types {
 		ListOfURIs accessControlOriginators,
 		AccessControlOperations accessControlOperations,
 		record of record {
-			record of ScheduleEntry accessControlWindow_list,
+			record of ScheduleEntry accessControlWindow_list optional,//TODO It must be optional
 			record {
 				record length(1 .. infinity) of Ipv4 ipv4Addresses optional,//TODO It must be optional,
 				record length(1 .. infinity) of Ipv6 ipv6Addresses optional//TODO It must be optional
 			} accessControlIpAddresses optional,
 			LocationRegion accessControlLocationRegion optional
-		} accessControlContexts_list
+		} accessControlContexts_list optional //TODO It must be optional
 	}
 	with {
 	  variant "name as uncapitalized";
-	  variant (accessControlContexts_list) "untagged";
+	  // variant (accessControlContexts_list) "untagged";
 	  variant (accessControlContexts_list[-]) "name as 'accessControlContexts'";
-	  variant (accessControlContexts_list[-].accessControlWindow_list) "untagged";
+	  // variant (accessControlContexts_list[-].accessControlWindow_list) "untagged";
 	  variant (accessControlContexts_list[-].accessControlWindow_list[-]) "name as 'accessControlWindow'";
 	  variant (accessControlContexts_list[-].accessControlIpAddresses.ipv4Addresses) "list";
 	  variant (accessControlContexts_list[-].accessControlIpAddresses.ipv6Addresses) "list";
@@ -1067,8 +1067,7 @@ module OneM2M_Types {
 	};
 
 
-	//TODO Use this type instead type record PrimitiveContent
- 	type union PrimitiveContent {
+	type union PrimitiveContent {
 		//TS-0004 - 7.5.2-1 & 7.5.2-2 Common elements to request/response content
 		//ResourceTypes
 		AE_optional aE,
@@ -2129,7 +2128,7 @@ module OneM2M_Types {
 		int31(31),
 		int32(32),
 		int33(33),
-		int34(34), 
+		int34(34), 	
 		int10001(10001),
 		int10002(10002),
 		int10003(10003),
@@ -5054,6 +5053,7 @@ group optionalResourceTypes {
 		  variant (resourceName) "attribute";
 		  variant (announcedAttribute) "list";
 		  variant (cSEBase) "name as capitalized";
+		  variant (cSEBase) "JSON:name as CSEBase"; // @JaeYoung: This variant is used to enconding/decoding
 		  variant (cSE_ID) "name as 'CSE-ID'";
 		  variant (m2M_Ext_ID) "name as 'M2M-Ext-ID'";
 		  variant (trigger_Recipient_ID) "name as 'Trigger-Recipient-ID'";

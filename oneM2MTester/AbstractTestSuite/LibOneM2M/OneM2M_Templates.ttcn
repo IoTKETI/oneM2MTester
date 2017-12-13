@@ -99,11 +99,11 @@ module OneM2M_Templates {
 			 * @param p_targetResourceAddress Target resource address
 			 * @param p_originator Originator (from)
 			 */
-			template (value) RequestPrimitive m_retrieveResource(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
+			template (value) RequestPrimitive m_retrieve(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
 				operation := int2,
 				to_ := p_targetResourceAddress,
 				from_ := p_originator,
-				requestIdentifier := "m_retrieveResource" & f_rnd(1, 1000000),
+				requestIdentifier := "m_retrieve" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := omit,
 				role := omit, 
@@ -125,7 +125,7 @@ module OneM2M_Templates {
 			 * @desc Base Receive RETRIEVE request primitive
 			 * @param p_targetResourceAddress Target resource address
 			 */
-			template RequestPrimitive mw_retrieveResource(XSD.ID p_targetResourceAddress) := {
+			template RequestPrimitive mw_retrieve(XSD.ID p_targetResourceAddress) := {
 				operation := int2,
 				to_ := p_targetResourceAddress,
 				from_ := ?,
@@ -152,7 +152,7 @@ module OneM2M_Templates {
 			 * @param p_targetResourceAddress Target resource address (including "#AttributeName")
 			 * @param p_originator Originator (from)
 			 */
-			template (value) RequestPrimitive m_retrieveResourceAttributeToOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
+			template (value) RequestPrimitive m_retrieveAttributeToOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
 				operation := int2,
 				to_ := p_targetResourceAddress,
 				from_ := p_originator,
@@ -180,7 +180,7 @@ module OneM2M_Templates {
 			 * @param p_attributeList Target attribute list
 			 * @param p_originator Originator (from)
 			 */
-			template (value) RequestPrimitive m_retrieveResourceAttributeContentOption(XSD.ID p_targetResourceAddress, in template (value) AttributeList_1 p_attributeList, in XSD.ID p_originator) := {
+			template (value) RequestPrimitive m_retrieveAttributeContentOption(XSD.ID p_targetResourceAddress, in template (value) AttributeList_1 p_attributeList, in XSD.ID p_originator) := {
 				operation := int2,
 				to_ := p_targetResourceAddress,
 				from_ := p_originator,
@@ -208,7 +208,7 @@ module OneM2M_Templates {
 			  * @param p_filterCriteria FilterCriteria
 			  * @param p_originator Originator (from)
 			 */
-			template (value) RequestPrimitive m_retrieveResourceFilterUsageOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterUsage p_filterUsage) modifies m_retrieveResource := {
+			template (value) RequestPrimitive m_retrieveFilterUsageOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterUsage p_filterUsage) modifies m_retrieve := {
 				requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
 				filterCriteria := {
 					createdBefore := omit,
@@ -237,7 +237,7 @@ module OneM2M_Templates {
 			  * @param p_filterUsage FilterUsage
 			  * @param p_labels Labels
 			 */
-			template (value) RequestPrimitive m_retrieveResourceFilterUsageOptionLabel(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterUsage p_filterUsage, in Labels p_labels) modifies m_retrieveResource := {
+			template (value) RequestPrimitive m_retrieveFilterUsageOptionLabel(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterUsage p_filterUsage, in Labels p_labels) modifies m_retrieve := {
 				requestIdentifier := "m_retrieveResourceFilterUsageOptionLabel" & f_rnd(1, 1000000),
 				filterCriteria := {
 					createdBefore := omit,
@@ -265,7 +265,7 @@ module OneM2M_Templates {
 			  * @param p_filterCriteria FilterCriteria
 			  * @param p_originator Originator (from)
 			 */
-			template (value) RequestPrimitive m_retrieveResourceDiscResTypeFilterUsageOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) DiscResType p_discResType, in template (value) FilterUsage p_filterUsage) modifies m_retrieveResource := {
+			template (value) RequestPrimitive m_retrieveDiscResTypeFilterUsageOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) DiscResType p_discResType, in template (value) FilterUsage p_filterUsage) modifies m_retrieve := {
 				requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
 				filterCriteria := {
 					createdBefore := omit,
@@ -294,7 +294,7 @@ module OneM2M_Templates {
 				  * @param p_filterCriteria FilterCriteria
 				  * @param p_originator Originator (from)
 				 */
-				template (value) RequestPrimitive m_retrieveResourceInvalidFormatOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_retrieveResource := {
+				template (value) RequestPrimitive m_retrieveInvalidFormatOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_retrieve := {
 					requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
 					filterCriteria := {
 						createdBefore := omit,
@@ -362,7 +362,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *
+				discoveryResultType := omit
 			};
         	
 			/**
@@ -533,8 +533,8 @@ module OneM2M_Templates {
 				eventCategory := *,
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
-				filterCriteria := *,
-				discoveryResultType := *
+				filterCriteria := omit,
+				discoveryResultType := omit
 			}
 			
 			
@@ -1040,7 +1040,7 @@ module OneM2M_Templates {
 				operation := int4,
 				to_ := p_resourceAddress,
 				from_ := p_originator,
-				requestIdentifier := testcasename() & "-m_deleteResource" & f_rnd(1, 1000000),
+				requestIdentifier := testcasename() & "-m_delete" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := omit, 
 				role := omit, 
@@ -1058,13 +1058,13 @@ module OneM2M_Templates {
 				discoveryResultType := omit
 			};
 			
-			template RequestPrimitive mw_deleteRequest(template XSD.ID p_resourceAddress := ?, template XSD.ID p_from := *) := {
+			template RequestPrimitive mw_delete(template XSD.ID p_resourceAddress := ?, template XSD.ID p_from := *) := {
 				operation := int4,
 				to_ := p_resourceAddress,
 				from_ := p_from,
 				requestIdentifier := ?,
-				resourceType := *,
-				primitiveContent := *, 
+				resourceType := omit,
+				primitiveContent := omit, 
 				role := *, 
 				originatingTimestamp := *,
 				requestExpirationTimestamp := *,
@@ -1077,7 +1077,7 @@ module OneM2M_Templates {
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
 				filterCriteria := *,
-				discoveryResultType := *
+				discoveryResultType := omit
 			};
         	
 		}//end group Delete
@@ -1087,11 +1087,11 @@ module OneM2M_Templates {
     		/**
 			 * @desc Base NOTIFY request primitive
 			 */
-			template RequestPrimitive m_notifyRequest := {
+			template RequestPrimitive m_notify := {
 				operation := int5,
 				to_ := "NotInitialized",
 				from_ := omit,
-				requestIdentifier := testcasename() & "-m_notifyRequest" & f_rnd(1, 1000000),
+				requestIdentifier := testcasename() & "-m_notify" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := {notification := m_contentCreateNotification_allOmit},
 				role := omit,
@@ -1112,11 +1112,11 @@ module OneM2M_Templates {
 			/**
 			 * @desc Base NOTIFY Aggregated request primitive
 			 */
-			template RequestPrimitive m_notifyAggregatedRequest := {
+			template RequestPrimitive m_notifyAggregatedNotification := {
 				operation := int5,
 				to_ := "NotInitialized",
 				from_ := omit,
-				requestIdentifier := testcasename() & "-m_notifyAggregatedRequest" & f_rnd(1, 1000000),
+				requestIdentifier := testcasename() & "-m_notifyAggregatedNotification" & f_rnd(1, 1000000),
 				resourceType := omit,
 				primitiveContent := {aggregatedNotification := {notification_list := {m_contentCreateNotification_allOmit,m_contentCreateNotification_allOmit}}},
 				role := omit,
@@ -1137,12 +1137,12 @@ module OneM2M_Templates {
     		/**
 			* @desc Base NOTIFY request primitive
 			*/
-			template RequestPrimitive mw_notifyBase := {
+			template RequestPrimitive mw_notify := {
 				operation := int5,
 				to_ := ?,
 				from_ := *,
 				requestIdentifier := ?,
-				resourceType := *,
+				resourceType := omit,
 				primitiveContent := {notification := mw_contentNotificationBase},
 				role := *,
 				originatingTimestamp := *,
@@ -1150,45 +1150,27 @@ module OneM2M_Templates {
 				resultExpirationTimestamp := *,
 				operationExecutionTime := *,
 				responseType := *,
-				resultPersistence := *,
-				resultContent := *,
+				resultPersistence := omit,
+				resultContent := omit,
 				eventCategory := *,
 				deliveryAggregation := *,
 				groupRequestIdentifier := *,
-				filterCriteria := *,
-				discoveryResultType := *
+				filterCriteria := omit,
+				discoveryResultType := omit
 			};
 			
 			/**
 			 * @desc Base NOTIFY request primitive
 			 */
-			template RequestPrimitive mw_aggregatedNotifyBase := {
-				operation := int5,
-				to_ := ?,
-				from_ := *,
-				requestIdentifier := ?,
-				resourceType := *,
-				primitiveContent := { aggregatedNotification := ?},
-				role := *,
-				originatingTimestamp := *,
-				requestExpirationTimestamp := *,
-				resultExpirationTimestamp := *,
-				operationExecutionTime := *,
-				responseType := *,
-				resultPersistence := *,
-				resultContent := *,
-				eventCategory := *,
-				deliveryAggregation := *,
-				groupRequestIdentifier := *,
-				filterCriteria := *,
-				discoveryResultType := *
+			template RequestPrimitive mw_notifyAggregatedNotification (in template (present) AggregatedNotification p_aggregatedNotification := ?) modifies mw_notify := {
+				primitiveContent := { aggregatedNotification := p_aggregatedNotification}
 			};
 			
 			/**
 			 * @desc Base NOTIFY request primitive
 			 */
 			
-			template RequestPrimitive mw_notify(in template (present) Notification p_notification) modifies mw_notifyBase := {
+			template RequestPrimitive mw_notifyNotification(in template (present) Notification p_notification) modifies mw_notify := {
 				primitiveContent := {notification := p_notification}
 			};
 			
@@ -1940,7 +1922,7 @@ module OneM2M_Templates {
 				expirationTime 			:= omit, //O
 				announceTo 				:= omit, 				   //O
 				announcedAttribute		:= omit, 			      //O
-				locationSource 			:= omit, //M
+				locationSource 			:= int1, //M
 				locationUpdatePeriod 		:= omit, //O
 				locationTargetID 			:= omit, 	//O
 				locationServer 			:= omit,//O
