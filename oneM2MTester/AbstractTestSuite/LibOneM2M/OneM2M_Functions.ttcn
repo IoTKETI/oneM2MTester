@@ -683,7 +683,7 @@ module OneM2M_Functions {
 					
 					p_ae2Index := f_getResource(vc_ae2);
 					if(ischosen(p_createRequestPrimitive.primitiveContent.subscription)){		//this condition is necessary for Subscription TCs where notification URI is set in m_createSubscriptionAdvanced
-						p_createRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(p_ae2Index)}; 
+						p_createRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(p_ae2Index)};
 					}
 					vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler(p_responseStatusCode));
 				}
@@ -1648,7 +1648,6 @@ module OneM2M_Functions {
     			
 				var MsgIn v_response;
 				var RequestPrimitive v_request;
-				var integer v_resourceIndex := -1;
 				var integer v_localResourceIndex := -1;
 				var PrimitiveContent v_remoteCSEResource;
 
@@ -1661,7 +1660,7 @@ module OneM2M_Functions {
 						tc_ac.stop;
 						setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
 						f_checkAttributesToBeSaved(int16, v_request, v_response.primitive.responsePrimitive);
-						v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int16, -1);
+						vc_remoteCseIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int16, -1);
 						v_remoteCSEResource := f_cse_generateLocalResource(v_response.primitive.responsePrimitive.primitiveContent, vc_cSEBaseIndex, int16);
 						v_localResourceIndex := f_setLocalResource(v_remoteCSEResource, int16, vc_cSEBaseIndex);
 					}
@@ -1680,7 +1679,7 @@ module OneM2M_Functions {
 
 				f_checkCseSimuStatus();
 
-				return v_resourceIndex;
+				return vc_remoteCseIndex;
     		
 			}
 			
@@ -1979,7 +1978,7 @@ module OneM2M_Functions {
 				
 				tc_ac.start;
 				alt {    				
-					[] mcaPort.receive(mw_request(mw_createContainer(?,?))) -> value v_request {
+					[] mcaPortIn.receive(mw_request(mw_createContainer(?,?))) -> value v_request {
 						tc_ac.stop;
     					
 						v_rp := v_request.primitive.requestPrimitive;		
@@ -1987,11 +1986,11 @@ module OneM2M_Functions {
 						v_modifiedResource := f_ae_generateLocalResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType);
 						v_resourceIndex := f_setLocalResource(v_modifiedResource, int2, v_parentIndex);
 						if(v_resourceIndex != -1) {
-							mcaPort.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
+							mcaPortIn.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
 							setverdict(pass, __SCOPE__&":INFO: Container created successfuly");
 						}
 						else {
-							mcaPort.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
+							mcaPortIn.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
 							setverdict(inconc, __SCOPE__&":INFO: Container creation failed");
 						}					
 					}
@@ -2863,7 +2862,7 @@ module OneM2M_Functions {
 		 * @param p_resourceAddress
 		 * @return boolean
 		 */
-		function f_isScopeSpRelative(XSD.ID p_resourceAddress) runs on Tester return boolean {				
+		function f_isScopeSpRelative(XSD.ID p_resourceAddress) runs on Tester return boolean {	
 			if ((p_resourceAddress[0] == "/") and (p_resourceAddress[1] != "/")){
 			  return true;
 			} else {
@@ -2978,7 +2977,7 @@ module OneM2M_Functions {
 			
 		}
 		
-		function f_sendUtPrimitive(template UtTriggerPrimitive p_utRequest, in charstring p_action) runs on Tester {
+		function f_sendUtPrimitive(template UtTriggerPrimitive p_utRequest, in universal charstring p_action) runs on Tester {
 			
 			if (PX_UT_IMPLEMENTED){
 				

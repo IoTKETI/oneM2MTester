@@ -1322,8 +1322,7 @@ module OneM2M_Testcases_CSE {
 								setverdict(fail, __SCOPE__ & "Resource ID not set correctly.");
 							}
 							
-							// @JaeYoung: f_isScopeSpRelative -> f_isScopeCseRelative
-							if(f_isScopeCseRelative(v_response.primitive.responsePrimitive.primitiveContent.aE.aE_ID)){
+							if(f_isScopeSpRelative(v_response.primitive.responsePrimitive.primitiveContent.aE.aE_ID)){
 								setverdict(pass, __SCOPE__ & "AE ID set correctly.");
 							} else {
 								setverdict(fail, __SCOPE__ & "AE ID not set correctly.");
@@ -2672,7 +2671,7 @@ module OneM2M_Testcases_CSE {
 					// Test Body
 					v_contentResponse.aE := mw_contentAeBase;
 	
-					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
+					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_aeIndex), f_getOriginator(v_aeIndex))));//TODO Maybe PX_SUPER_AE_ID
 
 					tc_ac.start;
 					alt {
@@ -3561,7 +3560,7 @@ module OneM2M_Testcases_CSE {
 						var RequestPrimitive v_request;
 						var ResourceType v_resourceType := int16;	//remoteCSE
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
-						var charstring v_action := __SCOPE__ & ": Please, send a valid UPDATE Request containing To set to " & PX_CSE1_ADDRESS & " and Content containing remoteCSE resource containing a valid attribute " & unichar2char(p_attribute[0]);														// Test control
+						var universal charstring v_action := __SCOPE__ & ": Please, send a valid UPDATE Request containing To set to " & PX_CSE1_ADDRESS & " and Content containing remoteCSE resource containing a valid attribute " & p_attribute[0];														// Test control
 						if(not(PICS_MN_CSE)) {
 							setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
 							stop;
@@ -3719,7 +3718,6 @@ module OneM2M_Testcases_CSE {
 				 */
 				testcase TC_CSE_REG_DEL_003() runs on AeSimu system CseSystem {
 					//Local variables
-					var MsgIn v_response;
 					var RequestPrimitive v_request;
 					var integer v_aeIndex := -1;	
 					// Test control
@@ -4380,7 +4378,7 @@ module OneM2M_Testcases_CSE {
 								vc_ae2.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, v_poaList), -1)); // AE2 is registred
 								vc_ae2.done;
 								v_ae2Index := f_getResource(vc_ae2);
-								p_parentRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae2Index)}; 
+								p_parentRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae2Index)};
 								vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
 							}
 							if(ischosen(p_parentRequestPrimitive.primitiveContent.group_)){
@@ -8187,7 +8185,6 @@ module OneM2M_Testcases_CSE {
 						var integer v_contentInstanceIndex1 := -1; 
 						var integer v_contentInstanceIndex2 := -1;
 						var template PrimitiveContent v_contentResponse;                        
-						timer t_contentInstanceCreationGap;    										   
 						// Test control
     				
 						// Test component configuration
@@ -8202,8 +8199,8 @@ module OneM2M_Testcases_CSE {
 						
 						v_contentInstanceIndex1 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex);
 						
-						t_contentInstanceCreationGap.start(1.0);
-						t_contentInstanceCreationGap.timeout;
+						f_sleep(1.0);
+						
 						v_contentInstanceIndex2 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex);  
 						
 						v_contentResponse.contentInstance := mw_contentContentInstanceBase;
@@ -8480,7 +8477,7 @@ module OneM2M_Testcases_CSE {
 	
 						v_ae1.start(f_CSE_DMR_RET_014(int23, m_createSubscriptionBase));//Subscription
 						v_ae1.done;
-						}
+					}
 				
 					function f_CSE_DMR_RET_014(ResourceType p_resourceType, template RequestPrimitive p_requestPrimitive) runs on AeSimu {
     				
@@ -11981,7 +11978,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_CNT_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12005,7 +12002,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_GRP_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12029,7 +12026,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_ACP_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12053,7 +12050,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_SCH_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateScheduleBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12077,7 +12074,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_PCH_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updatePollingChannelBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12101,7 +12098,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_007_SUB_CT() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_creationTime := "20001231T012345";
+						var Timestamp v_creationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
 
@@ -12189,7 +12186,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_CNT_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -12215,7 +12212,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_GRP_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -12241,7 +12238,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_ACP_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -12267,7 +12264,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_SCH_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateScheduleBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -12293,7 +12290,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_PCH_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updatePollingChannelBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -12319,7 +12316,7 @@ module OneM2M_Testcases_CSE {
 					testcase TC_CSE_DMR_UPD_008_SUB_ET() runs on Tester system CseSystem {
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
 						var AttributeAux_list v_nullFields;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -14765,7 +14762,7 @@ module OneM2M_Testcases_CSE {
 					*/
 					testcase TC_CSE_DMR_UPD_016_CSR_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateRemoteCSEBase;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -14831,7 +14828,7 @@ module OneM2M_Testcases_CSE {
 			  		
 					testcase TC_CSE_DMR_UPD_016_NOD_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateNodeBase;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -14899,7 +14896,7 @@ module OneM2M_Testcases_CSE {
 					
 					testcase TC_CSE_DMR_UPD_016_AE_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateAE;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -15101,7 +15098,7 @@ module OneM2M_Testcases_CSE {
 				    
 					testcase TC_CSE_DMR_UPD_016_SUB_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateSubscriptionBase;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -15204,7 +15201,7 @@ module OneM2M_Testcases_CSE {
 					
 					testcase TC_CSE_DMR_UPD_016_GRP_ET() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var Timestamp v_expirationTime := "20001231T012345";
+						var Timestamp v_expirationTime := "21001231T012345";
 						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
 						var ResponsePrimitive v_responsePrimitive;
 						var PrimitiveContent v_primitiveContentRetrieveResource;
@@ -16015,7 +16012,6 @@ module OneM2M_Testcases_CSE {
 						var integer v_contentInstanceIndex_1 := -1;
 						var integer v_contentInstanceIndex_2 := -1; 
 						const ResourceType c_containerResourceType := int3;
-						timer t_contentInstanceCreationGap;
 								   
 						// Test control
             
@@ -16031,8 +16027,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_contentInstanceIndex_1 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex); 
 						
-						t_contentInstanceCreationGap.start(1.0);
-						t_contentInstanceCreationGap.timeout;
+						f_sleep(1.0);
 						
 						v_contentInstanceIndex_2 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex);
 							
@@ -16160,7 +16155,6 @@ module OneM2M_Testcases_CSE {
 						var integer v_contentInstanceIndex_1 := -1;
 						var integer v_contentInstanceIndex_2 := -1; 
 						const ResourceType c_containerResourceType := int3;
-						timer t_contentInstanceCreationGap;
 								   
 						// Test control
             
@@ -16176,8 +16170,7 @@ module OneM2M_Testcases_CSE {
 						
 						v_contentInstanceIndex_1 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex); 
 						
-						t_contentInstanceCreationGap.start(1.0);
-						t_contentInstanceCreationGap.timeout;
+						f_sleep(1.0);
 												
 						v_contentInstanceIndex_2 := f_cse_createResource(int4, m_createContentInstance_noResourceName, v_containerIndex);
 							
@@ -22220,7 +22213,7 @@ module OneM2M_Testcases_CSE {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{omit, omit, { choice := { countryCode := {"ES"}}}}};
+							v_accessControlRule.accessControlContexts_list := {{{}, omit, { choice := { countryCode := {"ES"}}}}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
 							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
@@ -22317,7 +22310,7 @@ module OneM2M_Testcases_CSE {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{omit, omit, { choice := { countryCode := {"ES"}}}}};
+							v_accessControlRule.accessControlContexts_list := {{{}, omit, { choice := { countryCode := {"ES"}}}}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
 							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
@@ -22414,7 +22407,7 @@ module OneM2M_Testcases_CSE {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{omit, {{f_getIpv4Address(PX_AE1_ADDRESS)}, omit}, omit}};
+							v_accessControlRule.accessControlContexts_list := {{{}, {{f_getIpv4Address(PX_AE1_ADDRESS)}, omit}, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
 							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
@@ -22510,7 +22503,7 @@ module OneM2M_Testcases_CSE {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{omit, {{f_getIpv4Address(PX_AE2_ADDRESS)}, omit}, omit}};
+							v_accessControlRule.accessControlContexts_list := {{{}, {{f_getIpv4Address(PX_AE2_ADDRESS)}, omit}, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
 							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
