@@ -1648,7 +1648,6 @@ module OneM2M_Functions {
     			
 				var MsgIn v_response;
 				var RequestPrimitive v_request;
-				var integer v_localResourceIndex := -1;
 				var PrimitiveContent v_remoteCSEResource;
 
 				v_request := f_getCreateRequestPrimitive(int16, p_requestPrimitive, -1);
@@ -1662,7 +1661,7 @@ module OneM2M_Functions {
 						f_checkAttributesToBeSaved(int16, v_request, v_response.primitive.responsePrimitive);
 						vc_remoteCseIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int16, -1);
 						v_remoteCSEResource := f_cse_generateLocalResource(v_response.primitive.responsePrimitive.primitiveContent, vc_cSEBaseIndex, int16);
-						v_localResourceIndex := f_setLocalResource(v_remoteCSEResource, int16, vc_cSEBaseIndex);
+						vc_localRemoteCseIndex := f_setLocalResource(v_remoteCSEResource, int16, vc_cSEBaseIndex);
 					}
 					[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
 						tc_ac.stop;
@@ -1693,7 +1692,6 @@ module OneM2M_Functions {
 				var MsgIn v_request;
 				var ResponsePrimitive v_response;
 				var PrimitiveContent v_remoteCSEResource;
-				var integer v_localResourceIndex := -1;
 				var integer v_resourceIndex := -1;
 				var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 				var charstring v_action := "Please, send a CSE registration request";
@@ -1707,12 +1705,12 @@ module OneM2M_Functions {
 						tc_ac.stop;
 						setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
 						v_remoteCSEResource := f_cse_generateLocalResource(v_request.primitive.requestPrimitive.primitiveContent, vc_cSEBaseIndex, int16);//TODO Get index from v_request.primitive.requestPrimitive.to_
-						v_localResourceIndex := f_setLocalResource(v_remoteCSEResource, int16, vc_cSEBaseIndex);
+						vc_localRemoteCseIndex := f_setLocalResource(v_remoteCSEResource, int16, vc_cSEBaseIndex);
 						
 						v_response := valueof(m_responsePrimitive(int2001,v_request.primitive.requestPrimitive.requestIdentifier));
 						v_response.from_ := PX_CSE1_ID;
 						v_response.to_ := v_request.primitive.requestPrimitive.from_;
-						v_response.primitiveContent.remoteCSE := vc_localResourcesList[v_localResourceIndex].resource.remoteCSE;
+						v_response.primitiveContent.remoteCSE := vc_localResourcesList[vc_localRemoteCseIndex].resource.remoteCSE;
 						mccPortIn.send(m_response(v_response));
 						
 						v_resourceIndex := f_setResource(v_request.primitive.requestPrimitive.primitiveContent, int16, -1);
