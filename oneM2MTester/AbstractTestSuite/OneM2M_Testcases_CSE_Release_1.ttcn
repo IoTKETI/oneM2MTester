@@ -1356,7 +1356,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					//Test Body	
 					v_request := valueof(m_createAe(PX_APP_ID, omit, "C-AE-ID-STEM"));				
 	    									
-					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, v_aeIndex);
+					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
 					
 					mcaPort.send(m_request(v_request));
 					tc_ac.start;
@@ -7928,7 +7928,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						var integer v_acpIndex2 := -1;
 						var RequestPrimitive v_createRequestAcp1 := valueof(m_createAcp(f_getResourceAddress(-1), omit));
 						var RequestPrimitive v_createRequestAcp2 := valueof(m_createAcp(f_getResourceAddress(-1), omit));
-						var RequestPrimitive v_updateRequest := valueof(m_updateAeBase);
+						var RequestPrimitive v_updateRequest;
 						var AccessControlRule v_accessControlRule_1;
 						var AccessControlRule v_accessControlRule_2;
 						var SetOfAcrs v_setOfArcs_1;
@@ -7958,6 +7958,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						f_cse_updateResource(v_updateRequest);
 						
 						// Test Body
+						v_updateRequest := valueof(m_updateAeBase);
 						v_updateRequest.primitiveContent.aE.accessControlPolicyIDs := {f_getResourceId(vc_resourcesList[v_acpIndex2].resource)};
 						v_updateRequest := f_getUpdateRequestPrimitive(int1, v_aeIndex, v_updateRequest);
 						
