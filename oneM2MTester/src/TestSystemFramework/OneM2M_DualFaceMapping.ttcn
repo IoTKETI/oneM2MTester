@@ -333,6 +333,10 @@ module OneM2M_DualFaceMapping {
   		var ResponsePrimitive v_responsePrimitive;  
   		var ResponseStatusCode v_responseStatusCode;
  
+ 		// Variables for the Automated testing
+  		var RequestPrimitive v_requestPrimitive;
+  		var boolean v_resp_or_req := true; // 'true' means http resp, 'false' means http req 
+  		
   		var MQTT_v3_1_1_Message v_mqttMsg;
   		var ASP_RecvFrom v_ipl4Recv := p_aspRecvFrom;
   		var octetstring v_aspRecv_msg;  
@@ -340,7 +344,7 @@ module OneM2M_DualFaceMapping {
   		var charstring v_protocol_type 	:= f_upper2lower(PX_PROTOCOL_BINDING);
    		var charstring v_serial_type 	:= f_upper2lower(PX_SERIALIZATION);     
   		var charstring v_encoded_primitiveContent := "";
-  		var boolean enable_rsp_decode := true; //flag to enable response decoding operation
+  		var boolean enable_rsp_decode := true; // flag to enable response decoding operation
   		var bitstring v_bitStream := ''B;
   
   		if(ispresent(v_ipl4Recv.msg)){    	
@@ -350,6 +354,9 @@ module OneM2M_DualFaceMapping {
       		if(HTTP_BINDING == v_protocol_type or COAP_BINDING == v_protocol_type){
       	  
       	  		if(HTTP_BINDING == v_protocol_type){
+      	  		  
+      	  		  	var HTTPRequest v_httpResq; // Variable for the automated testing
+              	  	
               	  	var HTTPMessage v_httpMsg;
         	  		var HTTPResponse v_httpResp;
                 	var HeaderLines v_headerLines;
@@ -365,7 +372,9 @@ module OneM2M_DualFaceMapping {
                		if(0 == decode_state){
                			log(__SCOPE__&"All message are decoded!!");
                		  	
-               		  	if(ischosen(v_httpMsg.response)) {  	
+               		  	if(ischosen(v_httpMsg.response)) { // http response
+               		  	  	log(__SCOPE__&"- We are in the http response message");
+               		  	  	v_resp_or_req := true;   	
                		  	  	v_httpResp 	:= v_httpMsg.response;
                		  	  	
                		  	  	if(ispresent(v_httpResp.header)){
@@ -375,46 +384,86 @@ module OneM2M_DualFaceMapping {
                		  	  	}
                		  	  	
                		  	  	if(ispresent(v_httpResp.body)){
-               		  	  	  	v_httpRespBody	:= v_httpResp.body; //body is optional	
+               		  	  	  	v_httpRespBody	:= v_httpResp.body; // body is optional	
                		  	  	} else {
                		  	  		log(__SCOPE__&"-no http body is received!!");}               		  	  
                		  	} else {
                		  	  	log(__SCOPE__&"-[ERROR]v_httpMsg.response(): No Response is included in the HTTPMessage !!");
                		  		v_responsePrimitive.primitiveContent := omit;
-               		  	}               		  	
+               		  	}               
+               		  	
+               		  	if (ischosen(v_httpMsg.request)) { // http request
+               		  	  	log(__SCOPE__&"- We are in the http request message");
+               		  	  	v_resp_or_req := false;
+               		  	  	v_httpResq 	:= v_httpMsg.request;
+               		  	  	
+               		  	  	if(ispresent(v_httpResq.header)){
+               		  	  		v_headerLines 	:= v_httpResq.header;
+               		  	  	} else {
+               		  	  	  return 1;
+               		  	  	}
+               		  	  	
+               		  	  	if(ispresent(v_httpResq.body)){
+               		  	  	  	v_httpRespBody	:= v_httpResq.body; //body is optional	
+               		  	  	} else {
+               		  	  		log(__SCOPE__&"-no http body is received!!");}  
+               		  	} else {
+               		  	  	log(__SCOPE__&"-[ERROR]v_httpMsg.request(): No Request is included in the HTTPMessage !!");
+               		  		v_requestPrimitive.primitiveContent := omit;
+               		  	}		  	
                		  	
                		  	//decode headers
-               		  	//set X-M2M-RSC and X-M2M-RI
-               		  	for(var integer i := 0; i < lengthof(v_headerLines); i := i + 1){               		  	  	  	  
-               		  		v_header 		:= v_headerLines[i];
-               		  		v_headerName 	:= v_header.header_name;
-               		  		v_headerValue 	:= v_header.header_value;               		  		
+               		  	if(v_resp_or_req) { // response case
+               		  		for(var integer i := 0; i < lengthof(v_headerLines); i := i + 1){               		  	  	  	  
+               		  			v_header 		:= v_headerLines[i];
+               		  			v_headerName 	:= v_header.header_name;
+               		  			v_headerValue 	:= v_header.header_value;               		  		
                		  		
-               		  		if("X-M2M-RSC" == v_headerName){
-								log(__SCOPE__&"-[DEBUG] ENTER PARSING HTTP HEADERS!!");
+               		  			if("X-M2M-RSC" == v_headerName){
+									log(__SCOPE__&"-[DEBUG] ENTER PARSING HTTP HEADERS!!");
                		  		  
-               		  		  	if(not(RSC_OK == v_headerValue or RSC_CREATED == v_headerValue or RSC_UPDATED == v_headerValue or RSC_DELETED == v_headerValue )) {  
-               		  		  	  	enable_rsp_decode := false;       		  		  	  
-               		  		  	}
+               		  		  		if(not(RSC_OK == v_headerValue or RSC_CREATED == v_headerValue or RSC_UPDATED == v_headerValue or RSC_DELETED == v_headerValue )) {  
+               		  		  	  		enable_rsp_decode := false;       		  		  	  
+               		  		  		}
                		  		  
-               		  		  	var integer v_rsc_int := str2int(v_headerValue);               		  		  	
-               		  		  	int2enum(v_rsc_int, v_responseStatusCode);
-               		  		  	v_responsePrimitive.responseStatusCode 	:= v_responseStatusCode; 
-               		  		}
+               		  		  		var integer v_rsc_int := str2int(v_headerValue);               		  		  	
+               		  		  		int2enum(v_rsc_int, v_responseStatusCode);
+               		  		  		v_responsePrimitive.responseStatusCode 	:= v_responseStatusCode; 
+               		  			}
                		  		
-               		  		if("X-M2M-RI" == v_headerName){
-               		  		  	v_responsePrimitive.requestIdentifier 	:= v_headerValue;  		  		  
+               		  			if("X-M2M-RI" == v_headerName){
+               		  		  		v_responsePrimitive.requestIdentifier := v_headerValue;  		  		  
+               		  			}
                		  		}
-               		  	}
 
-        				if(v_httpRespBody != "" and not enable_rsp_decode){
-        				  	log(__SCOPE__&"-[ERROR]ERROR HTTP MESSAGE!!");
-        				}
+        					if(v_httpRespBody != "" and not enable_rsp_decode){
+        				  		log(__SCOPE__&"-[ERROR]ERROR HTTP MESSAGE!!");
+        					}
         
-        				if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
-        				  	v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type); 
-        				  	log(__SCOPE__&"-v_serial_type: ", v_serial_type);
-        				}			
+        					if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
+        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type); 
+        				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
+        					}	  
+               		  	} else { // request case
+               		  		for(var integer i := 0; i < lengthof(v_headerLines); i := i + 1){               		  	  	  	  
+               		  			v_header 		:= v_headerLines[i];
+               		  			v_headerName 	:= v_header.header_name;
+               		  			v_headerValue 	:= v_header.header_value;               		  		
+               		  		
+               		  			if("X-M2M-RI" == v_headerName){
+               		  		  		v_requestPrimitive.requestIdentifier 	:= v_headerValue;  		  		  
+               		  			}
+               		  		}
+
+        					if(v_httpRespBody != "" and not enable_rsp_decode){
+        				  		log(__SCOPE__&"-[ERROR]ERROR HTTP MESSAGE!!");
+        					}
+        
+        					if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
+        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type); 
+        				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
+        					}
+               		  	}			
                		} else { 
                			v_responsePrimitive.primitiveContent := omit;       		
                			log(__SCOPE__&"-[ERROR]dec_HTTPMessage(): fail to decode HTTP message!!");
@@ -513,8 +562,12 @@ module OneM2M_DualFaceMapping {
   				  	
   				  	if(enable_rsp_decode){  
   				  		if(JSON_SERIAL == v_serial_type){				  	  
-  				  	  		dec_state_int := f_dec_JSON_resourcePrimitive(char2oct(v_encoded_primitiveContent), v_responsePrimitive.primitiveContent);
-  				  	  		
+  				  	  		if(v_resp_or_req) { // response
+  				  		  		dec_state_int := f_dec_JSON_resourcePrimitive(char2oct(v_encoded_primitiveContent), v_responsePrimitive.primitiveContent);
+  				  		  	} else { // request 
+  				  		  	 	dec_state_int := f_dec_JSON_resourcePrimitive(char2oct(v_encoded_primitiveContent), v_requestPrimitive.primitiveContent);
+  				  		  	}		
+  				  		  	
   				  	  		if(0 == dec_state_int){              				  	  
               					log(__SCOPE__&"-f_dec_JSON_resourcePrimitive(): decode suceeded!!: ", dec_state_int);  
           				  	} else {
@@ -542,25 +595,53 @@ module OneM2M_DualFaceMapping {
   				  	log(__SCOPE__&"-[Decoding Parsing ERROR]f_primitiveContent_Dec(): PrimitiveContent object parsing failed!!");
   				  	v_responsePrimitive.primitiveContent := omit;
   				}      	  
-      	  
       		} else {
       	  		return 1;
       		}
       	
-      		//set to, from, etc attributes
- 			v_responsePrimitive.to_ 						:= PX_AE1_ID_STEM;
-       		v_responsePrimitive.from_						:= PX_CSE_NAME;
-       		v_responsePrimitive.originatingTimestamp 		:= omit;
-			v_responsePrimitive.resultExpirationTimestamp 	:= omit;
-			v_responsePrimitive.eventCategory 				:= omit;
-				
-			//set MsgIn
-			v_msgIn.primitive.responsePrimitive := v_responsePrimitive;
-			p_msgin := v_msgIn;
-    		return 0;
+      		//set response or request attribute 	
+      		if(v_resp_or_req) {
+      		  	log(__SCOPE__&"-Setting the response message");
+ 				v_responsePrimitive.to_ 						:= PX_AE1_ID_STEM;
+       			v_responsePrimitive.from_						:= PX_CSE_NAME;
+       			v_responsePrimitive.originatingTimestamp 		:= omit;
+				v_responsePrimitive.resultExpirationTimestamp 	:= omit;
+				v_responsePrimitive.eventCategory 				:= omit;
+      		
+      			//set MsgIn
+				v_msgIn.primitive.responsePrimitive := v_responsePrimitive;
+				p_msgin := v_msgIn;
+      		} else {
+      		  	log(__SCOPE__&"-Setting the request message");
+      		  	// primitive := { requestPrimitive := p_requestPrimitive}
+      		  	// mw_createContainer(omit,v_utRequest.to_
+      			
+      			//set MsgIn
+				v_requestPrimitive.operation := int1;
+      			v_requestPrimitive.from_ := omit;
+      			v_requestPrimitive.to_ := "Mobius";
+      			v_requestPrimitive.role := omit;
+      			v_requestPrimitive.resourceType := int3;
+      			v_requestPrimitive.originatingTimestamp := omit;
+      			v_requestPrimitive.requestExpirationTimestamp := omit;
+      			v_requestPrimitive.resultExpirationTimestamp := omit;
+      			v_requestPrimitive.operationExecutionTime := omit;
+      			v_requestPrimitive.responseType := omit;
+      			v_requestPrimitive.resultPersistence := omit;
+      			v_requestPrimitive.resultContent := omit; 
+      			v_requestPrimitive.eventCategory := omit; 
+      			v_requestPrimitive.deliveryAggregation := omit;
+      			v_requestPrimitive.groupRequestIdentifier := omit;
+      			v_requestPrimitive.filterCriteria := omit;
+      			v_requestPrimitive.discoveryResultType := omit;
+      			
+				v_msgIn.primitive.requestPrimitive := v_requestPrimitive;
+				p_msgin := v_msgIn; 
+      		}
+			return 0;
   		} else {
     		return 1;
-		}	
+		}
 	} with {extension "prototype(backtrack)"} // End of Function
 	
 	/******************************************************

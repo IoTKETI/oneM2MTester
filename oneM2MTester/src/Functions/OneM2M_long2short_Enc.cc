@@ -328,10 +328,10 @@ namespace OneM2M__DualFaceMapping {
 
 			}
 
-			/* In this function, we have parsed focedFileds array to add unsupported TTCN3 syntax value such as -1 and null.
+			/* In this function, we have parsed forcedFileds array to add unsupported TTCN3 syntax value such as -1 and null.
 			 * Therefore, other attributes can be added later
 			 */
-			if(p__forcedFields != NULL_VALUE) { // if requestPrimitive has focedValue
+			if(p__forcedFields != NULL_VALUE) { // if requestPrimitive has forcedValue
 				for(int i = 0; i < p__forcedFields.lengthof(); i++) {
 					if(p__forcedFields[i].name() == EXPIRATION_TIME) {
 						if (p__forcedFields[i].value__() == OMIT_VALUE) {
