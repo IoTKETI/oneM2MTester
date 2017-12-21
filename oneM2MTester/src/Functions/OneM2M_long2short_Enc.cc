@@ -46,6 +46,10 @@ struct MyKeyHash {
 };
 
 namespace OneM2M__DualFaceMapping {
+
+	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et");
+
+
 	//initial array for storing resource name
 	int array_size = 20480;
 	//long-2-short name mapping
@@ -259,7 +263,7 @@ namespace OneM2M__DualFaceMapping {
 	 * @p__serialization__type: serialization type (XML or JSON)
 	 * 
      */
-	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type){
+	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type, const OneM2M__Types::AttributeAux__list& p__forcedFields){
 
 		//TTCN_Logger::log(TTCN_DEBUG, "Enter f_serialization_Enc()...");
 		if(!initial_mapping()){
@@ -322,6 +326,36 @@ namespace OneM2M__DualFaceMapping {
 										
 				}
 
+			}
+
+			/* In this function, we have parsed focedFileds array to add unsupported TTCN3 syntax value such as -1 and null.
+			 * Therefore, other attributes can be added later
+			 */
+			if(p__forcedFields != NULL_VALUE) { // if requestPrimitive has focedValue
+				for(int i = 0; i < p__forcedFields.lengthof(); i++) {
+					if(p__forcedFields[i].name() == EXPIRATION_TIME) {
+						if (p__forcedFields[i].value__() == OMIT_VALUE) {
+
+							Value rootKeyValue = Value::null;
+
+							for (Value::iterator iter = jsonRootClone.begin(); iter != jsonRootClone.end(); ++iter) {
+
+								// Store the root key name
+								if(rootKeyValue == Value::null) {
+									rootKeyValue = iter.key();
+								}
+
+								// Check the sub-key name
+								elemName = iter.key();
+								elemObj = jsonRootClone.get(elemName.asString(), Value::null);
+
+								if(elemObj.isMember(EXPIRATION_TIME_SHORT)) {
+									jsonRootClone[rootKeyValue.asString()][EXPIRATION_TIME_SHORT] = Value::null;
+								}
+							}
+						}
+					}
+				}
 			}
 
 			StyledWriter writer;

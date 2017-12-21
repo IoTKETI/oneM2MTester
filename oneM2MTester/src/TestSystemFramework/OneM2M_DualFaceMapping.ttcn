@@ -36,7 +36,7 @@ module OneM2M_DualFaceMapping {
 	external function f_upper2lower(in charstring p_string) return charstring;
 
 	//Serialization encoding for XML, JSON 
-	external function f_serialization_Enc(in charstring p_source, in charstring p_serialization_type) return charstring;
+	external function f_serialization_Enc(in charstring p_source, in charstring p_serialization_type, in AttributeAux_list p_forcedFields) return charstring;
 	external function f_serialization_Enc_for_trigger_msg(in charstring p_source) return charstring;
 	external function f_split(in charstring p_cs, in charstring p_delim) return charstring;
 	external function f_split_uri(in charstring p_cs, in charstring p_delim) return Charstring_List;
@@ -168,8 +168,13 @@ module OneM2M_DualFaceMapping {
 							v_payload := f_encode_requestPrimitive(v_reqPrimitive, v_serial_type);
 
 							//serialized payload with short name representation
-							if(v_payload != ""){					  
-							  	v_payload := f_serialization_Enc(v_payload, v_serial_type);   							  
+							if(v_payload != ""){		
+								if(ispresent(p_msgout.forcedFields)) {						  
+									v_payload := f_serialization_Enc(v_payload, v_serial_type, p_msgout.forcedFields);
+								} else {
+									var AttributeAux_list v_nullFields := {};
+									v_payload := f_serialization_Enc(v_payload, v_serial_type, v_nullFields);
+								}			  					  
 							}	
 					
 							//Get CoapPReqResp Message
@@ -182,7 +187,6 @@ module OneM2M_DualFaceMapping {
         							log(__SCOPE__& "-outprint elements of Coap options", v_CoapMsg.options[i+6]);
         							v_len := i;
         						}
-            
       						}
       					
       						//Update CoapReqResP Message Options - Uri-Query in case resultContent is present 
@@ -199,11 +203,16 @@ module OneM2M_DualFaceMapping {
 								v_payload := f_encode_requestPrimitive(v_reqPrimitive, v_serial_type);
 
 								//serialized payload with short name representation
-								if(v_payload != ""){								  
-								  	v_payload := f_serialization_Enc(v_payload, v_serial_type);
+								if(v_payload != ""){
+									if(ispresent(p_msgout.forcedFields)) {						  
+										v_payload := f_serialization_Enc(v_payload, v_serial_type, p_msgout.forcedFields);
+									} else {
+										var AttributeAux_list v_nullFields := {};
+										v_payload := f_serialization_Enc(v_payload, v_serial_type, v_nullFields);
+									}								  
 								}							       					
         						v_CoapMsg := valueof(t_COAP_PUT_request(v_contentFormat, v_from, v_reqID, v_payload));
-        					}else if( 4 == v_operation){//DELETE
+        					}else if( 4 == v_operation){ //DELETE
         						v_CoapMsg := valueof(t_COAP_DELETE_request(v_contentFormat, v_from, v_reqID));
         					}
 					  
@@ -218,7 +227,7 @@ module OneM2M_DualFaceMapping {
         					
         					//Update CoapReqResP Message Options - Uri-Query in case resultContent is present 
         					if(ispresent(v_reqPrimitive.resultContent)){        
-        						v_CoapMsg.options[v_len+6]:= { uri_query := "rcn=" & int2str(v_resultContent) };        
+        						v_CoapMsg.options[v_len + 6]:= { uri_query := "rcn=" & int2str(v_resultContent) };        
         					}					  
 						} else {
 							log(__SCOPE__ &"Not supported operation type!", v_operation);
@@ -242,37 +251,49 @@ module OneM2M_DualFaceMapping {
 				     	//assemble accept with serialization type
 				     	v_accept := ACCEPT_BASE & v_serial_type;
 				         
-				     	if( 1 == v_operation ){//C 
+				     	if( 1 == v_operation ){ //CREATE 
 				     	
-				     		v_contentType	:= CONTENT_TYPE_BASE & v_serial_type & ";ty=" & int2str(v_ty);
+				     		v_contentType := CONTENT_TYPE_BASE & v_serial_type & ";ty=" & int2str(v_ty);
 				     		
 				     		//original payload with long name representation
 							v_payload := f_encode_requestPrimitive(v_reqPrimitive, v_serial_type); log(__SCOPE__&"-v_payload: ", v_payload);
 
 							//serialized payload with short name representation
-							if(v_payload != ""){		log(__SCOPE__& "[DEBUG] _____CHECK HERE !!!_____________________");							  
-								 v_payload := f_serialization_Enc(v_payload, v_serial_type); 
+							if(v_payload != ""){		
+								if(ispresent(p_msgout.forcedFields)) {						  
+									 v_payload := f_serialization_Enc(v_payload, v_serial_type, p_msgout.forcedFields);
+								} else {
+									var AttributeAux_list v_nullFields := {};
+									v_payload := f_serialization_Enc(v_payload, v_serial_type, v_nullFields);
+								}	 					  
 							} else {
 								log(__SCOPE__ &"-[]WARNING]f_encode_requestPrimitive: payload is NULL\n"); 
 							}
 				     						     		
 				     	  	v_httpReqMsg := valueof(t_HTTP_POST_request(connectId_init, v_uri, v_accept, v_from, v_reqID, v_contentType, v_payload)); 
 				     	  	                                  	  
-				     	} else if ( 2 == v_operation ){ //R
+				     	} else if ( 2 == v_operation ){ //RETRIEVE
 				     	  	v_httpReqMsg := valueof(t_HTTP_GET_request(connectId_init, v_uri, v_accept, v_from, v_reqID));
-				     	} else if ( 3 == v_operation ){ //U			     	
+				     	} else if ( 3 == v_operation ){ //UPDATE		     	
+				     		
+				     		v_contentType := CONTENT_TYPE_BASE & v_serial_type;
+				     		
 				     		//original payload with long name representation
 							v_payload := f_encode_requestPrimitive(v_reqPrimitive, v_serial_type);
 
 							//serialized payload with short name representation
-							if(v_payload != "") {								  
-								 v_payload := f_serialization_Enc(v_payload, v_serial_type); 
+							if(v_payload != "") {
+								if(ispresent(p_msgout.forcedFields)) {						  
+									v_payload := f_serialization_Enc(v_payload, v_serial_type, p_msgout.forcedFields);
+								} else {
+									var AttributeAux_list v_nullFields := {};
+									v_payload := f_serialization_Enc(v_payload, v_serial_type, v_nullFields);
+								}	 
 							}
-				     	
-				     		v_contentType	:= CONTENT_TYPE_BASE & v_serial_type;				     		
+				     						     		
 				     	  	v_httpReqMsg := valueof(t_HTTP_PUT_request(connectId_init, v_uri, v_accept, v_from, v_reqID, v_contentType, v_payload));
 				     	  	
-				     	}else if( 4 == v_operation){ //D
+				     	}else if( 4 == v_operation){ //DELETE
 				     	  	v_httpReqMsg := valueof(t_HTTP_DELETE_request(connectId_init, v_uri, v_accept, v_from, v_reqID)); 	
 				     	} else {
 				     		log(__SCOPE__ &"-Not supported operation type!", v_operation);
