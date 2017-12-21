@@ -495,6 +495,44 @@ module oneM2MTester_Template {
 			body := ""    
     	}
     	
+    	//HTTP GET request	
+    	template HTTPRequest t_HTTP_GET_request_for_AE_Testing (
+        	integer p_clientId, 
+        	charstring p_uri,
+            //integer p_major_version,
+            //integer p_minor_version,
+        	charstring p_accept,
+            charstring p_response_status,
+        	charstring p_requestId ) := {
+        	
+        	client_id 		:= p_clientId,
+        	method	 		:= GET_HTTP,
+        	uri	 			:= p_uri,
+        	version_major 	:= 1, //p_major_version,
+        	version_minor	:= 1, //p_minor_version,
+        	
+        	header := {
+				{
+        			header_name 	:= HTTP_HOST,
+        			header_value 	:= OneM2M_Constants.tsp_connectionParams.remHost & ":" & int2str(OneM2M_Constants.tsp_connectionParams.remPort)
+				},
+				{
+        			header_name 	:= HTTP_ACCEPT,
+        			header_value 	:= p_accept
+				},
+				{
+        			header_name 	:= HTTP_RESPONSE_STATUS,
+        			header_value 	:= p_response_status
+ 				},
+				{
+        			header_name 	:= HTTP_M2M_REQUEST_ID,
+        			header_value 	:= p_requestId
+				}
+        
+			},
+			body := ""    
+    	}
+    	
     	//HTTP PUT request	
     	template HTTPRequest t_HTTP_PUT_request(
         	integer p_clientId, 

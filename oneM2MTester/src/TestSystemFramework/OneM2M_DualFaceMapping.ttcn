@@ -311,7 +311,39 @@ module OneM2M_DualFaceMapping {
                 }else{
 					log(__SCOPE__ &"-[warning]NOT SUPPORTED Serialization or Protocol binding TYPE !! ");   		  	  
                 } 	   		     
-			} 
+			} else if (ischosen(p_msgout.primitive.responsePrimitive)) {
+				var ResponsePrimitive v_rspPrimitive := p_msgout.primitive.responsePrimitive;
+				var charstring v_rspRequestID_		 := "";
+				var charstring v_response_status 	 := "";
+				var HTTPRequest v_httpReqMsg;
+				var HTTPMessage v_httpMsgToSend;
+				var charstring v_accept; 
+				     	
+				//assemble accept with serialization type
+				v_accept := ACCEPT_BASE & v_serial_type;
+				
+				// ResponseStatus
+				if(ispresent(v_rspPrimitive.responseStatusCode)) {
+	  				var integer responseStatus	:= enum2int(v_rspPrimitive.responseStatusCode);     
+	  				v_response_status := int2str(responseStatus)             
+				}
+				
+				// RequestIdentifier
+				if(ispresent(v_rspPrimitive.requestIdentifier)) {
+	  				v_rspRequestID_	:= oct2char(unichar2oct(v_rspPrimitive.requestIdentifier));                  
+				}
+			  
+				v_httpReqMsg := valueof(t_HTTP_GET_request_for_AE_Testing(connectId_init, v_uri, v_accept, v_response_status, v_reqID));
+				
+				//generate HTTP Message
+				v_httpMsgToSend := {
+					request:= v_httpReqMsg                             	  
+				}
+				 log(__SCOPE__ &"-HTTP Message to send ", v_httpMsgToSend);
+				     	        
+				v_encoded_msg := enc_HTTPMessage(v_httpMsgToSend);        
+				log(__SCOPE__ &"-Encoded HTTP Message to send ", v_encoded_msg);
+			}
 			
 			//Generate IPL4ASP message 
 			p_asp_Send.connId		:= connectId_init;
