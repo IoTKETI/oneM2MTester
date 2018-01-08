@@ -47,8 +47,9 @@ struct MyKeyHash {
 
 namespace OneM2M__DualFaceMapping {
 
-	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et");
-
+	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et"),
+				 EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"), SUBSCRIPTION("subscription"),
+				 OPERATION_MONITOR_LIST("operationMonitor_list");
 
 	//initial array for storing resource name
 	int array_size = 20480;
@@ -65,177 +66,9 @@ namespace OneM2M__DualFaceMapping {
 	const char* PRIMITIVE_CONTENT 	= "PrimitiveContent";		
 	const char* XSI			= "http://www.w3.org/2001/XMLSchema-instance";
 	const char* XSI_TAG		= "xmlns:xsi";
-
 	const char* CONTENT_ATTR	= "content"; 
 	const char* EMBED_VALUES_ATTR	= "embed_values";
 	const char* ELEM_LIST_ATTR	= "elem_list";
-
-	/**
-     * @desc encode oneM2M resource primitive e.g. AE, container etc. into primitiveContent primitive
-     * @source_str: resource primitive representation
-	 * @serial_type: serialization type in which the resource primitive is represented
-     */
-	CHARSTRING f__primitiveContent__Dec(const CHARSTRING& source_str, const CHARSTRING& serial_type){
-
-		if(!initial_mapping()){
-			TTCN_Logger::log(TTCN_DEBUG, "\n[WARNING]oneM2M lon&short mapping initialization failed!!\n\n");
-		}
-
-		CHARSTRING encoded_message	= "";
-		const char* p_body		= (const char*)source_str;		
-	
-		if( "" == source_str){
-			return "";
-		}
-
-		if("json" == serial_type){
-
-			Value jsonDoc(objectValue);
-			Value jsonRoot(objectValue);
-			Reader jsonReader;
-			Value rootTag;
-			Value elemName;			
-			Value elemObj(objectValue);
-			Value subelemObj(objectValue);
-			Value grandelemObj(objectValue);
-
-			Value jsonRootClone(objectValue);
-			Value jsonObjClone(objectValue);
-			Value jsonArrayRoot(arrayValue);		
-
-			std::string rootTag_short;
-			std::string name_long;
-			std::string parent_tag = "";
-
-			bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
-
-			if ( !parsingSuccessful ) {
-				TTCN_Logger::log(TTCN_DEBUG, "JsonCPP API parsing error!");
-				return "JsonCPP API parsing error!";
-			}
-
-			TTCN_Logger::log(TTCN_DEBUG, "[Decoding] Read Json document for decoding:\n%s", jsonRoot.toStyledString().c_str());	
-	
-			if(jsonRoot.isObject()){  
-				
-				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
-					
-					elemName = iter.key();
-					elemObj = jsonRoot.get(elemName.asString(), "");
-					
-					name_long = getLongName(elemName.asString()); 
-
-					if(name_long == ""){
-						name_long = elemName.asString();
-					}
-
-					parent_tag = name_long;
-					
-					if(elemObj.isArray()){
-						for(unsigned int index = 0; index < elemObj.size(); index++){
-							grandelemObj = elemObj[index];
-							jsonObjClone[parent_tag.c_str()] = grandelemObj;
-						}
-					}else if(!elemObj.isObject() && !elemObj.isArray()){
-						jsonObjClone[name_long.c_str()] = elemObj;
-					}else if(elemObj.isObject()){
-						jsonObjClone[parent_tag.c_str()] = elemObj;
-						jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
-					}
-				}
-			}else if(jsonRoot.isArray()){
-				for(unsigned int index = 0; index < jsonRoot.size(); index++){
-					elemObj = jsonRoot[index];
-					jsonObjClone = elemObj;
-				}
-			}
-
-			jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
-
-			TTCN_Logger::log(TTCN_DEBUG, "Pretty print of DECODED JSON message:\n%s", jsonRootClone.toStyledString().c_str());
-
-			StyledWriter writer;
-			std::string json_str = writer.write(jsonRootClone);
-
-			CHARSTRING temp_cs(json_str.c_str());
-			encoded_message	= temp_cs;
-
-		} else if("xml" == serial_type){
-						
-			XMLDocument xmlDoc;
-			xmlDoc.Parse(p_body);			
-			XMLNode* pRoot;
-			XMLDeclaration* pDecl;
-			XMLNode* pNode;		
-			XMLElement* pElem;
-			XMLElement* pElemClone;
-			XMLElement* pRootClone;
-			XMLElement* pResourceRoot;
-			const char* name_el;
-			std::string name_long;
-			XMLDocument xmlDoclone;	
-			XMLElement* pRootElem;
-			XMLNode* pTemp;
-
-			for(pTemp = xmlDoc.FirstChild(); pTemp != NULL; pTemp = xmlDoc.LastChild()){
-				if(pTemp->ToDeclaration()){
-					pDecl = pTemp->ToDeclaration();
-				}else if(pTemp->ToElement()){
-					pRoot = pTemp->ToElement();
-					XMLPrinter print2;
-					pRoot->Accept(&print2);
-					break;	
-				}
-			}
-
-			if(pRoot){
-				pDecl = pRoot->ToDeclaration();
-
-				if(pDecl){
-					//TTCN_Logger::log(TTCN_DEBUG, "pRoot->ToDeclaration()!");
-				}
-
-				pRootElem = pRoot->ToElement();
-
-				if(pRootElem){ 
-
-					name_el = pRootElem->Name(); 
-					name_long = getLongName(name_el);			
-
-					if("" == name_long){
-						name_long = name_el;
-					}
-			
-					pRootClone 	= xmlDoclone.NewElement(PRIMITIVE_CONTENT); 
-					pResourceRoot 	= xmlDoclone.NewElement(name_long.c_str());
-			
-					if(pRootElem->Attribute(NAMESPACE_TAG)){
-						std::string  val_xmlns_ns = pRootElem->Attribute(NAMESPACE_TAG);
-						pRootClone->SetAttribute(NAMESPACE_TAG, val_xmlns_ns.c_str());
-					} else
-						pRootClone->SetAttribute(NAMESPACE_TAG, XML_NAMESPACE);
-					if(pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()))){ 
-						std::string val_resourceName = pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()));
-						pResourceRoot->SetAttribute( getLongName(getShortName(RESOURCE_NAME)).c_str(), val_resourceName.c_str() );
-					}
-
-					pRootClone->InsertEndChild(pResourceRoot);
-					
-					xmlDoclone.InsertEndChild(pRootClone);
-
-					for(pNode = pRoot->FirstChild(); pNode != NULL; pNode = pNode->NextSibling()){
-						pElem = pNode->ToElement();		
-						DeepParserDec(pElem, &xmlDoclone, pElemClone, pResourceRoot);
-					}
-					
-					XMLPrinter print;
-					xmlDoclone.Accept(&print);
-					encoded_message = print.CStr();
-				}
-			}
-		}
-		return encoded_message;
-	}
 
 	/**
 	 * @desc convert string from uppercase to lowercase
@@ -952,7 +785,175 @@ namespace OneM2M__DualFaceMapping {
 				jsonObjClone[name_short.c_str()] = elemObj;
 			}
 		}
+
 		return jsonObjClone;
+	}
+
+	/**
+	 * @desc encode oneM2M resource primitive e.g. AE, container etc. into primitiveContent primitive
+	 * @source_str: resource primitive representation
+	 * @serial_type: serialization type in which the resource primitive is represented
+	 */
+	CHARSTRING f__primitiveContent__Dec(const CHARSTRING& source_str, const CHARSTRING& serial_type){
+
+		if(!initial_mapping()){
+			TTCN_Logger::log(TTCN_DEBUG, "\n[WARNING]oneM2M lon&short mapping initialization failed!!\n\n");
+		}
+
+		CHARSTRING encoded_message	= "";
+		const char* p_body		= (const char*)source_str;
+
+		if( "" == source_str){
+			return "";
+		}
+
+		if("json" == serial_type){
+
+			Value jsonDoc(objectValue);
+			Value jsonRoot(objectValue);
+			Reader jsonReader;
+			Value rootTag;
+			Value elemName;
+			Value elemObj(objectValue);
+			Value subelemObj(objectValue);
+			Value grandelemObj(objectValue);
+
+			Value jsonRootClone(objectValue);
+			Value jsonObjClone(objectValue);
+			Value jsonArrayRoot(arrayValue);
+
+			std::string rootTag_short;
+			std::string name_long;
+			std::string parent_tag = "";
+
+			bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
+
+			if ( !parsingSuccessful ) {
+				TTCN_Logger::log(TTCN_DEBUG, "JsonCPP API parsing error!");
+				return "JsonCPP API parsing error!";
+			}
+
+			TTCN_Logger::log(TTCN_DEBUG, "[Decoding] Read Json document for decoding:\n%s", jsonRoot.toStyledString().c_str());
+
+			if(jsonRoot.isObject()){
+
+				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
+
+					elemName = iter.key();
+					elemObj = jsonRoot.get(elemName.asString(), "");
+
+					name_long = getLongName(elemName.asString());
+
+					if(name_long == ""){
+						name_long = elemName.asString();
+					}
+
+					parent_tag = name_long;
+
+					if(elemObj.isArray()){
+						for(unsigned int index = 0; index < elemObj.size(); index++){
+							grandelemObj = elemObj[index];
+							jsonObjClone[parent_tag.c_str()] = grandelemObj;
+						}
+					}else if(!elemObj.isObject() && !elemObj.isArray()){
+						jsonObjClone[name_long.c_str()] = elemObj;
+					}else if(elemObj.isObject()){
+						jsonObjClone[parent_tag.c_str()] = elemObj;
+						jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
+					}
+				}
+			}else if(jsonRoot.isArray()){
+				for(unsigned int index = 0; index < jsonRoot.size(); index++){
+					elemObj = jsonRoot[index];
+					jsonObjClone = elemObj;
+				}
+			}
+
+			// jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
+
+			TTCN_Logger::log(TTCN_DEBUG, "Pretty print of DECODED JSON message:\n%s", jsonRootClone.toStyledString().c_str());
+
+			StyledWriter writer;
+			std::string json_str = writer.write(jsonRootClone);
+
+			CHARSTRING temp_cs(json_str.c_str());
+			encoded_message	= temp_cs;
+
+		} else if("xml" == serial_type){
+
+			XMLDocument xmlDoc;
+			xmlDoc.Parse(p_body);
+			XMLNode* pRoot;
+			XMLDeclaration* pDecl;
+			XMLNode* pNode;
+			XMLElement* pElem;
+			XMLElement* pElemClone;
+			XMLElement* pRootClone;
+			XMLElement* pResourceRoot;
+			const char* name_el;
+			std::string name_long;
+			XMLDocument xmlDoclone;
+			XMLElement* pRootElem;
+			XMLNode* pTemp;
+
+			for(pTemp = xmlDoc.FirstChild(); pTemp != NULL; pTemp = xmlDoc.LastChild()){
+				if(pTemp->ToDeclaration()){
+					pDecl = pTemp->ToDeclaration();
+				}else if(pTemp->ToElement()){
+					pRoot = pTemp->ToElement();
+					XMLPrinter print2;
+					pRoot->Accept(&print2);
+					break;
+				}
+			}
+
+			if(pRoot){
+				pDecl = pRoot->ToDeclaration();
+
+				if(pDecl){
+					//TTCN_Logger::log(TTCN_DEBUG, "pRoot->ToDeclaration()!");
+				}
+
+				pRootElem = pRoot->ToElement();
+
+				if(pRootElem){
+
+					name_el = pRootElem->Name();
+					name_long = getLongName(name_el);
+
+					if("" == name_long){
+						name_long = name_el;
+					}
+
+					pRootClone 	= xmlDoclone.NewElement(PRIMITIVE_CONTENT);
+					pResourceRoot 	= xmlDoclone.NewElement(name_long.c_str());
+
+					if(pRootElem->Attribute(NAMESPACE_TAG)){
+						std::string  val_xmlns_ns = pRootElem->Attribute(NAMESPACE_TAG);
+						pRootClone->SetAttribute(NAMESPACE_TAG, val_xmlns_ns.c_str());
+					} else
+						pRootClone->SetAttribute(NAMESPACE_TAG, XML_NAMESPACE);
+					if(pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()))){
+						std::string val_resourceName = pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()));
+						pResourceRoot->SetAttribute( getLongName(getShortName(RESOURCE_NAME)).c_str(), val_resourceName.c_str() );
+					}
+
+					pRootClone->InsertEndChild(pResourceRoot);
+
+					xmlDoclone.InsertEndChild(pRootClone);
+
+					for(pNode = pRoot->FirstChild(); pNode != NULL; pNode = pNode->NextSibling()){
+						pElem = pNode->ToElement();
+						DeepParserDec(pElem, &xmlDoclone, pElemClone, pResourceRoot);
+					}
+
+					XMLPrinter print;
+					xmlDoclone.Accept(&print);
+					encoded_message = print.CStr();
+				}
+			}
+		}
+		return encoded_message;
 	}
 
 	/**
@@ -976,6 +977,9 @@ namespace OneM2M__DualFaceMapping {
 		std::string root_tag = "";
 		std::string name_long = "";
 
+		Value root_name_element;
+		bool hasRootTag = false; // key for storing the root tag name
+
 		for (Value::iterator iter = jsonSrc.begin(); iter != jsonSrc.end(); iter++) {
 			
 			elemName = iter.key();
@@ -989,6 +993,11 @@ namespace OneM2M__DualFaceMapping {
 			}
 			
 			parent_tag = name_long;
+
+			if(hasRootTag == false) {
+				root_name_element = elemName;
+				hasRootTag = true;
+			}
 
 			if(elemObj.isObject()){ 
 				root_tag = name_long;
@@ -1112,6 +1121,38 @@ namespace OneM2M__DualFaceMapping {
 				jsonObjClone[name_long.c_str()] = elemObj;
 			}
 		}
+
+		if((root_name_element.asString()).compare(SUBSCRIPTION) == 0) {
+
+			Value elemObj = jsonObjClone.get(root_name_element.asString(), "");
+
+			for (Value::iterator iter = elemObj.begin(); iter != elemObj.end(); iter++) {
+
+				Value elemKey = iter.key();
+
+				if((elemKey.asString()).compare(EVENT_NOTIFICATION_CRITERIA) == 0) { //
+
+					// For checking sub element of the eventNotificationCriteria
+					Value elemKey = iter.key();
+					Value eventNotiItemElem = elemObj.get(elemKey.asString(), "");
+
+					for (Value::iterator iter = eventNotiItemElem.begin(); iter != eventNotiItemElem.end(); ++iter) {
+						Value elemKey = iter.key();
+
+						if((elemKey.asString()).compare(OPERATION_MONITOR_LIST) == 0) { // has operationMonitor_list
+							return jsonObjClone;
+						} else {
+
+							Json::Value emptyArray_for_om;
+							emptyArray_for_om.append("int1");
+							eventNotiItemElem[OPERATION_MONITOR_LIST] = emptyArray_for_om;
+							jsonObjClone[SUBSCRIPTION][EVENT_NOTIFICATION_CRITERIA] = eventNotiItemElem;
+						}
+					}
+				}
+			}
+		}
+
 		return jsonObjClone;
 	}
 
