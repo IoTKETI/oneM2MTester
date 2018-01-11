@@ -49,7 +49,8 @@ namespace OneM2M__DualFaceMapping {
 
 	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et"),
 				 EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"), SUBSCRIPTION("subscription"),
-				 OPERATION_MONITOR_LIST("operationMonitor_list");
+				 OPERATION_MONITOR_LIST("operationMonitor_list"), AGGREGATED_RESPONSE("aggregatedResponse"),
+				 RESPONSE_PRIMITIVE_LIST("responsePrimitive_list"), REQUEST_IDENTIFIER("rqi");
 
 	int array_size = 20480; //initial array for storing resource name
 	HashMap<std::string, std::string, 50, MyKeyHash> hmap_l2s; //long-2-short name mapping
@@ -761,17 +762,14 @@ namespace OneM2M__DualFaceMapping {
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 
 			} else if(elemObj.isString()) {
-				if(	"op" 	== name_short   || "operation" 					== name_short ||
-					"ty" 	== name_short   || "resourceType" 				== name_short ||
-			        "acop" 	== name_short   || "accessControlOperations" 	== name_short ||
-		            "rcn" 	== name_short   || "resultContent" 				== name_short ||
-					"csy"	== name_short	|| "consistencyStrategy" 		== name_short ||
-					"cst"	== name_short	|| "cseType"					== name_short ){ //TODO: add all enumerated type here
+				if(	"op" 	== name_short   ||  "ty" 	== name_short   ||
+			        "acop" 	== name_short   ||  "rcn" 	== name_short   ||
+					"csy"	== name_short	||  "cst"	== name_short	||
+					"mt"    == name_short){ //TODO: add all enumerated type here
 
 					std::string attr_val = getShortName(elemObj.asString());
 					int tmp_int = atoi(attr_val.c_str());
 					jsonObjClone[name_short.c_str()] = tmp_int;
-
 				}else
 					jsonObjClone[name_short.c_str()] = elemObj.asString();
 
@@ -845,9 +843,16 @@ namespace OneM2M__DualFaceMapping {
 					parent_tag = name_long;
 
 					if(elemObj.isArray()){
+						//This loop is defined for the group/fanout for the moment
 						for(unsigned int index = 0; index < elemObj.size(); index++){
-							grandelemObj = elemObj[index];
-							jsonObjClone[parent_tag.c_str()] = grandelemObj;
+							Value subElemObjRoot;
+							Value subElemObj(objectValue);
+							subElemObj = elemObj[index]; // Extracting the one of Element from JSON Array.
+
+							subElemObj[REQUEST_IDENTIFIER] = "temp_requestIdentifier"; // rqi is defined to meet the responsePrimitive format
+
+							subElemObjRoot = JSONDeepParserDec(subElemObj, subElemObjRoot, jsonRootClone);
+							jsonRootClone[AGGREGATED_RESPONSE][RESPONSE_PRIMITIVE_LIST].append(subElemObjRoot);
 						}
 					}else if(!elemObj.isObject() && !elemObj.isArray()){
 						jsonObjClone[name_long.c_str()] = elemObj;
@@ -1091,7 +1096,14 @@ namespace OneM2M__DualFaceMapping {
 				}
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 			}else if(elemObj.isString()){
-				jsonObjClone[name_long.c_str()] = elemObj.asString();
+
+				//Handling responseStatusCode
+				if(name_long == "responseStatusCode") {
+					std::string attr_val = getLongName(elemObj.asString());
+					jsonObjClone[name_long.c_str()] = attr_val;
+				} else { // if not, it doesn't have any specific attribute to meet the primitive format.
+					jsonObjClone[name_long.c_str()] = elemObj.asString();
+				}
 			}else if(elemObj.isInt()){ 
 				
 				std::string tmp_str((const char*)(int2str(elemObj.asInt())));
@@ -1103,7 +1115,7 @@ namespace OneM2M__DualFaceMapping {
 					"csy"	== name_long   || "consistencyStrategy" 	 == name_long ||
 					"mt"	== name_long   || "memberType" 			     == name_long ||
 					"nct"	== name_long   || "notificationContentType"	 == name_long ||
-					"cst"	== name_long   || "cseType"			         == name_long){
+					"cst"	== name_long   || "cseType"			         == name_long ){
 
 					std::string attr_val = getLongName(tmp_str);		
 					jsonObjClone[name_long.c_str()] = attr_val;
