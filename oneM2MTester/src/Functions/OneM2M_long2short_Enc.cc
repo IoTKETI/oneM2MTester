@@ -11,8 +11,8 @@
 *   JaeYoung Hwang   - forest62590@gmail.com                                   	        *
 *   Nak-Myoung Sung                                                            	        *
 *   Ting Martin MIAO - initial implementation                                           *
-* Updated:  2017-09-01                                                          	    *
-*****************************************************************************************/
+*   Updated:  2017-09-01                                                          	    *
+****************************************************************************************/
 //  File:               OneM2M_long2short_Enc.cc
 //  Description:        Functions for oneM2M long to short, and short to long name conversion,
 //                      and XML, JSON parsing   
@@ -51,17 +51,12 @@ namespace OneM2M__DualFaceMapping {
 				 EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"), SUBSCRIPTION("subscription"),
 				 OPERATION_MONITOR_LIST("operationMonitor_list");
 
-	//initial array for storing resource name
-	int array_size = 20480;
-	//long-2-short name mapping
-	HashMap<std::string, std::string, 50, MyKeyHash> hmap_l2s; 
-	//short-2-long name mapping
-	HashMap<std::string, std::string, 50, MyKeyHash> hmap_s2l;
+	int array_size = 20480; //initial array for storing resource name
+	HashMap<std::string, std::string, 50, MyKeyHash> hmap_l2s; //long-2-short name mapping
+	HashMap<std::string, std::string, 50, MyKeyHash> hmap_s2l; //short-2-long name mapping
 
-	//TODO to be replace by PIXIT value
-	const char* XML_NAMESPACE 	= "http://www.onem2m.org/xml/protocols";
-	//TODO to be added in constant module
-	const char* NAMESPACE_TAG	= "xmlns:m2m";
+	const char* XML_NAMESPACE 	= "http://www.onem2m.org/xml/protocols"; // to be replace by PIXIT value
+	const char* NAMESPACE_TAG	= "xmlns:m2m"; // to be added in constant module
 	const char* RESOURCE_NAME	= "resourceName";
 	const char* PRIMITIVE_CONTENT 	= "PrimitiveContent";		
 	const char* XSI			= "http://www.w3.org/2001/XMLSchema-instance";
@@ -98,12 +93,11 @@ namespace OneM2M__DualFaceMapping {
      */
 	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type, const OneM2M__Types::AttributeAux__list& p__forcedFields){
 
-		//TTCN_Logger::log(TTCN_DEBUG, "Enter f_serialization_Enc()...");
-		if(!initial_mapping()){
+		if(!initial_mapping()) {
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 		}
 
-		const char* p_body		= (const char*)p__source;
+		const char* p_body			= (const char*)p__source;
 		CHARSTRING serial_str		= p__serialization__type;
 		CHARSTRING encoded_message	= "";
 
@@ -352,26 +346,21 @@ namespace OneM2M__DualFaceMapping {
 						if("L2S" == mapping_tag){
 							hmap_l2s.put(source_str, dest_str);
 							flag = true;
-	
 						}else if("S2L" == mapping_tag){
 							hmap_s2l.put(source_str, dest_str);
 							flag = true;
-							
 						}else
 							return false;
 					}else
 						return false;
-
 					pos_1 = pos_2 + 1;
 				}
 			}else
 				return false;
 		}else
 			return false;
-
 		return flag;
 	}
-
 
 	/**
 	 * @desc get long/short name from hash mapping table
@@ -379,6 +368,7 @@ namespace OneM2M__DualFaceMapping {
 	std::string getShortName(std::string long_name){ 
 		std::string short_name = "";
 		bool isOk =  hmap_l2s.get(long_name, short_name);
+
 		if(isOk)
 			return short_name;
 		return "";
@@ -387,6 +377,7 @@ namespace OneM2M__DualFaceMapping {
 	std::string getLongName(std::string short_name){
 		std::string long_name = "";
 		bool isOk =  hmap_s2l.get(short_name, long_name);
+
 		if(isOk)
 			return long_name;
 		return "";
@@ -396,7 +387,6 @@ namespace OneM2M__DualFaceMapping {
 	 * @desc split a string with specified delim and get the substr after the delim
 	 */
 	CHARSTRING f__split(const CHARSTRING& p__cs, const CHARSTRING& p__delim){
-		
 		const char* cs_str = (const char*)p__cs;
 		std::string src_str(cs_str);
 		
@@ -404,6 +394,7 @@ namespace OneM2M__DualFaceMapping {
 		char* delim_str = const_cast<char*>(temp_str);
 
 		std::vector<std::string> vector_elems = split(src_str, *delim_str);
+
 		for(unsigned int i=0; i< vector_elems.size(); i++){
 		
 			CHARSTRING tmp_str((vector_elems[i]).c_str());
@@ -428,10 +419,12 @@ namespace OneM2M__DualFaceMapping {
 		std::string str1(cs_temp2);
 		std::string str2(cs_temp3);
 		std::size_t pos = str_source.find_first_of(str1);
+
 		while(pos != std::string::npos){
 			str_source.replace(pos, 1, str2);
 			pos = str_source.find_first_of(str1, pos+1);
 		}
+
 		CHARSTRING tmp_str(str_source.c_str());
 		return tmp_str;	
 	}
@@ -470,6 +463,7 @@ namespace OneM2M__DualFaceMapping {
 
 		std::string uri_str(cs_temp);
 		std::string tmp_string = uri_str.substr(0,1);
+
 		if( (uri_str.substr(0,1)) != "/"){
 			TTCN_Logger::log(TTCN_DEBUG, "check first character of uri_string is '/' or not :(%s)", tmp_string.c_str());
 		}else{
@@ -499,10 +493,10 @@ namespace OneM2M__DualFaceMapping {
 		std::vector<std::string> elems;
 		stringstream ss(s);
 		std::string item;
+
 		while (getline(ss, item, delim)) {
 		    elems.push_back(item);
 		}
-
 		return elems;
 	}
 
@@ -869,6 +863,7 @@ namespace OneM2M__DualFaceMapping {
 				}
 			}
 
+			// Repetitive decoding function call, This function will be delete
 			// jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
 
 			TTCN_Logger::log(TTCN_DEBUG, "Pretty print of DECODED JSON message:\n%s", jsonRootClone.toStyledString().c_str());
@@ -933,6 +928,7 @@ namespace OneM2M__DualFaceMapping {
 						pRootClone->SetAttribute(NAMESPACE_TAG, val_xmlns_ns.c_str());
 					} else
 						pRootClone->SetAttribute(NAMESPACE_TAG, XML_NAMESPACE);
+
 					if(pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()))){
 						std::string val_resourceName = pRootElem->Attribute((getShortName(RESOURCE_NAME).c_str()));
 						pResourceRoot->SetAttribute( getLongName(getShortName(RESOURCE_NAME)).c_str(), val_resourceName.c_str() );
