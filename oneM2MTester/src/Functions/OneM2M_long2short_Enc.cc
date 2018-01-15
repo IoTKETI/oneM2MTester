@@ -50,7 +50,7 @@ namespace OneM2M__DualFaceMapping {
 	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et"),
 				 EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"), SUBSCRIPTION("subscription"),
 				 OPERATION_MONITOR_LIST("operationMonitor_list"), AGGREGATED_RESPONSE("aggregatedResponse"),
-				 RESPONSE_PRIMITIVE_LIST("responsePrimitive_list"), REQUEST_IDENTIFIER("rqi");
+				 RESPONSE_PRIMITIVE_LIST("responsePrimitive_list"), REQUEST_IDENTIFIER("rqi"), REQUEST_PRIMITIVE("rqp");
 
 	int array_size = 20480; //initial array for storing resource name
 	HashMap<std::string, std::string, 50, MyKeyHash> hmap_l2s; //long-2-short name mapping
@@ -755,9 +755,7 @@ namespace OneM2M__DualFaceMapping {
 							}
 							elemObjClone[parent_tag.c_str()] = elemArrayObj;
 						}
-
 					}
-
 				}
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 
@@ -777,7 +775,6 @@ namespace OneM2M__DualFaceMapping {
 				jsonObjClone[name_short.c_str()] = elemObj;
 			}
 		}
-
 		return jsonObjClone;
 	}
 
@@ -867,9 +864,6 @@ namespace OneM2M__DualFaceMapping {
 					jsonObjClone = elemObj;
 				}
 			}
-
-			// Repetitive decoding function call, This function will be delete
-			// jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
 
 			TTCN_Logger::log(TTCN_DEBUG, "Pretty print of DECODED JSON message:\n%s", jsonRootClone.toStyledString().c_str());
 
@@ -1038,7 +1032,6 @@ namespace OneM2M__DualFaceMapping {
 									Value tempObj = grandelemObj[index];
 																	
 									if(tempObj.isIntegral()){
-
 										std::string tmp_str((const char*)(int2str(tempObj.asLargestInt())));
 										
 										std::string attr_val = getLongName(tmp_str);
@@ -1138,7 +1131,7 @@ namespace OneM2M__DualFaceMapping {
 
 				Value elemKey = iter.key();
 
-				if((elemKey.asString()).compare(EVENT_NOTIFICATION_CRITERIA) == 0) { //
+				if((elemKey.asString()).compare(EVENT_NOTIFICATION_CRITERIA) == 0) {
 
 					// For checking sub element of the eventNotificationCriteria
 					Value elemKey = iter.key();
@@ -1192,8 +1185,8 @@ namespace OneM2M__DualFaceMapping {
 		bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
 
 		if ( !parsingSuccessful ) {
-			TTCN_Logger::log(TTCN_DEBUG, "JsonCPP API parsing error!");
-			return "JsonCPP API parsing error!";
+			TTCN_Logger::log(TTCN_DEBUG, "JSONCPP API parsing error!");
+			return "JSONCPP API parsing error!";
 		}
 
 		if(jsonRoot.isObject()){
@@ -1235,7 +1228,7 @@ namespace OneM2M__DualFaceMapping {
 		}
 
 		StyledWriter writer;
-		rootTag["rqp"] = jsonRootClone; // Root tag for triggering message
+		rootTag[REQUEST_PRIMITIVE] = jsonRootClone; // Root tag for triggering message
 		std::string json_str = writer.write(rootTag);
 
 		CHARSTRING temp_cs(json_str.c_str());
