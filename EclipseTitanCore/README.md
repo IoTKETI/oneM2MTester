@@ -18,6 +18,7 @@ oneM2MTester Configuration:
 Reference URL:
 https://github.com/eclipse/titan.core/blob/master/README.linux
 https://projects.eclipse.org/projects/tools.titan/downloads
+https://github.com/eclipse/titan.core/releases
 
 Reference Document:
 oneM2MTester_User_Guide_ver1_0_0.pdf in oneM2MTester_User_Manual folder

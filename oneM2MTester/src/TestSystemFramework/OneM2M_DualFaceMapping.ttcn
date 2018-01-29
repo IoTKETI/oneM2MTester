@@ -144,6 +144,23 @@ module OneM2M_DualFaceMapping {
         		  		v_uri := v_uri & "?rcn=" & int2str(v_resultContent);                  		  
           			}          		                        
             	}
+            	
+            	// FiterCriteria
+            	if(ispresent(v_reqPrimitive.filterCriteria)) {
+            	  
+            		// filterUsage value can be 1 or 2  
+            		if(ispresent(v_reqPrimitive.filterCriteria.filterUsage) and (2 == v_operation)) {
+            			var integer filterUsageValue := enum2int(v_reqPrimitive.filterCriteria.filterUsage);
+            			
+            			if(filterUsageValue == 1) {
+            				v_uri := v_uri & "?fu=1";  
+            			} else if(filterUsageValue == 2) {
+            				v_uri := v_uri & "?fu=2";  
+            			}
+            		}
+            		
+            		// Other features can be added in this branch
+            	}
               		
 				if(COAP_BINDING == v_protocol_type or HTTP_BINDING == v_protocol_type ) {	
 					var CoAP_Message v_CoapMsgToSend;
@@ -267,7 +284,7 @@ module OneM2M_DualFaceMapping {
 									v_payload := f_serialization_Enc(v_payload, v_serial_type, v_nullFields);
 								}	 					  
 							} else {
-								log(__SCOPE__ &"-[]WARNING]f_encode_requestPrimitive: payload is NULL\n"); 
+								log(__SCOPE__ &"-[WARNING]f_encode_requestPrimitive: payload is NULL\n"); 
 							}
 				     						     		
 				     	  	v_httpReqMsg := valueof(t_HTTP_POST_request(connectId_init, v_uri, v_accept, v_from, v_reqID, v_contentType, v_payload)); 

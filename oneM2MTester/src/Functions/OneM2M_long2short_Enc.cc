@@ -840,16 +840,24 @@ namespace OneM2M__DualFaceMapping {
 					parent_tag = name_long;
 
 					if(elemObj.isArray()){
-						//This loop is defined for the group/fanout for the moment
-						for(unsigned int index = 0; index < elemObj.size(); index++){
-							Value subElemObjRoot;
-							Value subElemObj(objectValue);
-							subElemObj = elemObj[index]; // Extracting the one of Element from JSON Array.
 
-							subElemObj[REQUEST_IDENTIFIER] = "temp_requestIdentifier"; // rqi is defined to meet the responsePrimitive format
+						if (parent_tag == "uRIList") { // This branch is defined for the Discovery testcases
 
-							subElemObjRoot = JSONDeepParserDec(subElemObj, subElemObjRoot, jsonRootClone);
-							jsonRootClone[AGGREGATED_RESPONSE][RESPONSE_PRIMITIVE_LIST].append(subElemObjRoot);
+							for(unsigned int index = 0; index < elemObj.size(); index++){
+								Value subElemObjRoot  = elemObj[index];
+								jsonRootClone[parent_tag.c_str()].append(subElemObjRoot);
+							}
+						} else { //This branch is defined for the group/fanout for the moment
+							for(unsigned int index = 0; index < elemObj.size(); index++){
+								Value subElemObjRoot;
+								Value subElemObj(objectValue);
+								subElemObj = elemObj[index]; // Extracting the one of Element from JSON Array.
+
+								subElemObj[REQUEST_IDENTIFIER] = "temp_requestIdentifier"; // rqi is defined to meet the responsePrimitive format
+
+								subElemObjRoot = JSONDeepParserDec(subElemObj, subElemObjRoot, jsonRootClone);
+								jsonRootClone[AGGREGATED_RESPONSE][RESPONSE_PRIMITIVE_LIST].append(subElemObjRoot);
+							}
 						}
 					}else if(!elemObj.isObject() && !elemObj.isArray()){
 						jsonObjClone[name_long.c_str()] = elemObj;
@@ -858,7 +866,7 @@ namespace OneM2M__DualFaceMapping {
 						jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
 					}
 				}
-			}else if(jsonRoot.isArray()){
+			} else if (jsonRoot.isArray()){
 				for(unsigned int index = 0; index < jsonRoot.size(); index++){
 					elemObj = jsonRoot[index];
 					jsonObjClone = elemObj;
