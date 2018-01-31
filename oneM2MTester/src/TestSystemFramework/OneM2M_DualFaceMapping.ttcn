@@ -32,6 +32,7 @@ module OneM2M_DualFaceMapping {
 	import from oneM2MTester_Template all;
 	
 	// External functions
+	external function f_extract_from_string(in charstring p_source) return charstring;
 	external function f_primitiveContent_Dec(in charstring p_source, in charstring p_serialization_type) return charstring;
 	external function f_upper2lower(in charstring p_string) return charstring;
 
@@ -42,7 +43,8 @@ module OneM2M_DualFaceMapping {
 	external function f_split_uri(in charstring p_cs, in charstring p_delim) return Charstring_List;
 	external function f_replace(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
 	external function f_adressingFormatter(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
-
+	
+	
 	/******************************************************
 	* Function for mcaPort and mccPort encoding           *
 	*******************************************************/
@@ -158,6 +160,20 @@ module OneM2M_DualFaceMapping {
             				v_uri := v_uri & "?fu=2";  
             			}
             		}
+            		                                         
+            		if(ispresent(v_reqPrimitive.filterCriteria.labels)) {
+            		  
+            		  
+            		  	var charstring v_char_streamTest := ttcn2string(v_reqPrimitive.filterCriteria.labels);
+            		  	var charstring extracted_string := "";
+            		  	extracted_string := f_extract_from_string(v_char_streamTest);
+            		  	
+            		  	v_uri := v_uri & "&lbl=" & extracted_string;	 
+            		}
+                  	
+            		// var universal charstring temp := v_reqPrimitive.filterCriteria.labels;
+            		//	//v_uri := "&lbl=" & v_reqPrimitive.filterCriteria.labels;
+            		// }
             		
             		// Other features can be added in this branch
             	}

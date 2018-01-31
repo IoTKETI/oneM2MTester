@@ -86,6 +86,22 @@ namespace OneM2M__DualFaceMapping {
 		return s_str;
 	}
 
+	CHARSTRING f__extract__from__string(const CHARSTRING& p__string) {
+		const char* tmp_str = (const char*)p__string;
+		std::string concat_str = "";
+		std::string s(tmp_str);
+
+		for(unsigned int i = 0; i < s.length(); i++){
+			if(s[i] != '"' && s[i] != '{' && s[i] != '}' && s[i] != '\\' && s[i] != ' '){
+				concat_str = concat_str + s[i];
+			}
+		}
+
+		CHARSTRING s_str(concat_str.c_str());
+
+		return s_str;
+	}
+
 	/**
 	 * @desc Serialize oneM2M request/responsePrimitives
  	 * @p__source: primitiveContent
@@ -843,11 +859,17 @@ namespace OneM2M__DualFaceMapping {
 
 						if (parent_tag == "uRIList") { // This branch is defined for the Discovery testcases
 
-							for(unsigned int index = 0; index < elemObj.size(); index++){
-								Value subElemObjRoot  = elemObj[index];
-								jsonRootClone[parent_tag.c_str()].append(subElemObjRoot);
+							if(elemObj.size() != 0) {
+								for(unsigned int index = 0; index < elemObj.size(); index++){
+									Value subElemObjRoot = elemObj[index];
+									jsonRootClone[parent_tag.c_str()].append(subElemObjRoot);
+								}
+							} else {
+								jsonRootClone[parent_tag.c_str()] = Json::Value(Json::arrayValue);
 							}
-						} else { //This branch is defined for the group/fanout for the moment
+						}
+
+						if (parent_tag == "group_") { // This branch is defined for the group/fanout for the moment
 							for(unsigned int index = 0; index < elemObj.size(); index++){
 								Value subElemObjRoot;
 								Value subElemObj(objectValue);
