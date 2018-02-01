@@ -160,9 +160,18 @@ module OneM2M_DualFaceMapping {
             				v_uri := v_uri & "?fu=2";  
             			}
             		}
-            		                                         
+            		      
+            		if(ispresent(v_reqPrimitive.discoveryResultType)) {
+            			var integer discoveryResultTypeValue := enum2int(v_reqPrimitive.discoveryResultType);
+            			
+            			if(discoveryResultTypeValue == 1) {
+            				v_uri := v_uri & "&drt=1";  
+            			} else if(discoveryResultTypeValue == 2) {
+            				v_uri := v_uri & "&drt=2";  
+            			}	
+            		}
+            		                                   
             		if(ispresent(v_reqPrimitive.filterCriteria.labels)) {
-            		  
             		  
             		  	var charstring v_char_streamTest := ttcn2string(v_reqPrimitive.filterCriteria.labels);
             		  	var charstring extracted_string := "";
@@ -170,12 +179,16 @@ module OneM2M_DualFaceMapping {
             		  	
             		  	v_uri := v_uri & "&lbl=" & extracted_string;	 
             		}
-                  	
-            		// var universal charstring temp := v_reqPrimitive.filterCriteria.labels;
-            		//	//v_uri := "&lbl=" & v_reqPrimitive.filterCriteria.labels;
-            		// }
             		
-            		// Other features can be added in this branch
+            		if(ispresent(v_reqPrimitive.filterCriteria.expireBefore)) {
+            			var charstring expireBeforeValue := unichar2char(v_reqPrimitive.filterCriteria.expireBefore);
+            			v_uri := v_uri & "&exb=" & expireBeforeValue;  	
+            		}
+            		
+            		if(ispresent(v_reqPrimitive.filterCriteria.expireAfter)) {
+            			var charstring expireAfterValue := unichar2char(v_reqPrimitive.filterCriteria.expireAfter);
+            			v_uri := v_uri & "&exa=" & expireAfterValue;  
+            		}
             	}
               		
 				if(COAP_BINDING == v_protocol_type or HTTP_BINDING == v_protocol_type ) {	
