@@ -14,6 +14,7 @@
 module OneM2M_Functions {
 	
 	import from XSD all;
+	import from LibCommon_Time all;
 	import from OneM2M_Templates all;
 	import from OneM2M_Types all;
 	import from OneM2M_TypesAndValues all;
@@ -746,7 +747,20 @@ module OneM2M_Functions {
 				if(p_ae.running) {
 					p_ae.stop;
 				}
-					p_ae.start(f_cse_postamble_deleteResources());
+				p_ae.start(f_cse_postamble_deleteResources());
+				p_ae.done;
+			}
+			
+			/**
+			 * @desc Calls to postamble for AeSimu component (i.e. AE1) on CseSimu 
+			 * @verdict 
+			 */
+			function f_cse_postamble_ae1() runs on CseSimu {
+				if(vc_ae1.running) {
+					vc_ae1.stop;
+				}
+				vc_ae1.start(f_cse_postamble_deleteResources());
+				vc_ae1.done;
 			}
 			
 			/**
@@ -759,14 +773,16 @@ module OneM2M_Functions {
 				var RequestPrimitive v_request;
 	
 				if (PX_RUN_POSTAMBLE) {
+					
+					if(vc_config == e_cf02CseSimuMaster) {
+						f_cse_postamble_ae1();
+					};
 		
 					for(i := lengthof(vc_resourcesIndexToBeDeleted) -1; i >=0; i := i - 1) {
 			
 						v_resourceAddress := f_getResourceAddress(vc_resourcesIndexToBeDeleted[i]); 
 			
 						v_request := valueof(m_delete(v_resourceAddress, f_getOriginator(vc_resourcesIndexToBeDeleted[i],false)));
-			
-						v_request.from_ := PX_SUPER_CSE_ID;
 
 						mccPort.send(m_request(v_request));
 			
@@ -839,6 +855,37 @@ module OneM2M_Functions {
 				return v_resourceIndex;
 		
 			}
+			
+			/**
+			 * @desc Message exchange for the update of an announced resource
+			 * @param p_requestPrimitive UPDATE request primitive to be used
+			 * @verdict 
+			 */
+			function f_cse_updateAnnouncedResource(in RequestPrimitive p_requestPrimitive) runs on CseSimu {
+
+				mccPort.send(m_request(p_requestPrimitive));
+				tc_ac.start;
+				alt {
+					[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) -> value vc_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__&":INFO: Attribute of announced resource updated successfuly");
+					}
+					[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) -> value vc_response {
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Error while updating announced resource");
+					}
+					[] mccPort.receive{
+						tc_ac.stop;
+						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, __SCOPE__&":INFO: No answer while updating announced resource");
+					}
+				}	
+				
+				f_checkCseSimuStatus();
+				
+			}// end f_cse_updateAnnouncedResource
 		
 			/**
 			 * @desc Creation of the auxiliar ACP resource
@@ -1001,6 +1048,11 @@ module OneM2M_Functions {
 						tc_ac.stop;
 						setverdict(pass, testcasename() & ": Resource present: " & f_getResourceAddress(p_resourceIndex));
 						return true;
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(int4004))) {
+						tc_ac.stop;
+						setverdict(pass, testcasename() & ": Resource: " & f_getResourceAddress(p_resourceIndex) & " not found");
+						return false;
 					}
 					[] mcaPort.receive(mw_response(mw_responsePrimitive(?, -))) {
 						tc_ac.stop;
@@ -1168,7 +1220,7 @@ module OneM2M_Functions {
 						tc_ac.stop;
 						setverdict(pass, __SCOPE__&":INFO: Resource type " & int2str(enum2int(p_resourceType)) & " created successfuly");
 						f_checkAttributesToBeSaved(p_resourceType, v_request, vc_response.primitive.responsePrimitive);
-						v_resourceIndex := f_setResource(vc_response.primitive.responsePrimitive.primitiveContent, p_resourceType, vc_remoteCseIndex);
+						v_resourceIndex := f_setResource(vc_response.primitive.responsePrimitive.primitiveContent, f_getAnnouncedResourceType(p_resourceType), vc_remoteCseIndex);
 					}
 					[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
 						tc_ac.stop;
@@ -1567,15 +1619,13 @@ module OneM2M_Functions {
 				
 				/**
 				 * @desc Handling message exchange for the AE Annc update
-				 * @param p_responseStatusCode Response Status Code to be used for the response to the AE Annc request
 				 * @verdict 
 				 */
 				//TODO TO BE FINALIZED
 				function f_cse_notifyProcedure_updateHandler() runs on CseSimu {
 					// Local variables
 					var ResponsePrimitive v_responsePrimitive;
-					var template Notification v_notificationRequest := mw_contentNotification_any;
-	 
+					var template Notification v_notificationRequest := mw_contentNotification_any;	 
 
 					//Preparation of Notification response to be sent
 					v_responsePrimitive := valueof(m_responseNotification(int2004, omit));
@@ -1625,6 +1675,11 @@ module OneM2M_Functions {
 						setverdict(pass, testcasename() & ": Resource present: " & f_getResourceAddress(p_resourceIndex));
 						return true;
 					}
+					[] mccPort.receive(mw_response(mw_responsePrimitive(int4004))) {
+						tc_ac.stop;
+						setverdict(pass, testcasename() & ": Resource: " & f_getResourceAddress(p_resourceIndex) & " not found");
+						return false;
+					}
 					[] mccPort.receive(mw_response(mw_responsePrimitive(?, -))) {
 						tc_ac.stop;
 						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
@@ -1637,6 +1692,38 @@ module OneM2M_Functions {
 				}	
 				return false;
 			}	
+			
+			/**
+			 * @desc Check that a resource is not present in the IUT (resourceId is NOT known)
+			 * @param p_parentIndex Index of the parent resource of the resource to be checked
+			 * @param p_resourceName Resource name (Hierarchical method is used) of the resource to be checked
+			 * @return boolean
+			 */
+			function f_cse_isResourceNotPresent (integer p_parentIndex, XSD.String p_resourceName) runs on CseSimu return boolean {
+			
+				log(testcasename() & ":INFO: Hierarchical addressing method is required to check the non presence of the resource");
+				
+				//Check to see if the resource has NOT been created
+				mccPort.send(m_request(m_retrieve(f_getResourceAddress(p_parentIndex, e_hierarchical) & "/" & p_resourceName, f_getOriginator(p_parentIndex))));
+				tc_ac.start;
+				alt {
+					[] mccPort.receive(mw_response(mw_responsePrimitive(int4004))) {
+						tc_ac.stop;
+						setverdict(pass, testcasename() & ": Resource not present");
+						return true;
+					}
+					[] mccPort.receive(mw_response(mw_responsePrimitive(?))) {
+						tc_ac.stop;
+						setverdict(inconc, testcasename() & ": Wrong response status code in the response");
+						return false;
+					}
+					[] tc_ac.timeout {
+						setverdict(inconc, testcasename() & ": No answer while retrieving resource");
+						return false;
+					}
+				}	
+				return false;
+			}			
 	    		
 			/**
 			 * @desc Registration of Test System (simulating a CSE) to the CSE IUT (creation of remoteCSE)
@@ -1713,7 +1800,7 @@ module OneM2M_Functions {
 						v_response.primitiveContent.remoteCSE := vc_localResourcesList[vc_localRemoteCseIndex].resource.remoteCSE;
 						mccPortIn.send(m_response(v_response));
 						
-						v_resourceIndex := f_setResource(v_request.primitive.requestPrimitive.primitiveContent, int16, -1);
+						v_resourceIndex := f_setResource(valueof(m_primitiveContentRemoteCSE(m_contentMyRemoteCSEResource)), int16, -1);
 					}
 					[] mccPortIn.receive {
 						tc_ac.stop;
@@ -1725,6 +1812,9 @@ module OneM2M_Functions {
 				}	
 
 				f_checkCseSimuStatus();
+				
+				//In order for the IUT to perform some actions
+				f_sleep(10.0);
 
 				return v_resourceIndex;
     		
@@ -1862,7 +1952,23 @@ module OneM2M_Functions {
 			  * @desc	Cse altstep for config 02 on CSE1 (AE1 as master)
 			  */
 			 altstep a_cse_cf02_cse1() runs on CseSimu {
-			
+				
+				var MsgIn v_request;
+				var ResponsePrimitive v_response;
+				var PrimitiveContent v_remoteResource; //localresource
+				var integer v_localResourceIndex;
+				var integer v_resourceIndex;
+
+				[] mccPortIn.receive(mw_request(mw_create)) -> value v_request {
+					v_remoteResource := f_cse_generateLocalResource(v_request.primitive.requestPrimitive.primitiveContent, f_getResourceIndex(v_request.primitive.requestPrimitive.to_), v_request.primitive.requestPrimitive.resourceType);
+					v_localResourceIndex := f_setLocalResource(v_remoteResource, v_request.primitive.requestPrimitive.resourceType, f_getResourceIndex(v_request.primitive.requestPrimitive.to_));
+	
+					v_response := valueof(m_responsePrimitive(int2001,v_request.primitive.requestPrimitive.requestIdentifier));
+					v_response.from_ := PX_CSE1_ID;
+					v_response.to_ := v_request.primitive.requestPrimitive.from_;
+					v_response.primitiveContent := vc_localResourcesList[v_localResourceIndex].resource;
+					mccPortIn.send(m_response(v_response));
+				}
 				[] mccPortIn.receive {
 					log(__SCOPE__&": WARNING: Unexpected message received");
 					repeat;
@@ -2140,7 +2246,7 @@ module OneM2M_Functions {
 
 			p_request.requestIdentifier := valueof(p_request.requestIdentifier) & f_rnd(1, 1000000);
 			
-			if(p_resourceType != int2) {
+			if((p_resourceType != int2) and (p_resourceType != int10002)) {
 				if(p_resourceType == int16) {
 					p_request.from_ := PX_CSE1_ID;
 				} else {	
@@ -2151,6 +2257,7 @@ module OneM2M_Functions {
 					}
 				}
 			}
+			
 			p_request.to_ := f_getResourceAddress(p_parentIndex);
 
 			if (p_resourceType == int1) {//AccessControlPolicy
@@ -2275,9 +2382,15 @@ module OneM2M_Functions {
 		
 			p_request.requestIdentifier := valueof(p_request.requestIdentifier) & f_rnd(1, 1000000);
 			
-			p_request.from_ := f_getOriginator(p_resourceIndex);
-
-			p_request.to_ := f_getResourceAddress(p_resourceIndex);
+			if(p_resourceType != int10002) {
+				p_request.from_ := f_getOriginator(p_resourceIndex);
+		
+				p_request.to_ := f_getResourceAddress(p_resourceIndex);
+			} else {
+				p_request.from_ := PX_CSE1_ID & "/" & f_getResourceId(vc_resourcesList[p_resourceIndex].resource); 
+				
+				p_request.to_ := f_getResourceAddress(p_resourceIndex, -, e_spRelative);
+			}
 
 			if (p_resourceType == int3) {//Container
 
@@ -2336,6 +2449,9 @@ module OneM2M_Functions {
 			}
 			if(ischosen(p_contentResource.aE)) {
 				return f_resourceIdCleaner(p_contentResource.aE.resourceID);
+			}
+			if(ischosen(p_contentResource.aEAnnc)) {
+				return f_resourceIdCleaner(p_contentResource.aEAnnc.resourceID);
 			}
 			if(ischosen(p_contentResource.serviceSubscribedAppRule)) {
 				return f_resourceIdCleaner(p_contentResource.serviceSubscribedAppRule.resourceID);
@@ -2396,6 +2512,9 @@ module OneM2M_Functions {
 			}
 			if(ischosen(p_contentResource.aE)) {
 				return p_contentResource.aE.resourceName;
+			}
+			if(ischosen(p_contentResource.aEAnnc)) {
+				return p_contentResource.aEAnnc.resourceName;
 			}
 			if(ischosen(p_contentResource.serviceSubscribedAppRule)) {
 				return p_contentResource.serviceSubscribedAppRule.resourceName;
@@ -2921,7 +3040,7 @@ module OneM2M_Functions {
 
 			tc_ac.start(15.0);
 			alt {
-				[] p_ae.done {
+				[] p_ae.done { //-> value v_verdict {
 					tc_ac.stop;
 				}
 				[] tc_ac.timeout {
@@ -2954,10 +3073,13 @@ module OneM2M_Functions {
 				if(vc_config == e_cf03) {
 				  f_cf03Down();
 				  stop;
-			   } else if (vc_config ==e_cf04) {
+			   	} else if (vc_config ==e_cf04) {
 				  f_cf04Down();
 				  stop;
-			   }
+				} else if (vc_config == e_cf02CseSimuMaster) {
+					f_cf02DownCseSimuMaster();
+					stop;
+				}
 			}
 		}
 		

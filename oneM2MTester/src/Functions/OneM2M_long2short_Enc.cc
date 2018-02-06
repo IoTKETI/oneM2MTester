@@ -802,7 +802,7 @@ namespace OneM2M__DualFaceMapping {
 	CHARSTRING f__primitiveContent__Dec(const CHARSTRING& source_str, const CHARSTRING& serial_type){
 
 		if(!initial_mapping()){
-			TTCN_Logger::log(TTCN_DEBUG, "\n[WARNING]oneM2M lon&short mapping initialization failed!!\n\n");
+			TTCN_Logger::log(TTCN_DEBUG, "\n[WARNING]oneM2M long&short mapping initialization failed!!\n\n");
 		}
 
 		CHARSTRING encoded_message	= "";
@@ -838,7 +838,7 @@ namespace OneM2M__DualFaceMapping {
 				return "JsonCPP API parsing error!";
 			}
 
-			TTCN_Logger::log(TTCN_DEBUG, "[Decoding] Read Json document for decoding:\n%s", jsonRoot.toStyledString().c_str());
+			TTCN_Logger::log(TTCN_DEBUG, "[Decoding] Read JSON document for decoding:\n%s", jsonRoot.toStyledString().c_str());
 
 			if(jsonRoot.isObject()){
 
@@ -856,7 +856,6 @@ namespace OneM2M__DualFaceMapping {
 					parent_tag = name_long;
 
 					if(elemObj.isArray()){
-
 						if (parent_tag == "uRIList") { // This branch is defined for the Discovery testcases
 
 							if(elemObj.size() != 0) {
@@ -868,24 +867,30 @@ namespace OneM2M__DualFaceMapping {
 								jsonRootClone[parent_tag.c_str()] = Json::Value(Json::arrayValue);
 							}
 						}
+					}else if(!elemObj.isObject() && !elemObj.isArray()){
+						jsonObjClone[name_long.c_str()] = elemObj;
+					}else if(elemObj.isObject()){
 
-						if (parent_tag == "group_") { // This branch is defined for the group/fanout for the moment
-							for(unsigned int index = 0; index < elemObj.size(); index++){
+						// This branch is defined for the group/fanout
+						if (parent_tag == "aggregatedResponse") {
+
+							Value responseArray(objectValue);
+							responseArray = elemObj["m2m:rsp"];
+
+							for(unsigned int index = 0; index < responseArray.size(); index++){
 								Value subElemObjRoot;
 								Value subElemObj(objectValue);
-								subElemObj = elemObj[index]; // Extracting the one of Element from JSON Array.
+								subElemObj = responseArray[index]; // Extracting the one of Element from JSON Array.
 
 								subElemObj[REQUEST_IDENTIFIER] = "temp_requestIdentifier"; // rqi is defined to meet the responsePrimitive format
 
 								subElemObjRoot = JSONDeepParserDec(subElemObj, subElemObjRoot, jsonRootClone);
 								jsonRootClone[AGGREGATED_RESPONSE][RESPONSE_PRIMITIVE_LIST].append(subElemObjRoot);
 							}
+						} else {
+							jsonObjClone[parent_tag.c_str()] = elemObj;
+							jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
 						}
-					}else if(!elemObj.isObject() && !elemObj.isArray()){
-						jsonObjClone[name_long.c_str()] = elemObj;
-					}else if(elemObj.isObject()){
-						jsonObjClone[parent_tag.c_str()] = elemObj;
-						jsonRootClone = JSONDeepParserDec(jsonObjClone, jsonRootClone, jsonRootClone);
 					}
 				}
 			} else if (jsonRoot.isArray()){

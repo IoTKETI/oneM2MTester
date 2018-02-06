@@ -233,6 +233,17 @@ module OneM2M_Templates {
 			/**
 			  * @desc RETRIEVE request primtive containing the Filter Criteria in the filterCriteria field
 			  * @param p_targetResourceAddress Target resource address 
+			  * @param p_filterCriteria FilterCriteria
+			  * @param p_originator Originator (from)
+			 */
+			template (value) RequestPrimitive m_retrieveFilterCriteria(XSD.ID p_targetResourceAddress, in XSD.ID p_originator, in template (value) FilterCriteria p_filterCriteria) modifies m_retrieve := {
+				requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
+				filterCriteria := p_filterCriteria
+			};
+			
+			/**
+			  * @desc RETRIEVE request primtive containing the Filter Criteria in the filterCriteria field
+			  * @param p_targetResourceAddress Target resource address 
 			  * @param p_originator Originator (from)
 			  * @param p_filterUsage FilterUsage
 			  * @param p_labels Labels
@@ -289,32 +300,56 @@ module OneM2M_Templates {
 			};
 			
 			/**
-				  * @desc RETRIEVE request primtive containing the Discovery Type in the discoveryResultType field and Filter Criteria in the filterCriteria field
-				  * @param p_targetResourceAddress Target resource address 
-				  * @param p_filterCriteria FilterCriteria
-				  * @param p_originator Originator (from)
-				 */
-				template (value) RequestPrimitive m_retrieveInvalidFormatOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_retrieve := {
-					requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
-					filterCriteria := {
-						createdBefore := omit,
-						createdAfter := omit,
-						modifiedSince := omit,
-						unmodifiedSince := omit,
-						stateTagSmaller := omit,
-						stateTagBigger := omit,
-						expireBefore := omit,
-						expireAfter := omit,
-						labels := omit,
-						resourceType := omit,
-						sizeAbove := omit,
-						sizeBelow := omit,
-						contentType_list := {},
-						attribute_list := {},
-						filterUsage := omit,
-						limit := omit
-					}
-				};
+			  * @desc RETRIEVE request primtive containing the Discovery Type in the discoveryResultType field and Filter Criteria in the filterCriteria field
+			  * @param p_targetResourceAddress Target resource address 
+			  * @param p_filterCriteria FilterCriteria
+			  * @param p_originator Originator (from)
+			 */
+			template (value) RequestPrimitive m_retrieveInvalidFormatOption(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_retrieve := {
+				requestIdentifier := "m_retrieveResourceFilterUsageOption" & f_rnd(1, 1000000),
+				filterCriteria := {
+					createdBefore := omit,
+					createdAfter := omit,
+					modifiedSince := omit,
+					unmodifiedSince := omit,
+					stateTagSmaller := omit,
+					stateTagBigger := omit,
+					expireBefore := omit,
+					expireAfter := omit,
+					labels := omit,
+					resourceType := omit,
+					sizeAbove := omit,
+					sizeBelow := omit,
+					contentType_list := {},
+					attribute_list := {},
+					filterUsage := omit,
+					limit := omit
+				}
+			};
+			
+			/**
+			  * @desc FilterCriteria empty template
+			 */
+			template (value) FilterCriteria m_filterCriteria := {
+				createdBefore := omit,
+				createdAfter := omit,
+				modifiedSince := omit,
+				unmodifiedSince := omit,
+				stateTagSmaller := omit,
+				stateTagBigger := omit,
+				expireBefore := omit,
+				expireAfter := omit,
+				labels := omit,
+				resourceType := omit,
+				sizeAbove := omit,
+				sizeBelow := omit,
+				contentType_list := {},
+				attribute_list := {},
+				filterUsage := omit,
+				limit := omit
+			}
+			
+			
 			
 		}//end group Retrieve
 
@@ -372,7 +407,6 @@ module OneM2M_Templates {
 				requestIdentifier := "m_updateAe",
 				primitiveContent:= {aE := m_contentUpdateAe}
 			};
-			
 						
 			/**
 			 * @desc Reception template for update Ae resource
@@ -476,15 +510,10 @@ module OneM2M_Templates {
 			   primitiveContent := {remoteCSE := m_contentUpdateRemoteCSE}
 			}
         	
-			template (value) RequestPrimitive m_updateAE modifies m_update := {
-				requestIdentifier := "m_updateAE",
-				primitiveContent := {aE := m_contentUpdateAe}
-			}
-        	
-			template (value) RequestPrimitive m_updateAEAnnc(template (omit) AcpType p_accessControlPolicyIds := omit, template (omit) XSD.ID p_to := omit, template (omit) XSD.ID p_from := omit, XSD.ID p_appId, XSD.ID p_stemId := "") modifies m_update:= {
+			template (value) RequestPrimitive m_updateAEAnncBase modifies m_update:= {
 				requestIdentifier := testcasename() & "-m_updateAEAnnc",
 				resourceType := int10002,
-				primitiveContent := {aEAnnc := m_contentUpdateAEAnnc(p_appId,p_stemId)}
+				primitiveContent := {aEAnnc := m_contentUpdateAEAnnc}
 			};
 		}//end group Update
     	
@@ -556,7 +585,7 @@ module OneM2M_Templates {
 			/**
 			 * @desc Reception template for CREATE AEAnnc
 			 */
-			template RequestPrimitive mw_createAEAnnc(template (omit) XSD.ID p_from := omit, template (omit) XSD.ID p_to := omit, template (omit) AcpType p_accessControlPolicyIds := omit) modifies mw_create := {
+			template RequestPrimitive mw_createAEAnnc(template (omit) XSD.ID p_from := omit, template (omit) XSD.ID p_to := omit, template (omit) AcpType p_accessControlPolicyIds := omit, template XSD.AnyURI p_link := ?) modifies mw_create := {
 				resourceType := int10002,
 				primitiveContent := {aEAnnc := mw_contentCreateAEAnnc({"Credential-ID:None"}, p_accessControlPolicyIds)}
 			};
@@ -1220,7 +1249,7 @@ module OneM2M_Templates {
 			lastModifiedTime := omit,//NP
 			labels := p_labels,//O
 			accessControlPolicyIDs := p_accessControlPolicyIds,//O
-			expirationTime := omit,//O
+			expirationTime := "20301231T012345",//O
 			link := p_link,//M TODO Put the right value
 			appName := omit,//O
 			app_ID := p_appId,//M
@@ -1240,7 +1269,7 @@ module OneM2M_Templates {
 		 * @param p_appId App ID
 		 * @param p_nodeLink Node link
 		 */
-		template AEAnnc_optional mw_contentCreateAEAnnc (in template  Labels p_labels := ?, in template AcpType p_accessControlPolicyIds := ?) := {
+		template AEAnnc_optional mw_contentCreateAEAnnc (in template  Labels p_labels := ?, in template AcpType p_accessControlPolicyIds := ?, template XSD.AnyURI p_link := ?) := {
 			resourceName := omit,//NA M
 			resourceType := omit,//NA M
 			resourceID := omit,//NA M
@@ -1250,7 +1279,7 @@ module OneM2M_Templates {
 			labels := p_labels,//MA
 			accessControlPolicyIDs := p_accessControlPolicyIds,//MA
 			expirationTime := ?,//MA M
-			link := ?,//M
+			link := p_link,//M
 			appName := omit,//OA
 			app_ID := omit,//OA
 			aE_ID := omit,//OA
@@ -1312,7 +1341,7 @@ module OneM2M_Templates {
 				accessControlRule_list := {valueof(m_createAcr(p_acor, p_allowedOperations))}
 			},//M
 			selfPrivileges := {
-				accessControlRule_list := {valueof(m_createAcr({"all"}, int63))}
+				accessControlRule_list := {valueof(m_createAcr(p_acor, int63))}
 			},//M
 			choice := omit //NP
 		};
@@ -2363,7 +2392,7 @@ module OneM2M_Templates {
 			choice := omit
 		}
     	
-		template (value) AEAnnc_optional m_contentUpdateAEAnnc (template (omit) XSD.ID p_appId := omit, template (omit) XSD.ID p_stemId := omit) := {
+		template (value) AEAnnc_optional m_contentUpdateAEAnnc := {
 			resourceName := omit,
 			resourceType := omit,
 			resourceID := omit,
@@ -2375,7 +2404,7 @@ module OneM2M_Templates {
 			expirationTime := omit,
 			link := omit,
 			appName := omit,
-			app_ID := p_appId,
+			app_ID := omit,
 			aE_ID := omit,
 			pointOfAccess := omit,
 			ontologyRef := omit,
@@ -2830,6 +2859,16 @@ module OneM2M_Templates {
 			requestReachability := omit,//M
 			nodeLink := omit,//O
 			choice := omit//O
+		};
+		
+		template RemoteCSE_optional m_contentMyRemoteCSEResource modifies m_contentRemoteCSE_allOmit := {
+			resourceName := PX_CSE1_NAME,//M
+			resourceType := int16,//M
+			resourceID := PX_CSE1_RESOURCE_ID,//M
+			pointOfAccess := {PX_CSE1_ADDRESS},//O
+			cSEBase := PX_CSE1_NAME,//M
+			cSE_ID := PX_CSE1_ID,//M
+			requestReachability := true//M
 		};
 		
 		template RemoteCSE_optional mw_contentRemoteCSEBase := {
