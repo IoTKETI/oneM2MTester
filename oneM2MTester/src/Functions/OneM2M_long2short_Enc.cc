@@ -871,7 +871,7 @@ namespace OneM2M__DualFaceMapping {
 						jsonObjClone[name_long.c_str()] = elemObj;
 					}else if(elemObj.isObject()){
 
-						// This branch is defined for the group/fanout
+						// This branch is defined for the group and fanout
 						if (parent_tag == "aggregatedResponse") {
 
 							Value responseArray(objectValue);
@@ -1059,7 +1059,6 @@ namespace OneM2M__DualFaceMapping {
 							}
 							
 							if(grandelemObj.isArray()){
-								
 								Value elemArrayObj(arrayValue);
 
 								for(unsigned int index = 0; index < grandelemObj.size(); index++){
@@ -1104,6 +1103,7 @@ namespace OneM2M__DualFaceMapping {
 							tempObj = subelemObj[index];
 							
 							if(tempObj.isString()){
+
 								elemArrayObj.append(tempObj.asString());
 							}else if(tempObj.isBool()){
 								elemArrayObj.append(tempObj.asBool());
@@ -1117,6 +1117,8 @@ namespace OneM2M__DualFaceMapping {
 							}else if(tempObj.isObject()){
 								tempObjClone = JSONDeepParserDec(tempObj, tempObjClone, subObjClone);
 								elemArrayObj.append(tempObjClone);								
+							} else {
+								TTCN_Logger::log(TTCN_DEBUG, "Unexpected flow");
 							}
 							elemObjClone[parent_tag.c_str()] = elemArrayObj;
 						}
@@ -1185,6 +1187,23 @@ namespace OneM2M__DualFaceMapping {
 							jsonObjClone[SUBSCRIPTION][EVENT_NOTIFICATION_CRITERIA] = eventNotiItemElem;
 						}
 					}
+				}
+			}
+		}
+
+		if((root_name_element.asString()).compare("group_") == 0) {
+
+			Value elemObj = jsonObjClone.get(root_name_element.asString(), "");
+
+			for (Value::iterator iter = elemObj.begin(); iter != elemObj.end(); iter++) {
+
+				Value elemKey = iter.key();
+				Value eventNotiItemElem = elemObj.get(elemKey.asString(), "");
+
+				if((elemKey.asString()).compare("membersAccessControlPolicyIDs") == 0) {
+					Json::Value emptyArray_for_om;
+					emptyArray_for_om.append("temp");
+					jsonObjClone["group_"]["membersAccessControlPolicyIDs"] = emptyArray_for_om;
 				}
 			}
 		}

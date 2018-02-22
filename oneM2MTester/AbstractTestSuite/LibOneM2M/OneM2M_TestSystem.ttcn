@@ -17,6 +17,10 @@ module OneM2M_TestSystem {
 	import from LibCommon_Time all;
 	import from OneM2M_Ports all;
 	import from OneM2M_Pixits all;
+	
+	//@JaeYoung, These are added for the translation port
+	import from IPL4asp_PortType all;
+	import from IPL4asp_Types all;
 
 /* ***************************************
  * 		Test System Components 
@@ -62,9 +66,9 @@ module OneM2M_TestSystem {
 		//global variables
 		var MyResourcesList vc_localResourcesList := {};
 		var AeSimu vc_ae1;//For CF02 when CseSimu is master
-		var integer vc_remoteCseIndex;
-		var integer vc_localRemoteCseIndex;
-		var integer vc_cSEBaseIndex;	//Index of the CSEBase resource of the Tester inside vc_localResourcesList
+		var integer vc_remoteCseIndex := -1;
+		var integer vc_localRemoteCseIndex := -1;
+		var integer vc_cSEBaseIndex := -1;	//Index of the CSEBase resource of the Tester inside vc_localResourcesList
 	};
 	
 	type component InCseSimu extends CseSimu {}
@@ -72,18 +76,35 @@ module OneM2M_TestSystem {
 	type component MnCseSimu extends CseSimu {}
 			
 	type component CseSystem {
-		port OneM2MPort mcaPort;
-		port OneM2MPort mcaPortIn;
-		port OneM2MPort mccPort;
-		port OneM2MPort mccPortIn;
+		//port OneM2MPort mcaPort;
+		//port OneM2MPort mcaPortIn;
+		//port OneM2MPort mccPort;
+		//port OneM2MPort mccPortIn;
+		//port AdapterControlPort acPort;
+		//port UpperTesterPort utPort;
+		
+		//@JaeYoung, These are added and modified for the translation port
+		port IPL4asp_PT mcaPort;
+		port IPL4asp_PT mcaPortIn;
+		port IPL4asp_PT mccPort;
+		port IPL4asp_PT mccPortIn;
+		port IPL4asp_PT utPort;
 		port AdapterControlPort acPort;
 	}	
 	
 	type component AeSystem {
-		port OneM2MPort mcaPort;
-		port OneM2MPort mcaPortIn;
+		//port OneM2MPort mcaPort;
+		//port OneM2MPort mcaPortIn;
+		//port AdapterControlPort acPort;
+		//port UpperTesterPort utPort;
+		
+		//@JaeYoung, These are added and modified for the translation port
+		port IPL4asp_PT mcaPort;
+		port IPL4asp_PT mcaPortIn;
+		port IPL4asp_PT mccPort;
+		port IPL4asp_PT mccPortIn;
+		port IPL4asp_PT utPort;
 		port AdapterControlPort acPort;
-		port UpperTesterPort utPort;
 	}		
 	
 			

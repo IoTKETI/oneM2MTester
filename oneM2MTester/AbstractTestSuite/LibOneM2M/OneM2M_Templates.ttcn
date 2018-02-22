@@ -76,16 +76,18 @@ module OneM2M_Templates {
 			forcedFields := p_forcedFields
 		};
 		
-		template MsgIn mw_request(in template (present) RequestPrimitive p_requestPrimitive) := {
-			primitive := { requestPrimitive := p_requestPrimitive}
+		template MsgIn mw_request(in template (present) RequestPrimitive p_requestPrimitive, template AttributeList_1 p_nullFields := *) := {
+			primitive := { requestPrimitive := p_requestPrimitive}, 
+			nullFields := p_nullFields
 		};
     	
 		/** 
 		 * @desc Base template for response receiving operations
 		 * @param p_responsePrimitive
 		 */
-		template MsgIn mw_response(in template (present) ResponsePrimitive p_responsePrimitive := ?) := {
-			primitive := { responsePrimitive := p_responsePrimitive}
+		template MsgIn mw_response(in template (present) ResponsePrimitive p_responsePrimitive := ?, template AttributeList_1 p_nullFields := *) := {
+			primitive := { responsePrimitive := p_responsePrimitive}, 
+			nullFields := p_nullFields
 		};
     	
 	}//end of group primitives
@@ -125,7 +127,7 @@ module OneM2M_Templates {
 			 * @desc Base Receive RETRIEVE request primitive
 			 * @param p_targetResourceAddress Target resource address
 			 */
-			template RequestPrimitive mw_retrieve(XSD.ID p_targetResourceAddress) := {
+			template RequestPrimitive mw_retrieve(template XSD.ID p_targetResourceAddress) := {
 				operation := int2,
 				to_ := p_targetResourceAddress,
 				from_ := ?,
@@ -383,7 +385,7 @@ module OneM2M_Templates {
 				to_ := p_to,
 				from_ := p_from,
 				requestIdentifier := ?,
-				resourceType := ?,
+				resourceType := omit,
 				primitiveContent:= ?,
 				role := *, 
 				originatingTimestamp := *,
@@ -585,7 +587,7 @@ module OneM2M_Templates {
 			/**
 			 * @desc Reception template for CREATE AEAnnc
 			 */
-			template RequestPrimitive mw_createAEAnnc(template (omit) XSD.ID p_from := omit, template (omit) XSD.ID p_to := omit, template (omit) AcpType p_accessControlPolicyIds := omit, template XSD.AnyURI p_link := ?) modifies mw_create := {
+			template RequestPrimitive mw_createAEAnnc(template XSD.ID p_from := ?, template XSD.ID p_to := ?, template AcpType p_accessControlPolicyIds := ?, template XSD.AnyURI p_link := ?) modifies mw_create := {
 				resourceType := int10002,
 				primitiveContent := {aEAnnc := mw_contentCreateAEAnnc({"Credential-ID:None"}, p_accessControlPolicyIds)}
 			};
@@ -916,7 +918,7 @@ module OneM2M_Templates {
 			template (value) RequestPrimitive m_createScheduleBase modifies m_create := {
 				requestIdentifier := testcasename() & "-m_createSchedule",
 				resourceType := int18,
-				primitiveContent := {schedule := m_contentCreateSchedule ({{"0 0 0,1,2 1 1 * *"}})}
+				primitiveContent := {schedule := m_contentCreateSchedule ({{"0 0 0,1,2 1 1 *"}})}
 			};
         	
 			template (value) RequestPrimitive m_createSchedule(XSD.ID p_parentResourceAddress, in template (omit)  XSD.String p_name, in template (value) ScheduleEntries p_scheduleElement ) modifies m_create := {
@@ -1280,15 +1282,15 @@ module OneM2M_Templates {
 			accessControlPolicyIDs := p_accessControlPolicyIds,//MA
 			expirationTime := ?,//MA M
 			link := p_link,//M
-			appName := omit,//OA
-			app_ID := omit,//OA
-			aE_ID := omit,//OA
-			pointOfAccess := omit, //OA {"http://127.0.0.1:1400/monitor"},//O //{"http://192.168.1.92:18080/notifications/AE"}, // TODO: Check this => AE PoA
-			ontologyRef := omit,//OA
-			nodeLink := omit,//OA
-			requestReachability := omit,//OA
-			contentSerialization := omit,//OA
-			choice := omit//NA
+			appName := *,//OA
+			app_ID := *,//OA
+			aE_ID := *,//OA
+			pointOfAccess := *, //OA {"http://127.0.0.1:1400/monitor"},//O //{"http://192.168.1.92:18080/notifications/AE"}, // TODO: Check this => AE PoA
+			ontologyRef := *,//OA
+			nodeLink := *,//OA
+			requestReachability := *,//OA
+			contentSerialization := *,//OA
+			choice := *//NA
 		};	
 		
 		/**
@@ -2866,7 +2868,7 @@ module OneM2M_Templates {
 			resourceType := int16,//M
 			resourceID := PX_CSE1_RESOURCE_ID,//M
 			pointOfAccess := {PX_CSE1_ADDRESS},//O
-			cSEBase := PX_CSE1_NAME,//M
+			cSEBase := PX_CSE1_ID & "/" & PX_CSE1_NAME,//M
 			cSE_ID := PX_CSE1_ID,//M
 			requestReachability := true//M
 		};
@@ -3409,7 +3411,7 @@ module OneM2M_Templates {
 			resourceName := ?,//M
 			resourceType := ?,//M
 			resourceID := ?,//M
-			parentID := ?,//M
+			parentID := omit,//M
 			creationTime := ?,//M
 			lastModifiedTime := ?,//M
 			labels := *,//O

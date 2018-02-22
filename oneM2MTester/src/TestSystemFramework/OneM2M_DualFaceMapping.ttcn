@@ -93,12 +93,12 @@ module OneM2M_DualFaceMapping {
 						log(__SCOPE__&"-Input Forced Fields: ", p_msgout.forcedFields); 
 					}	
 					
-    		    	var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
+    		    	/* var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
                   
                 	if(v_bit_stream != ''B) {
                   		var charstring v_char_streamTest := oct2char(bit2oct(v_bit_stream));
                     	log(__SCOPE__&" v_char_streamTest ", v_char_streamTest);
-                  	}    		        		    
+                  	} */   		        		    
     			}
 		  
 				//operation attribute
@@ -400,13 +400,14 @@ module OneM2M_DualFaceMapping {
 		  		p_asp_Send.proto 	:= {udp := {}};
 			}
 			p_asp_Send.msg 	:= v_encoded_msg; 
-      	}//if_msg_primitive      
+      	}//if_msg_primitive
+      	port.setstate(0);      
 	} with {extension "prototype(fast)"} // End of Function
 
 	/******************************************************
 	* Function for mcaPort and mccPort decoding           *
 	*******************************************************/
-	function f_dec_ASPRecvFrom_to_M2MPrimitive(in ASP_RecvFrom p_aspRecvFrom, out MsgIn p_msgin) return integer {
+	function f_dec_ASPRecvFrom_to_M2MPrimitive(in ASP_RecvFrom p_aspRecvFrom, out MsgIn p_msgin) {
 		var MsgIn v_msgIn;	
   		var ResponsePrimitive v_responsePrimitive;  
   		var ResponseStatusCode v_responseStatusCode;
@@ -458,7 +459,7 @@ module OneM2M_DualFaceMapping {
                		  	  	if(ispresent(v_httpResp.header)){
                		  	  		v_headerLines 	:= v_httpResp.header;
                		  	  	} else {
-               		  	  	  return 1;
+               		  	  		port.setstate(1);
                		  	  	}
                		  	  	
                		  	  	if(ispresent(v_httpResp.body)){
@@ -478,7 +479,7 @@ module OneM2M_DualFaceMapping {
                		  	  	if(ispresent(v_httpResq.header)){
                		  	  		v_headerLines 	:= v_httpResq.header;
                		  	  	} else {
-               		  	  	  return 1;
+               		  	  		port.setstate(1);
                		  	  	}
                		  	  	
                		  	  	if(ispresent(v_httpResq.body)){
@@ -674,7 +675,7 @@ module OneM2M_DualFaceMapping {
   				  	v_responsePrimitive.primitiveContent := omit;
   				}      	  
       		} else {
-      	  		return 1;
+      	  		port.setstate(1);
       		}
       	
       		//set response or request attribute 	
@@ -688,6 +689,7 @@ module OneM2M_DualFaceMapping {
       		
       			//set MsgIn
 				v_msgIn.primitive.responsePrimitive := v_responsePrimitive;
+				v_msgIn.nullFields := omit;
 				p_msgin := v_msgIn;
       		} else {
       		  	log(__SCOPE__&"-Setting the request message");
@@ -716,11 +718,11 @@ module OneM2M_DualFaceMapping {
 				v_msgIn.primitive.requestPrimitive := v_requestPrimitive;
 				p_msgin := v_msgIn; 
       		}
-			return 0;
+			port.setstate(0);
   		} else {
-    		return 1;
+    		port.setstate(1);
 		}
-	} with {extension "prototype(backtrack)"} // End of Function
+	} with {extension "prototype(fast)"} // End of Function
 	
 	/******************************************************
 	* Function for utPort encoding                        *
@@ -807,7 +809,7 @@ module OneM2M_DualFaceMapping {
 	/******************************************************
 	* Function for utPort decoding                        *
 	*******************************************************/
-	function f_dec_ASPRecvFrom_to_M2MPrimitive_for_trigger(in ASP_RecvFrom p_aspRecvFrom, out UtTriggerAckPrimitive p_msgin) return integer {
+	function f_dec_ASPRecvFrom_to_M2MPrimitive_for_trigger(in ASP_RecvFrom p_aspRecvFrom, out UtTriggerAckPrimitive p_msgin) {
     	
   		var octetstring v_aspRecv_msg;  
   		var UtTriggerAckPrimitive v_msgIn;
@@ -839,7 +841,7 @@ module OneM2M_DualFaceMapping {
                		if(ispresent(v_httpResp.header)){ // Parsing HTTP headers
                			v_headerLines 	:= v_httpResp.header;
                		} else {
-               			return 1;
+               			port.setstate(1);
                		}
                		  	  	
                		if(ispresent(v_httpResp.body)){ // Parsing HTTP body
@@ -901,9 +903,13 @@ module OneM2M_DualFaceMapping {
 		
 		p_msgin := v_msgIn;
 		
-		return 0;
-  	} with {extension "prototype(backtrack)"}
+		port.setstate(0);
+  	} with {extension "prototype(fast)"}
   	
+  	function f_discardASPEvent(in ASP_Event p_aspEventIn, out ASP_Event p_aspEventOut) {
+		port.setstate(2);
+	} with {extension "prototype(fast)"}
+	
   	function f_applyForcedAttribute(PrimitiveContent p_contentResource, AttributeAux_list p_forcedFields) return PrimitiveContent {
 					
 		if(ischosen(p_contentResource.accessControlPolicy)) {

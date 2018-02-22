@@ -1795,8 +1795,12 @@ module OneM2M_PermutationFunctions {
     					
 						if(ispresent(p_parentRequestPrimitive)) {
 							if(match(int23, p_parentRequestPrimitive.resourceType)){
-								vc_ae2.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, v_poaList), -1)); // AE2 is registred
-								vc_ae2.done;
+								vc_ae2.start(f_cse_preamble_createAcpAux("SubscriptionVerificationAcp", int63));
+								f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
+								
+								vc_ae2.start(f_cse_createResource_withAcpAux(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, v_poaList), -1)); // AE2 is registred
+								f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
+								
 								v_ae2Index := f_getResource(vc_ae2);
 								p_parentRequestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae2Index)};
 								vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
@@ -1830,8 +1834,10 @@ module OneM2M_PermutationFunctions {
 						// Test Body
     					
 						if(match(int23, p_requestPrimitive.resourceType)){
-							vc_ae2.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, v_poaList), -1)); // AE2 is registred
-							vc_ae2.done;
+							vc_ae2.start(f_cse_preamble_createAcpAux("SubscriptionVerificationAcp", int63));
+							f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
+							vc_ae2.start(f_cse_createResource_withAcpAux(int2, m_createAe(PX_APP_ID, -, PX_AE2_ID_STEM, c_defaultAE2Name, v_poaList), -1)); // AE2 is registred
+							f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 							v_ae2Index := f_getResource(vc_ae2);
 							p_requestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae2Index)}; 
 							vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
@@ -1902,8 +1908,10 @@ module OneM2M_PermutationFunctions {
 							vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
 							
     						if(match(int23, p_resourceType)){
-								vc_ae1.start(f_cse_createResource(int2, m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM, "MyAe", v_poaList), -1)); // AE1 is registered
-								vc_ae1.done;
+    							vc_ae1.start(f_cse_preamble_createAcpAux("SubscriptionVerificationAcp", int63));
+								f_cseSimu_checkComponentDoneAndGetVerdict(vc_ae1);
+								vc_ae1.start(f_cse_createResource_withAcpAux(int2, m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM, "MyAe", v_poaList), -1)); // AE1 is registered
+								f_cseSimu_checkComponentDoneAndGetVerdict(vc_ae1);
 								v_ae1Index := f_getResource(vc_ae1);
 								p_requestPrimitive.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae1Index)}; 
 								vc_ae1.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
@@ -1938,7 +1946,7 @@ module OneM2M_PermutationFunctions {
 							f_checkCseSimuStatus();
     								
 							//Check to see if the resource is present or not
-							if (f_isResourcePresentCseSimu(v_resourceIndex)){
+							if (f_cse_isResourcePresent(v_resourceIndex)){
 								setverdict(pass, __SCOPE__ & ":INFO: Resource created");
 							} else {
 								setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
@@ -2041,13 +2049,14 @@ module OneM2M_PermutationFunctions {
 						
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 	
 						
-						if(p_resourceType == int23){
-							//vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
-						}
-						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);			
+						v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestPrimitive, v_aeIndex);
   					    						    									
 						// Test Body
 						v_request.requestIdentifier := "Existing resource";
+						
+						if(p_resourceType == int23){
+							vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());
+						}
     					
 						mcaPort.send(m_request(v_request));
 						tc_ac.start;
@@ -2672,7 +2681,7 @@ module OneM2M_PermutationFunctions {
 						}	
 						vc_cse1.done;						
 						
-						vc_cse1.start(f_cse_resourceAnnouncementHandler());						
+						vc_cse1.start(f_cse_announcementProcedure_createHandler());						
 						v_resourceIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, omit));						
 						vc_cse1.done;
 		
@@ -2791,16 +2800,17 @@ module OneM2M_PermutationFunctions {
 						// Test adapter configuration
     				
 						// Preamble
-						v_acpAuxIndex := f_cse_preamble_createAcpAux(-, -);//c_CRUDNDi)
+						if(p_resourceType != int1) {
+							v_acpAuxIndex := f_cse_preamble_createAcpAux(-, int61);//c_CRUDNDi)
+							p_requestPrimitive := f_setAcpId(p_requestPrimitive, {f_getResourceId(vc_resourcesList[v_acpAuxIndex].resource)});
+						}
 						
-						v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpAuxIndex].resource)});//c_CRUDNDi;
+						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi;
 						
 						f_cse_preamble_subscriptionVerification(v_ae2Index, p_requestPrimitive, p_resourceType);
 										
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_requestPrimitive, v_aeIndex); 	
 
-						f_cse_updateAcpAuxResource(int61); //c_CUDNDi
-								
 						// Test Body
 						mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 
@@ -4323,60 +4333,6 @@ module OneM2M_PermutationFunctions {
     					    				
 					}//end f_CSE_DMR_UPD_004
     				
-					function f_CSE_DMR_UPD_005(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
-    				
-						// Local variables
-						var MsgIn v_response;
-						var RequestPrimitive v_request;
-						var integer v_aeIndex := -1;
-						var integer v_ae2Index := -1;
-						var integer v_resourceIndex := -1;
-											   
-						// Test control
-    				
-						// Test component configuration
-						f_cf01Up(true);
-    				
-						// Test adapter configuration
-    				
-						// Preamble
-						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-						
-						f_cse_preamble_subscriptionVerification(v_ae2Index, p_createRequestPrimitive, p_resourceType);
-						
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive , v_aeIndex);
-
-						// Test Body
-						v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_updateRequestPrimitive);
-
-						mcaPort.send(m_request(v_request));
-						tc_ac.start;
-						alt {
-							[] mcaPort.receive(mw_response(mw_responsePrimitive(int4004))) -> value v_response {
-								tc_ac.stop;
-								setverdict(pass, __SCOPE__ & ": Resource " & c_defaultResourceName & " of type " & int2str(enum2int(p_resourceType)) & " not found");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Wrong response status code");
-							}
-							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
-								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Error while updating an unexisting resource type " & int2str(enum2int(p_resourceType)));
-							}
-							[] tc_ac.timeout {
-								setverdict(fail, __SCOPE__ & ": No answer while updating resource type " & int2str(enum2int(p_resourceType)));
-							}
-						}	
-    								
-						// Postamble
-						f_cse_postamble_deleteResources();
-						
-						// Tear down
-						f_cf01Down();
-    					    				
-					}//end f_CSE_DMR_UPD_005
-    				
 					function f_CSE_DMR_UPD_006(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
     				
 						// Local variables
@@ -4552,38 +4508,39 @@ module OneM2M_PermutationFunctions {
     					    				
 					}//end f_CSE_DMR_UPD_008
 					
-					function f_CSE_DMR_UPD_009(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive, template (omit) AttributeAux_list p_nullFields := omit) runs on AeSimu {
+					function f_CSE_DMR_UPD_009(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
 	    				
 						// Local variables
 						var MsgIn v_response;
 						var RequestPrimitive v_request;
 						var integer v_aeIndex := -1;
-						var integer v_resourceIndex := -1;
 						var integer v_ae2Index := -1;
-							   
+						var integer v_resourceIndex := -1;
+												   
 						// Test control
-	
+	    				
 						// Test component configuration
 						f_cf01Up(true);
-	
+	    				
 						// Test adapter configuration
-	
+	    				
 						// Preamble
 						v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
-		
+							
 						f_cse_preamble_subscriptionVerification(v_ae2Index, p_createRequestPrimitive, p_resourceType);
-		
-						v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive, v_aeIndex); 				
-												
+							
+						v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive , v_aeIndex);
+	
 						// Test Body
 						v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_updateRequestPrimitive);
-		
+	
 						mcaPort.send(m_request(v_request));
+						
 						tc_ac.start;
 						alt {
-							[] mcaPort.receive(mw_response(mw_responsePrimitive(int4102))) -> value v_response {
+							[] mcaPort.receive(mw_response(mw_responsePrimitive(int4000))) -> value v_response {
 								tc_ac.stop;
-								setverdict(pass, __SCOPE__ & ": Operation not allowed. Attribute not updated with an unacceptable value");
+								setverdict(pass, __SCOPE__ & ": It is not possible to update an unexisting attribute of resource type " & int2str(enum2int(p_resourceType)));
 							}
 							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
 								tc_ac.stop;
@@ -4591,21 +4548,19 @@ module OneM2M_PermutationFunctions {
 							}
 							[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) {
 								tc_ac.stop;
-								setverdict(fail, __SCOPE__ & ": Attribute has been updated with an unacceptable value");
+								setverdict(fail, __SCOPE__ & ": Error while updating an unexisting resource type " & int2str(enum2int(p_resourceType)));
 							}
 							[] tc_ac.timeout {
 								setverdict(fail, __SCOPE__ & ": No answer while updating resource type " & int2str(enum2int(p_resourceType)));
 							}
 						}	
-					
-						vc_primitiveContentRetrievedResource := f_cse_retrieveResource(v_resourceIndex);
-					
+	    								
 						// Postamble
 						f_cse_postamble_deleteResources();
-		
+							
 						// Tear down
 						f_cf01Down();
-		    				
+	    					    				
 					}//end f_CSE_DMR_UPD_009
     				
 					function f_CSE_DMR_UPD_014(ResourceType p_resourceType, template RequestPrimitive p_createRequestPrimitive, template RequestPrimitive p_updateRequestPrimitive) runs on AeSimu {
@@ -4771,7 +4726,7 @@ module OneM2M_PermutationFunctions {
 
 						 // Preamble
 						if(p_resourceType != int2) {
-						 	v_aeIndex := f_cse_preamble_registerAe();//c_CRUDNDi);
+						 	v_aeIndex := f_cse_preamble_registerAe(-, {f_getAnnouncementTargetPoA("HTTP", PX_AE1_ADDRESS, "")});//c_CRUDNDi);
 						}
 						
 						if(p_resourceType != int1) {
@@ -4796,7 +4751,16 @@ module OneM2M_PermutationFunctions {
 						//Test Body
 						v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_updateRequestPrimitive);
 						
-						mcaPort.send(m_request(v_request)); //CSEBase
+						if(p_resourceType == int23) {	//Subscription
+							v_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_aeIndex)};							
+						}
+						
+						mcaPort.send(m_request(v_request));
+						
+						if(p_resourceType == int23) {	//Subscription
+							f_cse_notifyProcedure_subscriptionVerificationHandler();
+						}
+						
 						tc_ac.start;
 						alt {
 							[] mcaPort.receive(mw_response(mw_responsePrimitive(int2004))) -> value vc_response {
@@ -5018,9 +4982,17 @@ module OneM2M_PermutationFunctions {
 						
 						v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive, v_aeIndex); 
                 
+						f_cse_preamble_subscriptionVerification(v_ae2Index, p_createRequestPrimitiveChildResource, p_childResourceType);
+						
 						v_childResourceIndex := f_cse_createResource(p_childResourceType, p_createRequestPrimitiveChildResource, v_resourceIndex); 
                 												
+						if((p_resourceType == int23) or (p_childResourceType == int23)) {
+							vc_ae2.start(f_cse_notifyProcedure_defaultHandler());						
+						}
+						
 						f_cse_deleteResource(v_resourceIndex);
+						
+						f_checkAeSimuStatus();
                 		
 						// Test Body
 						mcaPort.send(m_request(m_delete(f_getResourceAddress(v_childResourceIndex), f_getOriginator(v_childResourceIndex))));
@@ -5902,7 +5874,6 @@ module OneM2M_PermutationFunctions {
 							// Local variables
 							var MsgIn v_response;
 							var integer v_aeIndex := -1;
-							var integer v_acpIndex := -1;
 							var charstring v_currentTime;
 							var RequestPrimitive v_createRequest;
 							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
@@ -5917,11 +5888,11 @@ module OneM2M_PermutationFunctions {
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
 							v_currentTime := fx_generateTimestamp();
-							v_accessControlRule.accessControlContexts_list := {{{"* * * * * " & f_getYear(v_currentTime)}, omit, omit}};
+							v_accessControlRule.accessControlContexts_list := {{{"* * * * " & f_getMonth(v_currentTime) & " *"}, omit, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
-							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							vc_acpAuxIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
-							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)}, -);
 			
 							// Test Body
 							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
@@ -5950,6 +5921,8 @@ module OneM2M_PermutationFunctions {
 	
 	
 							//Postamble
+							f_cse_updateAcpAuxResource(int63);
+							
 							f_cse_postamble_deleteResources();
 	
 							//Tear down
@@ -5960,8 +5933,9 @@ module OneM2M_PermutationFunctions {
 						function f_CSE_SEC_ACP_006(template RequestPrimitive p_requestPrimitive, in ResponseStatusCode p_responseStatusCode) runs on AeSimu{
 							// Local variables
 							var MsgIn v_response;
+							var charstring v_month;
+							var charstring v_currentTime;
 							var integer v_aeIndex := -1;
-							var integer v_acpIndex := -1;
 							var RequestPrimitive v_createRequest;
 							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
 			
@@ -5974,11 +5948,18 @@ module OneM2M_PermutationFunctions {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{{"* * * * * 3000"}, omit, omit}};
+							v_currentTime := fx_generateTimestamp();
+							v_month := f_getMonth(v_currentTime);
+							if(v_month =="12") {
+								v_month := "1";
+							} else {
+								v_month := int2char(char2int(v_month) + 1);
+							}
+							v_accessControlRule.accessControlContexts_list := {{{"* * * * " & v_month & " *"}, omit, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
-							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							vc_acpAuxIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
-							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, -);
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)}, -);
 			
 							// Test Body
 							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
@@ -6007,6 +5988,8 @@ module OneM2M_PermutationFunctions {
 	
 	
 							//Postamble
+							f_cse_updateAcpAuxResource(int63);
+							
 							f_cse_postamble_deleteResources();
 	
 							//Tear down
@@ -6365,6 +6348,77 @@ module OneM2M_PermutationFunctions {
 			}//end group AccessControlPolicy
 			
 		}//end group Security
+		
+		group Annoucement {
+			
+			group Basic {
+		
+				function f_CSE_ANNC_001(ResourceType p_resourceType, template RequestPrimitive p_createRequestAnnc, in template RequestPrimitive p_requestCreatePrimitive := omit, in template RequestPrimitive p_requestUpdatePrimitive := omit) runs on AeSimu {
+
+					// Local variables
+					var MsgIn v_response;
+					var RequestPrimitive v_request;
+					var integer v_parentIndex := -1;
+					var integer v_aeIndex := -1;
+					var integer v_resourceIndex;
+					var ResponsePrimitive v_responsePrimitive;
+					var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+					v_create.primitiveContent.aE.announceTo := {PX_CSE_ID};
+				   
+					// Test control
+
+					// Test component configuration
+					f_cf02Up();
+
+					// Test adapter configuration
+			
+					//Register the CSE
+					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));	
+					vc_cse1.done;
+					
+					//Preamble
+					vc_cse1.start(f_cse_announcementProcedure_createHandler(mw_createAEAnnc(-, -, -)));
+					v_aeIndex := f_cse_createResource(int2,v_create);
+					vc_cse1.done;
+					
+					// Test Body
+					if (ispresent (p_requestUpdatePrimitive)) {
+						v_resourceIndex := f_cse_createResource(p_resourceType,p_requestCreatePrimitive);
+ 				      	v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_requestUpdatePrimitive);
+					  	v_responsePrimitive.responseStatusCode := int2004;
+					} else {
+					  	v_request := f_getCreateRequestPrimitive(p_resourceType, p_requestCreatePrimitive, v_parentIndex);
+					  	v_responsePrimitive.responseStatusCode := int2001;
+					}
+					vc_cse1.start(f_cse_announcementProcedure_createHandler(p_createRequestAnnc));	
+					mcaPort.send(m_request(v_request));
+
+					tc_ac.start;
+					alt {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(v_responsePrimitive.responseStatusCode))) -> value v_response {
+							tc_ac.stop;
+							setverdict(pass, __SCOPE__, ": Operation for resource " & int2str(enum2int(p_resourceType)) & " performed successfully");	
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value vc_response {
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__, ": Wrong response status code");
+						}
+						[] tc_ac.timeout {
+							setverdict(fail, __SCOPE__, ": No answer while updating resource type " & int2str(enum2int(p_resourceType)));
+						}
+					}
+										
+					// Postamble
+					f_cse_postamble_deleteResources();
+
+					// Tear down
+					f_cf02Down();
+
+				}//end f_CSE_ANNC_001
+	
+			}//end group Basic
+		
+		}// end group Announcement
 	
 	}//end group CSE
 

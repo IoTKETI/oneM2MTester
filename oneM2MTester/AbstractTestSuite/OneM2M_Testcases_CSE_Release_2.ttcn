@@ -3380,44 +3380,6 @@ module OneM2M_Testcases_CSE_Release_2 {
 					
 				} // end g_CSE_DMR_UPD_004
 				
-				group g_CSE_DMR_UPD_005{
-					
-					/**
-					 * @desc Check that the IUT responds with an error when the AE tries to update an attribute of a  TARGET_RESOURCE_ADDRESS resource which does not exist
-					 * 
-					 */
-					testcase TC_CSE_DMR_UPD_005_SCH_EXC() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var XSD.PositiveInteger v_expirationCounter := 1;
-						var template RequestPrimitive v_createRequest := m_createScheduleBase;
-						var template RequestPrimitive v_updateRequest := m_updateScheduleBase;
-						
-						v_updateRequest.primitiveContent := {schedule_update_invalid := m_contentUpdateSchedule_invalid};
-
-						v_updateRequest.primitiveContent.schedule_update_invalid.expirationCounter := v_expirationCounter;
-										
-						v_ae1.start(f_CSE_DMR_UPD_005(int18, v_createRequest, v_updateRequest));//Schedule
-						v_ae1.done;
-					}
-					
-					testcase TC_CSE_DMR_UPD_005_PCH_EXC() runs on Tester system CseSystem {
-						// Local variables
-						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var XSD.PositiveInteger v_expirationCounter := 1;
-						var template RequestPrimitive v_createRequest := m_createPollingChannelBase;
-						var template RequestPrimitive v_updateRequest := m_updatePollingChannelBase;
-
-						v_updateRequest.primitiveContent := {pollingChannel_update_invalid := m_contentUpdatePollingChannel_invalid};
-						
-						v_updateRequest.primitiveContent.pollingChannel_update_invalid.expirationCounter := v_expirationCounter;
-							
-						v_ae1.start(f_CSE_DMR_UPD_005(int15, v_createRequest, v_updateRequest));//PollingChannel
-						v_ae1.done;
-					}
-					
-				} // end g_CSE_DMR_UPD_005
-				
 				group g_CSE_DMR_UPD_006{
 					
 					/**
@@ -3588,7 +3550,45 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 					
-				} // end g_CSE_DMR_UPD_008				
+				} // end g_CSE_DMR_UPD_008
+				
+				group g_CSE_DMR_UPD_009{
+					
+					/**
+					 * @desc Check that the IUT responds with an error when the AE tries to update an attribute of a  TARGET_RESOURCE_ADDRESS resource which does not exist
+					 * 
+					 */
+					testcase TC_CSE_DMR_UPD_009_SCH_EXC() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var XSD.PositiveInteger v_expirationCounter := 1;
+						var template RequestPrimitive v_createRequest := m_createScheduleBase;
+						var template RequestPrimitive v_updateRequest := m_updateScheduleBase;
+						
+						v_updateRequest.primitiveContent := {schedule_update_invalid := m_contentUpdateSchedule_invalid};
+
+						v_updateRequest.primitiveContent.schedule_update_invalid.expirationCounter := v_expirationCounter;
+										
+						v_ae1.start(f_CSE_DMR_UPD_009(int18, v_createRequest, v_updateRequest));//Schedule
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_DMR_UPD_009_PCH_EXC() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var XSD.PositiveInteger v_expirationCounter := 1;
+						var template RequestPrimitive v_createRequest := m_createPollingChannelBase;
+						var template RequestPrimitive v_updateRequest := m_updatePollingChannelBase;
+
+						v_updateRequest.primitiveContent := {pollingChannel_update_invalid := m_contentUpdatePollingChannel_invalid};
+						
+						v_updateRequest.primitiveContent.pollingChannel_update_invalid.expirationCounter := v_expirationCounter;
+							
+						v_ae1.start(f_CSE_DMR_UPD_009(int15, v_createRequest, v_updateRequest));//PollingChannel
+						v_ae1.done;
+					}
+					
+				} // end g_CSE_DMR_UPD_009				
 
 				group g_CSE_DMR_UPD_014 {
 					
@@ -5850,7 +5850,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
     					
 					//Check to see if the resource is NOT present
 					if(f_isResourceNotPresent(v_aeIndex, f_getResourceName(v_request.primitiveContent))){
@@ -5915,7 +5915,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
     					
 					//Check to see if the resource is NOT present
 					if(f_isResourceNotPresent(v_aeIndex, f_getResourceName(v_request.primitiveContent))){
@@ -5994,7 +5994,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						setverdict(fail, __SCOPE__ & ": Notifications sent before bathNotify/duration expired");
 					}
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6075,7 +6075,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}	
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6121,7 +6121,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 					
 					v_resourceIndex := f_cse_createResource(int23, v_createRequest, v_aeIndex);//Subscription
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 			
 					// Test Body
 					vc_ae2.start(f_cse_notifyProcedure_representationHandler(v_contentResponse)); // check if the notification is well received and if its content matchs
@@ -6148,7 +6148,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}	
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6205,7 +6205,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 					v_request:= f_getUpdateRequestPrimitive(int2, v_aeIndex, v_updateRequest); // AE update request
 					f_cse_updateResource(v_request); // AE update
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 					
 					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 	
@@ -6233,7 +6233,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6287,7 +6287,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 					v_request:= f_getUpdateRequestPrimitive(int2, v_aeIndex, v_updateRequest); // AE update request
 					f_cse_updateResource(v_request); // AE update
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					mcaPort.send(m_request(m_retrieve(f_getResourceAddress(v_resourceIndex), f_getOriginator(v_resourceIndex))));
 
@@ -6310,7 +6310,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6383,7 +6383,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}	
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6448,7 +6448,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 					v_request:= f_getUpdateRequestPrimitive(int2, v_aeIndex, v_updateRequest); // Update request 3
 					f_cse_updateResource(v_request);
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6517,7 +6517,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 					v_request:= f_getUpdateRequestPrimitive(int2, v_aeIndex, v_updateRequest); // Update request 3
 					f_cse_updateResource(v_request);
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6592,7 +6592,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}	
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6671,7 +6671,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}
 					
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6743,7 +6743,7 @@ module OneM2M_Testcases_CSE_Release_2 {
 						}
 					}	
 
-					f_checkComponentDoneAndGetVerdict(vc_ae2);
+					f_aeSimu_checkComponentDoneAndGetVerdict(vc_ae2);
 
 					//Postamble
 					f_cse_postamble_deleteResources();
@@ -6776,6 +6776,101 @@ module OneM2M_Testcases_CSE_Release_2 {
 			}//end group AccessControlPolicy
 			
 		}//end group Security
+		
+		group Announcement {
+			
+			group Basic {
+		
+				group g_CSE_ANNC_001 {
+			
+					testcase TC_CSE_ANNC_001_ACP_UPD() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createAccessControlPolicyAnnc;
+  
+						v_updateRequest.primitiveContent.accessControlPolicy.announceTo := {f_getAnnouncementTargetPoA()};
+                  
+						v_ae1.start(f_CSE_ANNC_001(int1, v_createRequestAnnc, omit, v_updateRequest));//AccessControlPolicy
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_ACP_CRE() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createAcpBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createAccessControlPolicyAnnc;
+  
+						v_createRequest.primitiveContent.accessControlPolicy.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int1, v_createRequestAnnc, v_createRequest, omit));//AccessControlPolicy
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_CNT_UPD() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_updateRequest := m_updateContainerBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createContainerAnncBase;
+  
+						v_updateRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int3, v_createRequestAnnc, omit, v_updateRequest));//Container
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_CNT_CRE() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createContainerAnncBase;
+  
+						v_createRequest.primitiveContent.container.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int3, v_createRequestAnnc, v_createRequest, omit));//Container
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_GRP_UPD() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_updateRequest := m_updateGroupBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createGroupAnncBase;
+  
+						v_updateRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int9, v_createRequestAnnc, omit, v_updateRequest));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_GRP_CRE() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createGroupBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createGroupAnncBase;
+  
+						v_createRequest.primitiveContent.group_.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int9, v_createRequestAnnc, v_createRequest, omit));//Group
+						v_ae1.done;
+					}
+					
+					testcase TC_CSE_ANNC_001_CIN_CRE() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var template RequestPrimitive v_createRequest := m_createContentInstanceBase;
+						var template RequestPrimitive v_createRequestAnnc := mw_createContentInstanceAnncBase;
+  
+						v_createRequest.primitiveContent.contentInstance.announceTo := {f_getAnnouncementTargetPoA()};
+  
+						v_ae1.start(f_CSE_ANNC_001(int4, v_createRequestAnnc, v_createRequest, omit));//ContentInstance
+						v_ae1.done;
+					}
+			
+				}// end group g_CSE_ANNC_001
+		
+			}//end group Basic
+		}//end group Announcement
 	
 	}//end group CSE
 
