@@ -518,7 +518,7 @@ module OneM2M_Functions {
 			 * @return Internal AE resource index
 			 * @verdict 
 			 */
-			function f_cse_preamble_registerAe(template (omit) AcpType p_accessControlPolicyIDs := omit, in template (omit) PoaList p_poaList := omit) runs on AeSimu system CseSystem return integer {//c_CRUDNDi
+			function f_cse_preamble_registerAe(template (omit) AcpType p_accessControlPolicyIDs := omit, in template (omit) PoaList p_poaList := omit) runs on AeSimu return integer {//c_CRUDNDi
 			
 				var RequestPrimitive v_request;
 				var MsgIn v_response;
@@ -1173,6 +1173,8 @@ module OneM2M_Functions {
 				var RequestPrimitive v_request;
 				
 				v_request := valueof(m_updateAcpBase);
+				
+				v_request.requestIdentifier := valueof(v_request.requestIdentifier) & f_rnd(1, 1000000);
 				
 				v_request.to_ := f_getResourceAddress(vc_acpAuxIndex);
 				v_request.from_ := f_getOriginator(vc_acpAuxIndex);

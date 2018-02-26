@@ -399,7 +399,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 	                
 					//Preamble
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 					
 					//Test Body
 					v_request := valueof(m_createAe(PX_APP_ID, omit, f_getResourceAddress(-1, -, e_spRelative) & "/" & PX_ALLOWED_C_AE_IDS[0]));	
@@ -525,7 +525,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					//TODO: create serviceSubscribedProfile, Node, and serviceSubscribedAppRule
 					//v_cseBaseIndex := f_cse_preamble_createServiceSubscribedProfile({"C*"}); //c_CRUDNDi);
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 					
 					//Test Body	
 					//v_request := valueof(m_createAe(PX_APP_ID, omit, "C-AE-ID-STEM"));				
@@ -535,13 +535,19 @@ module OneM2M_Testcases_CSE_Release_1 {
 					mcaPort.send(m_request(v_request));
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int4005))) {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int4107))) {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation rejected.");
 						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int4005))) -> value v_response{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response{
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, creating AE with not allowed AE-ID ");
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
 						}
 						[] tc_ac.timeout {
 							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
@@ -796,7 +802,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					//Test control
 					if(not(PICS_IN_CSE)) {
-						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						setverdict(inconc, __SCOPE__ & ": IUT shall be IN-CSE to run this test case");
 						stop;
 					}
 	                
@@ -1094,23 +1100,29 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					//Preamble
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 											
 					// Test Body
-					v_request := valueof(m_createAe(PX_APP_ID, omit, omit));				
+					v_request := valueof(m_createAe(PX_NOT_ALLOWED_APP_ID, omit, omit));				
 	    									
 					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, v_cseBaseIndex);
 					
 					mcaPort.send(m_request(v_request));
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int4005))) {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int4107))) {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation rejected.");
 						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int4005))) -> value v_response{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response{
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, creating AE with not allowed APP-ID ");
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
 						}
 						[] tc_ac.timeout {
 							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
@@ -5019,6 +5031,70 @@ module OneM2M_Testcases_CSE_Release_1 {
 									setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
 								}
 							}
+						}
+					}
+					
+					testcase TC_CSE_DMR_UPD_004_ACP_PVS_PV_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var Labels v_labels_1 := {"VALUE_1"};
+						var Labels v_labels_2 := {"To be deleted"};
+						var SetOfAcrs v_privileges_1 := {accessControlRule_list := {valueof(m_createAcr({"all"}, int63))}};
+						var SetOfAcrs v_selfprivileges_2 := {accessControlRule_list := {valueof(m_createAcr({"all"}, int62))}};
+						var AttributeAux_list v_nullFields;
+						var template RequestPrimitive v_createRequest := m_createAcpBase;// privileges set by default to 63 for *
+						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
+						var ResponsePrimitive v_responsePrimitive;
+						var PrimitiveContent v_primitiveContentRetrieveResource;
+						
+						v_createRequest.primitiveContent.accessControlPolicy.labels := v_labels_1;//Attribute 3
+						v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {};//Attribute 2
+						v_updateRequest.primitiveContent.accessControlPolicy.selfPrivileges := v_selfprivileges_2; //Attribute 1
+						v_updateRequest.primitiveContent.accessControlPolicy.privileges := v_privileges_1;//Attribute 2
+						v_updateRequest.primitiveContent.accessControlPolicy.labels := v_labels_2;//Attribute 3
+						
+						v_nullFields := {{"labels", omit}};
+      							
+						v_ae1.start(f_CSE_DMR_UPD_004(int1, v_createRequest, v_updateRequest, v_nullFields));//AccessControlPolicy
+						v_ae1.done;
+						
+						 
+																		
+						if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_ae1);
+							if(ispresent(v_responsePrimitive.primitiveContent)) {
+								if(ischosen(v_responsePrimitive.primitiveContent.accessControlPolicy)) {
+									//Check attribute 1
+									if(not match(v_responsePrimitive.primitiveContent.accessControlPolicy.selfPrivileges.accessControlRule_list[0].accessControlOperations, v_selfprivileges_2.accessControlRule_list[0].accessControlOperations)){
+										setverdict(fail, __SCOPE__ & ": Error: SelfPrivileges attribute not updated correctly")
+									}
+									//Check attribute 2
+									if(not match(v_responsePrimitive.primitiveContent.accessControlPolicy.privileges, valueof(v_updateRequest.primitiveContent.accessControlPolicy.privileges))){
+										setverdict(fail, __SCOPE__ & ": Error: Privileges attribute not added correctly")
+									}
+									//Check attribute 3
+									if(ispresent(v_responsePrimitive.primitiveContent.accessControlPolicy.labels)){
+										setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
+									}
+								}
+							}
+							
+							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);
+							
+							//Check that the resource has been udpated correctly
+						  	if(ischosen(v_primitiveContentRetrieveResource.accessControlPolicy)) {
+							  //Check attribute 1
+							  if(not match (v_primitiveContentRetrieveResource.accessControlPolicy.selfPrivileges.accessControlRule_list[0].accessControlOperations, v_selfprivileges_2.accessControlRule_list[0].accessControlOperations)){
+								  setverdict(fail, __SCOPE__ & ": Error: SelfPrivileges attribute not updated correctly")
+							  }
+							  //Check attribute 2
+							  if(not match (v_primitiveContentRetrieveResource.accessControlPolicy.privileges, valueof(v_updateRequest.primitiveContent.accessControlPolicy.privileges))){
+								  setverdict(fail, __SCOPE__ & ": Error: Privileges attribute not added correctly")
+							  }
+							  //Check attribute 3
+							  if(ispresent(v_primitiveContentRetrieveResource.accessControlPolicy.labels)){
+								  setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
+							  }
+						  	}
 						}
 					}
 					

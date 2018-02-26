@@ -2674,9 +2674,9 @@ module OneM2M_PermutationFunctions {
 	
 						// Preamble
 						
-						if (PX_IUT_IS_MN_CSE == true) {
+						if (PX_MN_CSE) {
 							vc_cse1.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
-						}else if (PX_IUT_IS_IN_CSE == true) {
+						}else if (PX_IN_CSE) {
 							vc_cse1.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
 						}	
 						vc_cse1.done;						
@@ -5905,6 +5905,9 @@ module OneM2M_PermutationFunctions {
 								[] mcaPort.receive(mw_response(mw_responsePrimitive(p_responseStatusCode))) -> value v_response {
 									tc_ac.stop;
 									setverdict(pass, __SCOPE__ & ": Successful operation on resource type int2 (Ae)");
+									if(p_responseStatusCode == int2002) {
+										f_removeElementFromList(vc_resourcesIndexToBeDeleted, v_aeIndex);
+									}
 								}
 								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
 									tc_ac.stop;
@@ -5980,6 +5983,9 @@ module OneM2M_PermutationFunctions {
 								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
 									tc_ac.stop;
 									setverdict(fail, __SCOPE__ & ": Error operation have been accpeted without having privileges");
+									if(p_responseStatusCode == int2002) {
+										f_removeElementFromList(vc_resourcesIndexToBeDeleted, v_aeIndex);
+									}
 								}
 								[] tc_ac.timeout {
 									setverdict(fail, __SCOPE__ & ": No answer while executing operation");
@@ -6117,7 +6123,6 @@ module OneM2M_PermutationFunctions {
 							// Local variables
 							var MsgIn v_response;
 							var integer v_aeIndex := -1;
-							var integer v_acpIndex := -1;
 							var RequestPrimitive v_createRequest;
 							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
 			
@@ -6132,9 +6137,9 @@ module OneM2M_PermutationFunctions {
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
 							v_accessControlRule.accessControlContexts_list := {{{}, {{f_getIpv4Address(PX_AE1_ADDRESS)}, omit}, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
-							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							vc_acpAuxIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
-							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
 			
 							// Test Body
 							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
@@ -6147,6 +6152,9 @@ module OneM2M_PermutationFunctions {
 								[] mcaPort.receive(mw_response(mw_responsePrimitive(p_responseStatusCode))) -> value v_response {
 									tc_ac.stop;
 									setverdict(pass, __SCOPE__ & ": Successful operation on resource type int2 (Ae)");
+									if(p_responseStatusCode == int2002) {
+										f_removeElementFromList(vc_resourcesIndexToBeDeleted, v_aeIndex);
+									}
 								}
 								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
 									tc_ac.stop;
@@ -6163,6 +6171,8 @@ module OneM2M_PermutationFunctions {
 	
 	
 							//Postamble
+							f_cse_updateAcpAuxResource(int63);
+							
 							f_cse_postamble_deleteResources();
 	
 							//Tear down
@@ -6174,7 +6184,6 @@ module OneM2M_PermutationFunctions {
 							// Local variables
 							var MsgIn v_response;
 							var integer v_aeIndex := -1;
-							var integer v_acpIndex := -1;
 							var RequestPrimitive v_createRequest;
 							var AccessControlRule v_accessControlRule := valueof(m_createAcr({"all"}, int63));	
 			
@@ -6187,11 +6196,11 @@ module OneM2M_PermutationFunctions {
 	
 							// Preamble
 							v_createRequest := f_getCreateRequestPrimitive(int1, m_createAcpBase, -1);
-							v_accessControlRule.accessControlContexts_list := {{{}, {{f_getIpv4Address(PX_AE2_ADDRESS)}, omit}, omit}};
+							v_accessControlRule.accessControlContexts_list := {{{}, {{"240.0.0.0"}, omit}, omit}};
 							v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {v_accessControlRule};
-							v_acpIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
+							vc_acpAuxIndex := f_cse_createResource(int1, v_createRequest); // CSE child resource
 							
-							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[v_acpIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
+							v_aeIndex := f_cse_preamble_registerAe({f_getResourceId(vc_resourcesList[vc_acpAuxIndex].resource)}, {f_getAnnouncementTargetPoA(-, PX_AE1_ADDRESS, -)});
 			
 							// Test Body
 							p_requestPrimitive.to_ := f_getResourceAddress(v_aeIndex);
@@ -6212,6 +6221,9 @@ module OneM2M_PermutationFunctions {
 								[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
 									tc_ac.stop;
 									setverdict(fail, __SCOPE__ & ": Error operation have been accpeted without having privileges");
+									if(p_responseStatusCode == int2002) {
+										f_removeElementFromList(vc_resourcesIndexToBeDeleted, v_aeIndex);
+									}
 								}
 								[] tc_ac.timeout {
 									setverdict(fail, __SCOPE__ & ": No answer while executing operation");
@@ -6220,6 +6232,8 @@ module OneM2M_PermutationFunctions {
 	
 	
 							//Postamble
+							f_cse_updateAcpAuxResource(int63);
+							
 							f_cse_postamble_deleteResources();
 	
 							//Tear down
