@@ -2720,7 +2720,7 @@ module OneM2M_Types {
 	  variant (choice) "XML"."untagged";
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
-	  variant (choice.subscription_list) "XML"."untagged";
+	  variant (choice.subscription_list)"XML". "untagged";
 	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 	};
 
@@ -2924,7 +2924,7 @@ module OneM2M_Types {
 	  //variant (memberTypeValidated) "text 'true' as '1'";
 	  //variant (memberTypeValidated) "text 'false' as '0'";
 	  variant (choice) "XML"."untagged";
-	  variant (choice.childResource_list) "XML"."untagged";
+	  variant (choice.childResource_list)"XML". "untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
 	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
@@ -3634,8 +3634,8 @@ module OneM2M_Types {
 
 	type XSD.String DebugInfo
 	with {
-	  variant "XML"."name as uncapitalized";
-	  variant "XML"."element";
+	  variant "name as uncapitalized";
+	  variant "element";
 	};
 
 
@@ -4064,7 +4064,7 @@ module OneM2M_Types {
 	}
 	with {
 	  variant "XML"."name as uncapitalized";
-	  variant (operationMonitor_list)"XML". "untagged";
+	  variant (operationMonitor_list) "XML"."untagged";
 	  variant (operationMonitor_list[-]) "XML"."name as 'operationMonitor'";
 	  variant (notificationEventType_list) "XML"."untagged";
 	  variant (notificationEventType_list[-]) "XML"."name as 'notificationEventType'";
@@ -4854,7 +4854,7 @@ group optionalResourceTypes {
 		  variant "XML"."name as uncapitalized";
 		  variant "XML"."element";
 		  variant (resourceName) "XML"."attribute";
-		  variant (announcedAttribute)"XML". "list";
+		  variant (announcedAttribute) "XML"."list";
 		  variant (choice) "XML"."untagged";
 		  variant (choice.childResource_list) "XML"."untagged";
 		  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
@@ -5490,7 +5490,7 @@ group invalidTypes {
 	with {
 	  variant "XML"."name as uncapitalized";
 	  variant "XML"."element";
-	  variant (resourceName) "XML"."attribute";
+	  variant (resourceName) "attribute";
 	};	
 	
 	type record Schedule_update_invalid 
@@ -5686,7 +5686,7 @@ group OtherTypes {
 }
 with {
   encode "XML";
-  encode "JSON";
+  encode "JSON"; //@JaeYoung, added for the multiple encoding/decoding
   variant "namespace as 'http://www.onem2m.org/xml/protocols' prefix 'm2m'";
   variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
   extension "anytype AggregatedResponse, AggregatedNotification,Notification, ServiceSubscribedAppRule_optional, charstring, AnyURI, AttributeList, AE, AccessControlPolicy, AccessControlPolicy_optional, ACP_update_invalid, AE_optional, AE_update_invalid,AEAnnc_optional, Container_optional, CSEBase_optional, Container_update_invalid, ContentInstance_optional,  Group_optional, Group_update_invalid, Schedule_optional, Schedule_update_invalid, Subscription_optional, Subscription_update_invalid, PollingChannel_optional, PollingChannel_update_invalid, LocationPolicy_optional, LocationPolicy_update_invalid"

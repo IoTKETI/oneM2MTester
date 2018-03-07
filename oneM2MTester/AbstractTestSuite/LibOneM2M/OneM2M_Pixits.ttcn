@@ -21,11 +21,9 @@ module OneM2M_Pixits {
 	
 		group IutParameters {
 			
-			modulepar boolean PX_IN_CSE	:= true; 
+			modulepar boolean PX_MN_CSE	:= true; 
 			
-			modulepar boolean PX_MN_CSE	:= false; 
-						
-			modulepar boolean PX_ASN_CSE:= false; 
+			modulepar boolean PX_IN_CSE	:= false; 
 		
 			modulepar charstring PX_SUT_ADDRESS := "127.0.0.1:8080";
 			
@@ -69,8 +67,6 @@ module OneM2M_Pixits {
 			
 			modulepar XSD.IDREFS PX_NOT_ALLOWED_S_AE_IDS := {"S-NotAllowedAeId"};
 			
-			modulepar XSD.ID PX_NOT_ALLOWED_APP_ID := "NotAllowedAppId";
-			
 			modulepar AddressingMethod PX_ADDRESSING_METHOD := e_hierarchical;
 	
 			modulepar PrimitiveScope PX_PRIMITIVE_SCOPE 	:= e_cseRelative;
@@ -82,8 +78,6 @@ module OneM2M_Pixits {
 			modulepar charstring PX_XML_NAMESPACE 			:= "m2m=""http://www.onem2m.org/xml/protocols""";
 			
 			modulepar ListOfURIs PX_ACOR 					:= {"all"};
-			
-			modulepar float PX_TCONFIG_IUT					:= 10.0;
 						
 		}
 		
@@ -144,6 +138,13 @@ module OneM2M_Pixits {
 	
 			modulepar boolean PX_RUN_POSTAMBLE 				:= true;		
 		}
+
+	
+	//for checking whether the locationPolicy creation request is originated from a ASN-AE
+	//NOTE: Apply to Device-based location request, and this requires Test System (TS) to activate ASN-AE mode to test IUT  	
+	modulepar boolean PX_IUT_IS_ASN_CSE				:= false; //default //set it to true when running Device-based location testcases 	
+	modulepar boolean PX_IUT_IS_MN_CSE				:= false; //default //set it to true when running Share-based location testcases
+	modulepar boolean PX_IUT_IS_IN_CSE				:= false; //default //set it to true when running Share-based location testcases
 	
 	//constant parameters for LOC  
 	modulepar XSD.Token PX_LOCATION_TARGET_ID				:= "{LOCATION-TARGET-ID}"; //SUPPOSE TO BE RECEIVED FROM LOCATION SERVER
