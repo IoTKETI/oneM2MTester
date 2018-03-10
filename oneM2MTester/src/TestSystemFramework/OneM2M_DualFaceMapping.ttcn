@@ -124,6 +124,13 @@ module OneM2M_DualFaceMapping {
 		  		  		log(__SCOPE__&"-f_adressingFormatter(CSE-relative):", v_uri);	  		  
 		  			} else if (PX_PRIMITIVE_SCOPE == e_absolute){
 		  		 		v_uri := f_adressingFormatter(v_to, "/", "/_");
+		  		 		
+		  		 		var AddressingMethod p_addressingMethod := PX_ADDRESSING_METHOD;
+		  		 		
+		  		 		if (ischosen(v_reqPrimitive.primitiveContent.aE) and p_addressingMethod == e_nonHierarchical){
+		  		 			 v_uri := v_uri & "/" & PX_CSE_RESOURCE_ID;	 
+		  		 		}
+		  		  		
 		  		  		log(__SCOPE__&"-f_adressingFormatter(Absolute-relative):", v_uri); 
 		  			}	         		
             	}
