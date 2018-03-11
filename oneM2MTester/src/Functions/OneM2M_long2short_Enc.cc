@@ -669,10 +669,9 @@ namespace OneM2M__DualFaceMapping {
 			// CHARSTRING tmp_for_name_checking(elemName.asCString());
 			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
 			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
-			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
 
 			if(elemObj.isObject()){
-
 				root_tag = name_short;
 
 				elemObjClone = JSONDeepParser(elemObj, elemObjClone, jsonObjClone);
@@ -751,6 +750,7 @@ namespace OneM2M__DualFaceMapping {
 							}
 						}
 					}else if(subelemObj.isArray()){
+
 						Value elemArrayObj(arrayValue);
 
 						for(unsigned int index = 0; index < subelemObj.size(); index++){
@@ -787,8 +787,23 @@ namespace OneM2M__DualFaceMapping {
 				}else
 					jsonObjClone[name_short.c_str()] = elemObj.asString();
 
-			}else{
-				jsonObjClone[name_short.c_str()] = elemObj;
+			} else {
+                // This branch was defined to handle the accessControlContexts
+				if (parent_tag == "acco") {
+					Value elemArrayObj(arrayValue);
+
+					for(unsigned int index = 0; index < elemObj.size(); index++){
+						tempObj = elemObj[index];
+
+						if(tempObj.isObject()){
+							tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
+							elemArrayObj.append(tempObjClone);
+						}
+					}
+					jsonObjClone[name_short.c_str()] = elemArrayObj;
+				} else {
+					jsonObjClone[name_short.c_str()] = elemObj;
+				}
 			}
 		}
 		return jsonObjClone;
