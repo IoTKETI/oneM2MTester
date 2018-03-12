@@ -1175,7 +1175,22 @@ namespace OneM2M__DualFaceMapping {
 			}else if(elemObj.isBool()){
 				jsonObjClone[name_long.c_str()] = elemObj;
 			}else{
-				jsonObjClone[name_long.c_str()] = elemObj;
+				// This branch was defined to handle the accessControlContexts
+				if (parent_tag == "accessControlContexts_list") {
+					Value elemArrayObj(arrayValue);
+
+					for(unsigned int index = 0; index < elemObj.size(); index++){
+						tempObj = elemObj[index];
+
+						if(tempObj.isObject()){
+							tempObjClone = JSONDeepParserDec(tempObj, tempObjClone, subObjClone);
+							elemArrayObj.append(tempObjClone);
+						}
+					}
+					jsonObjClone[name_long.c_str()] = elemArrayObj;
+				} else {
+					jsonObjClone[name_long.c_str()] = elemObj;
+				}
 			}
 		}
 
