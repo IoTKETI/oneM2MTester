@@ -1039,6 +1039,11 @@ namespace OneM2M__DualFaceMapping {
 			
 			parent_tag = name_long;
 
+			// CHARSTRING tmp_for_name_checking(elemName.asCString());
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
+
 			if(hasRootTag == false) {
 				root_name_element = elemName;
 				hasRootTag = true;
@@ -1118,7 +1123,6 @@ namespace OneM2M__DualFaceMapping {
 							tempObj = subelemObj[index];
 							
 							if(tempObj.isString()){
-
 								elemArrayObj.append(tempObj.asString());
 							}else if(tempObj.isBool()){
 								elemArrayObj.append(tempObj.asBool());
@@ -1170,7 +1174,7 @@ namespace OneM2M__DualFaceMapping {
 				jsonObjClone[name_long.c_str()] = elemObj;
 			}else if(elemObj.isBool()){
 				jsonObjClone[name_long.c_str()] = elemObj;
-			}else{									
+			}else{
 				jsonObjClone[name_long.c_str()] = elemObj;
 			}
 		}
@@ -1222,7 +1226,6 @@ namespace OneM2M__DualFaceMapping {
 				}
 			}
 		}
-
 		return jsonObjClone;
 	}
 

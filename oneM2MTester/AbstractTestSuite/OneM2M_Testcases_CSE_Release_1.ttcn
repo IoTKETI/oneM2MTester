@@ -1812,7 +1812,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 	
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), {"parentID"})) -> value v_response {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), omit)) -> value v_response {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": Response OK for retrieving");
 						}
@@ -2018,7 +2018,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), {"parentID"})) -> value v_response {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), omit)) -> value v_response {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": cseType attribute is set to 1 (IN_CSE)");
 						}
@@ -2231,7 +2231,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 
 					tc_ac.start;
 					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), {"parentID"})) -> value v_response {
+						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2000, v_contentResponse), omit)) -> value v_response {
 							tc_ac.stop;
 							
 							if (v_response.primitive.responsePrimitive.primitiveContent.cSEBase.supportedResourceType == PX_SRT) {
