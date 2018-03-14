@@ -1405,7 +1405,7 @@ module OneM2M_PermutationFunctions {
 						
 					}
 
-					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in charstring p_action) runs on CseSimu {
+					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
 	  
 						var ResponsePrimitive v_responsePrimitive;
 						
@@ -2674,9 +2674,9 @@ module OneM2M_PermutationFunctions {
 	
 						// Preamble
 						
-						if (PX_IUT_IS_MN_CSE == true) {
+						if (PX_MN_CSE) {
 							vc_cse1.start(f_cse_registrationRemoteCse(m_createRemoteCSEBase));
-						}else if (PX_IUT_IS_IN_CSE == true) {
+						}else if (PX_IN_CSE) {
 							vc_cse1.start(f_cse_registerRemoteCse(m_createRemoteCSEBase));
 						}	
 						vc_cse1.done;						
@@ -5546,7 +5546,7 @@ module OneM2M_PermutationFunctions {
 						tc_ac.stop;
 						setverdict(fail, __SCOPE__ & ": Wrong response status code while retrieving resource");
 					}
-					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) { 
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) { 
 						tc_ac.stop;
 						setverdict(fail, __SCOPE__ & ": Wrong response while retrieving resource");
 					}

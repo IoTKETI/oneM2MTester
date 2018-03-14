@@ -35,8 +35,7 @@ module OneM2M_Functions {
 			
 			// Map
 			map(self:mcaPort, system:mcaPort);
-			// @JaeYoung, this code was modified for Already in use issues
-			// map(self:mcaPortIn, system:mcaPortIn);
+			map(self:mcaPortIn, system:mcaPortIn);
 			map(self:acPort, system:acPort);
 			
 			activate(a_default());
@@ -131,6 +130,10 @@ module OneM2M_Functions {
 			vc_config := e_cf02CseSimuMaster;
 			vc_testSystemRole := e_cse;		
 			vc_ae1 := AeSimu.create("AE1") alive;
+			
+			//Initialization of local CSEBase
+			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
+			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
 				
 			// Map
 			map(self:mccPort, system:mccPort);
@@ -140,9 +143,6 @@ module OneM2M_Functions {
 			activate(a_cse_cf02_cse1());
 			vc_ae1.start(f_cf02UpAe1());
 			vc_ae1.done;
-			
-			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
-			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
 				
 			// Connect
 			
@@ -178,6 +178,10 @@ module OneM2M_Functions {
 			vc_config := e_cf03;
 			vc_testSystemRole := e_cse;		
 			
+			//Creation of CSEBase
+			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
+			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
+			
 			// Map
 			map(self:mcaPortIn, system:mcaPortIn);//TODO To be consistent, we should use mcaPortIn for AE testing
 			map(self:acPort, system:acPort);
@@ -186,11 +190,6 @@ module OneM2M_Functions {
 			}
 			activate(a_default());
 			activate(a_ae_cf03());
-			
-			//Creation of CSEBase
-			
-			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
-			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
 		
 			// Connect
 					
@@ -208,18 +207,16 @@ module OneM2M_Functions {
 			vc_config := e_cf04;
 			vc_testSystemRole := e_cse;	
 			
-	
+			//Creation of CSEBase
+			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
+			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
+			
 			// Map
 			map(self:mccPort, system:mccPort);
 			map(self:mccPortIn, system:mccPortIn);
 			map(self:acPort, system:acPort);
 			activate(a_default());
 			activate(a_cse_cf04());
-			
-			//Creation of CSEBase
-			
-			v_cSEBaseResource := f_cse_generateLocalResource(-, -1, int5);
-			vc_cSEBaseIndex := f_setLocalResource(v_cSEBaseResource, int5, -1);
 
 			// Connect
 			
@@ -1046,10 +1043,6 @@ module OneM2M_Functions {
 						tc_ac.stop;
 						setverdict(inconc, __SCOPE__&":INFO: Error while retrieving resource");
 					}
-					[] mcaPort.receive{
-						tc_ac.stop;
-						setverdict(inconc, __SCOPE__&":INFO: Unexpected message received");
-					}
 					[] tc_ac.timeout {
 						setverdict(inconc, __SCOPE__&":INFO: No answer while retrieving resource");
 					}
@@ -1607,23 +1600,23 @@ module OneM2M_Functions {
     	
 					if (ischosen(p_primitiveContent.aE)){
 						log("Representation contains AE resource representation");
-						if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.aE)) {
+						if(isvalue(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.aE)) {
 							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.aE, p_primitiveContent.aE);
 							log("Expected primitiveContent");
 						}
-						else if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive)) {
+						else if(isvalue(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.aE)) {
 							v_matchResult :=match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.aE, p_primitiveContent.aE);
 						}
-						else if (ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification)) {
+						else if (isvalue(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list)) {
 							v_matchResult := true;
 							v_numberOfAggregatedNotification := lengthof(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list);
 							for(i := 0; i< v_numberOfAggregatedNotification; i := i + 1){
-								if(ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.resource)) {
+								if(isvalue(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.resource.aE)) {
 									if(not (match(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.resource.aE, p_primitiveContent.aE))){
 										v_matchResult := false;
 									}
 								}
-								else if(ischosen(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.responsePrimitive)) {
+								else if(isvalue(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.responsePrimitive.primitiveContent.aE)) {
 									if(not (match(p_requestPrimitive.primitiveContent.aggregatedNotification.notification_list[i].notificationEvent.representation.responsePrimitive.primitiveContent.aE, p_primitiveContent.aE))){
 										v_matchResult := false;
 									}
@@ -1637,10 +1630,10 @@ module OneM2M_Functions {
 					}
     	
 					if (ischosen(p_primitiveContent.container)){
-						if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.container)) {
+						if(isvalue(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.container)) {
 							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.resource.container, p_primitiveContent.container)
 						}
-						else if(ischosen(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive)) {
+						else if(isvalue(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.container)) {
 							v_matchResult := match(p_requestPrimitive.primitiveContent.notification.notificationEvent.representation.responsePrimitive.primitiveContent.container, p_primitiveContent.container)
 						}
 					}
@@ -2058,37 +2051,27 @@ module OneM2M_Functions {
 					}
 				} else if (p_resourceType == int10002 and ispresent (p_resource)) { //AE Annc
 					if(ischosen(p_resource.aEAnnc)) {
-						v_myResource.aEAnnc.expirationTime := valueof(p_resource.aEAnnc.expirationTime);
-						v_myResource.aEAnnc.accessControlPolicyIDs := valueof(p_resource.aEAnnc.accessControlPolicyIDs);
-						v_myResource.aEAnnc.labels := valueof(p_resource.aEAnnc.labels);
-				}
+					 	v_myResource.aEAnnc := valueof(p_resource.aEAnnc);
+					}
 				} else if (p_resourceType == int10001 and ispresent (p_resource)) { //Acp Annc
 					if(ischosen(p_resource.accessControlPolicyAnnc)) {
-						v_myResource.accessControlPolicyAnnc.expirationTime := valueof(p_resource.accessControlPolicyAnnc.expirationTime);
-						v_myResource.accessControlPolicyAnnc.labels := valueof(p_resource.accessControlPolicyAnnc.labels);
-						v_myResource.accessControlPolicyAnnc.privileges := valueof(p_resource.accessControlPolicyAnnc.privileges);
-						v_myResource.accessControlPolicyAnnc.selfPrivileges := valueof(p_resource.accessControlPolicyAnnc.selfPrivileges);
+				 		v_myResource.accessControlPolicyAnnc := valueof(p_resource.accessControlPolicyAnnc);
 					}
 				} else if (p_resourceType == int10003 and ispresent (p_resource)) { //Container Annc
 					if(ischosen(p_resource.containerAnnc)) {
-						v_myResource.containerAnnc.expirationTime := valueof(p_resource.containerAnnc.expirationTime);
-						v_myResource.containerAnnc.accessControlPolicyIDs := valueof(p_resource.containerAnnc.accessControlPolicyIDs);
-						v_myResource.containerAnnc.labels := valueof(p_resource.containerAnnc.labels);
+						v_myResource.containerAnnc := valueof(p_resource.containerAnnc);
 					}
 				} else if (p_resourceType == int10009 and ispresent (p_resource)) { //Group Annc
 					if(ischosen(p_resource.groupAnnc)) {
-						v_myResource.groupAnnc.expirationTime := valueof(p_resource.groupAnnc.expirationTime);
-						v_myResource.groupAnnc.accessControlPolicyIDs := valueof(p_resource.groupAnnc.accessControlPolicyIDs);
-						v_myResource.groupAnnc.labels := valueof(p_resource.groupAnnc.labels);
+						v_myResource.groupAnnc := valueof(p_resource.groupAnnc);
 					}
 				} else if (p_resourceType == int10014 and ispresent (p_resource)) { //ContentInstance Annc
 					if(ischosen(p_resource.contentInstanceAnnc)) {
-						v_myResource.contentInstanceAnnc.expirationTime := valueof(p_resource.contentInstanceAnnc.expirationTime);
-						v_myResource.contentInstanceAnnc.labels := valueof(p_resource.contentInstanceAnnc.labels);
+						v_myResource.contentInstanceAnnc := valueof(p_resource.contentInstanceAnnc);
 					}
 				} else if (p_resourceType == int1 and ispresent (p_resource)) { //Acp Resource
 				   if(ischosen (p_resource.accessControlPolicy)){
-					v_myResource.accessControlPolicy := valueof(p_resource.accessControlPolicy);
+						v_myResource.accessControlPolicy := valueof(p_resource.accessControlPolicy);
 					
 						if(not(ispresent(p_resource.accessControlPolicy.resourceName))) {
 							v_myResource.accessControlPolicy.resourceName := "accessControlPolicy" & int2str(v_resourceIndex);
@@ -2097,7 +2080,6 @@ module OneM2M_Functions {
 					v_myResource.accessControlPolicy.resourceType := p_resourceType;
 					v_myResource.accessControlPolicy.resourceID := "accessControlPolicy" & int2str(v_resourceIndex);
 					v_myResource.accessControlPolicy.parentID := f_getResourceId(vc_localResourcesList[p_parentIndex].resource);
-					v_myResource.accessControlPolicy.labels := valueof(p_resource.accessControlPolicy.labels);
 					v_myResource.accessControlPolicy.creationTime := fx_generateTimestamp();
 					if(not(ispresent(p_resource.accessControlPolicy.expirationTime))) {
 						v_myResource.accessControlPolicy.expirationTime := "20301231T012345";

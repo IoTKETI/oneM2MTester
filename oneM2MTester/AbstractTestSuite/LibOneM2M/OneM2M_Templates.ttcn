@@ -675,6 +675,15 @@ module OneM2M_Templates {
 				resourceType := int3,
 				primitiveContent := {container := m_contentCreateContainer}
 			};
+			       	
+			/**
+			 * @desc Base CREATE request primitive for Container resource using Container_update_invalid
+			 */
+			template (value) RequestPrimitive m_createContainerBaseInvalid modifies m_create := {
+				requestIdentifier := testcasename() & "-m_createContainer",
+				resourceType := int3,
+				primitiveContent := {container_update_invalid := m_contentCreateContainerInvalid}
+			};
 			
 			/**
 			 * @desc Base CREATE request primitive for remoteCSE resource
@@ -1823,6 +1832,35 @@ module OneM2M_Templates {
 			parentID := omit,//NP
 			creationTime := omit,//NP
 			lastModifiedTime := omit,//NP
+			labels := omit,//O
+			accessControlPolicyIDs := omit,//O
+			expirationTime := omit,//O
+			announceTo := omit,//O
+			announcedAttribute := omit,//O
+			stateTag := omit,//NP
+			creator := omit,//O
+			maxNrOfInstances := omit,//O
+			maxByteSize := omit,//O
+			maxInstanceAge := omit,//O
+			currentNrOfInstances := omit,//NP
+			currentByteSize := omit,//NP
+			locationID := omit,//O
+			ontologyRef := omit,//O
+			choice := omit//NP
+		};
+    	
+		/**
+		 * @desc Base primitiveContent for invalid CREATE operation for Container resource (using Container_update_invalid)
+		 * @param p_name Resource name
+		 */
+		template (value) Container_update_invalid m_contentCreateContainerInvalid (in template (omit) XSD.String p_name := c_defaultContainerResourceName):= {
+			resourceName := p_name,//O
+			resourceType := omit,//NP
+			resourceID := omit,//NP
+			parentID := omit,//NP
+			creationTime := omit,//NP
+			lastModifiedTime := omit,//NP
+			expirationCounter := omit,//Field not existing in container resource
 			labels := omit,//O
 			accessControlPolicyIDs := omit,//O
 			expirationTime := omit,//O

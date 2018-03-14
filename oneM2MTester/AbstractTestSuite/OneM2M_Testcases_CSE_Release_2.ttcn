@@ -5347,53 +5347,56 @@ module OneM2M_Testcases_CSE_Release_2 {
 				var MsgIn v_response;
 				var LocationSource v_locationSource		:= int2;//Device-based
 				var integer v_resourceIndex := -1;
+				
+				//Test control
+				if(not(PICS_ASN_CSE)) {
+					setverdict(inconc, __SCOPE__ & ": IUT shall support ASN-CSE to run this test case. Set PX_ASN_CSE to true to run this test case");
+					stop;
+				}
+				
 				//Test component configuration
 				f_cf01Up();
      	     	
-     	     	
-				if(PX_IUT_IS_ASN_CSE){
-     	     	  
-					//Preamble
-					v_aeAuxIndex := f_cse_preamble_registerAe();
-					//Set requestPrimitive
-					v_request	  := f_getCreateRequestPrimitive(int10, m_createLocationPolicy(v_locationSource, omit, locationUpdatePeriod, omit, omit), v_aeAuxIndex);
-				   									
-					// Test Body					
-					mcaPort.send(m_request(v_request));
-					tc_ac.start;
-					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
-							tc_ac.stop;
-							setverdict(pass, __SCOPE__ & ": Resource locationPolicy is created successfully with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode))&"!");
-							f_checkAttributesToBeSaved(int10, v_request, v_response.primitive.responsePrimitive);
-							v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int10, v_aeAuxIndex);
-						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
-							tc_ac.stop;
-							setverdict(fail, __SCOPE__ & ": Wrong response status code");
-						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
-							tc_ac.stop;
-							setverdict(fail, __SCOPE__ & ": Error occurrs with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)) & "while handling a valid locationPolicy resource create request!");
-						}
-						[] tc_ac.timeout {
-							setverdict(fail, __SCOPE__ & ": Timeout due to no response from requested server!");
-						}
-					}	
-      		      
-					f_checkAeSimuStatus();
-    						
-					//Check to see if the resource is present or not
-					if(f_isResourcePresent(v_resourceIndex)) {
-						setverdict(pass, __SCOPE__ & ":INFO: Resource created");
-					} else {
-						setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+ 	     		//Preamble
+				v_aeAuxIndex := f_cse_preamble_registerAe();
+				//Set requestPrimitive
+				v_request	  := f_getCreateRequestPrimitive(int10, m_createLocationPolicy(v_locationSource, omit, locationUpdatePeriod, omit, omit), v_aeAuxIndex);
+			   									
+				// Test Body					
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__ & ": Resource locationPolicy is created successfully with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode))&"!");
+						f_checkAttributesToBeSaved(int10, v_request, v_response.primitive.responsePrimitive);
+						v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int10, v_aeAuxIndex);
 					}
-      		      
-				  // Postamble
-					f_cse_postamble_deleteResources();	 
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(fail, __SCOPE__ & ": Wrong response status code");
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+						tc_ac.stop;
+						setverdict(fail, __SCOPE__ & ": Error occurrs with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)) & "while handling a valid locationPolicy resource create request!");
+					}
+					[] tc_ac.timeout {
+						setverdict(fail, __SCOPE__ & ": Timeout due to no response from requested server!");
+					}
+				}	
+  		      
+				f_checkAeSimuStatus();
+						
+				//Check to see if the resource is present or not
+				if(f_isResourcePresent(v_resourceIndex)) {
+					setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+				} else {
+					setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+				}
+  		      
+			  // Postamble
+				f_cse_postamble_deleteResources();	 
     				
-				} 
 				// Tear down
 				f_cf01Down(); 		      
 		      
@@ -5412,53 +5415,55 @@ module OneM2M_Testcases_CSE_Release_2 {
 				var MsgIn v_response;
 				var integer v_resourceIndex := -1;
      	     	
+     	     	//Test control
+				if(not(PICS_MN_CSE)) {
+					setverdict(inconc, __SCOPE__ & ": IUT shall support MN-CSE to run this test case. Set PX_MN_CSE to true to run this test case");
+					stop;
+				}
+				
 				//Test component configuration
 				f_cf01Up();
-     	     	
-     	     	
-				if(PX_IUT_IS_MN_CSE){
-     	     	      	     	    
-					//Preamble
-					v_aeAuxIndex := f_cse_preamble_registerAe();
-					//Set requestPrimitive
-					v_request	  := f_getCreateRequestPrimitive(int10, m_createLocationPolicy(v_locationSource, omit, omit, omit, omit), v_aeAuxIndex);
-				  									
-					// Test Body					
-					mcaPort.send(m_request(v_request));
-					tc_ac.start;
-					alt {
-						[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
-							tc_ac.stop;
-							setverdict(pass, __SCOPE__ & ": Resource locationPolicy is created successfully with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode))&"!");
-							f_checkAttributesToBeSaved(int10, v_request, v_response.primitive.responsePrimitive);
-							v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int10, v_aeAuxIndex);
-						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
-							tc_ac.stop;
-							setverdict(fail, __SCOPE__ & ": Wrong response status code");
-						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
-							tc_ac.stop;
-							setverdict(fail, __SCOPE__ & ": Error occurrs with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)) & "while handling a valid locationPolicy resource create request!");
-						}
-						[] tc_ac.timeout {
-							setverdict(fail, __SCOPE__ & ": Timeout due to no response from requested server!");
-						}
-					}	
-    		      
-					f_checkAeSimuStatus();
-    						
-					//Check to see if the resource is present or not
-					if(f_isResourcePresent(v_resourceIndex)) {
-						setverdict(pass, __SCOPE__ & ":INFO: Resource created");
-					} else {
-						setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+ 	     	      	     	    
+				//Preamble
+				v_aeAuxIndex := f_cse_preamble_registerAe();
+				//Set requestPrimitive
+				v_request	  := f_getCreateRequestPrimitive(int10, m_createLocationPolicy(v_locationSource, omit, omit, omit, omit), v_aeAuxIndex);
+			  									
+				// Test Body					
+				mcaPort.send(m_request(v_request));
+				tc_ac.start;
+				alt {
+					[] mcaPort.receive(mw_response(mw_responsePrimitive(int2001))) -> value v_response {
+						tc_ac.stop;
+						setverdict(pass, __SCOPE__ & ": Resource locationPolicy is created successfully with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode))&"!");
+						f_checkAttributesToBeSaved(int10, v_request, v_response.primitive.responsePrimitive);
+						v_resourceIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int10, v_aeAuxIndex);
 					}
-    		      
-				  // Postamble
-					f_cse_postamble_deleteResources();	 
-    				
-				}  
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response {
+						tc_ac.stop;
+						setverdict(fail, __SCOPE__ & ": Wrong response status code");
+					}
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response {
+						tc_ac.stop;
+						setverdict(fail, __SCOPE__ & ": Error occurrs with response status code: " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)) & "while handling a valid locationPolicy resource create request!");
+					}
+					[] tc_ac.timeout {
+						setverdict(fail, __SCOPE__ & ": Timeout due to no response from requested server!");
+					}
+				}	
+		      
+				f_checkAeSimuStatus();
+						
+				//Check to see if the resource is present or not
+				if(f_isResourcePresent(v_resourceIndex)) {
+					setverdict(pass, __SCOPE__ & ":INFO: Resource created");
+				} else {
+					setverdict(fail, __SCOPE__ & ":ERROR: Resource not created");
+				}
+		      
+				//Postamble
+				f_cse_postamble_deleteResources();	 
+				
 				// Tear down
 				f_cf01Down(); 		      
 		      

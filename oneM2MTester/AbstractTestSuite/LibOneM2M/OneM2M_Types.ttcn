@@ -405,7 +405,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
-	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
+	  variant (choice.subscription_list[-])"XML". "name as 'subscription'";
 	};
 
 
@@ -1189,7 +1189,7 @@ module OneM2M_Types {
 	}
 	with {
 	  variant "XML"."name as uncapitalized";
-	  variant (scheduleEntry_list) "XML"."untagged";
+	  variant (scheduleEntry_list)"XML". "untagged";
 	  variant (scheduleEntry_list[-]) "XML"."name as 'scheduleEntry'";
 	};
 
@@ -1204,7 +1204,7 @@ module OneM2M_Types {
 		Status status optional
 	}
 	with {
-	  variant "XML"."name as uncapitalized";
+	  variant"XML". "name as uncapitalized";
 	  variant (action_) "XML"."name as 'action'";
 	};
 
@@ -1645,7 +1645,7 @@ module OneM2M_Types {
 	  variant "XML"."name as uncapitalized";
 	  variant "XML"."element";
 	  variant (resourceName) "XML"."attribute";
-	  variant (announcedAttribute) "XML"."list";
+	  variant (announcedAttribute)"XML". "list";
 	  variant (choice) "XML"."untagged";
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
@@ -2643,7 +2643,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
-	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
+	  variant (choice.subscription_list[-])"XML"."name as 'subscription'";
 	};
 
 
@@ -2728,7 +2728,7 @@ module OneM2M_Types {
 	  variant (choice) "XML"."untagged";
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
-	  variant (choice.subscription_list)"XML". "untagged";
+	  variant (choice.subscription_list) "XML"."untagged";
 	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 	};
 
@@ -2932,7 +2932,7 @@ module OneM2M_Types {
 	  //variant (memberTypeValidated) "text 'true' as '1'";
 	  //variant (memberTypeValidated) "text 'false' as '0'";
 	  variant (choice) "XML"."untagged";
-	  variant (choice.childResource_list)"XML". "untagged";
+	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
 	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
@@ -3590,7 +3590,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.choice_list) "XML"."untagged";
-	  variant (choice.choice_list[-]) "XML"."untagged";
+	  variant (choice.choice_list[-])"XML". "untagged";
 	};
 
 
@@ -3642,8 +3642,8 @@ module OneM2M_Types {
 
 	type XSD.String DebugInfo
 	with {
-	  variant "name as uncapitalized";
-	  variant "element";
+	  variant "XML"."name as uncapitalized";
+	  variant "XML"."element";
 	};
 
 
@@ -4819,7 +4819,7 @@ group optionalResourceTypes {
 		  //variant (execEnable) "text 'false' as '0'";
 		  variant (choice) "XML"."untagged";
 		  variant (choice.childResource_list) "XML"."untagged";
-		  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
+		  variant (choice.childResource_list[-])"XML". "name as 'childResource'";
 		  variant (choice.choice_list) "XML"."untagged";
 		  variant (choice.choice_list[-]) "XML"."untagged";
 		};
@@ -4975,7 +4975,7 @@ group optionalResourceTypes {
 		  variant (resourceName) "XML"."attribute";
 		  variant (announcedAttribute) "XML"."list";
 		  variant (cSEBase) "XML"."name as capitalized";
-		  variant (cSEBase) "JSON"."JSON:name as CSEBase";
+		  variant (cSEBase) "JSON"."JSON:name as CSEBase"; //@JaeYoung
 		  variant (cSE_ID) "XML"."name as 'CSE-ID'";
 		  variant (m2M_Ext_ID) "XML"."name as 'M2M-Ext-ID'";
 		  variant (trigger_Recipient_ID) "XML"."name as 'Trigger-Recipient-ID'";
@@ -5193,7 +5193,7 @@ group optionalResourceTypes {
 		  variant (deviceIdentifier) "XML"."list";
 		  variant (choice) "XML"."untagged";
 		  variant (choice.childResource_list) "XML"."untagged";
-		  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
+		  variant (choice.childResource_list[-])"XML". "name as 'childResource'";
 		  variant (choice.subscription_list) "XML"."untagged";
 		  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 		};
@@ -5411,13 +5411,13 @@ group invalidTypes {
 		Timestamp expirationTime optional,
 		ListOfURIs announceTo optional,
 		record length(1 .. infinity) of XSD.NCName announcedAttribute optional,
-		XSD.NonNegativeInteger stateTag optional,
+		XSD.Integer stateTag optional,
 		XSD.ID creator optional,
-		XSD.NonNegativeInteger maxNrOfInstances optional,
-		XSD.NonNegativeInteger maxByteSize optional,
-		XSD.NonNegativeInteger maxInstanceAge optional,
-		XSD.NonNegativeInteger currentNrOfInstances optional,
-		XSD.NonNegativeInteger currentByteSize optional,
+		XSD.Integer maxNrOfInstances optional,
+		XSD.Integer maxByteSize optional,
+		XSD.Integer maxInstanceAge optional,
+		XSD.Integer currentNrOfInstances optional,
+		XSD.Integer currentByteSize optional,
 		XSD.AnyURI locationID optional,
 		XSD.AnyURI ontologyRef optional,
 		union {
@@ -5499,7 +5499,7 @@ group invalidTypes {
 	with {
 	  variant "XML"."name as uncapitalized";
 	  variant "XML"."element";
-	  variant (resourceName) "attribute";
+	  variant (resourceName) "XML"."attribute";
 	};	
 	
 	type record Schedule_update_invalid 
@@ -5689,13 +5689,17 @@ group OtherTypes {
 		variant "XML"."untagged";
 	}		
 		
-	type record of ResourceType ResourceTypeList_1;
+	type record of ResourceType ResourceTypeList_1
+	with {
+		variant "XML"."name as uncapitalized";
+		variant "XML"."list";
+	};
 }
 
 }
 with {
   encode "XML";
-  encode "JSON"; //@JaeYoung, added for the multiple encoding/decoding
+  encode "JSON";
   variant "namespace as 'http://www.onem2m.org/xml/protocols' prefix 'm2m'";
   variant "controlNamespace 'http://www.w3.org/2001/XMLSchema-instance' prefix 'xsi'";
   extension "anytype AggregatedResponse, AggregatedNotification,Notification, ServiceSubscribedAppRule_optional, charstring, AnyURI, AttributeList, AE, AccessControlPolicy, AccessControlPolicy_optional, ACP_update_invalid, AE_optional, AE_update_invalid,AEAnnc_optional, Container_optional, CSEBase_optional, Container_update_invalid, ContentInstance_optional,  Group_optional, Group_update_invalid, Schedule_optional, Schedule_update_invalid, Subscription_optional, Subscription_update_invalid, PollingChannel_optional, PollingChannel_update_invalid, LocationPolicy_optional, LocationPolicy_update_invalid"

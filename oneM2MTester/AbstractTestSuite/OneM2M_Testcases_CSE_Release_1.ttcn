@@ -386,7 +386,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
-					var charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AE-ID is allowed to register: " & unichar2char(PX_ALLOWED_C_AE_IDS[0]);
+					var universal charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AE-ID is allowed to register: " & PX_ALLOWED_C_AE_IDS[0];
 					
 					//Test control
 					if(not(PICS_IN_CSE)) {
@@ -399,7 +399,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 	                
 					//Preamble
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 					
 					//Test Body
 					v_request := valueof(m_createAe(PX_APP_ID, omit, f_getResourceAddress(-1, -, e_spRelative) & "/" & PX_ALLOWED_C_AE_IDS[0]));	
@@ -435,7 +435,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 				}
 		  	  	
 				/**
-				 * @desc Check that the IUT sends a registration CREATE Request with the value of the attribute ATTRIBUTE_NAME  of the AE resource
+				 * @desc Check that the IUT accepts a create request of <AE> resource with attributes multiplicity equals to 1 and provided preprovisioned AE_ID of AE-ID-Stem format.
 				 * 
 				 */
 				testcase TC_CSE_REG_CRE_002() runs on AeSimu system CseSystem {
@@ -453,7 +453,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					//Preamble
 					
 					//Test Body
-					v_request := valueof(m_createAe(PX_APP_ID, omit, "C-AE-ID-STEM"));				
+					v_request := valueof(m_createAe(PX_APP_ID, omit, PX_ALLOWED_C_AE_IDS[0]));				
 	    									
 					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
 	
@@ -513,7 +513,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
-					var charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AE-ID is not allowed to register: " & unichar2char(PX_NOT_ALLOWED_C_AE_IDS[0]);
+					var universal charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AE-ID is not allowed to register: " & PX_NOT_ALLOWED_C_AE_IDS[0];
 					
 					//Test control
 	                
@@ -525,7 +525,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					//TODO: create serviceSubscribedProfile, Node, and serviceSubscribedAppRule
 					//v_cseBaseIndex := f_cse_preamble_createServiceSubscribedProfile({"C*"}); //c_CRUDNDi);
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 					
 					//Test Body	
 					//v_request := valueof(m_createAe(PX_APP_ID, omit, "C-AE-ID-STEM"));				
@@ -539,9 +539,15 @@ module OneM2M_Testcases_CSE_Release_1 {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation rejected.");
 						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int4107))) -> value v_response{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response{
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, creating AE with not allowed AE-ID ");
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
 						}
 						[] tc_ac.timeout {
 							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
@@ -796,7 +802,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					//Test control
 					if(not(PICS_IN_CSE)) {
-						setverdict(inconc, __SCOPE__ & ": IUT shall be MN-CSE to run this test case");
+						setverdict(inconc, __SCOPE__ & ": IUT shall be IN-CSE to run this test case");
 						stop;
 					}
 	                
@@ -874,7 +880,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));
 					vc_cse1.done;
 					
-					v_aeIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, "S-AE-ID-STEM"));
+					v_aeIndex := f_cse_createResource(int2, m_createAe(PX_APP_ID, omit, PX_ALLOWED_S_AE_IDS[0]));
 					
 					vc_cse1.start(f_cse_announcementProcedure_createHandler());
 					vc_cse1.done;
@@ -989,7 +995,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					testcase TC_CSE_REG_CRE_012_AE_LBL() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, PX_AE1_ID_STEM);
 						
 						v_create.primitiveContent.aE.labels := {"labels"};
 						v_ae1.start(f_CSE_REG_CRE_012(v_create));
@@ -998,7 +1004,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					testcase TC_CSE_REG_CRE_012_AE_APN() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, PX_AE1_ID_STEM);
 						
 						v_create.primitiveContent.aE.appName := "AeAppName";
 						v_ae1.start(f_CSE_REG_CRE_012(v_create));
@@ -1007,7 +1013,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					testcase TC_CSE_REG_CRE_012_AE_POA() runs on Tester system CseSystem {
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, omit);
+						var template RequestPrimitive v_create := m_createAe(PX_APP_ID, omit, PX_AE1_ID_STEM);
 						
 						v_create.primitiveContent.aE.pointOfAccess := {PX_AE1_ADDRESS};
 						v_ae1.start(f_CSE_REG_CRE_012(v_create));
@@ -1085,7 +1091,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					var RequestPrimitive v_request;
 					var integer v_cseBaseIndex := -1;
 					var ResourceType v_resourceType := int2;
-					var charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AppId is not allowed to register: " & unichar2char(PX_APP_ID);
+					var universal charstring v_action :=  __SCOPE__ & ": Please, make sure that the following AppId is not allowed to register: " & PX_APP_ID;
 	   
 					//Test control
 	                
@@ -1094,10 +1100,10 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					//Preamble
 					action(v_action);
-					f_sleepIgnoreDef(30.0);
+					f_sleepIgnoreDef(PX_TCONFIG_IUT);
 											
 					// Test Body
-					v_request := valueof(m_createAe(PX_APP_ID, omit, omit));				
+					v_request := valueof(m_createAe(PX_NOT_ALLOWED_APP_ID, -, PX_AE1_ID_STEM, -, -));				
 	    									
 					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, v_cseBaseIndex);
 					
@@ -1108,9 +1114,15 @@ module OneM2M_Testcases_CSE_Release_1 {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": AE creation rejected.");
 						}
-						[] mcaPort.receive(mw_response(mw_responsePrimitiveInverse(int4107))) -> value v_response{
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value v_response{
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Error while creating AE with status code " & int2str(enum2int(v_response.primitive.responsePrimitive.responseStatusCode)));
+						}
+						[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) -> value v_response{
+							tc_ac.stop;
+							setverdict(fail, __SCOPE__ & ": Error, creating AE with not allowed APP-ID ");
+							f_checkAttributesToBeSaved(int2, v_request, v_response.primitive.responsePrimitive);
+							vc_aeAuxIndex := f_setResource(v_response.primitive.responsePrimitive.primitiveContent, int2);
 						}
 						[] tc_ac.timeout {
 							setverdict(fail, __SCOPE__ & ": No answer while creating AE");
@@ -1134,7 +1146,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						
 						//Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM);
 						
 						v_createRequest.primitiveContent.aE.app_ID := omit;	//Mandatory app_ID field is being set empty
 	
@@ -1146,7 +1158,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 	
 						// Local variables
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM);
 						
 						v_createRequest.primitiveContent.aE.requestReachability := omit;	//Mandatory requestReachability field is being set empty
 						
@@ -1286,7 +1298,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					vc_cse1.start(f_cse_registrationRemoteCse(mw_createRemoteCSE));
 					vc_cse1.done;
 	
-					v_request := valueof(m_createAe(PX_APP_ID, omit, omit));				
+					v_request := valueof(m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM));				
 						
 					v_request := f_getCreateRequestPrimitive(v_resourceType, v_request, -1);
 
@@ -1511,7 +1523,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					// Local variables
 					var ResponsePrimitive v_responsePrimitive;
 					var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
-					var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with attributes multiplicity equals to 1";
+					var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with attributes multiplicity equals to 1";
 	   
 					//Test control
 					if(not(PICS_MN_CSE or PICS_ASN_CSE)) {
@@ -1620,7 +1632,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_RN() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute resourceName";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute resourceName";
 						v_utRequest.primitiveContent.remoteCSE.resourceName := "UNINITIALIZED";
 						v_request.primitiveContent.remoteCSE.resourceName := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1629,7 +1641,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_ET() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute expirationTime";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute expirationTime";
 						v_utRequest.primitiveContent.remoteCSE.expirationTime := "20301231T012345";
 						v_request.primitiveContent.remoteCSE.expirationTime := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1638,7 +1650,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_LBL() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute labels";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute labels";
 						v_utRequest.primitiveContent.remoteCSE.labels := {"UNINITIALIZED"};
 						v_request.primitiveContent.remoteCSE.labels := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1647,7 +1659,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_POA() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute pointOfAccess";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute pointOfAccess";
 						v_utRequest.primitiveContent.remoteCSE.pointOfAccess := {"UNINITIALIZED"};
 						v_request.primitiveContent.remoteCSE.pointOfAccess := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1656,7 +1668,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_NL() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute nodeLink";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute nodeLink";
 						v_utRequest.primitiveContent.remoteCSE.nodeLink := "UNINITIALIZED";
 						v_request.primitiveContent.remoteCSE.nodeLink := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1665,7 +1677,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_CRE_026_CST() runs on CseSimu system CseSystem {
 						var template UtTriggerPrimitive v_utRequest := m_utCreateRemoteCSE;
 						var template RequestPrimitive v_request := mw_createRemoteCSE;
-						var charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute cseType";
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a CSE registration request with optional attribute cseType";
 						v_utRequest.primitiveContent.remoteCSE.cseType := int1;//TODO It should be marked as "UNITIALIZED"
 						v_request.primitiveContent.remoteCSE.cseType := ?;
 						f_CSE_REG_CRE_026(v_utRequest,v_request,v_action);
@@ -1940,7 +1952,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_RET_004_LBL() runs on Tester system CseSystem {
 						// Local variables
 						var Labels v_labels_1 := {"VALUE_1"};
-						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM);
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						var template PrimitiveContent v_contentResponse;
 						
@@ -1956,7 +1968,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_RET_004_APN() runs on Tester system CseSystem {
 						//Local variables
 						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM);
 						 var template PrimitiveContent v_contentResponse;
 						 
 						 v_createRequest.primitiveContent.aE.appName := "AeAppName";
@@ -1971,7 +1983,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					testcase TC_CSE_REG_RET_004_POA() runs on Tester system CseSystem {
 						//Local variables
 						 var AeSimu v_ae1 := AeSimu.create("AE1") alive;
-						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID);
+						 var template RequestPrimitive v_createRequest := m_createAe(PX_APP_ID, -, PX_AE1_ID_STEM);
 						 var template PrimitiveContent v_contentResponse;
 						 
 						 v_createRequest.primitiveContent.aE.pointOfAccess := {PX_AE1_ADDRESS};
@@ -2067,7 +2079,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 				 // Test adapter configuration
 
 				 // Preamble
-				 if(PICS_IN_CSE){
+				 if(PX_IN_CSE){
 				     vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
 				    
 					 v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
@@ -2096,7 +2108,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						 }
 					 }
 				    
-				 } else if (PICS_MN_CSE) {
+				 } else if (PX_MN_CSE) {
 					vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);
 					
 					v_contentResponse.remoteCSE := mw_contentRemoteCSEBase;
@@ -2284,7 +2296,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					 var ResourceType v_resourceType := int16;	//remoteCSE
 					 var template PrimitiveContent v_contentResponse;
 					 var template UtTriggerPrimitive v_utRequest;
-					 var charstring v_action := __SCOPE__ & ": Please, send a valid RETRIEVE Request containing To set to " & PX_CSE1_ADDRESS;
+					 var universal charstring v_action := __SCOPE__ & ": Please, send a valid RETRIEVE Request containing To set to " & PX_CSE1_ADDRESS;
 	 		
 					 // Test control
 					 if(not(PICS_MN_CSE)) {
@@ -2347,11 +2359,11 @@ module OneM2M_Testcases_CSE_Release_1 {
 					 // Test adapter configuration
 	
 					 // Preamble
-                    if (PICS_IN_CSE){
+                    if (PX_IN_CSE){
                         vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
                     }
                     
-                    if (PICS_MN_CSE){
+                    if (PX_MN_CSE){
                         vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);   
                     }
 					 
@@ -2630,11 +2642,11 @@ module OneM2M_Testcases_CSE_Release_1 {
 					// Test adapter configuration
 
 					// Preamble
-                    if (PICS_MN_CSE){
+                    if (PX_MN_CSE){
 					    vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSE);
                     }
                     
-                    if (PICS_IN_CSE){
+                    if (PX_IN_CSE){
 					    vc_remoteCseIndex := f_cse_registerRemoteCse(m_createRemoteCSEBase);
                     }
                     
@@ -2647,10 +2659,12 @@ module OneM2M_Testcases_CSE_Release_1 {
 						[] mccPort.receive(mw_response(mw_responsePrimitive(int2002))) {
 							tc_ac.stop;
 							setverdict(pass, __SCOPE__ & ": Deletion of <remoteCSE> resource has been accepted");
+							f_removeElementFromList(vc_resourcesIndexToBeDeleted, vc_remoteCseIndex);							
 						}
 						[] mccPort.receive(mw_response(mw_responsePrimitiveOK)) {
 							tc_ac.stop;
 							setverdict(fail, __SCOPE__ & ": Wrong response status code in the response");
+							f_removeElementFromList(vc_resourcesIndexToBeDeleted, vc_remoteCseIndex);
 						}
 						[] mccPort.receive(mw_response(mw_responsePrimitiveKO)) {
 							tc_ac.stop;
@@ -2735,7 +2749,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 					var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
 					var UtTriggerAckPrimitive v_trigger_response;
 					var integer v_auxInteger;
-					var charstring v_action := __SCOPE__ & ": Please, send a valid DELETE Request containing To set to " & PX_CSE1_ADDRESS;
+					var universal charstring v_action := __SCOPE__ & ": Please, send a valid DELETE Request containing To set to " & PX_CSE1_ADDRESS;
 					
 					//Test control
 					if(not(PICS_MN_CSE)) {
@@ -3248,11 +3262,11 @@ module OneM2M_Testcases_CSE_Release_1 {
 					 */
 					testcase TC_CSE_DMR_CRE_005_MNI() runs on Tester system CseSystem {
 						// Local variables
-						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						var template RequestPrimitive v_createRequest := m_createContainerBaseInvalid;
 						var AttributeAux v_invalidAttribute;
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 												
-						v_createRequest.primitiveContent.container.maxNrOfInstances := 0;
+						v_createRequest.primitiveContent.container_update_invalid.maxNrOfInstances := -1;
 						v_invalidAttribute := {name := "maxNrOfInstances", value_ := "-1"};
 						
 						v_ae1.start(f_CSE_DMR_CRE_005(int3, v_createRequest, v_invalidAttribute));			
@@ -3261,11 +3275,11 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					testcase TC_CSE_DMR_CRE_005_MBS() runs on Tester system CseSystem {
 						// Local variables
-						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						var template RequestPrimitive v_createRequest := m_createContainerBaseInvalid;
 						var AttributeAux v_invalidAttribute;
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						
-						v_createRequest.primitiveContent.container.maxByteSize := 0;
+						v_createRequest.primitiveContent.container_update_invalid.maxByteSize := -1;
 						v_invalidAttribute := {name := "maxByteSize", value_ := "-1"};
 						
 						v_ae1.start(f_CSE_DMR_CRE_005(int3, v_createRequest, v_invalidAttribute));
@@ -3275,11 +3289,11 @@ module OneM2M_Testcases_CSE_Release_1 {
 					
 					testcase TC_CSE_DMR_CRE_005_MIA() runs on Tester system CseSystem {
 						// Local variables
-						var template RequestPrimitive v_createRequest := m_createContainerBase;
+						var template RequestPrimitive v_createRequest := m_createContainerBaseInvalid;
 						var AttributeAux v_invalidAttribute;
 						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
 						
-						v_createRequest.primitiveContent.container.maxInstanceAge := 0;
+						v_createRequest.primitiveContent.container_update_invalid.maxInstanceAge := -1;
 						v_invalidAttribute := {name := "maxInstanceAge", value_ := "-1"};
 						
 						v_ae1.start(f_CSE_DMR_CRE_005(int3, v_createRequest, v_invalidAttribute));
@@ -3913,7 +3927,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						var RequestPrimitive v_request;
 						var integer v_aeIndex := -1;
 						var integer v_containerIndex := -1;
-						const integer c_maxByteSize := 0;				   
+						const integer c_maxByteSize := 1;				   
 						// Test control
 
 						// Test component configuration
@@ -5019,6 +5033,70 @@ module OneM2M_Testcases_CSE_Release_1 {
 									setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
 								}
 							}
+						}
+					}
+					
+					testcase TC_CSE_DMR_UPD_004_ACP_PVS_PV_LBL() runs on Tester system CseSystem {
+						// Local variables
+						var AeSimu v_ae1 := AeSimu.create("AE1") alive;
+						var Labels v_labels_1 := {"VALUE_1"};
+						var Labels v_labels_2 := {"To be deleted"};
+						var SetOfAcrs v_privileges_1 := {accessControlRule_list := {valueof(m_createAcr({"all"}, int63))}};
+						var SetOfAcrs v_selfprivileges_2 := {accessControlRule_list := {valueof(m_createAcr({"all"}, int62))}};
+						var AttributeAux_list v_nullFields;
+						var template RequestPrimitive v_createRequest := m_createAcpBase;// privileges set by default to 63 for *
+						var template RequestPrimitive v_updateRequest := m_updateAcpBase;
+						var ResponsePrimitive v_responsePrimitive;
+						var PrimitiveContent v_primitiveContentRetrieveResource;
+						
+						v_createRequest.primitiveContent.accessControlPolicy.labels := v_labels_1;//Attribute 3
+						v_createRequest.primitiveContent.accessControlPolicy.privileges.accessControlRule_list := {};//Attribute 2
+						v_updateRequest.primitiveContent.accessControlPolicy.selfPrivileges := v_selfprivileges_2; //Attribute 1
+						v_updateRequest.primitiveContent.accessControlPolicy.privileges := v_privileges_1;//Attribute 2
+						v_updateRequest.primitiveContent.accessControlPolicy.labels := v_labels_2;//Attribute 3
+						
+						v_nullFields := {{"labels", omit}};
+      							
+						v_ae1.start(f_CSE_DMR_UPD_004(int1, v_createRequest, v_updateRequest, v_nullFields));//AccessControlPolicy
+						v_ae1.done;
+						
+						 
+																		
+						if(getverdict == pass){ v_responsePrimitive := f_getResponsePrimitive(v_ae1);
+							if(ispresent(v_responsePrimitive.primitiveContent)) {
+								if(ischosen(v_responsePrimitive.primitiveContent.accessControlPolicy)) {
+									//Check attribute 1
+									if(not match(v_responsePrimitive.primitiveContent.accessControlPolicy.selfPrivileges.accessControlRule_list[0].accessControlOperations, v_selfprivileges_2.accessControlRule_list[0].accessControlOperations)){
+										setverdict(fail, __SCOPE__ & ": Error: SelfPrivileges attribute not updated correctly")
+									}
+									//Check attribute 2
+									if(not match(v_responsePrimitive.primitiveContent.accessControlPolicy.privileges, valueof(v_updateRequest.primitiveContent.accessControlPolicy.privileges))){
+										setverdict(fail, __SCOPE__ & ": Error: Privileges attribute not added correctly")
+									}
+									//Check attribute 3
+									if(ispresent(v_responsePrimitive.primitiveContent.accessControlPolicy.labels)){
+										setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
+									}
+								}
+							}
+							
+							v_primitiveContentRetrieveResource := f_getPrimitiveContentRetrievedResource(v_ae1);
+							
+							//Check that the resource has been udpated correctly
+						  	if(ischosen(v_primitiveContentRetrieveResource.accessControlPolicy)) {
+							  //Check attribute 1
+							  if(not match (v_primitiveContentRetrieveResource.accessControlPolicy.selfPrivileges.accessControlRule_list[0].accessControlOperations, v_selfprivileges_2.accessControlRule_list[0].accessControlOperations)){
+								  setverdict(fail, __SCOPE__ & ": Error: SelfPrivileges attribute not updated correctly")
+							  }
+							  //Check attribute 2
+							  if(not match (v_primitiveContentRetrieveResource.accessControlPolicy.privileges, valueof(v_updateRequest.primitiveContent.accessControlPolicy.privileges))){
+								  setverdict(fail, __SCOPE__ & ": Error: Privileges attribute not added correctly")
+							  }
+							  //Check attribute 3
+							  if(ispresent(v_primitiveContentRetrieveResource.accessControlPolicy.labels)){
+								  setverdict(fail, __SCOPE__ & ": Error: Labels attribute not deleted correctly")
+							  }
+						  	}
 						}
 					}
 					
@@ -9545,7 +9623,7 @@ module OneM2M_Testcases_CSE_Release_1 {
 						tc_ac.stop;
 						setverdict(fail, __SCOPE__ & ": Wrong response status code while retrieving resource");
 					}
-					[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) { 
+					[] mcaPort.receive(mw_response(mw_responsePrimitiveOK)) { 
 						tc_ac.stop;
 						setverdict(fail, __SCOPE__ & ": Wrong response while retrieving resource");
 					}
