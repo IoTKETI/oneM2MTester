@@ -176,6 +176,7 @@ namespace OneM2M__DualFaceMapping {
 			 * Therefore, other attributes can be added later
 			 */
 			if(p__forcedFields != NULL_VALUE) { // if requestPrimitive has forcedValue
+
 				for(int i = 0; i < p__forcedFields.lengthof(); i++) {
 					if(p__forcedFields[i].name() == EXPIRATION_TIME) {
 						if (p__forcedFields[i].value__() == OMIT_VALUE) {
@@ -195,6 +196,48 @@ namespace OneM2M__DualFaceMapping {
 
 								if(elemObj.isMember(EXPIRATION_TIME_SHORT)) {
 									jsonRootClone[rootKeyValue.asString()][EXPIRATION_TIME_SHORT] = Value::null;
+								}
+							}
+						}
+					} else if (p__forcedFields[i].name() == "selfPrivileges") {
+						if (p__forcedFields[i].value__() == OMIT_VALUE) {
+
+							Value rootKeyValue = Value::null;
+
+							for (Value::iterator iter = jsonRootClone.begin(); iter != jsonRootClone.end(); ++iter) {
+
+								// Store the root key name
+								if(rootKeyValue == Value::null) {
+									rootKeyValue = iter.key();
+								}
+
+								// Check the sub-key name
+								elemName = iter.key();
+								elemObj = jsonRootClone.get(elemName.asString(), Value::null);
+
+								if(elemObj.isMember("pvs")) {
+									jsonRootClone[rootKeyValue.asString()]["pvs"] = Value::null;
+								}
+							}
+						}
+					} else if (p__forcedFields[i].name() == "notificationURI") {
+						if (p__forcedFields[i].value__() == OMIT_VALUE) {
+
+							Value rootKeyValue = Value::null;
+
+							for (Value::iterator iter = jsonRootClone.begin(); iter != jsonRootClone.end(); ++iter) {
+
+								// Store the root key name
+								if(rootKeyValue == Value::null) {
+									rootKeyValue = iter.key();
+								}
+
+								// Check the sub-key name
+								elemName = iter.key();
+								elemObj = jsonRootClone.get(elemName.asString(), Value::null);
+
+								if(elemObj.isMember("nu")) {
+									jsonRootClone[rootKeyValue.asString()]["nu"] = Value::null;
 								}
 							}
 						}
