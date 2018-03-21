@@ -248,6 +248,10 @@ namespace OneM2M__DualFaceMapping {
 			StyledWriter writer;
 			std::string json_str = writer.write(jsonRootClone);
 
+			// std::replace(json_str.begin(), json_str.end(), '\\\\', '\0');
+			// json_str.erase(std::remove(json_str.begin(), json_str.end(), '\n'), json_str.end());
+			// json_str.erase(std::remove(json_str.begin(), json_str.end(), ' '), json_str.end());
+
 			CHARSTRING temp_cs(json_str.c_str());
 			encoded_message = temp_cs;
 

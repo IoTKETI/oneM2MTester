@@ -108,7 +108,11 @@ module OneM2M_DualFaceMapping {
 			
 				//from attribute
 				if(ispresent(v_reqPrimitive.from_)) {
-		  			v_from := oct2char(unichar2oct(v_reqPrimitive.from_));                         
+					v_from := oct2char(unichar2oct(v_reqPrimitive.from_));       
+				  	
+				  	if(v_from == "UnknowOriginator" or v_from == "testDomain") {
+				  		v_from := "c" & v_from;  
+				  	}	                    
 				}
 				
 				//parse requestPrimitive to_ attribute and generate protocol target URL
