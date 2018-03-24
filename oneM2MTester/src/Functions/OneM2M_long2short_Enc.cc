@@ -47,6 +47,8 @@ struct MyKeyHash {
 
 namespace OneM2M__DualFaceMapping {
 
+	int connectionID = 0;
+
 	static const CHARSTRING EXPIRATION_TIME("expirationTime"), EXPIRATION_TIME_SHORT("et"),
 				 EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"), SUBSCRIPTION("subscription"),
 				 OPERATION_MONITOR_LIST("operationMonitor_list"), AGGREGATED_RESPONSE("aggregatedResponse"),
@@ -65,6 +67,14 @@ namespace OneM2M__DualFaceMapping {
 	const char* CONTENT_ATTR	= "content"; 
 	const char* EMBED_VALUES_ATTR	= "embed_values";
 	const char* ELEM_LIST_ATTR	= "elem_list";
+
+	INTEGER f__getConId__mcaPortIn ( ) {
+		return connectionID;
+	}
+
+	void f__setConId__mcaPortIn(const INTEGER& p__string) {
+		connectionID = p__string;
+	}
 
 	/**
 	 * @desc convert string from uppercase to lowercase

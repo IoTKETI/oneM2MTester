@@ -369,6 +369,35 @@ module oneM2MTester_Template {
      *============================
      */
     group Http_template {    	
+      
+      template HTTPResponse http_response_for_mcaPortIn (
+        	integer    p_clientId, 
+        	integer    p_statusCode,
+        	charstring p_requestId,
+        	charstring p_payload) := {
+        	
+        	client_id 		:= p_clientId,
+        	version_major 	:= 1, //p_major_version,
+        	version_minor	:= 1, //p_minor_version,
+        	statuscode		:= p_statusCode,
+        	statustext      := "",
+        	
+        	header := {
+    			{
+    				header_name 	:= HTTP_HOST,
+    				header_value 	:= OneM2M_Constants.tsp_connectionParams.remHost & ":" & int2str(OneM2M_Constants.tsp_connectionParams.remPort)
+    			},
+    			{
+    				header_name 	:= HTTP_M2M_REQUEST_ID,
+    				header_value 	:= p_requestId
+    			},			
+    			{
+    				header_name 	:= HTTP_CONTENT_LENGTH,
+    				header_value 	:= int2str(lengthof(p_payload))
+    			}
+    		},
+    		body := p_payload
+		}      
         
         /**
     	 * @desc HTTP POST request for utTrigger primitive

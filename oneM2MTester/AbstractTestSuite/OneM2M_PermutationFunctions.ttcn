@@ -38,7 +38,7 @@ module OneM2M_PermutationFunctions {
 						var integer v_resourceIndex := -1;
 						var MsgIn v_request;
 						var PrimitiveContent v_modifiedResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid CREATE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid CREATE Request for container containing To set to " & f_getLocalResourceAddress(0, e_nonHierarchical, p_primitiveScope);
 						
 						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -48,7 +48,7 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 						
 						//Send Trigger Message
-						v_utRequest.to_ := f_getLocalResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						v_utRequest.to_ := f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
 						v_utRequest.from_ := "UNINITIALIZED";
 						f_sendUtPrimitive(v_utRequest, v_action);
 						
@@ -82,7 +82,7 @@ module OneM2M_PermutationFunctions {
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
 						var UtTriggerAckPrimitive v_trigger_response;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid CREATE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid CREATE Request for container containing To set to " & f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						
 						
 						//Test Control
@@ -94,7 +94,7 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 	
 						//Send Trigger Message
-						v_utRequest.to_ := f_getLocalResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						v_utRequest.to_ := f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						v_utRequest.from_ := "UNINITIALIZED";
 						f_sendUtPrimitive(v_utRequest,v_action);
 							

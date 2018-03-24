@@ -43,8 +43,10 @@ module OneM2M_DualFaceMapping {
 	external function f_split_uri(in charstring p_cs, in charstring p_delim) return Charstring_List;
 	external function f_replace(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
 	external function f_adressingFormatter(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
-	
-	
+
+	external function f_getConId_mcaPortIn() return integer;
+	external function f_setConId_mcaPortIn(in integer mca_port_in_conID);
+
 	/******************************************************
 	* Function for mcaPort and mccPort encoding           *
 	*******************************************************/
@@ -111,7 +113,7 @@ module OneM2M_DualFaceMapping {
 					v_from := oct2char(unichar2oct(v_reqPrimitive.from_));       
 				  	
 				  	if(v_from == "UnknowOriginator" or v_from == "testDomain") {
-				  		v_from := "c" & v_from;  
+				  		v_from := "C" & v_from;  
 				  	}	                    
 				}
 				
@@ -367,44 +369,53 @@ module OneM2M_DualFaceMapping {
 					}            
                 }else{
 					log(__SCOPE__ &"-[warning]NOT SUPPORTED Serialization or Protocol binding TYPE !! ");   		  	  
-                } 	   		     
+                }
+                
+                // Handling the connectionID                
+                p_asp_Send.connId := connectId_init;
+                 	   		     
 			} else if (ischosen(p_msgout.primitive.responsePrimitive)) {
 				var ResponsePrimitive v_rspPrimitive := p_msgout.primitive.responsePrimitive;
 				var charstring v_rspRequestID_		 := "";
-				var charstring v_response_status 	 := "";
-				var HTTPRequest v_httpReqMsg;
+				var integer v_response_status;
+				var HTTPResponse v_httpRespMsg;
 				var HTTPMessage v_httpMsgToSend;
-				var charstring v_accept; 
-				     	
-				//assemble accept with serialization type
-				v_accept := ACCEPT_BASE & v_serial_type;
 				
+				// Handling the connectionID    
+				p_asp_Send.connId := f_getConId_mcaPortIn();
+	
 				// ResponseStatus
 				if(ispresent(v_rspPrimitive.responseStatusCode)) {
-	  				var integer responseStatus	:= enum2int(v_rspPrimitive.responseStatusCode);     
-	  				v_response_status := int2str(responseStatus)             
+	  				v_response_status := enum2int(v_rspPrimitive.responseStatusCode);         
+	  				
+	  				// change onem2m response stauts code to http response status code
+	  				if(v_response_status == 2000) {
+	  					v_response_status := 200;
+	  				} else if (v_response_status == 2001) {
+	  					v_response_status := 201;
+	  				} else if (v_response_status == 2004) {
+	  					v_response_status := 204;       
+					}
 				}
 				
 				// RequestIdentifier
 				if(ispresent(v_rspPrimitive.requestIdentifier)) {
 	  				v_rspRequestID_	:= oct2char(unichar2oct(v_rspPrimitive.requestIdentifier));                  
 				}
-			  
-				v_httpReqMsg := valueof(t_HTTP_GET_request_for_AE_Testing(connectId_init, v_uri, v_accept, v_response_status, v_reqID));
+			    
+				v_httpRespMsg := valueof(http_response_for_mcaPortIn(f_getConId_mcaPortIn(), v_response_status, v_rspRequestID_, ""));
 				
 				//generate HTTP Message
 				v_httpMsgToSend := {
-					request:= v_httpReqMsg                             	  
+					response:= v_httpRespMsg                             	  
 				}
-				 log(__SCOPE__ &"-HTTP Message to send ", v_httpMsgToSend);
+				log(__SCOPE__ &"-HTTP Message to send ", v_httpMsgToSend);
 				     	        
 				v_encoded_msg := enc_HTTPMessage(v_httpMsgToSend);        
-				log(__SCOPE__ &"-Encoded HTTP Message to send ", v_encoded_msg);
+				log(__SCOPE__ &"-Encoded HTTP Message to send ", v_encoded_msg);				
 			}
 			
-			//Generate IPL4ASP message 
-			p_asp_Send.connId		:= connectId_init;
-				
+			//Generate IPL4ASP message 				
 			if(HTTP_BINDING == v_protocol_type){
 		  		p_asp_Send.proto 	:= {tcp := {}};
 			} else if(COAP_BINDING == v_protocol_type){
@@ -421,7 +432,7 @@ module OneM2M_DualFaceMapping {
 	function f_dec_ASPRecvFrom_to_M2MPrimitive(in ASP_RecvFrom p_aspRecvFrom, out MsgIn p_msgin) {
 		var MsgIn v_msgIn;	
   		var ResponsePrimitive v_responsePrimitive;  
-  		var ResponseStatusCode v_responseStatusCode;
+  		var ResponseStatusCode v_responseStatusCode;		
  
  		// Variables for the Automated testing
   		var RequestPrimitive v_requestPrimitive;
@@ -702,6 +713,8 @@ module OneM2M_DualFaceMapping {
 				v_msgIn.primitive.responsePrimitive := v_responsePrimitive;
 				v_msgIn.nullFields := omit;
 				p_msgin := v_msgIn;
+				
+				
       		} else {
       		  	log(__SCOPE__&"-Setting the request message");
       		  	// primitive := { requestPrimitive := p_requestPrimitive}
@@ -727,6 +740,8 @@ module OneM2M_DualFaceMapping {
       			v_requestPrimitive.discoveryResultType := omit;
       			
 				v_msgIn.primitive.requestPrimitive := v_requestPrimitive;
+				f_setConId_mcaPortIn(p_aspRecvFrom.connId);
+				v_msgIn.nullFields := omit;
 				p_msgin := v_msgIn; 
       		}
 			port.setstate(0);
