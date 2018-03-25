@@ -33,7 +33,7 @@ module OneM2M_DualFaceMapping {
 	
 	// External functions
 	external function f_extract_from_string(in charstring p_source) return charstring;
-	external function f_primitiveContent_Dec(in charstring p_source, in charstring p_serialization_type) return charstring;
+	external function f_primitiveContent_Dec(in charstring p_source, in charstring p_serialization_type, in charstring p_noti_received) return charstring;
 	external function f_upper2lower(in charstring p_string) return charstring;
 
 	//Serialization encoding for XML, JSON 
@@ -46,7 +46,7 @@ module OneM2M_DualFaceMapping {
 
 	external function f_getConId_mcaPortIn() return integer;
 	external function f_setConId_mcaPortIn(in integer mca_port_in_conID);
-
+	
 	/******************************************************
 	* Function for mcaPort and mccPort encoding           *
 	*******************************************************/
@@ -395,6 +395,8 @@ module OneM2M_DualFaceMapping {
 	  					v_response_status := 201;
 	  				} else if (v_response_status == 2004) {
 	  					v_response_status := 204;       
+					} else if (v_response_status == 4000) {
+					  	v_response_status := 400;
 					}
 				}
 				
@@ -542,7 +544,7 @@ module OneM2M_DualFaceMapping {
         					}
         
         					if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
-        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type); 
+        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type, ""); 
         				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
         					}	  
                		  	} else { // request case
@@ -551,7 +553,7 @@ module OneM2M_DualFaceMapping {
                		  			v_headerName 	:= v_header.header_name;
                		  			v_headerValue 	:= v_header.header_value;               		  		
                		  		
-               		  			if("X-M2M-RI" == v_headerName){
+               		  			if("X-M2M-RI" == v_headerName or "x-m2m-ri" == v_headerName){
                		  		  		v_requestPrimitive.requestIdentifier 	:= v_headerValue;  		  		  
                		  			}
                		  		}
@@ -559,9 +561,9 @@ module OneM2M_DualFaceMapping {
         					if(v_httpRespBody != "" and not enable_rsp_decode){
         				  		log(__SCOPE__&"-[ERROR]ERROR HTTP MESSAGE!!");
         					}
-        
+        					
         					if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
-        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type); 
+        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type, "noti_received"); 
         				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
         					}
                		  	}			
@@ -636,7 +638,7 @@ module OneM2M_DualFaceMapping {
                		  	  	  	v_coapRespBody := oct2char(v_coapPayload);
                		  	  	  	
                		  	  	  	if(v_coapRespBody != "" and v_serial_type != "" and enable_rsp_decode) {
-               		  	  	  	 	v_encoded_primitiveContent := f_primitiveContent_Dec(v_coapRespBody, v_serial_type);       		  	  	  	  
+               		  	  	  	 	v_encoded_primitiveContent := f_primitiveContent_Dec(v_coapRespBody, v_serial_type, "");       		  	  	  	  
                		  	  		}       		  	  	  	
                		  	  	} else {
                		  	  		log(__SCOPE__&"-No Coap body!!!!");
@@ -717,15 +719,17 @@ module OneM2M_DualFaceMapping {
 				
       		} else {
       		  	log(__SCOPE__&"-Setting the request message");
-      		  	// primitive := { requestPrimitive := p_requestPrimitive}
-      		  	// mw_createContainer(omit,v_utRequest.to_
-      			
+      		  	/*  We manually put the several values to the attributes
+      		  	 *  To manage both notification and ae testing,
+      		  	 *  we hvae to parse the several field to make notification and ae tseting branch 
+				 */
+      		  	
       			//set MsgIn
-				v_requestPrimitive.operation := int1;
+				v_requestPrimitive.operation := int5 // AE: int1;
       			v_requestPrimitive.from_ := omit;
       			v_requestPrimitive.to_ := "Mobius";
       			v_requestPrimitive.role := omit;
-      			v_requestPrimitive.resourceType := int3;
+      			v_requestPrimitive.resourceType := omit // AE: int3;
       			v_requestPrimitive.originatingTimestamp := omit;
       			v_requestPrimitive.requestExpirationTimestamp := omit;
       			v_requestPrimitive.resultExpirationTimestamp := omit;

@@ -36,4 +36,14 @@ namespace OneM2M__DualFaceMapping {
 	void DeepParserDec(tinyxml2::XMLElement* pRootElem, tinyxml2::XMLDocument* xmlDoclone, tinyxml2::XMLElement* pRootElemClone, tinyxml2::XMLElement* pDestParent);
 	Json::Value JSONDeepParser(Json::Value jsonSrc, Json::Value jsonObjClone, Json::Value jsonParent);
 	Json::Value JSONDeepParserDec(Json::Value jsonSrc, Json::Value jsonObjClone, Json::Value jsonTarget);
+
+	/*********************************************************
+	 * Parser functions will be here for all oneM2M resources
+	 *********************************************************/
+
+	/******* Encoding functions *******/
+
+	/******* Decoding functions *******/
+	CHARSTRING noti_JSON_Dec_Parser(const CHARSTRING& source_str, const CHARSTRING& serial_type);
+	Json::Value noti_JSON_Dec_Parser_Deep(Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
 }
