@@ -38,7 +38,7 @@ namespace OneM2M__DualFaceMapping {
 	Json::Value JSONDeepParserDec(Json::Value jsonSrc, Json::Value jsonObjClone, Json::Value jsonTarget);
 
 	/*********************************************************
-	 * Parser functions will be here for all oneM2M resources
+	 * Parser functions will be here for all oneM2M resources*
 	 *********************************************************/
 
 	/******* Encoding functions *******/

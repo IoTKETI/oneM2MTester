@@ -9,8 +9,7 @@
 *											                                            *
 * Contributors:										                                    *
 *   JaeYoung Hwang   - forest62590@gmail.com                                   	        *
-*   Nak-Myoung Sung                                                            	        *
-*   Ting Martin MIAO - initial implementation                                           *
+*   Nak-Myoung Sung  - nmsung@keti.re.kr                                       	        *
 *   Updated:  2018-03-25                                                          	    *
 ****************************************************************************************/
 
@@ -188,11 +187,10 @@ namespace OneM2M__DualFaceMapping {
 		}
 
 		// * rootTags such as 'm2m:sub', 'm2m:con' have to be under name "resource"
-		if(rootName == SUBSCRIPTION) {
-			rootName = RESOURCE;
+		if(rootName == SUBSCRIPTION || rootName == "aE" || rootName == "container") {
 
 			Value elemForSub(objectValue);
-			elemForSub[SUBSCRIPTION] = containerForSubElem;
+			elemForSub[rootName] = containerForSubElem;
 
 			objectRoot[RESOURCE] = elemForSub;
 		} else { // if attribute is not rootTag
