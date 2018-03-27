@@ -120,6 +120,9 @@ namespace OneM2M__DualFaceMapping {
      */
 	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type, const OneM2M__Types::AttributeAux__list& p__forcedFields){
 
+		// This function has been temporary added to encode the operationMonitor_list case
+		// encoding function will be added...
+
 		if(!initial_mapping()) {
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 		}
@@ -179,7 +182,6 @@ namespace OneM2M__DualFaceMapping {
 					}
 										
 				}
-
 			}
 
 			/* In this function, we have parsed forcedFileds array to add unsupported TTCN3 syntax value such as -1 and null.
@@ -724,8 +726,6 @@ namespace OneM2M__DualFaceMapping {
 			parent_tag = name_short;
 
 			if(elemObj.isObject()){
-				TTCN_Logger::log(TTCN_DEBUG, "**************1111*********************\n");
-
 
 				root_tag = name_short;
 
