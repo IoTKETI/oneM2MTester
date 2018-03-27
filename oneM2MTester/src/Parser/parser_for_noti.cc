@@ -170,6 +170,8 @@ namespace OneM2M__DualFaceMapping {
 				std::string tmp_str((const char*)(int2str(elemObj.asInt())));
 				std::string attr_val = getLongName(tmp_str);
 				containerForSubElem[name_long.c_str()] = attr_val;
+			} else if (elemObj.isBool()) { // bool
+				containerForSubElem[name_long.c_str()] = elemObj;
 			}
 		}
 
