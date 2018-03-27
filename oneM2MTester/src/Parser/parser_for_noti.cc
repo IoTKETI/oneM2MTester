@@ -111,7 +111,7 @@ namespace OneM2M__DualFaceMapping {
 
 		// Constant variables for the resource and attributes name
 		static const std::string SUBSCRIPTION("subscription"), RESOURCE("resource"), EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"),
-							     OPERATION_MONITOR_LIST("operationMonitor_list");
+							     OPERATION_MONITOR_LIST("operationMonitor_list"), EXPIRATION_COUNTER("expirationCounter");
 
 		std::string name_long;
 		std::string rootName;
@@ -167,9 +167,11 @@ namespace OneM2M__DualFaceMapping {
 			} else if (elemObj.isString()) { // string
 				containerForSubElem[name_long.c_str()] = elemObj;
 			} else if (elemObj.isInt()) { // integer
-				std::string tmp_str((const char*)(int2str(elemObj.asInt())));
-				std::string attr_val = getLongName(tmp_str);
-				containerForSubElem[name_long.c_str()] = attr_val;
+				if(name_long != EXPIRATION_COUNTER) {
+					std::string tmp_str((const char*)(int2str(elemObj.asInt())));
+					std::string attr_val = getLongName(tmp_str);
+					containerForSubElem[name_long.c_str()] = attr_val;
+				}
 			} else if (elemObj.isBool()) { // bool
 				containerForSubElem[name_long.c_str()] = elemObj;
 			}

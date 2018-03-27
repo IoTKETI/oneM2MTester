@@ -823,6 +823,7 @@ namespace OneM2M__DualFaceMapping {
 							}else if(tempObj.isObject()){
 								tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
 								elemArrayObj.append(tempObjClone);
+							}
 						}
 						elemObjClone[parent_tag.c_str()] = elemArrayObj;
 					}
