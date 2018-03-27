@@ -120,9 +120,6 @@ namespace OneM2M__DualFaceMapping {
      */
 	CHARSTRING f__serialization__Enc(const CHARSTRING& p__source, const CHARSTRING& p__serialization__type, const OneM2M__Types::AttributeAux__list& p__forcedFields){
 
-		// This function has been temporary added to encode the operationMonitor_list case
-		// encoding function will be added...
-
 		if(!initial_mapping()) {
 			TTCN_Logger::log(TTCN_DEBUG, "[WARNING]oneM2M long-short mapping initialization failed!!");
 		}
@@ -150,12 +147,39 @@ namespace OneM2M__DualFaceMapping {
 			std::string name_short;
 			std::string parent_tag = "";
 
+			// This function has been temporary added to encode the operationMonitor_list case
 			bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
+
 			if ( !parsingSuccessful ) {
 				TTCN_Logger::log(TTCN_DEBUG, "JsonCPP API parsing error!");
 				return "JsonCPP API parsing error!";
 			}
 
+			if(jsonRoot.isObject()){
+				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
+					Value subElemName = iter.key();
+					Value subElemObj = jsonRoot.get(subElemName.asString(), "");
+
+					for (Value::iterator iter = subElemObj.begin(); iter != subElemObj.end(); ++iter) {
+						Value subElemName2 = iter.key();
+
+
+						if(subElemName2 == "eventNotificationCriteria") {
+							Value subElemObj2 = subElemObj.get(subElemName2.asString(), "");
+
+							for (Value::iterator iter = subElemObj2.begin(); iter != subElemObj2.end(); ++iter) {
+								Value subElemName3 = iter.key();
+								if(subElemName3 == "operationMonitor_list") {
+									encoded_message = sub_JSON_Enc_Parser(p__source);
+									return encoded_message;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Following procedures are the original functions for the onem2m resource encoding
 			if(jsonRoot.isObject()){  
 
 				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
@@ -1278,7 +1302,6 @@ namespace OneM2M__DualFaceMapping {
 						if((elemKey.asString()).compare(OPERATION_MONITOR_LIST) == 0) { // has operationMonitor_list
 							return jsonObjClone;
 						} else {
-
 							Json::Value emptyArray_for_om;
 							emptyArray_for_om.append("int1");
 							eventNotiItemElem[OPERATION_MONITOR_LIST] = emptyArray_for_om;

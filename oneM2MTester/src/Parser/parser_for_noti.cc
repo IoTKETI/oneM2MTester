@@ -167,11 +167,15 @@ namespace OneM2M__DualFaceMapping {
 			} else if (elemObj.isString()) { // string
 				containerForSubElem[name_long.c_str()] = elemObj;
 			} else if (elemObj.isInt()) { // integer
-				if(name_long != EXPIRATION_COUNTER) {
+				if(name_long != EXPIRATION_COUNTER && name_long != "currentByteSize" && name_long != "currentNrOfInstances" && name_long != "stateTag" && name_long != "maxInstanceAge") {
 					std::string tmp_str((const char*)(int2str(elemObj.asInt())));
 					std::string attr_val = getLongName(tmp_str);
 					containerForSubElem[name_long.c_str()] = attr_val;
+				} else {
+					containerForSubElem[name_long.c_str()] = elemObj;
 				}
+			} else if (elemObj.isDouble()) {
+				containerForSubElem[name_long.c_str()] = elemObj;
 			} else if (elemObj.isBool()) { // bool
 				containerForSubElem[name_long.c_str()] = elemObj;
 			}

@@ -42,6 +42,8 @@ namespace OneM2M__DualFaceMapping {
 	 *********************************************************/
 
 	/******* Encoding functions *******/
+	CHARSTRING sub_JSON_Enc_Parser(const CHARSTRING& p__source);
+	Json::Value sub_JSON_Enc_Parser_Deep(Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
 
 	/******* Decoding functions *******/
 	CHARSTRING noti_JSON_Dec_Parser(const CHARSTRING& source_str, const CHARSTRING& serial_type);
