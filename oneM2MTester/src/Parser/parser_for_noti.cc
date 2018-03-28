@@ -112,7 +112,7 @@ namespace OneM2M__DualFaceMapping {
 		// Constant variables for the resource and attributes name
 		static const std::string SUBSCRIPTION("subscription"), RESOURCE("resource"), EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"),
 							     OPERATION_MONITOR_LIST("operationMonitor_list"), EXPIRATION_COUNTER("expirationCounter"), CURRENT_BYTE_SIZE("currentByteSize"),
-								 CURRENT_NR_INSTANCES("currentNrOfInstances"), STATE_TAG("statTag"), AE("aE"), CONTAINER("container"), MAX_INSTANCE_AGE("maxInstanceAge");
+								 CURRENT_NR_INSTANCES("currentNrOfInstances"), STATE_TAG("stateTag"), AE("aE"), CONTAINER("container"), MAX_INSTANCE_AGE("maxInstanceAge");
 
 		std::string name_long;
 		std::string rootName;
