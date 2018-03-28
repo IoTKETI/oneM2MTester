@@ -25,6 +25,7 @@ using namespace std;
 
 namespace OneM2M__DualFaceMapping {
 	CHARSTRING sub_JSON_Enc_Parser(const CHARSTRING& p__source){
+
 		Value elemName;
 		Value elemObj(objectValue);
 		Value subElemObj(objectValue);

@@ -111,7 +111,8 @@ namespace OneM2M__DualFaceMapping {
 
 		// Constant variables for the resource and attributes name
 		static const std::string SUBSCRIPTION("subscription"), RESOURCE("resource"), EVENT_NOTIFICATION_CRITERIA("eventNotificationCriteria"),
-							     OPERATION_MONITOR_LIST("operationMonitor_list"), EXPIRATION_COUNTER("expirationCounter");
+							     OPERATION_MONITOR_LIST("operationMonitor_list"), EXPIRATION_COUNTER("expirationCounter"), CURRENT_BYTE_SIZE("currentByteSize"),
+								 CURRENT_NR_INSTANCES("currentNrOfInstances"), STATE_TAG("statTag"), AE("aE"), CONTAINER("container"), MAX_INSTANCE_AGE("maxInstanceAge");
 
 		std::string name_long;
 		std::string rootName;
@@ -167,7 +168,7 @@ namespace OneM2M__DualFaceMapping {
 			} else if (elemObj.isString()) { // string
 				containerForSubElem[name_long.c_str()] = elemObj;
 			} else if (elemObj.isInt()) { // integer
-				if(name_long != EXPIRATION_COUNTER && name_long != "currentByteSize" && name_long != "currentNrOfInstances" && name_long != "stateTag" && name_long != "maxInstanceAge") {
+				if(name_long != EXPIRATION_COUNTER && name_long != CURRENT_BYTE_SIZE && name_long != CURRENT_NR_INSTANCES && name_long != STATE_TAG && name_long != MAX_INSTANCE_AGE) {
 					std::string tmp_str((const char*)(int2str(elemObj.asInt())));
 					std::string attr_val = getLongName(tmp_str);
 					containerForSubElem[name_long.c_str()] = attr_val;
@@ -195,7 +196,7 @@ namespace OneM2M__DualFaceMapping {
 		}
 
 		// * rootTags such as 'm2m:sub', 'm2m:con' have to be under name "resource"
-		if(rootName == SUBSCRIPTION || rootName == "aE" || rootName == "container") {
+		if(rootName == SUBSCRIPTION || rootName == AE || rootName == CONTAINER) {
 
 			Value elemForSub(objectValue);
 			elemForSub[rootName] = containerForSubElem;
