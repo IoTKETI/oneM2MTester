@@ -379,6 +379,7 @@ module OneM2M_DualFaceMapping {
 				var ResponsePrimitive v_rspPrimitive := p_msgout.primitive.responsePrimitive;
 				var charstring v_rspRequestID_		 := "";
 				var integer v_response_status;
+				var integer v_onem2m_response_status;
 				var HTTPResponse v_httpRespMsg;
 				var HTTPMessage v_httpMsgToSend;
 				
@@ -387,6 +388,7 @@ module OneM2M_DualFaceMapping {
 	
 				// ResponseStatus
 				if(ispresent(v_rspPrimitive.responseStatusCode)) {
+				    v_onem2m_response_status := enum2int(v_rspPrimitive.responseStatusCode);
 	  				v_response_status := enum2int(v_rspPrimitive.responseStatusCode);         
 	  				
 	  				// change onem2m response stauts code to http response status code
@@ -406,7 +408,7 @@ module OneM2M_DualFaceMapping {
 	  				v_rspRequestID_	:= oct2char(unichar2oct(v_rspPrimitive.requestIdentifier));                  
 				}
 			    
-				v_httpRespMsg := valueof(http_response_for_mcaPortIn(f_getConId_mcaPortIn(), v_response_status, v_rspRequestID_, ""));
+				v_httpRespMsg := valueof(http_response_for_mcaPortIn(f_getConId_mcaPortIn(), v_response_status, v_onem2m_response_status, v_rspRequestID_, ""));
 				
 				//generate HTTP Message
 				v_httpMsgToSend := {

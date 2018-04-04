@@ -373,6 +373,7 @@ module oneM2MTester_Template {
       	template HTTPResponse http_response_for_mcaPortIn (
         	integer    p_clientId, 
         	integer    p_statusCode,
+        	integer    p_onem2m_statusCode,
         	charstring p_requestId,
         	charstring p_payload) := {
         	
@@ -391,6 +392,10 @@ module oneM2MTester_Template {
     				header_name 	:= HTTP_M2M_REQUEST_ID,
     				header_value 	:= p_requestId
     			},			
+    			{
+    				header_name 	:= HTTP_RESPONSE_STATUS,
+    				header_value 	:= int2str(p_onem2m_statusCode)
+    			},	
     			{
     				header_name 	:= HTTP_CONTENT_LENGTH,
     				header_value 	:= int2str(lengthof(p_payload))
