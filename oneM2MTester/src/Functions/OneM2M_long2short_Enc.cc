@@ -871,15 +871,18 @@ namespace OneM2M__DualFaceMapping {
 				if (parent_tag == "acco") {
 					Value elemArrayObj(arrayValue);
 
-					for(unsigned int index = 0; index < elemObj.size(); index++){
-						tempObj = elemObj[index];
+					if(elemObj.size() != 0) {
+						for(unsigned int index = 0; index < elemObj.size(); index++){
+							tempObj = elemObj[index];
 
-						if(tempObj.isObject()){
-							tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
-							elemArrayObj.append(tempObjClone);
+							if(tempObj.isObject()){
+								tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
+								elemArrayObj.append(tempObjClone);
+							}
 						}
+						jsonObjClone[name_short.c_str()] = elemArrayObj;
 					}
-					jsonObjClone[name_short.c_str()] = elemArrayObj;
+
 				} else {
 					jsonObjClone[name_short.c_str()] = elemObj;
 				}
@@ -1002,12 +1005,100 @@ namespace OneM2M__DualFaceMapping {
 					}
 				}
 
+				if(name_long == "accessControlPolicy") {
+
+					for (Value::iterator iter = jsonRootClone.begin(); iter != jsonRootClone.end(); ++iter) {
+
+						Value subElemName = iter.key();
+						Value subElemObj = jsonRootClone.get(subElemName.asString(), "");
+
+						for (Value::iterator iter = subElemObj.begin(); iter != subElemObj.end(); ++iter) {
+							Value subElemName2 = iter.key();
+
+							// privileges
+							if(subElemName2 == "privileges") {
+								Value subElemObj3 = subElemObj.get(subElemName2.asString(), "");
+
+								for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
+
+									bool accoCheck = false;
+
+									Value subElemName4 = iter.key();
+									if(subElemName4 == "accessControlRule_list") {
+										Value arrayForACCO(arrayValue);
+										arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
+
+										Value objForAcco(objectValue);
+										objForAcco = arrayForACCO[0];
+
+										if(objForAcco.isMember("accessControlContexts_list")) {
+											accoCheck = true;
+										}
+
+										if(accoCheck == false) {
+											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
+
+											if(objForAcco.isObject()) {
+												TTCN_Logger::log(TTCN_DEBUG, "object variable");
+											}
+
+											Json::Value root;
+											Json::Value objForAcco_temp;
+											objForAcco_temp.append(objForAcco);
+											root["accessControlRule_list"] = objForAcco_temp;
+											jsonRootClone["accessControlPolicy"]["privileges"] = root;
+										}
+									}
+								}
+							}
+
+							// self-privileges
+							if(subElemName2 == "selfPrivileges") {
+								Value subElemObj3 = subElemObj.get(subElemName2.asString(), "");
+
+								for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
+
+									bool accoCheck = false;
+
+									Value subElemName4 = iter.key();
+									if(subElemName4 == "accessControlRule_list") {
+										Value arrayForACCO(arrayValue);
+										arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
+
+										Value objForAcco(objectValue);
+										objForAcco = arrayForACCO[0];
+
+										if(objForAcco.isMember("accessControlContexts_list")) {
+											accoCheck = true;
+										}
+
+										if(accoCheck == false) {
+											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
+
+											if(objForAcco.isObject()) {
+												TTCN_Logger::log(TTCN_DEBUG, "object variable");
+											}
+
+											Json::Value root;
+											Json::Value objForAcco_temp;
+											objForAcco_temp.append(objForAcco);
+											root["accessControlRule_list"] = objForAcco_temp;
+											jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
 				TTCN_Logger::log(TTCN_DEBUG, "Pretty print of DECODED JSON message:\n%s", jsonRootClone.toStyledString().c_str());
 
 				StyledWriter writer;
 				std::string json_str = writer.write(jsonRootClone);
 
 				CHARSTRING temp_cs(json_str.c_str());
+
 				encoded_message	= temp_cs;
 
 			} else if("xml" == serial_type){
