@@ -747,7 +747,12 @@ namespace OneM2M__DualFaceMapping {
 				name_short = elemName.asString();
 			}
 
-			parent_tag = name_short;
+			name_short = name_short;
+
+			// CHARSTRING tmp_for_name_checking(elemName.asCString());
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
 
 			if(elemObj.isObject()){
 
@@ -866,6 +871,12 @@ namespace OneM2M__DualFaceMapping {
 				}else
 					jsonObjClone[name_short.c_str()] = elemObj.asString();
 
+				// Handle creator="NullValue" testcases
+				if(name_short == "cr") {
+					if(elemObj.asString() == "NullValue") {
+						jsonObjClone[name_short.c_str()] = Value::null;
+					}
+				}
 			} else {
                 // This branch was defined to handle the accessControlContexts
 				if (parent_tag == "acco") {
@@ -882,7 +893,6 @@ namespace OneM2M__DualFaceMapping {
 						}
 						jsonObjClone[name_short.c_str()] = elemArrayObj;
 					}
-
 				} else {
 					jsonObjClone[name_short.c_str()] = elemObj;
 				}
