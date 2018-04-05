@@ -41,15 +41,19 @@ namespace OneM2M__DualFaceMapping {
 	 * Parser functions will be here for all oneM2M resources *
 	 **********************************************************/
 
-	/******* Decoding functions *******/
-	CHARSTRING acp_JSON_Dec_Parser(const CHARSTRING& source_str, const CHARSTRING& serial_type);
-	Json::Value acp_JSON_Dec_Parser_Deep (Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
-
 	/******* Encoding functions *******/
+
+	// 1. AccessControlPolicy
+	CHARSTRING acp_JSON_Enc_Parser(const CHARSTRING& p__source);
+	Json::Value acp_JSON_Enc_Parser_Deep (Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
+
+	// 2. Subscription
 	CHARSTRING sub_JSON_Enc_Parser(const CHARSTRING& p__source);
 	Json::Value sub_JSON_Enc_Parser_Deep(Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
 
 	/******* Decoding functions *******/
+
+	// 1. Notification
 	CHARSTRING noti_JSON_Dec_Parser(const CHARSTRING& source_str, const CHARSTRING& serial_type);
 	Json::Value noti_JSON_Dec_Parser_Deep(Json::Value objectSource, Json::Value objectRoot, Json::Value elemName);
 }

@@ -147,7 +147,6 @@ namespace OneM2M__DualFaceMapping {
 			std::string name_short;
 			std::string parent_tag = "";
 
-			// This function has been temporary added to encode the operationMonitor_list case
 			bool parsingSuccessful = jsonReader.parse(p_body, jsonRoot, false);
 
 			if ( !parsingSuccessful ) {
@@ -155,6 +154,7 @@ namespace OneM2M__DualFaceMapping {
 				return "JsonCPP API parsing error!";
 			}
 
+			// This function has been temporary added to encode the operationMonitor_list case
 			if(jsonRoot.isObject()){
 				for (Value::iterator iter = jsonRoot.begin(); iter != jsonRoot.end(); ++iter) {
 					Value subElemName = iter.key();
@@ -163,7 +163,7 @@ namespace OneM2M__DualFaceMapping {
 					for (Value::iterator iter = subElemObj.begin(); iter != subElemObj.end(); ++iter) {
 						Value subElemName2 = iter.key();
 
-
+						// 1. Subscription
 						if(subElemName2 == "eventNotificationCriteria") {
 							Value subElemObj2 = subElemObj.get(subElemName2.asString(), "");
 
@@ -172,6 +172,24 @@ namespace OneM2M__DualFaceMapping {
 								if(subElemName3 == "operationMonitor_list") {
 									encoded_message = sub_JSON_Enc_Parser(p__source);
 									return encoded_message;
+								}
+							}
+						}
+
+						// 2. AccessControlPolicy, TC_CSE_SEC_ACP_CRE_004
+						if(subElemName2 == "privileges" || subElemName2 == "selfPrivileges") {
+							Value subElemObj2 = subElemObj.get(subElemName2.asString(), "");
+
+							for (Value::iterator iter = subElemObj2.begin(); iter != subElemObj2.end(); ++iter) {
+								Value subElemName3 = iter.key();
+								if(subElemName3 == "accessControlRule_list") {
+									Value subElemName4 = subElemObj2.get(subElemName3.asString(), "");
+
+									// if pvs or pv accessControlRule are emtpy array
+									if(subElemName4.empty()) {
+										encoded_message = acp_JSON_Enc_Parser(p__source);
+										return encoded_message;
+									}
 								}
 							}
 						}
@@ -274,6 +292,27 @@ namespace OneM2M__DualFaceMapping {
 
 								if(elemObj.isMember("nu")) {
 									jsonRootClone[rootKeyValue.asString()]["nu"] = Value::null;
+								}
+							}
+						}
+					} else if(p__forcedFields[i].name() == "creator") {
+						if (p__forcedFields[i].value__() == OMIT_VALUE) {
+
+							Value rootKeyValue = Value::null;
+
+							for (Value::iterator iter = jsonRootClone.begin(); iter != jsonRootClone.end(); ++iter) {
+
+								// Store the root key name
+								if(rootKeyValue == Value::null) {
+									rootKeyValue = iter.key();
+								}
+
+								// Check the sub-key name
+								elemName = iter.key();
+								elemObj = jsonRootClone.get(elemName.asString(), Value::null);
+
+								if(elemObj.isMember("cr")) {
+									jsonRootClone[rootKeyValue.asString()]["cr"] = Value::null;
 								}
 							}
 						}
@@ -805,7 +844,6 @@ namespace OneM2M__DualFaceMapping {
 								Value elemArrayObj(arrayValue);
 
 								for(unsigned int index = 0; index < grandelemObj.size(); index++){
-
 									tempObj = grandelemObj[index];
 
 									if(tempObj.isString()){
@@ -838,7 +876,6 @@ namespace OneM2M__DualFaceMapping {
 
 						if(subelemObj.size() != 0) {
 							for(unsigned int index = 0; index < subelemObj.size(); index++){
-
 								tempObj = subelemObj[index];
 
 								if(tempObj.isString()){
@@ -864,22 +901,15 @@ namespace OneM2M__DualFaceMapping {
 				if(	"op" 	== name_short   ||  "ty" 	== name_short   ||
 			        "acop" 	== name_short   ||  "rcn" 	== name_short   ||
 					"csy"	== name_short	||  "cst"	== name_short	||
-					"mt"    == name_short ){ //TODO: add all enumerated type here
+					"mt"    == name_short   ||  "nct"   == name_short ){ //TODO: add all enumerated type here
 
 					std::string attr_val = getShortName(elemObj.asString());
 					int tmp_int = atoi(attr_val.c_str());
 					jsonObjClone[name_short.c_str()] = tmp_int;
 				}else
 					jsonObjClone[name_short.c_str()] = elemObj.asString();
-
-				// Handle creator="NullValue" testcases
-				if(name_short == "cr") {
-					if(elemObj.asString() == "NullValue") {
-						jsonObjClone[name_short.c_str()] = Value::null;
-					}
-				}
 			} else {
-                // This branch was defined to handle the accessControlContexts
+				// This branch was defined to handle the accessControlContexts
 				if (parent_tag == "acco") {
 					Value elemArrayObj(arrayValue);
 
@@ -894,7 +924,7 @@ namespace OneM2M__DualFaceMapping {
 						}
 						jsonObjClone[name_short.c_str()] = elemArrayObj;
 					}
-				} else {
+				} else { // Handling empty actw testcases
 					if(elemObj.isArray()) {
 						if(elemObj.size() != 0) {
 							jsonObjClone[name_short.c_str()] = elemObj;
@@ -1036,57 +1066,63 @@ namespace OneM2M__DualFaceMapping {
 							if(subElemName2 == "privileges") {
 								Value subElemObj3 = subElemObj.get(subElemName2.asString(), "");
 
-								for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
+								if (subElemObj3.empty()) { // if empty privileges
+									Json::Value elemObj_for_empty(objectValue);
+									elemObj_for_empty["accessControlRule_list"] = Json::Value(Json::arrayValue);
+									jsonRootClone["accessControlPolicy"]["privileges"] = elemObj_for_empty;
+								} else { // if privileges have attributes
+									for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
 
-									bool accoCheck = false;
+										bool accoCheck = false;
 
-									Value subElemName4 = iter.key();
-									if(subElemName4 == "accessControlRule_list") {
-										Value arrayForACCO(arrayValue);
-										arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
+										Value subElemName4 = iter.key();
+										if(subElemName4 == "accessControlRule_list") {
+											Value arrayForACCO(arrayValue);
+											arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
 
-										Value objForAcco(objectValue);
-										objForAcco = arrayForACCO[0];
+											Value objForAcco(objectValue);
+											objForAcco = arrayForACCO[0];
 
-										if(objForAcco.isMember("accessControlContexts_list")) {
-											accoCheck = true;
+											if(objForAcco.isMember("accessControlContexts_list")) {
+												accoCheck = true;
 
-											// 1. get acco array
-											Value sub_arrayForACCO(arrayValue);
-											sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
+												// 1. get acco array
+												Value sub_arrayForACCO(arrayValue);
+												sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
 
-											// 2. extract object in acco array
-											Value sub_objectForACCO(objectValue);
-											sub_objectForACCO = sub_arrayForACCO[0];
+												// 2. extract object in acco array
+												Value sub_objectForACCO(objectValue);
+												sub_objectForACCO = sub_arrayForACCO[0];
 
-											// 3. if acco object doesn't have actw attribute
-											if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
+												// 3. if acco object doesn't have actw attribute
+												if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
 
-												sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
+													sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
 
-												Json::Value sub_objForAcco_temp;
-												sub_objForAcco_temp.append(sub_objectForACCO);
-												// root["accessControlContexts_list"] = sub_objForAcco_temp;
+													Json::Value sub_objForAcco_temp;
+													sub_objForAcco_temp.append(sub_objectForACCO);
+													// root["accessControlContexts_list"] = sub_objForAcco_temp;
 
-												objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
+													objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
 
-												Json::Value root_acr;
-												Json::Value objForACR_temp;
-												objForACR_temp.append(objForAcco);
-												root_acr["accessControlRule_list"] = objForACR_temp;
+													Json::Value root_acr;
+													Json::Value objForACR_temp;
+													objForACR_temp.append(objForAcco);
+													root_acr["accessControlRule_list"] = objForACR_temp;
 
-												jsonRootClone["accessControlPolicy"]["privileges"] = root_acr;
+													jsonRootClone["accessControlPolicy"]["privileges"] = root_acr;
+												}
 											}
-										}
 
-										if(accoCheck == false) {
-											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
+											if(accoCheck == false) {
+												objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
 
-											Json::Value root;
-											Json::Value objForAcco_temp;
-											objForAcco_temp.append(objForAcco);
-											root["accessControlRule_list"] = objForAcco_temp;
-											jsonRootClone["accessControlPolicy"]["privileges"] = root;
+												Json::Value root;
+												Json::Value objForAcco_temp;
+												objForAcco_temp.append(objForAcco);
+												root["accessControlRule_list"] = objForAcco_temp;
+												jsonRootClone["accessControlPolicy"]["privileges"] = root;
+											}
 										}
 									}
 								}
@@ -1096,57 +1132,63 @@ namespace OneM2M__DualFaceMapping {
 							if(subElemName2 == "selfPrivileges") {
 								Value subElemObj3 = subElemObj.get(subElemName2.asString(), "");
 
-								for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
+								if (subElemObj3.empty()) { // if empty selfPrivileges
+									Json::Value elemObj_for_empty(objectValue);
+									elemObj_for_empty["accessControlRule_list"] = Json::Value(Json::arrayValue);
+									jsonRootClone["accessControlPolicy"]["selfPrivileges"] = elemObj_for_empty;
+								} else { // if selfPrivileges have attributes
+									for (Value::iterator iter = subElemObj3.begin(); iter != subElemObj3.end(); ++iter) {
 
-									bool accoCheck = false;
+										bool accoCheck = false;
 
-									Value subElemName4 = iter.key();
-									if(subElemName4 == "accessControlRule_list") {
-										Value arrayForACCO(arrayValue);
-										arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
+										Value subElemName4 = iter.key();
+										if(subElemName4 == "accessControlRule_list") {
+											Value arrayForACCO(arrayValue);
+											arrayForACCO = subElemObj3.get(subElemName4.asString(), "");
 
-										Value objForAcco(objectValue);
-										objForAcco = arrayForACCO[0];
+											Value objForAcco(objectValue);
+											objForAcco = arrayForACCO[0];
 
-										if(objForAcco.isMember("accessControlContexts_list")) {
-											accoCheck = true;
+											if(objForAcco.isMember("accessControlContexts_list")) {
+												accoCheck = true;
 
-											// 1. get acco array
-											Value sub_arrayForACCO(arrayValue);
-											sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
+												// 1. get acco array
+												Value sub_arrayForACCO(arrayValue);
+												sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
 
-											// 2. extract object in acco array
-											Value sub_objectForACCO(objectValue);
-											sub_objectForACCO = sub_arrayForACCO[0];
+												// 2. extract object in acco array
+												Value sub_objectForACCO(objectValue);
+												sub_objectForACCO = sub_arrayForACCO[0];
 
-											//3. if acco object doesn't have actw attribute
-											if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
+												//3. if acco object doesn't have actw attribute
+												if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
 
-												sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
+													sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
 
-												Json::Value sub_objForAcco_temp;
-												sub_objForAcco_temp.append(sub_objectForACCO);
-												// root["accessControlContexts_list"] = sub_objForAcco_temp;
+													Json::Value sub_objForAcco_temp;
+													sub_objForAcco_temp.append(sub_objectForACCO);
+													// root["accessControlContexts_list"] = sub_objForAcco_temp;
 
-												objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
+													objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
 
-												Json::Value root_acr;
-												Json::Value objForACR_temp;
-												objForACR_temp.append(objForAcco);
-												root_acr["accessControlRule_list"] = objForACR_temp;
+													Json::Value root_acr;
+													Json::Value objForACR_temp;
+													objForACR_temp.append(objForAcco);
+													root_acr["accessControlRule_list"] = objForACR_temp;
 
-												jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root_acr;
+													jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root_acr;
+												}
 											}
-										}
 
-										if(accoCheck == false) {
-											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
+											if(accoCheck == false) {
+												objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
 
-											Json::Value root;
-											Json::Value objForAcco_temp;
-											objForAcco_temp.append(objForAcco);
-											root["accessControlRule_list"] = objForAcco_temp;
-											jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root;
+												Json::Value root;
+												Json::Value objForAcco_temp;
+												objForAcco_temp.append(objForAcco);
+												root["accessControlRule_list"] = objForAcco_temp;
+												jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root;
+											}
 										}
 									}
 								}
@@ -1385,6 +1427,7 @@ namespace OneM2M__DualFaceMapping {
 						}
 					}					
 				}
+
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
 			}else if(elemObj.isString()){
 
