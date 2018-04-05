@@ -749,6 +749,11 @@ namespace OneM2M__DualFaceMapping {
 
 			parent_tag = name_short;
 
+			// CHARSTRING tmp_for_name_checking(elemName.asCString());
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
+
 			if(elemObj.isObject()){
 
 				root_tag = name_short;
@@ -829,27 +834,28 @@ namespace OneM2M__DualFaceMapping {
 							}
 						}
 					}else if(subelemObj.isArray()){
-
 						Value elemArrayObj(arrayValue);
 
-						for(unsigned int index = 0; index < subelemObj.size(); index++){
+						if(subelemObj.size() != 0) {
+							for(unsigned int index = 0; index < subelemObj.size(); index++){
 
-							tempObj = subelemObj[index];
+								tempObj = subelemObj[index];
 
-							if(tempObj.isString()){
-								elemArrayObj.append(tempObj.asString());
-							}else if(tempObj.isBool()){
-								elemArrayObj.append(tempObj.asBool());
-							}else if(tempObj.isDouble()){
-								elemArrayObj.append(tempObj.asDouble());
-							}else if(tempObj.isInt64()){
-								elemArrayObj.append(tempObj.asInt64());
-							}else if(tempObj.isObject()){
-								tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
-								elemArrayObj.append(tempObjClone);
+								if(tempObj.isString()){
+									elemArrayObj.append(tempObj.asString());
+								}else if(tempObj.isBool()){
+									elemArrayObj.append(tempObj.asBool());
+								}else if(tempObj.isDouble()){
+									elemArrayObj.append(tempObj.asDouble());
+								}else if(tempObj.isInt64()){
+									elemArrayObj.append(tempObj.asInt64());
+								}else if(tempObj.isObject()){
+									tempObjClone = JSONDeepParser(tempObj, tempObjClone, subObjClone);
+									elemArrayObj.append(tempObjClone);
+								}
 							}
+							elemObjClone[parent_tag.c_str()] = elemArrayObj;
 						}
-						elemObjClone[parent_tag.c_str()] = elemArrayObj;
 					}
 				}
 				jsonObjClone[root_tag.c_str()] = elemObjClone;
@@ -888,9 +894,14 @@ namespace OneM2M__DualFaceMapping {
 						}
 						jsonObjClone[name_short.c_str()] = elemArrayObj;
 					}
-
 				} else {
-					jsonObjClone[name_short.c_str()] = elemObj;
+					if(elemObj.isArray()) {
+						if(elemObj.size() != 0) {
+							jsonObjClone[name_short.c_str()] = elemObj;
+						}
+					} else {
+						jsonObjClone[name_short.c_str()] = elemObj;
+					}
 				}
 			}
 		}
@@ -1039,14 +1050,37 @@ namespace OneM2M__DualFaceMapping {
 
 										if(objForAcco.isMember("accessControlContexts_list")) {
 											accoCheck = true;
+
+											// 1. get acco array
+											Value sub_arrayForACCO(arrayValue);
+											sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
+
+											// 2. extract object in acco array
+											Value sub_objectForACCO(objectValue);
+											sub_objectForACCO = sub_arrayForACCO[0];
+
+											// 3. if acco object doesn't have actw attribute
+											if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
+
+												sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
+
+												Json::Value sub_objForAcco_temp;
+												sub_objForAcco_temp.append(sub_objectForACCO);
+												// root["accessControlContexts_list"] = sub_objForAcco_temp;
+
+												objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
+
+												Json::Value root_acr;
+												Json::Value objForACR_temp;
+												objForACR_temp.append(objForAcco);
+												root_acr["accessControlRule_list"] = objForACR_temp;
+
+												jsonRootClone["accessControlPolicy"]["privileges"] = root_acr;
+											}
 										}
 
 										if(accoCheck == false) {
 											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
-
-											if(objForAcco.isObject()) {
-												TTCN_Logger::log(TTCN_DEBUG, "object variable");
-											}
 
 											Json::Value root;
 											Json::Value objForAcco_temp;
@@ -1076,14 +1110,37 @@ namespace OneM2M__DualFaceMapping {
 
 										if(objForAcco.isMember("accessControlContexts_list")) {
 											accoCheck = true;
+
+											// 1. get acco array
+											Value sub_arrayForACCO(arrayValue);
+											sub_arrayForACCO = objForAcco.get("accessControlContexts_list", "");
+
+											// 2. extract object in acco array
+											Value sub_objectForACCO(objectValue);
+											sub_objectForACCO = sub_arrayForACCO[0];
+
+											//3. if acco object doesn't have actw attribute
+											if(!sub_objectForACCO.isMember("accessControlWindow_list")) {
+
+												sub_objectForACCO["accessControlWindow_list"] = Json::Value(Json::arrayValue);
+
+												Json::Value sub_objForAcco_temp;
+												sub_objForAcco_temp.append(sub_objectForACCO);
+												// root["accessControlContexts_list"] = sub_objForAcco_temp;
+
+												objForAcco["accessControlContexts_list"] = sub_objForAcco_temp;
+
+												Json::Value root_acr;
+												Json::Value objForACR_temp;
+												objForACR_temp.append(objForAcco);
+												root_acr["accessControlRule_list"] = objForACR_temp;
+
+												jsonRootClone["accessControlPolicy"]["selfPrivileges"] = root_acr;
+											}
 										}
 
 										if(accoCheck == false) {
 											objForAcco["accessControlContexts_list"] = Json::Value(Json::arrayValue);
-
-											if(objForAcco.isObject()) {
-												TTCN_Logger::log(TTCN_DEBUG, "object variable");
-											}
 
 											Json::Value root;
 											Json::Value objForAcco_temp;
