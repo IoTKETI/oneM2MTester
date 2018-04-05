@@ -864,7 +864,7 @@ namespace OneM2M__DualFaceMapping {
 				if(	"op" 	== name_short   ||  "ty" 	== name_short   ||
 			        "acop" 	== name_short   ||  "rcn" 	== name_short   ||
 					"csy"	== name_short	||  "cst"	== name_short	||
-					"mt"    == name_short){ //TODO: add all enumerated type here
+					"mt"    == name_short ){ //TODO: add all enumerated type here
 
 					std::string attr_val = getShortName(elemObj.asString());
 					int tmp_int = atoi(attr_val.c_str());

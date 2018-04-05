@@ -82,7 +82,13 @@ namespace OneM2M__DualFaceMapping {
 				subElemObj[name_short.c_str()] = elemArrayObj;
 
 			} else if (elemObj.isString()) { // string
-				subElemObj[name_short.c_str()] = elemObj;
+				if("nct" == name_short ){ //TODO: add all enumerated type here
+					std::string attr_val = getShortName(elemObj.asString());
+					int tmp_int = atoi(attr_val.c_str());
+					subElemObj[name_short.c_str()] = tmp_int;
+				} else {
+					subElemObj[name_short.c_str()] = elemObj;
+				}
 			}
 		}
 
