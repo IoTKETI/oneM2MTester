@@ -48,13 +48,12 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 						
 						//Send Trigger Message
-						v_utRequest.to_ := f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest, v_action);
 						
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_createContainer(-,v_utRequest.to_))) -> value v_request {
+							[] mcaPortIn.receive(mw_request(mw_createContainer(-,v_utRequest.requestPrimitive.to_))) -> value v_request {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container creation request received successfuly");
 								v_parentIndex := f_getResourceIndex(v_request.primitive.requestPrimitive.to_);
@@ -78,7 +77,7 @@ module OneM2M_PermutationFunctions {
 						f_cf03Down();
 					}
 					function f_AE_GEN_CRE_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
-	
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequest := m_utCreateContainer;
 						var UtTriggerAckPrimitive v_trigger_response;
@@ -94,18 +93,17 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 	
 						//Send Trigger Message
-						v_utRequest.to_ := f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest,v_action);
 							
 	
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_createContainer(-,v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_createContainer(-,v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container creation request received successfuly");
 		
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -128,13 +126,13 @@ module OneM2M_PermutationFunctions {
 			group Update {
 						
 					function f_AE_GEN_UPD_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
-						
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid UPDATE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid UPDATE Request for container containing To set to " & f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
 						
 						
 						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
@@ -145,19 +143,18 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 						
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequest.to_ := f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest,v_action);
 						
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_updateContainer(-,v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_updateContainer(-,v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 							
-								v_responsePrimitive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2004, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -175,13 +172,13 @@ module OneM2M_PermutationFunctions {
 						f_cf03Down();
 					}
 					function f_AE_GEN_UPD_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
-	
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequest := m_utUpdateContainer;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid UPDATE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid UPDATE Request for container containing To set to " & f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						
 						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -191,18 +188,18 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 	
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest,v_action);
 								
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_updateContainer(-,v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_updateContainer(-,v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 							
-								v_responsePrimitive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2004, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -225,14 +222,14 @@ module OneM2M_PermutationFunctions {
 			group Retrieve {
 						
 					function f_AE_GEN_RET_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
-			
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequestTemplate;
                         var UtTriggerPrimitive v_utRequest;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid RETRIEVE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid RETRIEVE Request for container containing To set to " & f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
 						
 						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -242,19 +239,19 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 			
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequestTemplate := m_utRetrieveResource(f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope),"UNINITIALIZED");
+						v_utRequestTemplate := m_utRetrieve(f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope));
 						f_sendUtPrimitive(v_utRequestTemplate,v_action);
                         v_utRequest := valueof(v_utRequestTemplate);
 			
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
 				
-								v_responsePrimitive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2000, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -272,14 +269,14 @@ module OneM2M_PermutationFunctions {
 						f_cf03Down();
 					}
 					function f_AE_GEN_RET_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
-
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						var template UtTriggerPrimitive v_utRequestTemplate;
                         var UtTriggerPrimitive v_utRequest;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid RETRIEVE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid RETRIEVE Request for container containing To set to " & f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						
 						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -289,19 +286,19 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequestTemplate := m_utRetrieveResource(f_getLocalResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope),"UNINITIALIZED");
+						v_utRequestTemplate := m_utRetrieve(f_getLocalResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope));
                         v_utRequest := valueof(v_utRequestTemplate);
 						f_sendUtPrimitive(v_utRequest,v_action);
 
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container retrieve request received successfuly");
 				
-								v_responsePrimitive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2000, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -324,13 +321,13 @@ module OneM2M_PermutationFunctions {
 			group Delete {
 						
 					function f_AE_GEN_DEL_001(PrimitiveScope p_primitiveScope) runs on CseSimu {
-			
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
-						var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
+						var template UtTriggerPrimitive v_utRequest := m_utDelete;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid DELETE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_nonHierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid DELETE Request for container containing To set to " & f_getLocalResourceAddress(-, e_nonHierarchical, p_primitiveScope);
 
 						if(not(PICS_UNSTRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Unstructured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -340,19 +337,18 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 			
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequest.to_ := f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger, e_nonHierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest,v_action);
 			
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 				
-								v_responsePrimitive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2004, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -370,13 +366,13 @@ module OneM2M_PermutationFunctions {
 						f_cf03Down();
 					}
 					function f_AE_GEN_DEL_002(PrimitiveScope p_primitiveScope) runs on CseSimu {
-
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
-						var template UtTriggerPrimitive v_utRequest := m_utDeleteRequest;
+						var template UtTriggerPrimitive v_utRequest := m_utDelete;
 						var UtTriggerAckPrimitive v_trigger_response;
 						var integer v_auxInteger;
 						var PrimitiveContent v_localResource;
-						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid DELETE Request for container containing To set to " & f_getLocalResourceAddress(-1, e_hierarchical, p_primitiveScope);
+						var universal charstring v_action :=  __SCOPE__ & ": Please, send a valid DELETE Request for container containing To set to " & f_getLocalResourceAddress(-, e_hierarchical, p_primitiveScope);
 						
 						if(not(PICS_STRUCTURED_CSE_RELATIVE_RESOURCE_ID_FORMAT)) {
 							setverdict(inconc, __SCOPE__, ": Structured-CSE-Relative-Resource-ID format support is required to run this test case");
@@ -386,20 +382,19 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 
 						//Send Trigger Message
-						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), -1, int3);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
 						v_auxInteger := f_setLocalResource(v_localResource, int3);
-						v_utRequest.to_ := f_getLocalResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope);
-						v_utRequest.from_ := "UNINITIALIZED";
+						v_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger, e_hierarchical, p_primitiveScope);
 						f_sendUtPrimitive(v_utRequest,v_action);
 				
 
 						tc_ac.start;
 						alt {
-							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.to_))) {
+							[] mcaPortIn.receive(mw_request(mw_delete(v_utRequest.requestPrimitive.to_))) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request received successfuly");
 				
-								v_responsePrimitive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2004, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 								mcaPortIn.send(m_response(v_responsePrimitive));
 							}
 							[] mcaPortIn.receive(mw_request(?)) {
@@ -425,25 +420,27 @@ module OneM2M_PermutationFunctions {
 			
 			group Create {
 						
-				   function f_AE_REG_CRE_002(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_response, in universal charstring p_action) runs on CseSimu {
+				   function f_AE_REG_CRE_002(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
 	
 						//primitives for mcaPortIn
-					   var MsgIn v_request;
+					    var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 	
 					   f_cf03Up();
 	
 					   //Send Trigger Message
+					   p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(-, -, -);
+					   p_request.to_ := p_utRequest.requestPrimitive.to_;
 					   f_sendUtPrimitive(p_utRequest,p_action);
 	
 					   //Test behavior
 					   tc_ac.start;
 					   alt{
-							[] mcaPortIn.receive(mw_request(p_response)) -> value v_request {
+							[] mcaPortIn.receive(mw_request(p_request)) -> value v_request {
 							   tc_ac.stop;
 							   setverdict(pass, __SCOPE__, " : AE registration request is accepted!!");
 								//v_responsePrimitive := valueof(m_responsePrimitiveTemp(int2000, omit));
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 	
 							   //send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -475,13 +472,19 @@ module OneM2M_PermutationFunctions {
 			group Create {
 			
 					function f_AE_DMR_CRE_003(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
-	
+						var MsgIn v_request;
+						var PrimitiveContent v_localResource;
+						var integer v_containerIndex := -1;
 						var ResponsePrimitive v_responsePrimitive;
 	
 						//Test component configuration
 						f_cf03Up();
 	
 						//send triggering primitive to SUT
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
+						v_containerIndex := f_setLocalResource(v_localResource, int3);
+						p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_containerIndex, -, -);
+						p_request.to_ := p_utRequest.requestPrimitive.to_;
 						f_sendUtPrimitive(p_utRequest,p_action);
 	
 						//Test behavior
@@ -489,12 +492,12 @@ module OneM2M_PermutationFunctions {
 						alt{
 	
 							//receive MsgIn requestPrimitive
-							[] mcaPortIn.receive(mw_request(p_request)) {
+							[] mcaPortIn.receive(mw_request(p_request)) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : ContentInstance creation request is accepted!!");
 	
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 	
 								//send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -514,13 +517,15 @@ module OneM2M_PermutationFunctions {
 						f_cf03Down();
 					}
 					function f_AE_DMR_CRE_004(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
-	
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 	
 						//Test component configuration
 						f_cf03Up();
 	
 						//send triggering primitive to SUT
+						p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(-, -, -);
+						p_request.to_ := p_utRequest.requestPrimitive.to_;
 						f_sendUtPrimitive(p_utRequest,p_action);
 	
 						//Test behavior
@@ -528,12 +533,12 @@ module OneM2M_PermutationFunctions {
 						alt{
 	
 							//receive MsgIn requestPrimitive
-							[] mcaPortIn.receive(mw_request(p_request)) {
+							[] mcaPortIn.receive(mw_request(p_request)) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container creation request is accepted!!");
 	
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 	
 								//send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -557,24 +562,23 @@ module OneM2M_PermutationFunctions {
 			
 			group Update {
 				
-				   function f_AE_DMR_UPD_001(template UtTriggerPrimitive p_utRequestTestBody, in universal charstring p_action, template RequestPrimitive p_expectedUpdateRequest) runs on CseSimu {
+				   function f_AE_DMR_UPD_001(template UtTriggerPrimitive p_utRequest, in universal charstring p_action, template RequestPrimitive p_expectedUpdateRequest) runs on CseSimu {
 	
 						//primitives for mcaPortIn
 					   	var MsgIn v_request;
-						var ResponsePrimitive v_responsePrimitive;
-					   	var integer v_aeIndex := -1;
-					   	var integer v_resourceIndex := -1;
-					   	var integer v_parentIndex := -1;
-					   	var PrimitiveContent v_modifiedResource;						
+						var integer v_auxInteger := -1;
+					   	var PrimitiveContent v_modifiedResource;
+					   	var PrimitiveContent v_localResource;
 	
 					   	f_cf03Up();
 					   
 					   	//Preamble
-					   	v_aeIndex := f_ae_preamble_registerAe();
-	
+						
 					   	//Send Trigger Message
-						p_utRequestTestBody.to_ := f_getLocalResourceAddress(v_aeIndex);
-					   	f_sendUtPrimitive(p_utRequestTestBody,p_action);
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentAe(m_contentCreateAe(omit, omit, omit, omit))), vc_cSEBaseIndex, int2);
+						v_auxInteger := f_setLocalResource(v_localResource, int2);
+						p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger);
+					   	f_sendUtPrimitive(p_utRequest,p_action);
 	
 					   //Test behavior
 					   
@@ -583,14 +587,10 @@ module OneM2M_PermutationFunctions {
 							[] mcaPortIn.receive(mw_request(p_expectedUpdateRequest)) -> value v_request {
 							   tc_ac.stop;
 							   setverdict(pass, __SCOPE__, " : AE update request is accepted!");
-								v_parentIndex := f_getResourceIndex(v_request.primitive.requestPrimitive.to_);
-								v_modifiedResource := f_ae_generateLocalResource(v_request.primitive.requestPrimitive.primitiveContent, v_parentIndex, v_request.primitive.requestPrimitive.resourceType);
-								v_resourceIndex := f_setLocalResource(v_modifiedResource, v_request.primitive.requestPrimitive.resourceType, v_parentIndex);	
-								if(v_resourceIndex != -1) {
-									mcaPortIn.send(m_response(m_responsePrimitive_content(int2004, v_request.primitive.requestPrimitive.requestIdentifier, v_modifiedResource)));
-								}
-							   //send back responsePrimitive
-								//mcaPortIn.send(m_response(v_responsePrimitive));
+							   
+							   vc_response.primitive.responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
+
+							   mcaPortIn.send(m_response(vc_response.primitive.responsePrimitive));
 						   }
 							[] mcaPortIn.receive(mw_request(?)) -> value v_request {
 							   tc_ac.stop;
@@ -607,13 +607,18 @@ module OneM2M_PermutationFunctions {
 					}
 	
 					function f_AE_DMR_UPD_002(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
-
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
+						var PrimitiveContent v_localResource;
+						var integer v_auxInteger := -1;
 
 						//Test component configuration
 						f_cf03Up();
 
 						//send triggering primitive to SUT
+						v_localResource := f_ae_generateLocalResource(valueof(m_primitiveContentContainer(m_contentCreateContainer)), vc_cSEBaseIndex, int3);
+						v_auxInteger := f_setLocalResource(v_localResource, int3);
+						p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(v_auxInteger);
 						f_sendUtPrimitive(p_utRequest,p_action);
 
 						//Test behavior
@@ -621,12 +626,12 @@ module OneM2M_PermutationFunctions {
 						alt{
 
 							//receive MsgIn requestPrimitive
-							[] mcaPortIn.receive(mw_request(p_request)) {
+							[] mcaPortIn.receive(mw_request(p_request)) -> value (v_request) {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : Container update request is accepted!!");
 
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2004, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2004, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 
 								//send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -650,29 +655,33 @@ module OneM2M_PermutationFunctions {
 
 			group Retrieve {
 				
-					function f_AE_DMR_RET_001(ResourceType p_resourceType, XSD.AnyURI p_address, in universal charstring p_action) runs on CseSimu {
+					function f_AE_DMR_RET_001(ResourceType p_resourceType, template PrimitiveContent p_primitiveContent, in universal charstring p_action) runs on CseSimu {
 		
 						//variables
-						var template UtTriggerPrimitive v_utRequest := m_utRetrieveResource (p_address, "UNINITIALIZED");
+						var template UtTriggerPrimitive v_utRequest;
 						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
+						var PrimitiveContent v_localResource;
+						var integer v_auxInteger := -1;
 		
 						//Test component configuration
 						f_cf03Up();
 		
 						//send triggering primitive to SUT
-						v_utRequest.resourceType := p_resourceType;
+						v_localResource := f_ae_generateLocalResource(valueof(p_primitiveContent), vc_cSEBaseIndex, p_resourceType);
+						v_auxInteger := f_setLocalResource(v_localResource, p_resourceType);
+						v_utRequest := m_utRetrieve(f_getLocalResourceAddress(v_auxInteger));
 						f_sendUtPrimitive(v_utRequest,p_action);
 						
 						//Test behavior
 						tc_ac.start;
 						alt{
-							[] mcaPortIn.receive(mw_request(mw_retrieve(p_address))) -> value v_request {
+							[] mcaPortIn.receive(mw_request(mw_retrieve(f_getLocalResourceAddress(v_auxInteger)))) -> value v_request {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__, " : retrieve resource type request is accepted!!");
 								
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2000, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2000, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 		
 								//send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -712,6 +721,7 @@ module OneM2M_PermutationFunctions {
 						f_cf03Up();
 
 						//send triggering primitive to SUT
+						p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress();
 						f_sendUtPrimitive(p_utRequest,p_action);
 
 						//Test behavior
@@ -722,7 +732,7 @@ module OneM2M_PermutationFunctions {
 								setverdict(pass, __SCOPE__, " : Subscription creation request is accepted!");
 
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 
 								//send back responsePrimitive
 								mcaPortIn.send(m_response(v_responsePrimitive));
@@ -1407,6 +1417,7 @@ module OneM2M_PermutationFunctions {
 
 					function f_CSE_REG_CRE_026(template UtTriggerPrimitive p_utRequest, template RequestPrimitive p_request, in universal charstring p_action) runs on CseSimu {
 	  
+						var MsgIn v_request;
 						var ResponsePrimitive v_responsePrimitive;
 						
 						//Test control
@@ -1426,12 +1437,12 @@ module OneM2M_PermutationFunctions {
 						alt{
 
 							//receive MsgIn requestPrimitive
-							[] mccPortIn.receive(mw_request(p_request)) {
+							[] mccPortIn.receive(mw_request(p_request)) -> value v_request {
 								tc_ac.stop;
 								setverdict(pass, __SCOPE__&":INFO: Resource type remoteCSE created successfuly");
 
 								//set responseStatusCode back to SUT
-								v_responsePrimitive := valueof(m_responsePrimitive(int2001, "To_be_defined", omit));
+								v_responsePrimitive := valueof(m_responsePrimitive(int2001, v_request.primitive.requestPrimitive.requestIdentifier, omit));
 
 								//send back responsePrimitive
 								mccPortIn.send(m_response(v_responsePrimitive));
@@ -1729,8 +1740,7 @@ module OneM2M_PermutationFunctions {
 						vc_remoteCseIndex := f_cse_registrationRemoteCse(mw_createRemoteCSEBase);
 						
 						//Send Trigger Message
-					    v_utRequest.to_ := f_getResourceAddress();
-					    v_utRequest.from_ := "UNINITIALIZED";
+					    v_utRequest.requestPrimitive.to_ := f_getResourceAddress();
 					    f_sendUtPrimitive(v_utRequest, v_action);
 
 						// Test Body
@@ -4708,10 +4718,11 @@ module OneM2M_PermutationFunctions {
 						 //Local variables
 						 var MsgIn v_response;
 						 var RequestPrimitive v_request;
+						 var ResponsePrimitive v_responsePrimitive;
 						 var integer v_aeIndex := -1;
 						 var integer v_resourceIndex := -1;
 						 var integer v_ae2Index := -1;
-						var integer v_acpAuxIndex := -1;
+						 var integer v_acpAuxIndex := -1;
 							   
 						 // Test control
 
@@ -4741,6 +4752,9 @@ module OneM2M_PermutationFunctions {
 							f_cse_preamble_subscriptionVerification(v_ae2Index, p_createRequestPrimitive, p_resourceType);
 
 						 	v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive);//under the CSEBase resource
+							if(vc_ae2.running) {
+						 		vc_ae2.stop;
+						 	}
 						} else {	//ResourceType = RemoteCSE
 							vc_cse1.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
 							vc_cse1.done;
@@ -4751,15 +4765,11 @@ module OneM2M_PermutationFunctions {
 						//Test Body
 						v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_updateRequestPrimitive);
 						
-						if(p_resourceType == int23) {	//Subscription
+						if((p_resourceType == int23) and (ispresent(v_request.primitiveContent.subscription.notificationURI))) {	//Subscription
 							v_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_aeIndex)};							
 						}
 						
 						mcaPort.send(m_request(v_request));
-						
-						if(p_resourceType == int23) {	//Subscription
-							vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler(int2001));
-						}
 						
 						tc_ac.start;
 						alt {
@@ -4774,6 +4784,15 @@ module OneM2M_PermutationFunctions {
 							[] mcaPort.receive(mw_response(mw_responsePrimitiveKO)) -> value vc_response {
 								tc_ac.stop;
 								setverdict(fail, __SCOPE__, ": Error while updating mandatory attribute");
+							}
+							[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotificationVerification))) -> value vc_request {
+								tc_ac.stop;
+								setverdict(pass, __SCOPE__ & ":INFO: Notification for Subscription verification received");
+								v_responsePrimitive := valueof(m_responseNotification(int2000, omit));
+								v_responsePrimitive.requestIdentifier := vc_request.primitive.requestPrimitive.requestIdentifier;
+								mcaPortIn.send(m_response(v_responsePrimitive));
+								tc_ac.start;
+								repeat;
 							}
 							[] tc_ac.timeout {
 								setverdict(fail, __SCOPE__, ": No answer while updating resource type " & int2str(enum2int(p_resourceType)));

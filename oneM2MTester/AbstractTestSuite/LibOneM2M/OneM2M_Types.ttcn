@@ -405,7 +405,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
-	  variant (choice.subscription_list[-])"XML". "name as 'subscription'";
+	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 	};
 
 
@@ -1017,7 +1017,7 @@ module OneM2M_Types {
 	};
 
 
-	type XSD.String ResourceName (pattern "[a-zA-Z0-9]([a-zA-Z0-9.\-,_]*)")
+	type XSD.String ResourceName (pattern "[a-zA-Z0-9]([a-zA-Z0-9.\-,_]#(0,))")
 	with {
 	  variant "XML"."name as uncapitalized";
 	};
@@ -1189,7 +1189,7 @@ module OneM2M_Types {
 	}
 	with {
 	  variant "XML"."name as uncapitalized";
-	  variant (scheduleEntry_list)"XML". "untagged";
+	  variant (scheduleEntry_list) "XML"."untagged";
 	  variant (scheduleEntry_list[-]) "XML"."name as 'scheduleEntry'";
 	};
 
@@ -1204,7 +1204,7 @@ module OneM2M_Types {
 		Status status optional
 	}
 	with {
-	  variant"XML". "name as uncapitalized";
+	  variant "XML"."name as uncapitalized";
 	  variant (action_) "XML"."name as 'action'";
 	};
 
@@ -1645,7 +1645,7 @@ module OneM2M_Types {
 	  variant "XML"."name as uncapitalized";
 	  variant "XML"."element";
 	  variant (resourceName) "XML"."attribute";
-	  variant (announcedAttribute)"XML". "list";
+	  variant (announcedAttribute) "XML"."list";
 	  variant (choice) "XML"."untagged";
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
@@ -2041,14 +2041,6 @@ module OneM2M_Types {
 		int21(21),
 		int22(22),
 		int23(23),
-		//@JaeYoung, additional resource type added
-		int24(24),
-		int25(25),
-		int26(26),
-		int27(27),
-		int28(28),
-		int29(29),
-		int30(30),
 		int10001(10001),
 		int10002(10002),
 		int10003(10003),
@@ -2643,7 +2635,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.subscription_list) "XML"."untagged";
-	  variant (choice.subscription_list[-])"XML"."name as 'subscription'";
+	  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 	};
 
 
@@ -3591,7 +3583,7 @@ module OneM2M_Types {
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 	  variant (choice.choice_list) "XML"."untagged";
-	  variant (choice.choice_list[-])"XML". "untagged";
+	  variant (choice.choice_list[-]) "XML"."untagged";
 	};
 
 
@@ -3973,7 +3965,7 @@ module OneM2M_Types {
 	with {
 	  variant "XML"."name as uncapitalized";
 	  variant "XML"."element";
-	  variant (resourceName) "XML"."attribute";
+	  variant (resourceName) "attribute";
 	  variant (choice) "XML"."untagged";
 	  variant (choice.childResource_list) "XML"."untagged";
 	  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
@@ -4160,7 +4152,10 @@ module OneM2M_Types {
 			encode "adapter";
 		}
 		
-		type RequestPrimitive UtTriggerPrimitive
+		type record UtTriggerPrimitive {
+			RequestPrimitive requestPrimitive, 
+			AttributeAux_list forcedFields optional
+		}
 		with {
 			encode "UpperTester"
 		}
@@ -4820,7 +4815,7 @@ group optionalResourceTypes {
 		  //variant (execEnable) "text 'false' as '0'";
 		  variant (choice) "XML"."untagged";
 		  variant (choice.childResource_list) "XML"."untagged";
-		  variant (choice.childResource_list[-])"XML". "name as 'childResource'";
+		  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 		  variant (choice.choice_list) "XML"."untagged";
 		  variant (choice.choice_list[-]) "XML"."untagged";
 		};
@@ -5194,7 +5189,7 @@ group optionalResourceTypes {
 		  variant (deviceIdentifier) "XML"."list";
 		  variant (choice) "XML"."untagged";
 		  variant (choice.childResource_list) "XML"."untagged";
-		  variant (choice.childResource_list[-])"XML". "name as 'childResource'";
+		  variant (choice.childResource_list[-]) "XML"."name as 'childResource'";
 		  variant (choice.subscription_list) "XML"."untagged";
 		  variant (choice.subscription_list[-]) "XML"."name as 'subscription'";
 		};

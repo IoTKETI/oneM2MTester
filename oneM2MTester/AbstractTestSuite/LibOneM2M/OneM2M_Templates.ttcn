@@ -431,7 +431,6 @@ module OneM2M_Templates {
 			 * @desc Base Reception template for update Container
 			 */
 			template RequestPrimitive mw_updateContainer(template XSD.ID p_from := *, template XSD.ID p_to := ?) modifies mw_update := {
-				resourceType := int3,
 				primitiveContent := {container := ?}
 			}; 
 			
@@ -3774,126 +3773,165 @@ module OneM2M_Templates {
 
 	group UpperTester {
 		template (value) UtTriggerPrimitive m_utCreate := {
-			operation := int1,
-			to_ := "NotInitialized",
-			from_ := "NotInitialized",
-			requestIdentifier := testcasename() & "-m_utCreate" & f_rnd(1, 1000000),
-			resourceType := omit,
-			primitiveContent := omit,
-			role := omit, 
-			originatingTimestamp := omit,
-			requestExpirationTimestamp := omit,
-			resultExpirationTimestamp := omit,
-			operationExecutionTime := omit,
-			responseType := omit,
-			resultPersistence := omit,
-			resultContent := omit,
-			eventCategory := omit,
-			deliveryAggregation := omit,
-			groupRequestIdentifier := omit,
-			filterCriteria := omit,
-			discoveryResultType := omit
+			requestPrimitive := {
+				operation := int1,
+				to_ := "NotInitialized",
+				from_ := "UNINITIALIZED",
+				requestIdentifier := testcasename() & "-m_utCreate" & f_rnd(1, 1000000),
+				resourceType := omit,
+				primitiveContent := omit,
+				role := omit, 
+				originatingTimestamp := omit,
+				requestExpirationTimestamp := omit,
+				resultExpirationTimestamp := omit,
+				operationExecutionTime := omit,
+				responseType := omit,
+				resultPersistence := omit,
+				resultContent := omit,
+				eventCategory := omit,
+				deliveryAggregation := omit,
+				groupRequestIdentifier := omit,
+				filterCriteria := omit,
+				discoveryResultType := omit
+			},
+			forcedFields := omit
 		};
 		
+		template (value) UtTriggerPrimitive m_utCreateAe modifies m_utCreate := {
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utCreateAe" & f_rnd(1, 1000000),
+				resourceType := int2,
+				primitiveContent := {aE := m_contentAe_allOmit}
+			}
+		}
+		
 		template (value) UtTriggerPrimitive m_utCreateContainer modifies m_utCreate := {
-			requestIdentifier := testcasename() & "-m_utCreateContainer" & f_rnd(1, 1000000),
-			resourceType := int3,
-			primitiveContent := {container := m_contentContainer_allOmit}
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utCreateContainer" & f_rnd(1, 1000000),
+				resourceType := int3,
+				primitiveContent := {container := m_contentContainer_allOmit}
+			}
 		}
 		
 		template (value) UtTriggerPrimitive m_utCreateContentInstance modifies m_utCreate := {
-			requestIdentifier := testcasename() & "-m_utCreateContentInstance" & f_rnd(1, 1000000),
-			resourceType := int4,
-			primitiveContent := {contentInstance := m_contentContentInstance_allOmit}
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utCreateContentInstance" & f_rnd(1, 1000000),
+				resourceType := int4,
+				primitiveContent := {contentInstance := m_contentContentInstance_allOmit}
+			}
 		}
 		
 		template (value) UtTriggerPrimitive m_utCreateSubscription modifies m_utCreate := {
-			requestIdentifier := testcasename() & "-m_utCreateSubscription" & f_rnd(1, 1000000),
-			resourceType := int23,
-			primitiveContent := {subscription := m_contentSubscription}
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utCreateSubscription" & f_rnd(1, 1000000),
+				resourceType := int23,
+				primitiveContent := {subscription := m_contentSubscription}
+			}
 		}
 		
 		template (value) UtTriggerPrimitive m_utCreateRemoteCSE modifies m_utCreate := {
-			requestIdentifier := testcasename() & "-m_utCreateRemoteCSE" & f_rnd(1, 1000000),
-			resourceType := int16,
-			primitiveContent := {remoteCSE := m_contentRemoteCSE_allOmit}
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utCreateRemoteCSE" & f_rnd(1, 1000000),
+				resourceType := int16,
+				primitiveContent := {remoteCSE := m_contentRemoteCSE_allOmit}
+			}
 		}
  		
-		template (value) UtTriggerPrimitive m_utRetrieveResource(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) := {
-			operation := int2,
-			to_ := p_targetResourceAddress,
-			from_ := p_originator,
-			requestIdentifier := "m_utRetrieveResource" & f_rnd(1, 1000000),
-			resourceType := omit,
-			primitiveContent := omit,
-			role := omit, 
-			originatingTimestamp := omit,
-			requestExpirationTimestamp := omit,
-			resultExpirationTimestamp := omit,
-			operationExecutionTime := omit,
-			responseType := omit,
-			resultPersistence := omit,
-			resultContent := omit,
-			eventCategory := omit,
-			deliveryAggregation := omit,
-			groupRequestIdentifier := omit,
-			filterCriteria := omit,
-			discoveryResultType := omit
+		template (value) UtTriggerPrimitive m_utRetrieve(XSD.ID p_targetResourceAddress) := {
+			requestPrimitive := {
+				operation := int2,
+				to_ := p_targetResourceAddress,
+				from_ := "UNINITIALIZED",
+				requestIdentifier := "m_utRetrieveResource" & f_rnd(1, 1000000),
+				resourceType := omit,
+				primitiveContent := omit,
+				role := omit, 
+				originatingTimestamp := omit,
+				requestExpirationTimestamp := omit,
+				resultExpirationTimestamp := omit,
+				operationExecutionTime := omit,
+				responseType := omit,
+				resultPersistence := omit,
+				resultContent := omit,
+				eventCategory := omit,
+				deliveryAggregation := omit,
+				groupRequestIdentifier := omit,
+				filterCriteria := omit,
+				discoveryResultType := omit
+			},
+			forcedFields := omit
 		};
 		
 		template (value) UtTriggerPrimitive m_utUpdate := {
-			operation := int3,
-			to_ := "NotInitialized",
-			from_ := "NotInitialized",
-			requestIdentifier := testcasename() & "-m_utUpdate" & f_rnd(1, 1000000),
-			resourceType := omit,
-			primitiveContent := omit,
-			role := omit, 
-			originatingTimestamp := omit,
-			requestExpirationTimestamp := omit,
-			resultExpirationTimestamp := omit,
-			operationExecutionTime := omit,
-			responseType := omit,
-			resultPersistence := omit,
-			resultContent := omit,
-			eventCategory := omit,
-			deliveryAggregation := omit,
-			groupRequestIdentifier := omit,
-			filterCriteria := omit,
-			discoveryResultType := omit
+			requestPrimitive := {
+				operation := int3,
+				to_ := "NotInitialized",
+				from_ := "UNINITIALIZED",
+				requestIdentifier := testcasename() & "-m_utUpdate" & f_rnd(1, 1000000),
+				resourceType := omit,
+				primitiveContent := omit,
+				role := omit, 
+				originatingTimestamp := omit,
+				requestExpirationTimestamp := omit,
+				resultExpirationTimestamp := omit,
+				operationExecutionTime := omit,
+				responseType := omit,
+				resultPersistence := omit,
+				resultContent := omit,
+				eventCategory := omit,
+				deliveryAggregation := omit,
+				groupRequestIdentifier := omit,
+				filterCriteria := omit,
+				discoveryResultType := omit
+			},
+			forcedFields := omit
 		};
 		
-		template (value) UtTriggerPrimitive m_utUpdateContainer modifies m_utUpdate := {
-			requestIdentifier := testcasename() & "-m_utUpdateContainer" & f_rnd(1, 1000000),
-			resourceType := int3,
-			primitiveContent := {container := m_contentUpdateContainer}
+		template (value) UtTriggerPrimitive m_utUpdateAe modifies m_utUpdate := {
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utUpdateContainer" & f_rnd(1, 1000000),
+				resourceType := int2,
+				primitiveContent := {aE := m_contentUpdateAe}
+			}
 		}
 		
-		template (value) UtTriggerPrimitive m_utDeleteRequest := {
-			operation := int4,
-			to_ := "NotInitialized",
-			from_ := "NotInitialized",
-			requestIdentifier := testcasename() & "-m_utDeleteRequest" & f_rnd(1, 1000000),
-			resourceType := omit,
-			primitiveContent := omit, 
-			role := omit, 
-			originatingTimestamp := omit,
-			requestExpirationTimestamp := omit,
-			resultExpirationTimestamp := omit,
-			operationExecutionTime := omit,
-			responseType := omit,
-			resultPersistence := omit,
-			resultContent := omit,
-			eventCategory := omit,
-			deliveryAggregation := omit,
-			groupRequestIdentifier := omit,
-			filterCriteria := omit,
-			discoveryResultType := omit
+		template (value) UtTriggerPrimitive m_utUpdateContainer modifies m_utUpdate := {
+			requestPrimitive := {
+				requestIdentifier := testcasename() & "-m_utUpdateContainer" & f_rnd(1, 1000000),
+				resourceType := int3,
+				primitiveContent := {container := m_contentUpdateContainer}
+			}
+		}
+		
+		template (value) UtTriggerPrimitive m_utDelete := {
+			requestPrimitive := {
+				operation := int4,
+				to_ := "NotInitialized",
+				from_ := "UNINITIALIZED",
+				requestIdentifier := testcasename() & "-m_utDeleteRequest" & f_rnd(1, 1000000),
+				resourceType := omit,
+				primitiveContent := omit, 
+				role := omit, 
+				originatingTimestamp := omit,
+				requestExpirationTimestamp := omit,
+				resultExpirationTimestamp := omit,
+				operationExecutionTime := omit,
+				responseType := omit,
+				resultPersistence := omit,
+				resultContent := omit,
+				eventCategory := omit,
+				deliveryAggregation := omit,
+				groupRequestIdentifier := omit,
+				filterCriteria := omit,
+				discoveryResultType := omit
+			},
+			forcedFields := omit
 		};
 		
-		template (value) UtTriggerPrimitive m_utDeleteResource(XSD.ID p_targetResourceAddress, in XSD.ID p_originator) modifies m_utDeleteRequest := {
-			to_ := p_targetResourceAddress,
-			from_ := p_originator
+		template (value) UtTriggerPrimitive m_utDeleteResource(XSD.ID p_targetResourceAddress) modifies m_utDelete := {
+			requestPrimitive := {
+				to_ := p_targetResourceAddress
+			}
 		};
 		
 		

@@ -21,14 +21,29 @@ module OneM2M_Pixits {
 	
 		group IutParameters {
 			
+			/**
+			 * @desc IUT CSE IN role 
+			 */
 			modulepar boolean PX_IN_CSE	:= true; 
-			
+
+			/**
+			 * @desc IUT CSE MN role 
+			 */			
 			modulepar boolean PX_MN_CSE	:= false; 
-						
+
+			/**
+			 * @desc IUT CSE ASN role 
+			 */						
 			modulepar boolean PX_ASN_CSE:= false; 
 		
+			/**
+			 * @desc IUT IP address and port 
+			 */
 			modulepar charstring PX_SUT_ADDRESS := "127.0.0.1:8080";
 			
+			/**
+			 * @desc IUT Upper Tester interface support 
+			 */
 			modulepar boolean PX_UT_IMPLEMENTED := false;
 			
 			/**
@@ -60,42 +75,86 @@ module OneM2M_Pixits {
 			 * @desc CSE-ID with privileges to CREATE at the IUT CSEBase with SP-relative-CSE-ID format (relative) according to TS-0001-7.2-1
 			 */	
 			modulepar XSD.ID PX_SUPER_CSE_ID				:= "/admin:admin";	
-			
+
+			/**
+			 * @desc Allowed AE-IDs starting with C 
+			 */			
 			modulepar XSD.IDREFS PX_ALLOWED_C_AE_IDS := {"C-AllowedAeId"};
-			
+
+			/**
+			 * @desc Not allowed AE-IDs starting with C 
+			 */			
 			modulepar XSD.IDREFS PX_NOT_ALLOWED_C_AE_IDS := {"C-NotAllowedAeId"};
-			
+
+			/**
+			 * @desc Allowed AE-IDs starting with S 
+			 */			
 			modulepar XSD.IDREFS PX_ALLOWED_S_AE_IDS := {"S-AllowedAeId"};
 			
+			/**
+			 * @desc Not allowed AE-IDs starting with S 
+			 */			
 			modulepar XSD.IDREFS PX_NOT_ALLOWED_S_AE_IDS := {"S-NotAllowedAeId"};
 			
+			/**
+			 * @desc Not allowed App-ID 
+			 */			
 			modulepar XSD.ID PX_NOT_ALLOWED_APP_ID := "NotAllowedAppId";
 			
+			/**
+			 * @desc Addressing method to use during test execution 
+			 */			
 			modulepar AddressingMethod PX_ADDRESSING_METHOD := e_hierarchical;
 	
+			/**
+			 * @desc Primitive scope to use during test execution 
+			 */			
 			modulepar PrimitiveScope PX_PRIMITIVE_SCOPE 	:= e_cseRelative;
 	
+			/**
+			 * @desc Serialization to use during test execution 
+			 */			
 			modulepar charstring PX_SERIALIZATION			:= "XML";
 	
+			/**
+			 * @desc Protocolo binding to use during test execution 
+			 */			
 			modulepar charstring PX_PROTOCOL_BINDING 		:= "HTTP";		
 			
+			/**
+			 * @desc Namespace composed of "prefix" = "xml namespace" to use during test execution 
+			 */			
 			modulepar charstring PX_XML_NAMESPACE 			:= "m2m=""http://www.onem2m.org/xml/protocols""";
 			
+			/**
+			 * @desc Character to indicate "all originators" for AccessControlOriginators element 
+			 */			
 			modulepar ListOfURIs PX_ACOR 					:= {"all"};
 			
+			/**
+			 * @desc Time given for configuring IUT when required (i.e. when UT not implemented) 
+			 */			
 			modulepar float PX_TCONFIG_IUT					:= 10.0;
 						
 		}
 		
 		group TesterParameters {
 		
+			/**
+			 * @desc AE1 IP address and listening port 
+			 */			
 			modulepar charstring PX_AE1_ADDRESS				:= "127.0.0.1:3141";
 	
+			/**
+			 * @desc AE2 IP address and listening port 
+			 */			
 			modulepar charstring PX_AE2_ADDRESS				:= "127.0.0.1:3142";
 	
+			/**
+			 * @desc CSE1 IP address and listening port 
+			 */			
 			modulepar charstring PX_CSE1_ADDRESS			:= "127.0.0.1:4141";
 	
-
 			/**
 			 * @desc Test System CSE1 Name
 			 */	
@@ -140,8 +199,14 @@ module OneM2M_Pixits {
 		
 		group ExecutionParameters {
 		
+			/**
+			 * @desc Resources to be deleted by TC_DELETE_RESOURCES 
+			 */			
 			modulepar XSD.IDREFS PX_RESOURCES_TO_BE_DELETED := {"MyAe"};
 	
+			/**
+			 * @desc To enable run postamble (for debugging) 
+			 */			
 			modulepar boolean PX_RUN_POSTAMBLE 				:= true;		
 		}
 	

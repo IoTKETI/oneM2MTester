@@ -777,31 +777,31 @@ module OneM2M_DualFaceMapping {
 		var HTTPMessage v_httpMsgToSend;
 		var charstring v_accept;
   		
-  		v_reqPrimitive := p_msgout; 
+  		v_reqPrimitive := p_msgout.requestPrimitive;
   		
         // to 
-        if(ispresent(p_msgout.to_)){
+        if(ispresent(v_reqPrimitive.to_)){
 			v_to := "/"; //oct2char(unichar2oct(v_reqPrimitive.to_));
 			log(__SCOPE__&"-to", v_to); 
 		}
 		
 		// from
-		if(ispresent(p_msgout.from_)) {
+		if(ispresent(v_reqPrimitive.from_)) {
 		  v_from := oct2char(unichar2oct(v_reqPrimitive.from_));          
 		}
 		
 		// requestIdentifier
-		if(ispresent(p_msgout.requestIdentifier)) {
+		if(ispresent(v_reqPrimitive.requestIdentifier)) {
 			v_reqID	:= oct2char(unichar2oct(v_reqPrimitive.requestIdentifier));  
 		}
 		
 		// resourceType
-		if(ispresent(p_msgout.resourceType)) {
+		if(ispresent(v_reqPrimitive.resourceType)) {
 		  v_ty := enum2int(v_reqPrimitive.resourceType); 
 		}
 		
 		// primitiveContent
-		if(ispresent(p_msgout.primitiveContent)) {
+		if(ispresent(v_reqPrimitive.primitiveContent)) {
 			var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
                   
         	if(v_bit_stream != ''B) {

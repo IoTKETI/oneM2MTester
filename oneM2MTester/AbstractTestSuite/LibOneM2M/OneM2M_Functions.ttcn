@@ -40,7 +40,7 @@ module OneM2M_Functions {
 			map(self:acPort, system:acPort);
 			
 			activate(a_default());
-			activate(a_cse_cf01());
+			vc_a_cse := activate(a_cse_cf01());
 				
 			// Initialize AE2
 			if(p_auxiliaryAe2Required) {
@@ -89,7 +89,7 @@ module OneM2M_Functions {
 				map(self:utPort, system:utPort);
 			}
 			activate(a_default());
-			activate(a_cse_cf02_ae1());
+			vc_a_cse := activate(a_cse_cf02_ae1());
 			vc_cse1.start(f_cf02UpCse1());
 			vc_cse1.done;
 				
@@ -102,7 +102,7 @@ module OneM2M_Functions {
 		/**
 			@desc Ports mapping and default behaviour activation for Config 2 on the CSE1
 		*/
-		function f_cf02UpCse1() runs on CseSimu system AeSystem {
+		function f_cf02UpCse1() runs on CseSimu system AeSystem{
 			
 			// Variables
 			var PrimitiveContent v_cSEBaseResource;
@@ -141,7 +141,7 @@ module OneM2M_Functions {
 			map(self:mccPortIn, system:mccPortIn);
 			map(self:acPort, system:acPort);
 			activate(a_default());
-			activate(a_cse_cf02_cse1());
+			vc_a_cse := activate(a_cse_cf02_cse1());
 			vc_ae1.start(f_cf02UpAe1());
 			vc_ae1.done;
 				
@@ -190,7 +190,7 @@ module OneM2M_Functions {
 				map(self:utPort, system:utPort);
 			}
 			activate(a_default());
-			activate(a_ae_cf03());
+			vc_a_ae := activate(a_ae_cf03());
 		
 			// Connect
 					
@@ -217,7 +217,7 @@ module OneM2M_Functions {
 			map(self:mccPortIn, system:mccPortIn);
 			map(self:acPort, system:acPort);
 			activate(a_default());
-			activate(a_cse_cf04());
+			vc_a_cse := activate(a_cse_cf04());
 
 			// Connect
 			
@@ -276,7 +276,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping for Config 03
 		 */
-		function f_cf03Down() runs on CseSimu system AeSystem {
+		function f_cf03Down() runs on CseSimu {
 			
 			unmap(self:mcaPortIn, system:mcaPortIn);
 			if(PX_UT_IMPLEMENTED){
@@ -288,7 +288,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping for Config 04
 		 */
-		function f_cf04Down() runs on CseSimu system AeSystem {
+		function f_cf04Down() runs on CseSimu system AeSystem{
 	
 			unmap(self:mccPort, system:mccPort);
 			unmap(self:mccPortIn, system:mccPortIn);
@@ -707,7 +707,7 @@ module OneM2M_Functions {
 			 * @desc Deletion of all resources created during the test case execution. It deals also with AE2 created resources if any. IUT gets clean and ready for next execution
 			 * @verdict 
 			 */
-			function f_cse_postamble_deleteResources() runs on AeSimu {
+			function f_cse_postamble_deleteResources() runs on AeSimu system CseSystem {
 				var integer i;
 				var XSD.ID v_resourceAddress;
 				var RequestPrimitive v_request;
@@ -760,7 +760,7 @@ module OneM2M_Functions {
 			 * @desc Calls to postamble for AeSimu components (i.e. AE2)
 			 * @verdict 
 			 */
-			function f_cse_postamble_aeSimu(in AeSimu p_ae) runs on AeSimu {
+			function f_cse_postamble_aeSimu(in AeSimu p_ae) runs on AeSimu system CseSystem {
 				if(p_ae.running) {
 					p_ae.stop;
 				}
@@ -772,7 +772,7 @@ module OneM2M_Functions {
 			 * @desc Calls to postamble for AeSimu component (i.e. AE1) on CseSimu 
 			 * @verdict 
 			 */
-			function f_cse_postamble_ae1() runs on CseSimu {
+			function f_cse_postamble_ae1() runs on CseSimu system AeSystem {
 				if(vc_ae1.running) {
 					vc_ae1.stop;
 				}
@@ -784,7 +784,7 @@ module OneM2M_Functions {
 			 * @desc Calls to postamble for CseSimu component (i.e. CSE1) on AeSimu 
 			 * @verdict 
 			 */
-			function f_cse_postamble_cse1() runs on AeSimu {
+			function f_cse_postamble_cse1() runs on AeSimu system CseSystem {
 				if(vc_cse1.running) {
 					vc_cse1.stop;
 				}
@@ -796,7 +796,7 @@ module OneM2M_Functions {
 			 * @desc Deletion of all resources created during the test case execution. IUT gets clean and ready for next execution
 			 * @verdict 
 			 */
-			function f_cse_postamble_deleteResourcesCSE() runs on CseSimu {
+			function f_cse_postamble_deleteResourcesCSE() runs on CseSimu system AeSystem {
 				var integer i;
 				var XSD.ID v_resourceAddress;
 				var RequestPrimitive v_request;
@@ -2212,10 +2212,18 @@ module OneM2M_Functions {
 				}
 				[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotification(?)))) -> value v_request {
 					//Send response 
-					v_responsePrimitive := valueof(m_responseNotification(int2001, omit));
+					v_responsePrimitive := valueof(m_responseNotification(int2000, omit));
 					v_responsePrimitive.requestIdentifier := v_request.primitive.requestPrimitive.requestIdentifier;
 					mcaPortIn.send(m_response(v_responsePrimitive));
 					log(__SCOPE__&": WARNING: Unexpected Notification message received");
+					repeat;
+				}
+				[] mcaPortIn.receive(mw_request(mw_notifyNotification(mw_contentNotificationVerification))) -> value v_request {
+					//Send response 
+					v_responsePrimitive := valueof(m_responseNotification(int2000, omit));
+					v_responsePrimitive.requestIdentifier := v_request.primitive.requestPrimitive.requestIdentifier;
+					mcaPortIn.send(m_response(v_responsePrimitive));
+					log(__SCOPE__&": WARNING: Unexpected Notification for Subscription Verification message received");
 					repeat;
 				}
 			 }			
@@ -2375,16 +2383,15 @@ module OneM2M_Functions {
 			 * @return 	Internal resource index of AE or -1 in case of failure		
 			 * @verdict	inconc if no AE registration request is received 
 			 */
-			function f_ae_preamble_registerAe(template UtTriggerPrimitive p_utRequest := m_create) runs on CseSimu return integer {
+	 		function f_ae_preamble_registerAe(template UtTriggerPrimitive p_utRequest := m_utCreateAe) runs on CseSimu return integer {
     		
 				var MsgIn v_request;
-				var PrimitiveContent v_modifiedResource;
-				var integer v_resourceIndex, v_parentIndex;
-				var RequestPrimitive v_rp;
+				var integer v_localResourceIndex, v_parentIndex;
 				var charstring v_action := "Please, register the AE on the Tester";
-
-				if(not(ispresent(p_utRequest.primitiveContent))) {
-					p_utRequest.primitiveContent.aE := m_contentCreateAe(omit, omit, omit, omit);
+				
+				p_utRequest.requestPrimitive.to_ := f_getLocalResourceAddress(-,-,-);
+				if(not(ispresent(p_utRequest.requestPrimitive.primitiveContent))) {
+					p_utRequest.requestPrimitive.primitiveContent.aE := m_contentCreateAe(omit, omit, omit, omit);
 				}
   
 				f_sendUtPrimitive(p_utRequest, v_action);
@@ -2394,18 +2401,10 @@ module OneM2M_Functions {
 					[] mcaPortIn.receive(mw_request(mw_createAe)) -> value v_request {
 						tc_ac.stop;
     					
-						v_rp := v_request.primitive.requestPrimitive;		
-						v_parentIndex := f_getResourceIndex(v_rp.to_);
-						v_modifiedResource := f_ae_generateLocalResource(v_rp.primitiveContent, v_parentIndex, v_rp.resourceType);
-						v_resourceIndex := f_setLocalResource(v_modifiedResource, int2, v_parentIndex);
-						if(v_resourceIndex != -1) {
-							mcaPortIn.send(m_response(m_responsePrimitive_content(int2001, v_rp.requestIdentifier, v_modifiedResource)));
-							setverdict(pass, __SCOPE__&":INFO: Application registered successfuly");
-						}
-						else {
-							mcaPortIn.send(m_response(m_responsePrimitive(int5000, v_request.primitive.requestPrimitive.requestIdentifier)));
-							setverdict(inconc, __SCOPE__&":INFO: AE registration failed");
-						}					
+						v_localResourceIndex := f_processCreateRequestPrimitive(v_request.primitive.requestPrimitive);
+						
+						mcaPortIn.send(m_response(vc_response.primitive.responsePrimitive));
+							
 					}
     					
 					[] tc_ac.timeout {
@@ -2416,7 +2415,7 @@ module OneM2M_Functions {
 				
 				f_checkCseSimuStatus();	
     			
-				return v_resourceIndex;	
+				return v_localResourceIndex;	
 			}//end function f_ae_preamble_register
 			
 			            
@@ -2426,7 +2425,7 @@ module OneM2M_Functions {
 			 * @return 	Internal resource index of Container or -1 in case of failure		
 			 * @verdict	inconc if no Container create request is received 
 			 */
-			function f_ae_preamble_createContainer(template UtTriggerPrimitive p_utRequest := m_create) runs on CseSimu return integer {
+			function f_ae_preamble_createContainer(template UtTriggerPrimitive p_utRequest := m_utCreateAe) runs on CseSimu return integer {
     		
 				var MsgIn v_request;
 				var PrimitiveContent v_modifiedResource;
@@ -2434,8 +2433,8 @@ module OneM2M_Functions {
 				var RequestPrimitive v_rp;
 				var charstring v_action := "Please, create a Container resource on the Tester";
 				
-				if(not(ispresent(p_utRequest.primitiveContent))) {
-					p_utRequest.primitiveContent.container := m_contentCreateContainer;
+				if(not(ispresent(p_utRequest.requestPrimitive.primitiveContent))) {
+					p_utRequest.requestPrimitive.primitiveContent.container := m_contentCreateContainer;
 				}
     		
 				f_sendUtPrimitive(p_utRequest, v_action);
@@ -2532,7 +2531,7 @@ module OneM2M_Functions {
 				// Error
 				return p_resource;
 			}
-			
+
 		} // end helpingFunctions
 		
 		group altstepFunctions {
@@ -3305,6 +3304,35 @@ module OneM2M_Functions {
 			
 			
 		} // end f_getAnnouncedResourceType
+		
+		/**
+		 * @desc   Proccessing of the request primitive
+		 * @param  p_request          Request primitive to be processed
+		 * @return p_response 		Response primitive to be sent back
+		 */
+		function f_processCreateRequestPrimitive(in RequestPrimitive p_request) runs on CseSimu return integer {			
+			var integer v_parentIndex := -1;
+			var integer v_localResourceIndex := -1;
+			var PrimitiveContent v_localResource;
+				
+			v_parentIndex := f_getResourceIndex(p_request.to_);
+			if(v_parentIndex == -1) {
+				setverdict(inconc,__SCOPE__&": ERROR: Target resource not found");
+				vc_response.primitive.responsePrimitive := valueof(m_responsePrimitive(int4004,p_request.requestIdentifier));
+		
+			} else {
+				setverdict(pass, __SCOPE__&":INFO: Resource created successfuly");
+				v_localResource := f_ae_generateLocalResource(p_request.primitiveContent, v_parentIndex, p_request.resourceType);
+				v_localResourceIndex := f_setLocalResource(v_localResource, p_request.resourceType, v_parentIndex);
+	
+				vc_response.primitive.responsePrimitive := valueof(m_responsePrimitive(int2001,p_request.requestIdentifier));
+				vc_response.primitive.responsePrimitive.primitiveContent := vc_localResourcesList[v_localResourceIndex].resource;
+			}
+			vc_response.primitive.responsePrimitive.from_ := PX_CSE1_ID;
+			vc_response.primitive.responsePrimitive.to_ := p_request.from_;
+				
+			return v_localResourceIndex;
+		}
     				
 	}//end group getSetFunctions
 	
@@ -3530,9 +3558,9 @@ module OneM2M_Functions {
 			
 			if (PX_UT_IMPLEMENTED){
 				
-				p_utRequest.from_ := "UNINITIALIZED";
-				p_utRequest.requestIdentifier := "m_uttriggerPrimitive" & f_rnd(1, 1000000);
+				p_utRequest.requestPrimitive.requestIdentifier := "m_uttriggerPrimitive" & f_rnd(1, 1000000);
 
+				deactivate;
 				utPort.send(valueof(p_utRequest));
 
 				tc_wait.start;
@@ -3549,7 +3577,21 @@ module OneM2M_Functions {
 						setverdict(inconc, __SCOPE__, " : Timeout due to no response received from requested SUT!");
 					}
 				}
-			
+				
+				/* activate(a_default());
+				if(vc_config == e_cf01) {
+					vc_a_cse := activate(a_cse_cf01());
+				} else if ((vc_config == e_cf02) or (vc_config == e_cf02CseSimuMaster)) {
+					if(vc_testSystemRole == e_ae) {
+						vc_a_cse := activate(a_cse_cf02_ae1());
+					} else if (vc_testSystemRole == e_cse) {
+						vc_a_cse := activate(a_cse_cf02_cse1());
+					}
+				} else if (vc_config == e_cf03) {
+					vc_a_ae := activate(a_ae_cf03());
+				} else if (vc_config == e_cf04) {
+					vc_a_cse := activate(a_cse_cf04());
+				} */
 			}else{
 				
 				action(p_action);
