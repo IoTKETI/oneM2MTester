@@ -4752,9 +4752,9 @@ module OneM2M_PermutationFunctions {
 							f_cse_preamble_subscriptionVerification(v_ae2Index, p_createRequestPrimitive, p_resourceType);
 
 						 	v_resourceIndex := f_cse_createResource(p_resourceType, p_createRequestPrimitive);//under the CSEBase resource
-							if(vc_ae2.running) {
+							/* if(vc_ae2.running) {
 						 		vc_ae2.stop;
-						 	}
+						 	} */
 						} else {	//ResourceType = RemoteCSE
 							vc_cse1.start(f_cse_registerRemoteCse(p_createRequestPrimitive));
 							vc_cse1.done;
@@ -4766,7 +4766,8 @@ module OneM2M_PermutationFunctions {
 						v_request := f_getUpdateRequestPrimitive(p_resourceType, v_resourceIndex, p_updateRequestPrimitive);
 						
 						if((p_resourceType == int23) and (ispresent(v_request.primitiveContent.subscription.notificationURI))) {	//Subscription
-							v_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_aeIndex)};							
+							v_request.primitiveContent.subscription.notificationURI := {f_getResourceAddress(v_ae2Index)};	
+							vc_ae2.start(f_cse_notifyProcedure_subscriptionVerificationHandler());						
 						}
 						
 						mcaPort.send(m_request(v_request));
