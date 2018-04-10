@@ -52,18 +52,8 @@ Visit [wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
     ![InnoWireless logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/Innowireless_logo.png)
 
 ## **Latest News**
-[2017 September]
-- oneM2MTester version 2.1.0 is ready for download!! 
-
-[2017 June]
-- oneM2MTester version 2.0 participated oneM2M conformance test sessions in 2017 ETSI Plugtest event!! 
-
-[2017 February]
-- oneM2MTester version 1.2 is available for download!!
-
-[2017 January]
-- oneM2MTester version 1.0 released!!
-- Huawei(China) shows high interest in oneM2MTester project and joined oneM2MTester project in January 2017!! Welcome Huawei to join oneM2MTester project!!
+[2018 April]
+- oneM2MTester version 2.0.0 supports all oneM2M Release1 testcases required by TTA 
 
 
 
