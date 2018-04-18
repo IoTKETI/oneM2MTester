@@ -43,6 +43,7 @@ module OneM2M_DualFaceMapping {
 	external function f_split_uri(in charstring p_cs, in charstring p_delim) return Charstring_List;
 	external function f_replace(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
 	external function f_adressingFormatter(in charstring p_source, in charstring p_str1, in charstring p_str2) return charstring;
+	external function f_adressingFormatChecker(in charstring p_source) return charstring;
 
 	// Function to handle the connection id used in mcaPortIn
 	external function f_getConId_mcaPortIn() return integer;
@@ -122,14 +123,18 @@ module OneM2M_DualFaceMapping {
 				if(ispresent(v_reqPrimitive.to_)) {
 		  			v_to := oct2char(unichar2oct(v_reqPrimitive.to_)); 
 		  			v_uri := v_to;  
-		  		
-		  			if(PX_PRIMITIVE_SCOPE == e_spRelative){
+	
+					var PrimitiveScope primitiveScopeForAllGeneral;
+
+					var charstring primitiveScopeCheck := f_adressingFormatChecker(v_uri);
+					
+		  			if(primitiveScopeCheck == "SPRELATIVE"){
 		  		    	v_uri := "/~" & v_to;	
 		  		  		log(__SCOPE__&"-f_adressingFormatter(Sp-relative):", v_uri);
-		  			} else if (PX_PRIMITIVE_SCOPE == e_cseRelative){
+		  			} else if (primitiveScopeCheck == "CSERELATIVE"){
 		  				v_uri := "/" & v_to;
 		  		  		log(__SCOPE__&"-f_adressingFormatter(CSE-relative):", v_uri);	  		  
-		  			} else if (PX_PRIMITIVE_SCOPE == e_absolute){
+		  			} else if (primitiveScopeCheck == "ABSOLUTE"){
 		  		 		v_uri := f_adressingFormatter(v_to, "/", "/_");
 		  		 		
 		  		 		var AddressingMethod p_addressingMethod := PX_ADDRESSING_METHOD;
