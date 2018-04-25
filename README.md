@@ -32,9 +32,9 @@ Visit [Wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
 
 ## **Licenses**
 - [BSD 3-Clause License](https://github.com/IoTKETI/oneM2MTester/blob/master/LICENSE) ([OCEAN](http://developers.iotocean.org/) Open alliance for IoT standard)
-- [Eclipse Public License v1.0](http://www.eclipse.org/org/documents/epl-v10.php) ([Eclipse Titan](https://github.com/eclipse/titan.core) open source TTCN-3 compiler)
-- [MIT License](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE) ([JsonCpp](https://github.com/open-source-parsers/jsoncpp) open source C++ JSON parser)
-- [zlib License](https://github.com/leethomason/tinyxml2#license) ([TinyXML2](https://github.com/leethomason/tinyxml2) open source C++ XML parser)
+- [Eclipse Public License v1.0](http://www.eclipse.org/org/documents/epl-v10.php) ([Eclipse Titan](https://github.com/eclipse/titan.core) Open Source TTCN-3 compiler)
+- [MIT License](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE) ([JsonCpp](https://github.com/open-source-parsers/jsoncpp) Open Source C++ JSON parser)
+- [zlib License](https://github.com/leethomason/tinyxml2#license) ([TinyXML2](https://github.com/leethomason/tinyxml2) Open Source C++ XML parser)
 
 ## **Members Logo**
   ![KETI logo](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/Partnership/KETI_logo.png) 
@@ -51,8 +51,4 @@ Visit [Wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more gui
 
 ## **Latest News**
 [2018 April]
-- oneM2MTester version 2.0.0 supports all oneM2M Release1 testcases required by TTA 
-
-
-
-
+- oneM2MTester version 2.0.0 supports all oneM2M Release1 testcases required by TTA

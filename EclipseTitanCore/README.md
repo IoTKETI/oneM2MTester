@@ -6,24 +6,10 @@ Titan core version (i.e. Titan TTCN-3 compiler version) impacts the compiling re
 Because oneM2MTester project incorporates oneM2M abstract test suite which defines a bunch of oneM2M
 specific data types, whose complexity impacts the TTCN-3 compiler's performance.
 
-Due to this reason, we provide a specific version of Eclipse Titan core in the repository, which has been verified 
-to work well with oneM2MTester. Before running oneM2MTester, please make sure you are using the latest oneM2MTester
-code in the GitHub, and also the Titan Core version you are using matches with the one offered to you in the GitHub.
+Due to this reason, we provide a specific version URL of Eclipse Titan Core in this repository, which has been verified 
+to work well with oneM2MTester. Before running oneM2MTester, please make sure you are using the same Eclipse Titan Core used in oneM2MTester.
 
 oneM2MTester Configuration:
-- Operating System: Ubuntu 14.04 LTS
-- Eclipse Version: Mars.2 Release (4.5.2) 
-- Titan Version: 113 200/6 R2A (Build date: May 26 2017)
-
-Reference URL:
-https://github.com/eclipse/titan.core/blob/master/README.linux
-https://projects.eclipse.org/projects/tools.titan/downloads
-https://github.com/eclipse/titan.core/releases
-
-Reference Document:
-oneM2MTester_User_Guide_ver1_0_0.pdf in oneM2MTester_User_Manual folder
-Installation_Guide_for_the_TITAN_TTCN-3_Test_Executor_2017.pdf in Eclipse_TITAN_Documentation folder
-
-
-
-
+- Operating System: Ubuntu 16.04 LTS
+- Eclipse Version: Neon.3 Release (4.6.3) 
+- Titan Core Version: https://github.com/eclipse/titan.core/tree/78a82971bdd606e92e522b9808e27991ddad7dc9
