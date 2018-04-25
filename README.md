@@ -21,7 +21,7 @@
 
 - The **oneM2MTester** tool is developed based on open source [Eclipse TITAN](https://projects.eclipse.org/projects/tools.titan) for oneM2M platform developers or testing engineers to test and evaluate their oneM2M implementations (CSE and AE) during or after the implementation development. 
 
-## **[Dissemination]**
+## **Dissemination**
 - Active participation and demonstration oneM2MTester in international conference and events
 - We prepare and upload oneM2MTester tutorial video into oneM2M webinar series
 
@@ -30,8 +30,8 @@ More information for the dissemination of oneM2MTester can be found [here](https
 ## **Wiki Page**
 Visit [Wiki homepage](https://github.com/IoTKETI/oneM2MTester/wiki) for more guide information and here is a quick link for [oneM2MTester User Guide](https://github.com/IoTKETI/oneM2MTester/blob/master/doc/oneM2MTester_User_Manual/oneM2MTester_User_Guide_ver2_1_0.pdf)
 
-## **[Licenses]**
-- [BSD 3-Clause License](https://github.com/IoTKETI/oneM2MTester/blob/master/LICENSE ([OCEAN](http://developers.iotocean.org/) Open alliance for IoT standard)
+## **Licenses**
+- [BSD 3-Clause License](https://github.com/IoTKETI/oneM2MTester/blob/master/LICENSE) ([OCEAN](http://developers.iotocean.org/) Open alliance for IoT standard)
 - [Eclipse Public License v1.0](http://www.eclipse.org/org/documents/epl-v10.php) ([Eclipse Titan](https://github.com/eclipse/titan.core) open source TTCN-3 compiler)
 - [MIT License](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE) ([JsonCpp](https://github.com/open-source-parsers/jsoncpp) open source C++ JSON parser)
 - [zlib License](https://github.com/leethomason/tinyxml2#license) ([TinyXML2](https://github.com/leethomason/tinyxml2) open source C++ XML parser)
