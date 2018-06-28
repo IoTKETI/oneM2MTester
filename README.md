@@ -22,8 +22,9 @@
 - The **oneM2MTester** tool is developed based on open source [Eclipse TITAN](https://projects.eclipse.org/projects/tools.titan) for oneM2M platform developers or testing engineers to test and evaluate their oneM2M implementations (CSE and AE) during or after the implementation development. 
 
 ## **Dissemination**
-- Active participation and demonstration oneM2MTester in international conference and events
-- We prepare and upload oneM2MTester tutorial video into oneM2M webinar series
+- Active participation and demonstration oneM2MTester in international conference and events.
+- We prepare and upload oneM2MTester conformance testing video on the [YouTube](https://youtu.be/ZWehPOwLSb4).
+- M2MSpace is being developed by Innowiress is commercial oneM2M conformance testing tool based on oneM2MTester. In addition, M2MSpace is [authorized by TTA](http://www.onem2mcert.com/sub/sub02_06.php).
 
 More information for the dissemination of oneM2MTester can be found [here](https://github.com/IoTKETI/oneM2MTester/wiki/Dissemination-of-oneM2MTester).
 
