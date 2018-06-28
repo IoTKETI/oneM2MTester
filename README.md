@@ -24,7 +24,7 @@
 ## **Dissemination**
 - Active participation and demonstration oneM2MTester in international conference and events.
 - We prepare and upload oneM2MTester conformance testing video on the [YouTube](https://youtu.be/ZWehPOwLSb4).
-- M2MSpace is being developed by Innowiress is commercial oneM2M conformance testing tool based on oneM2MTester. In addition, M2MSpace is [authorized by TTA](http://www.onem2mcert.com/sub/sub02_06.php).
+- M2MSpace which is being developed by Innowiress is commercial oneM2M conformance testing tool based on oneM2MTester. In addition, M2MSpace is [authorized by TTA](http://www.onem2mcert.com/sub/sub02_06.php).
 
 More information for the dissemination of oneM2MTester can be found [here](https://github.com/IoTKETI/oneM2MTester/wiki/Dissemination-of-oneM2MTester).
 
