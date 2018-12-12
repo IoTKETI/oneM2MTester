@@ -76,6 +76,55 @@ namespace OneM2M__DualFaceMapping {
 		connectionID = p__string;
 	}
 
+	CHARSTRING f__resourcetype__extract(const CHARSTRING& p__string) {
+		const char* tmp_str = (const char*)p__string;
+		std::string concat_str = "";
+		std::string s(tmp_str);
+		int count = 0;
+
+		// Extract the resource type
+		for(unsigned int i = s.length() - 1; i > 0; i++) {
+
+			if(s[i] != '=') {
+				concat_str = concat_str + s[i];
+			} else {
+				break;
+			}
+		}
+
+		CHARSTRING s_str(concat_str.c_str());
+
+		return s_str;
+	}
+
+	CHARSTRING f__to__extract (const CHARSTRING& p__string) {
+		const char* tmp_str = (const char*)p__string;
+		std::string s(tmp_str);
+
+		if(s[0] == '/') {
+			// Delete the first slash for the to_ parameter
+			for(unsigned int i = 0; i < s.length(); i++) {
+				s[i] = s[i + 1];
+			}
+		}
+
+		if(s[0] == '~') {
+			// Delete the first slash for the to_ parameter
+			for(unsigned int i = 0; i < s.length(); i++) {
+				s[i] = s[i + 1];
+			}
+		}
+
+		if(s[0] == '_') {
+			// Delete the first slash for the to_ parameter
+			s[0] = '/';
+		}
+
+		CHARSTRING s_str(s.c_str());
+
+		return s_str;
+	}
+
 	/**
 	 * @desc convert string from uppercase to lowercase
 	 * @p__string: string containing uppercase letters
@@ -102,7 +151,7 @@ namespace OneM2M__DualFaceMapping {
 		std::string s(tmp_str);
 
 		for(unsigned int i = 0; i < s.length(); i++){
-			if(s[i] != '"' && s[i] != '{' && s[i] != '}' && s[i] != '\\' && s[i] != ' '){
+			if(s[i] != '"' && s[i] != '{' && s[i] != '}' && s[i] != '\\' && s[i] != ' ') {
 				concat_str = concat_str + s[i];
 			}
 		}
@@ -803,11 +852,6 @@ namespace OneM2M__DualFaceMapping {
 
 			parent_tag = name_short;
 
-			// CHARSTRING tmp_for_name_checking(elemName.asCString());
-			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
-			// TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
-			// TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
-
 			if(elemObj.isObject()){
 
 				root_tag = name_short;
@@ -889,12 +933,21 @@ namespace OneM2M__DualFaceMapping {
 					}else if(subelemObj.isArray()){
 						Value elemArrayObj(arrayValue);
 
+						TTCN_Logger::log(TTCN_DEBUG, "@@@@@@@@@@@@@@@@@@@@@@2\n");
+
+						CHARSTRING tmp_for_name_checking(elemName.asCString());
+						TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+						TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+						TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
+
 						if(subelemObj.size() != 0) {
+
 							for(unsigned int index = 0; index < subelemObj.size(); index++){
 								tempObj = subelemObj[index];
-
+								TTCN_Logger::log(TTCN_DEBUG, "**************123123123*********************");
 								if(tempObj.isString()){
 									elemArrayObj.append(tempObj.asString());
+									TTCN_Logger::log(TTCN_DEBUG, "**************456456456*********************");
 								}else if(tempObj.isBool()){
 									elemArrayObj.append(tempObj.asBool());
 								}else if(tempObj.isDouble()){
@@ -907,6 +960,12 @@ namespace OneM2M__DualFaceMapping {
 								}
 							}
 							elemObjClone[parent_tag.c_str()] = elemArrayObj;
+
+							if(parent_tag == "labels" || parent_tag == "lbl") {
+								TTCN_Logger::log(TTCN_DEBUG, "**************label*********************");
+							} else {
+								TTCN_Logger::log(TTCN_DEBUG, "**************others*********************");
+							}
 						}
 					}
 				}
@@ -940,11 +999,18 @@ namespace OneM2M__DualFaceMapping {
 						jsonObjClone[name_short.c_str()] = elemArrayObj;
 					}
 				} else { // Handling empty actw testcases
+					CHARSTRING tmp_for_name_checking(elemName.asCString());
+					TTCN_Logger::log(TTCN_DEBUG, "**************root*********************");
+					TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+					TTCN_Logger::log(TTCN_DEBUG, "**************root*********************\n");
+
 					if(elemObj.isArray()) {
 						if(elemObj.size() != 0) {
+							TTCN_Logger::log(TTCN_DEBUG, "@@@@@@@@@@@@@@@@@@@@@@2\n");
 							jsonObjClone[name_short.c_str()] = elemObj;
 						}
 					} else {
+						TTCN_Logger::log(TTCN_DEBUG, "#######################\n");
 						jsonObjClone[name_short.c_str()] = elemObj;
 					}
 				}
@@ -1589,12 +1655,29 @@ namespace OneM2M__DualFaceMapping {
 				}
 				parent_tag = name_short;
 
+				CHARSTRING tmp_for_name_checking(elemName.asCString());
+				TTCN_Logger::log(TTCN_DEBUG, "**************parent*********************");
+				TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+				TTCN_Logger::log(TTCN_DEBUG, "**************parent*********************\n");
+
+
 				if(elemObj.isArray()){
 					for(unsigned int index = 0; index < elemObj.size(); index++){
 						grandelemObj = elemObj[index];
 						jsonObjClone[parent_tag.c_str()] = grandelemObj;
+
+
+//						CHARSTRING tmp_for_name_checking(elemObj.asCString());
+					TTCN_Logger::log(TTCN_DEBUG, "**************root1*********************");
+//						TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+//						TTCN_Logger::log(TTCN_DEBUG, "**************root1*********************\n");
 					}
 				} else if(!elemObj.isObject() && !elemObj.isArray()){
+//					CHARSTRING tmp_for_name_checking(elemObj.asCString());
+					TTCN_Logger::log(TTCN_DEBUG, "**************root2*********************");
+//					TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+//					TTCN_Logger::log(TTCN_DEBUG, "**************root2*********************\n");
+
 					// All enumerated type will be placed here
 					if(	parent_tag == "op"   || parent_tag == "ty"	||
 						parent_tag == "acop" || parent_tag == "csy"	||
@@ -1607,8 +1690,20 @@ namespace OneM2M__DualFaceMapping {
 						jsonRootClone[parent_tag.c_str()] = elemObj;
 					}
 				} else if(elemObj.isObject()){ // Go deep parsing child objects
+//					CHARSTRING tmp_for_name_checking(elemObj.asCString());
+					TTCN_Logger::log(TTCN_DEBUG, "**************root3*********************");
+//					TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+//					TTCN_Logger::log(TTCN_DEBUG, "**************root3*********************\n");
+
+					CHARSTRING tmp_for_name_checking(elemName.asCString());
+//					TTCN_Logger::log(TTCN_DEBUG, "**************parent*********************");
+//					TTCN_Logger::log(TTCN_DEBUG, (const char*)tmp_for_name_checking);
+//					TTCN_Logger::log(TTCN_DEBUG, "**************parent*********************\n");
+
 					jsonObjClone[parent_tag.c_str()] = elemObj;
 					jsonRootClone = JSONDeepParser(jsonObjClone, jsonRootClone, jsonRootClone);
+
+
 				}
 			}
 		}
@@ -1619,7 +1714,7 @@ namespace OneM2M__DualFaceMapping {
 
 		CHARSTRING temp_cs(json_str.c_str());
 		encoded_message = temp_cs;
-		// TTCN_Logger::log(TTCN_DEBUG, (const char*)encoded_message);
+		TTCN_Logger::log(TTCN_DEBUG, (const char*)encoded_message);
 
 		return encoded_message;
 	}

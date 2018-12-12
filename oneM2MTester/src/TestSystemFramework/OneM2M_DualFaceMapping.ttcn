@@ -49,6 +49,9 @@ module OneM2M_DualFaceMapping {
 	external function f_getConId_mcaPortIn() return integer;
 	external function f_setConId_mcaPortIn(in integer mca_port_in_conID);
 	
+	// Function for the AE testing
+	external function f_to_extract(in charstring p_source) return charstring;
+	external function f_resourcetype_extract(in charstring p_source) return charstring; 
 	/******************************************************
 	* Function for mcaPort and mccPort encoding           *
 	*******************************************************/
@@ -476,6 +479,8 @@ module OneM2M_DualFaceMapping {
                 	var charstring v_headerValue 	:= "";
                 	var charstring v_httpRespBody 	:= "";  
                 	
+                	var charstring req_method := "";
+                	
          			//decoding HTTP message      	
                 	var integer decode_state := dec_HTTPMessage(v_aspRecv_msg, v_httpMsg, tsp_socket_debugging);
                		log(__SCOPE__&"dec_HTTPMessage: return value (if equal to zero then all response are decoded): ", decode_state);
@@ -504,12 +509,32 @@ module OneM2M_DualFaceMapping {
                		  	}               
                		  	
                		  	if (ischosen(v_httpMsg.request)) { // http request
-               		  	  	log(__SCOPE__&"- We are in the http request message");
+               		  	  	log(__SCOPE__&"- We are in the http request message (AE-1)");
                		  	  	v_resp_or_req := false;
                		  	  	v_httpResq 	:= v_httpMsg.request;
+               		  	  	v_requestPrimitive.primitiveContent := omit;
+               		  	  	
+      						if(ispresent(v_httpResq.method)) {      
+ 	     						req_method := unichar2char(v_httpResq.method);							
+      							
+      							if(req_method == "POST") {
+      								v_requestPrimitive.operation := int1;
+      							} else if(req_method == "GET") {
+      							  	v_requestPrimitive.operation := int2;
+      							} else if(req_method == "PUT") {
+      							  	v_requestPrimitive.operation := int3;
+      							} else if(req_method == "DELETE") {
+      							  	v_requestPrimitive.operation := int4;
+      							}
+      						}
+      						
+      						if(ispresent(v_httpResq.uri)) {
+      							var charstring to_ := f_to_extract(v_httpResq.uri); 
+      							v_requestPrimitive.to_ := to_;
+      						}
                		  	  	
                		  	  	if(ispresent(v_httpResq.header)){
-               		  	  		v_headerLines 	:= v_httpResq.header;
+               		  	  		v_headerLines := v_httpResq.header;
                		  	  	} else {
                		  	  		port.setstate(1);
                		  	  	}
@@ -556,6 +581,8 @@ module OneM2M_DualFaceMapping {
         				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
         					}	  
                		  	} else { // request case
+               		  		log(__SCOPE__&"- We are in the http request message (AE-2)");
+               		  	
                		  		for(var integer i := 0; i < lengthof(v_headerLines); i := i + 1){               		  	  	  	  
                		  			v_header 		:= v_headerLines[i];
                		  			v_headerName 	:= v_header.header_name;
@@ -564,6 +591,36 @@ module OneM2M_DualFaceMapping {
                		  			if("X-M2M-RI" == v_headerName or "x-m2m-ri" == v_headerName){
                		  		  		v_requestPrimitive.requestIdentifier 	:= v_headerValue;  		  		  
                		  			}
+               		  			
+               		  			if(req_method == "POST") {
+                 		  			if("Content-Type" == v_headerName or "content-type" == v_headerName) {
+                 		  				var charstring resource_type := f_resourcetype_extract(v_headerValue);  
+                 		  					
+                 		  				if(resource_type == "1") {
+                 		  					v_requestPrimitive.resourceType := int1; // AccessControlPolicy
+                 		  				} else if(resource_type == "2") {
+                 		  					v_requestPrimitive.resourceType := int2; // AE
+                 		  				} else if(resource_type == "3") {
+                 		  					v_requestPrimitive.resourceType := int3; // Container
+                 		  				} else if(resource_type == "4") {
+                 		  					v_requestPrimitive.resourceType := int4; // contentInstacne
+                 		  				} else if(resource_type == "5") {
+                 		  					v_requestPrimitive.resourceType := int5; // CSE
+                 		  				} else if(resource_type == "23") {
+                 		  					v_requestPrimitive.resourceType := int23; // Subscription
+                 		  				}
+                 		  			}
+                 		  			
+                 		  			// from
+                 		  			v_requestPrimitive.from_ := omit;
+               		  			} else { // GET, PUT, DELETE
+ 	              		  			v_requestPrimitive.resourceType := omit;
+ 	              		  			
+ 	              		  			// from 
+ 	              		  			if("X-M2M-Origin" == v_headerName or "x-m2m-origin" == v_headerName){	  		  
+               		  					v_requestPrimitive.from_ := v_headerValue;               		  				
+               		  				}	
+ 	              		  		}
                		  		}
 
         					if(v_httpRespBody != "" and not enable_rsp_decode){
@@ -571,7 +628,7 @@ module OneM2M_DualFaceMapping {
         					}
         					
         					if(v_httpRespBody != "" and v_serial_type != "" and enable_rsp_decode){ //Only decode http response body when it is postive response message
-        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type, "noti_received"); 
+        				  		v_encoded_primitiveContent := f_primitiveContent_Dec(v_httpRespBody, v_serial_type, ""); 
         				  		log(__SCOPE__&"-v_serial_type: ", v_serial_type);
         					}
                		  	}			
@@ -733,11 +790,11 @@ module OneM2M_DualFaceMapping {
 				 */
       		  	
       			//set MsgIn
-				v_requestPrimitive.operation := int5 // AE: int1;
-      			v_requestPrimitive.from_ := omit;
-      			v_requestPrimitive.to_ := "Mobius";
+				// v_requestPrimitive.operation := int1; //v_requestPrimitive.operation; // AE: int1;
+      			// v_requestPrimitive.to_ := "Mobius" // v_requestPrimitive.to_;
+      			// v_requestPrimitive.resourceType := int3; // v_requestPrimitive.resourceType // AE: int3;
+      			// v_requestPrimitive.from_ := omit;
       			v_requestPrimitive.role := omit;
-      			v_requestPrimitive.resourceType := omit // AE: int3;
       			v_requestPrimitive.originatingTimestamp := omit;
       			v_requestPrimitive.requestExpirationTimestamp := omit;
       			v_requestPrimitive.resultExpirationTimestamp := omit;
@@ -805,16 +862,16 @@ module OneM2M_DualFaceMapping {
 		  v_ty := enum2int(v_reqPrimitive.resourceType); 
 		}
 		
-		// primitiveContent
-		if(ispresent(v_reqPrimitive.primitiveContent)) {
-			var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
-                  
-        	if(v_bit_stream != ''B) {
-            	var charstring v_char_streamTest := oct2char(bit2oct(v_bit_stream));
-                log(__SCOPE__&" v_char_streamTest ", v_char_streamTest);
-        	} 
-		}     	
-				     	
+//		// primitiveContent
+//		if(ispresent(v_reqPrimitive.primitiveContent)) {
+//			var bitstring v_bit_stream := encvalue(v_reqPrimitive.primitiveContent);
+//                  
+//        	if(v_bit_stream != ''B) {
+//            	var charstring v_char_streamTest := oct2char(bit2oct(v_bit_stream));
+//                log(__SCOPE__&" v_char_streamTest ", v_char_streamTest);
+//        	} 
+//		}     	
+//				     	
 		//assemble accept with serialization type
 		v_accept 		:= "application/json";
   		v_contentType	:= "application/json";
@@ -841,6 +898,8 @@ module OneM2M_DualFaceMapping {
 		p_asp_Send.connId	:= connectId_init;				
 		p_asp_Send.proto 	:= {tcp := {}};
 		p_asp_Send.msg 		:= v_encoded_msg;
+		
+		port.setstate(0);
       	      	
 	} with {extension "prototype(fast)"}
 	

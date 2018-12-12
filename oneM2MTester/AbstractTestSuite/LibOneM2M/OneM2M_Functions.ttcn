@@ -2560,7 +2560,7 @@ module OneM2M_Functions {
 			 * @remark  This altstep includes a_ae_default
 			 * @see		a_ae_default
 			 */
-			altstep a_ae_cf03() runs on CseSimu {
+			altstep a_ae_cf03() runs on CseSimu system AeSystem {
 				
 				var MsgIn v_request;			
 				var PrimitiveContent v_modifiedResource;
@@ -3117,6 +3117,10 @@ module OneM2M_Functions {
 		function f_getLocalResourceAddress(integer  p_targetResourceIndex := 0, AddressingMethod p_addressingMethod := PX_ADDRESSING_METHOD, PrimitiveScope p_primitiveScope := PX_PRIMITIVE_SCOPE) runs on CseSimu return XSD.ID {
 			var XSD.ID v_resourceAddress;
 			
+			if(p_targetResourceIndex == -1) {
+				p_targetResourceIndex := 0;
+			}
+					
 			if(p_primitiveScope == e_cseRelative) {
 					
 				if(p_addressingMethod == e_nonHierarchical) {
