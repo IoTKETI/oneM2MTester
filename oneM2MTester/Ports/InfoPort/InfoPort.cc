@@ -71,5 +71,13 @@ namespace OneM2M__Ports {
 
 	}
 
+	void InfoPort::outgoing_send(const INTEGER&) {
+
+	}
+
+	void InfoPort::outgoing_send(const UNIVERSAL_CHARSTRING&) {
+
+	}
+
 } /* end of namespace */
 

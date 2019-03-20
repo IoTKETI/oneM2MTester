@@ -21,6 +21,7 @@ module OneM2M_TestSystem {
 	//@JaeYoung, These are added for the translation port
 	import from IPL4asp_PortType all;
 	import from IPL4asp_Types all;
+	
 
 /* ***************************************
  * 		Test System Components 
@@ -34,17 +35,17 @@ module OneM2M_TestSystem {
 		timer tc_ac := PX_TAC;
 		timer tc_wait := PX_TWAIT;
 		//global variables
+		var charstring vc_protocolBinding;
 		var Configurations vc_config;
 		var TestSystemRole vc_testSystemRole;
 		var MyResourcesList vc_resourcesList;
 		var IntegerList vc_resourcesIndexToBeDeleted := {};
-		var integer vc_aeAuxIndex := -1;//TODO To be removed
 		var integer vc_acpAuxIndex := -1;
-		var AccessControlPolicy_optional vc_acpAux;
 		var MsgIn vc_request;
 		var MsgIn vc_response;
-		var default vc_a_ae := null;
-		var default vc_a_cse := null;
+		var default vc_aeSimu := null;
+		var default vc_cseSimu := null;
+		var PrimitiveContent vc_primitiveContentRetrievedResource;
 	};
 	
 	type component AeSimu extends Tester {
@@ -53,10 +54,11 @@ module OneM2M_TestSystem {
 		port OneM2MPort mcaPortIn;
 	
 		//global variables
-		var PrimitiveContent vc_primitiveContentRetrievedResource;
+		//var PrimitiveContent vc_primitiveContentRetrievedResource;
 
 		var CseSimu vc_cse1;//For CF02 when AeSimu is master
 		var boolean vc_auxiliaryAe2Up := false;
+		var integer vc_aeAuxIndex := -1;//Specific to AeSimu
 	};
 		
 	type component CseSimu extends Tester {
@@ -68,14 +70,17 @@ module OneM2M_TestSystem {
 		//global variables
 		var MyResourcesList vc_localResourcesList := {};
 		var AeSimu vc_ae1;//For CF02 when CseSimu is master
-		var integer vc_remoteCseIndex := -1;
 		var integer vc_localRemoteCseIndex := -1;
 		var integer vc_cSEBaseIndex := -1;	//Index of the CSEBase resource of the Tester inside vc_localResourcesList
+		var CseTypeID vc_cseType;	//cseType of the simulated CSE. IN =1, MN = 2
+		var integer vc_remoteCseIndex := -1;//Specific to CseSimu
 	};
 	
-	type component InCseSimu extends CseSimu {}
+	type component InCseSimu extends CseSimu {
+	}
 	
-	type component MnCseSimu extends CseSimu {}
+	type component MnCseSimu extends CseSimu {
+	}
 			
 	type component CseSystem {
 		//port OneM2MPort mcaPort;
@@ -108,6 +113,11 @@ module OneM2M_TestSystem {
 		port IPL4asp_PT utPort;
 		port AdapterControlPort acPort;
 	}		
+	
+			
+	
+	
+
 }// end of module
 with {
 	extension "anytype charstring"

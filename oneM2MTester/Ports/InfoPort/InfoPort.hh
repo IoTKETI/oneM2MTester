@@ -40,6 +40,8 @@ class InfoPort : public InfoPort_BASE {
 		void outgoing_send(const OneM2M__Types::ResponsePrimitive&);
 		void outgoing_send(const OneM2M__Types::PrimitiveContent&);
 		void outgoing_send(const OneM2M__Types::MyResource&);
+		void outgoing_send(const INTEGER&);
+		void outgoing_send(const UNIVERSAL_CHARSTRING&);
 	};
 } /* end of namespace */
 

@@ -12,10 +12,10 @@
  */
 
 module OneM2M_Ports {
-	import from OneM2M_Types all;
 	import from IPL4asp_PortType all;
 	import from IPL4asp_Types all;
-	
+	import from OneM2M_Types all;
+	import from XSD all;
 	
 	// Module dependencies
 	import from Mqtt_v3_1_1_Types all;
@@ -27,7 +27,10 @@ module OneM2M_Ports {
 	import from oneM2MTester_Template all;
 	import from OneM2M_DualFaceMapping all; 
 	
-
+	/* ***************************************
+	 * 		oneM2M Ports 
+	 * ***************************************
+	 */
 	/**
 	 * @desc Port to transport oneM2M primitives
 	 * @desc Output MsgOut   
@@ -59,22 +62,20 @@ module OneM2M_Ports {
 	 * @desc Port to transport Adaptor Control primitives
 	 */
 	type port AdapterControlPort message {
-		out
-			AcRequestPrimitive;
 		in
 			AcResponsePrimitive;
+		out
+			AcRequestPrimitive;
 	}
 	
 	/**
 	 * @desc Port to exchange information between components
 	 */
 	type port InfoPort message {
-		out
-			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource;
 		in
-			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource;
+			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource, integer, XSD.ID;
+		out
+			RequestPrimitive, ResponsePrimitive, PrimitiveContent, MyResource, integer, XSD.ID;
 	}
 	
-	
 }//end module
-
