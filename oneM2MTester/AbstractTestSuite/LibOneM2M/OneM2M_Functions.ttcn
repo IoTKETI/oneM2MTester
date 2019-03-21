@@ -27,7 +27,7 @@ module OneM2M_Functions {
 		/**
 			@desc Ports mapping and default behaviour activation for Config 1
 		*/
-		function f_cf01Up(in boolean p_auxiliaryAe2Required := false) runs on AeSimu {
+		function f_cf01Up(in boolean p_auxiliaryAe2Required := false) runs on AeSimu system CseSystem {
 			
 			// Variables
 			vc_config := e_cf01;
@@ -59,7 +59,7 @@ module OneM2M_Functions {
 		/**
 			@desc Ports mapping and default behaviour activation for Config 1 on the auxiliary AE2
 		*/
-		function f_cf01UpAe2() runs on AeSimu {
+		function f_cf01UpAe2() runs on AeSimu system CseSystem {
 			
 			// Variables
 			vc_config := e_cf01;
@@ -77,7 +77,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports mapping and default behaviour activation for Config 02
 		 */
-		function f_cf02Up(in CseTypeID p_cseType := int2) runs on AeSimu {
+		function f_cf02Up(in CseTypeID p_cseType := int2) runs on AeSimu system CseSystem {
 				
 			// Variables
 			vc_config := e_cf02;
@@ -106,7 +106,7 @@ module OneM2M_Functions {
 		/**
 			@desc Ports mapping and default behaviour activation for Config 2 on the CSE1
 		*/
-		function f_cf02UpCse1(in CseTypeID p_cseType := int2) runs on CseSimu {
+		function f_cf02UpCse1(in CseTypeID p_cseType := int2) runs on CseSimu system AeSystem {
 			
 			// Variables
 			var PrimitiveContent v_cSEBaseResource;
@@ -129,7 +129,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports mapping and default behaviour activation for Config 02
 		 */
-		function f_cf02UpCseSimuMaster(in CseTypeID p_cseType := int2) runs on CseSimu {
+		function f_cf02UpCseSimuMaster(in CseTypeID p_cseType := int2) runs on CseSimu system AeSystem  {
 				
 			// Variables
 			var PrimitiveContent v_cSEBaseResource;
@@ -162,7 +162,7 @@ module OneM2M_Functions {
 		/**
 			@desc Ports mapping and default behaviour activation for Config 2 on the AE1
 		*/
-		function f_cf02UpAe1(in CseTypeID p_cseType := int2) runs on AeSimu {
+		function f_cf02UpAe1(in CseTypeID p_cseType := int2) runs on AeSimu system CseSystem {
 			
 			// Variables
 			vc_config := e_cf02CseSimuMaster;	
@@ -180,7 +180,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports mapping and default behaviour activation for Config 03
 		 */
-		function f_cf03Up(in CseTypeID p_cseType := int2) runs on CseSimu {
+		function f_cf03Up(in CseTypeID p_cseType := int2) runs on CseSimu system AeSystem {
 		
 			// Variables
 			var PrimitiveContent v_cSEBaseResource;
@@ -210,7 +210,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports mapping and default behaviour activation for Config 04
 		 */
-		function f_cf04Up(in CseTypeID p_cseType := int2) runs on CseSimu {
+		function f_cf04Up(in CseTypeID p_cseType := int2) runs on CseSimu system AeSystem {
 
 			// Variables
 			var PrimitiveContent v_cSEBaseResource;
@@ -237,7 +237,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping
 		 */
-		function f_cf01Down() runs on AeSimu {
+		function f_cf01Down() runs on AeSimu system CseSystem {
 		
 			unmap(self:mcaPort, system:mcaPort);
 			unmap(self:acPort, system:acPort);
@@ -250,7 +250,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping
 		 */
-		function f_cf01DownAe2() runs on AeSimu {
+		function f_cf01DownAe2() runs on AeSimu system CseSystem {
 				
 			unmap(self:mcaPort, system:mcaPort);
 			unmap(self:acPort, system:acPort);
@@ -260,7 +260,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping
 		 */
-		function f_cf02Down() runs on AeSimu {
+		function f_cf02Down() runs on AeSimu system CseSystem {
 		
 			unmap(self:mcaPort, system:mcaPort);
 			unmap(self:acPort, system:acPort);
@@ -275,7 +275,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping
 		 */
-		function f_cf02DownCseSimuMaster() runs on CseSimu {
+		function f_cf02DownCseSimuMaster() runs on CseSimu system AeSystem {
 				
 			unmap(self:mccPort, system:mccPort);
 			unmap(self:mccPortIn, system:mccPortIn);
@@ -287,7 +287,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping for Config 03
 		 */
-		function f_cf03Down() runs on CseSimu {
+		function f_cf03Down() runs on CseSimu system AeSystem {
 			
 			unmap(self:mcaPortIn, system:mcaPortIn);
 			if(PX_UT_IMPLEMENTED){
@@ -299,7 +299,7 @@ module OneM2M_Functions {
 		/**
 		 * @desc Ports unmapping for Config 04
 		 */
-		function f_cf04Down() runs on CseSimu {
+		function f_cf04Down() runs on CseSimu system AeSystem {
 	
 			unmap(self:mccPort, system:mccPort);
 			unmap(self:mccPortIn, system:mccPortIn);
